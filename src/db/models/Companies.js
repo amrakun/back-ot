@@ -1,10 +1,37 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 
+// basic info
+const BasicInfoSchema = mongoose.Schema({
+  enName: field({ type: String }),
+  mnName: field({ type: String }),
+  isRegisteredOnSup: field({ type: Boolean }),
+  address: field({ type: String }),
+  address2: field({ type: String, optional: true }),
+  address3: field({ type: String, optional: true }),
+  townOrCity: field({ type: String }),
+  province: field({ type: String }),
+  zipCode: field({ type: Number }),
+  country: field({ type: String }),
+  registeredInCountry: field({ type: String }),
+  registeredInAimag: field({ type: String }),
+  registeredInSum: field({ type: String }),
+  isSubContractor: field({ type: Boolean }),
+  corporateStructure: field({ type: String }),
+  registrationNumber: field({ type: Number }),
+  email: field({ type: String }),
+  foreignOwnershipPercentage: field({ type: Number }),
+  totalNumberOfEmployees: field({ type: Number }),
+  totalNumberOfMongolianEmployees: field({ type: Number }),
+  totalNumberOfUmnugoviEmployees: field({ type: Number }),
+}, { _id: false });
+
+
+// Main schema
 const CompanySchema = mongoose.Schema({
-  name: field({ type: String }),
-  createdAt: field({ type: Date }),
+  basicInfo: BasicInfoSchema,
 });
+
 
 class Company {
   /**
@@ -12,10 +39,16 @@ class Company {
    * @param  {Object} doc object
    * @return {Promise} Newly created company object
    */
-  static async createCompany(doc) {
-    doc.createdAt = new Date();
+  static async createCompany(basicInfo) {
+    if (await this.findOne({ enName: basicInfo.enName })) {
+      throw new Error('Duplicated english name');
+    }
 
-    return this.create(doc);
+    if (await this.findOne({ mnName: basicInfo.mnName })) {
+      throw new Error('Duplicated mongolian name');
+    }
+
+    return this.create({ basicInfo });
   }
 
   /**
@@ -26,19 +59,6 @@ class Company {
   static async updateCompany(_id, fields) {
     await Companies.update({ _id }, { $set: { ...fields } });
     return Companies.findOne({ _id });
-  }
-
-  /**
-   * Delete company
-   * @param  {string} _id - company id
-   * @return {Promise} Updated company object
-   */
-  static async removeCompany(_id) {
-    const companyObj = await Companies.findOne({ _id });
-
-    if (!companyObj) throw new Error(`Company not found with id ${_id}`);
-
-    return companyObj.remove();
   }
 }
 

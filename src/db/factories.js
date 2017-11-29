@@ -4,7 +4,8 @@ import { Companies } from './models';
 
 export const companyFactory = (params = {}) => {
   const company = new Companies({
-    name: params.name || faker.random.word(),
+    enName: params.enName || faker.random.word(),
+    mnName: params.mnName || faker.random.word(),
   });
 
   return company.save();

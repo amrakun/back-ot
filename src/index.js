@@ -2,6 +2,7 @@
 
 import dotenv from 'dotenv';
 import express from 'express';
+import { createServer } from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
@@ -25,6 +26,16 @@ app.use(
   '/graphql',
   graphqlExpress(req => ({ schema, context: { user: req.user } })),
 );
+
+// Wrap the Express server
+const server = createServer(app);
+
+// subscriptions server
+const { PORT } = process.env;
+
+server.listen(PORT, () => {
+  console.log(`GraphQL Server is now running on ${PORT}`);
+});
 
 if (process.env.NODE_ENV === 'development') {
   app.use(
