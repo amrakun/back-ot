@@ -40,25 +40,42 @@ class Company {
    * @return {Promise} Newly created company object
    */
   static async createCompany(basicInfo) {
-    if (await this.findOne({ enName: basicInfo.enName })) {
-      throw new Error('Duplicated english name');
-    }
+    const { enName, mnName } = basicInfo;
 
-    if (await this.findOne({ mnName: basicInfo.mnName })) {
-      throw new Error('Duplicated mongolian name');
-    }
+    await this.checkNames({ enName, mnName });
 
     return this.create({ basicInfo });
   }
 
   /**
-   * Update a company
-   * @param  {string} _id - company id
+   * Update basic info
+   * @param  {String} _id - company id
+   * @param  {Object} basicInfo - company basic info
    * @return {Promise} Updated company object
    */
-  static async updateCompany(_id, fields) {
-    await Companies.update({ _id }, { $set: { ...fields } });
+  static async updateBasicInfo(_id, basicInfo) {
+    const { enName, mnName } = basicInfo;
+
+    // validations
+    await this.checkNames({ _id, enName, mnName });
+
+    // update
+    await Companies.update({ _id }, { $set: { basicInfo } });
+
     return Companies.findOne({ _id });
+  }
+
+  /*
+   * Check english and mongolian names duplication
+   */
+  static async checkNames({ _id, enName, mnName }) {
+    if (await this.findOne({ _id: { $ne: _id }, enName: enName })) {
+      throw new Error('Duplicated english name');
+    }
+
+    if (await this.findOne({ _id: { $ne: _id }, mnName: mnName })) {
+      throw new Error('Duplicated mongolian name');
+    }
   }
 }
 
