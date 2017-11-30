@@ -44,11 +44,31 @@ const ContactInfoSchema = mongoose.Schema({
   email: field({ type: String }),
 }, { _id: false });
 
+// management team helper schema
+const PersonSchema = mongoose.Schema({
+  name: field({ type: String }),
+  jobTitle: field({ type: String }),
+  phone: field({ type: Number }),
+  email: field({ type: String }),
+}, { _id: false });
+
+// management team
+const ManagementTeamSchema = mongoose.Schema({
+  managingDirector: PersonSchema,
+  executiveOfficer: PersonSchema,
+  salesDirector: PersonSchema,
+  financialDirector: PersonSchema,
+  otherMember1: PersonSchema,
+  otherMember2: PersonSchema,
+  otherMember3: PersonSchema,
+}, { _id: false });
+
 
 // Main schema
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
-  contactInfo: ContactInfoSchema
+  contactInfo: ContactInfoSchema,
+  managementTeam: ManagementTeamSchema,
 });
 
 
@@ -93,6 +113,19 @@ class Company {
   static async updateContactInfo(_id, contactInfo) {
     // update
     await Companies.update({ _id }, { $set: { contactInfo } });
+
+    return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update management team
+   * @param  {String} _id - company id
+   * @param  {Object} doc - company management team info
+   * @return {Promise} Updated company object
+   */
+  static async updateManagementTeam(_id, doc) {
+    // update
+    await Companies.update({ _id }, { $set: { managementTeam: doc } });
 
     return Companies.findOne({ _id });
   }

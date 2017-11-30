@@ -176,4 +176,38 @@ describe('Companies model tests', () => {
     expect(contactInfo.phone).toBe(doc.phone);
     expect(contactInfo.phone2).toBe(doc.phone2);
   });
+
+  test('Update management team', async () => {
+    const company = await companyFactory();
+
+    const generatePersonDoc = () => {
+      return {
+        name: `${Math.random()}name`,
+        jobTitle: `${Math.random()}jobTitle`,
+        phone: Math.random(),
+        email: `${Math.random()}@gmail.com`,
+      }
+    }
+
+    const doc = {
+      managingDirector: generatePersonDoc(),
+      executiveOfficer: generatePersonDoc(),
+      salesDirector: generatePersonDoc(),
+      financialDirector: generatePersonDoc(),
+      otherMember1: generatePersonDoc(),
+      otherMember2: generatePersonDoc(),
+      otherMember3: generatePersonDoc(),
+    }
+
+    const updatedCompany = await Companies.updateManagementTeam(company._id, doc);
+    const managementTeam = updatedCompany.managementTeam;
+
+    expect(managementTeam.managingDirector.toJSON()).toEqual(doc.managingDirector);
+    expect(managementTeam.executiveOfficer.toJSON()).toEqual(doc.executiveOfficer);
+    expect(managementTeam.salesDirector.toJSON()).toEqual(doc.salesDirector);
+    expect(managementTeam.financialDirector.toJSON()).toEqual(doc.financialDirector);
+    expect(managementTeam.otherMember1.toJSON()).toEqual(doc.otherMember1);
+    expect(managementTeam.otherMember2.toJSON()).toEqual(doc.otherMember2);
+    expect(managementTeam.otherMember3.toJSON()).toEqual(doc.otherMember3);
+  });
 });
