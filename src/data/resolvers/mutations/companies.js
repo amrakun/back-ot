@@ -9,9 +9,8 @@ const companyMutations = {
     return Companies.createCompany(basicInfo);
   },
 
-  /**
+  /*
    * Update company basic info
-   * @return {Promise} company object
    */
   async companiesEditBasicInfo(root, { _id, basicInfo }) {
     return Companies.updateBasicInfo(_id, basicInfo);
@@ -19,10 +18,16 @@ const companyMutations = {
 
   /**
    * Update company contact info
-   * @return {Promise} company object
    */
   async companiesEditContactInfo(root, { _id, contactInfo }) {
     return Companies.updateContactInfo(_id, contactInfo);
+  },
+
+  /**
+   * Update company management team
+   */
+  async companiesEditManagementTeam(root, { _id, managementTeam }) {
+    return Companies.updateManagementTeam(_id, managementTeam);
   },
 };
 
