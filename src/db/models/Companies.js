@@ -90,6 +90,13 @@ const GroupInfoSchema = mongoose.Schema({
   shareholders: [ShareholderSchema],
 }, { _id: false });
 
+// capacity building certificate =========
+const CertificateInfoSchema = mongoose.Schema({
+  isReceived: field({ type: Boolean }),
+  isOTSupplier: field({ type: Boolean }),
+  cwpo: field({ type: String }),
+}, { _id: false });
+
 
 // Main schema ============
 const CompanySchema = mongoose.Schema({
@@ -99,6 +106,7 @@ const CompanySchema = mongoose.Schema({
   shareholderInfo: ShareholderInfoSchema,
   groupInfo: GroupInfoSchema,
   products: [String],
+  certificateInfo: CertificateInfoSchema,
 });
 
 
@@ -135,68 +143,55 @@ class Company {
   }
 
   /**
-   * Update contact info
-   * @param  {String} _id - company id
-   * @param  {Object} contactInfo - company contact info
-   * @return {Promise} Updated company object
+   * Update info helper
    */
-  static async updateContactInfo(_id, contactInfo) {
+  static async commonUpdate(_id, key, value) {
     // update
-    await Companies.update({ _id }, { $set: { contactInfo } });
+    await Companies.update({ _id }, { $set: { [key]: value } });
 
     return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update contact info
+   */
+  static async updateContactInfo(_id, contactInfo) {
+    return this.commonUpdate(_id, 'contactInfo', contactInfo);
   }
 
   /**
    * Update management team
-   * @param  {String} _id - company id
-   * @param  {Object} doc - company management team info
-   * @return {Promise} Updated company object
    */
   static async updateManagementTeam(_id, doc) {
-    // update
-    await Companies.update({ _id }, { $set: { managementTeam: doc } });
-
-    return Companies.findOne({ _id });
+    return this.commonUpdate(_id, 'managementTeam', doc);
   }
 
   /**
    * Update shareholder info
-   * @param  {String} _id - company id
-   * @param  {Object} shareholderInfo - company shareholder info
-   * @return {Promise} Updated company object
    */
   static async updateShareholderInfo(_id, shareholderInfo) {
-    // update
-    await Companies.update({ _id }, { $set: { shareholderInfo } });
-
-    return Companies.findOne({ _id });
+    return this.commonUpdate(_id, 'shareholderInfo', shareholderInfo);
   }
 
   /**
    * Update group info
-   * @param  {String} _id - company id
-   * @param  {Object} groupInfo - company group info
-   * @return {Promise} Updated company object
    */
   static async updateGroupInfo(_id, groupInfo) {
-    // update
-    await Companies.update({ _id }, { $set: { groupInfo } });
-
-    return Companies.findOne({ _id });
+    return this.commonUpdate(_id, 'groupInfo', groupInfo);
   }
 
   /**
    * Update products info
-   * @param  {String} _id - company id
-   * @param  {Object} products - company product codes
-   * @return {Promise} Updated company object
    */
   static async updateProductsInfo(_id, products) {
-    // update
-    await Companies.update({ _id }, { $set: { products } });
+    return this.commonUpdate(_id, 'products', products);
+  }
 
-    return Companies.findOne({ _id });
+  /**
+   * Update certificate info
+   */
+  static async updateCertificateInfo(_id, certificateInfo) {
+    return this.commonUpdate(_id, 'certificateInfo', certificateInfo);
   }
 
   /*

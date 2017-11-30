@@ -288,4 +288,21 @@ describe('Companies model tests', () => {
 
     expect(productsInfo).toContain(...productCodes);
   });
+
+  test('Update certificate info', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      isReceived: true,
+      isOTSupplier: false,
+      cwpo: 'CW49108',
+    }
+
+    const updatedCompany = await Companies.updateCertificateInfo(company._id, doc);
+    const certificateInfo = updatedCompany.certificateInfo;
+
+    expect(certificateInfo.isReceived).toBe(doc.isReceived);
+    expect(certificateInfo.isOTSupplier).toBe(doc.isOTSupplier);
+    expect(certificateInfo.cwpo).toBe(doc.cwpo);
+  });
 });
