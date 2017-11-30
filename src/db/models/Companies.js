@@ -121,12 +121,35 @@ const CertificateInfoSchema = mongoose.Schema(
 
 // financial information =========
 
+const YearAmountSchema = mongoose.Schema(
+  {
+    year: field({ type: Number }),
+    amount: field({ type: Number }),
+  },
+  { _id: false },
+);
+
+const DatePathSchema = mongoose.Schema(
+  {
+    date: field({ type: String }),
+    path: field({ type: String }),
+  },
+  { _id: false },
+);
+
 const FinancialInfoSchema = mongoose.Schema(
   {
     // Can you provide accounts for the last 3 financial year?
     canProvideAccountsInfo: field({ type: Boolean }),
 
     currency: field({ type: String }),
+    annualTurnover: [YearAmountSchema],
+    preTaxProfit: [YearAmountSchema],
+    totalAssets: [YearAmountSchema],
+    totalCurrentAssets: [YearAmountSchema],
+    totalShareholderEquity: [YearAmountSchema],
+
+    canProvideRecordsInfo: [DatePathSchema],
 
     // Is your company up to date with Social Security payments?
     isUpToDateSSP: field({ type: Boolean }),

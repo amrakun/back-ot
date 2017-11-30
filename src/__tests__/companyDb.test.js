@@ -310,6 +310,15 @@ describe('Companies model tests', () => {
     const doc = {
       canProvideAccountsInfo: true,
       currency: 'Euro (EUR)',
+      annualTurnover: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      preTaxProfit: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalAssets: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalCurrentAssets: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalShareholderEquity: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      canProvideRecordsInfo: [
+        { date: '2010/10/1', path: 'path1' },
+        { date: '2008/10/05', path: 'path2' },
+      ],
       isUpToDateSSP: true,
       isUpToDateCTP: true,
     };
@@ -320,5 +329,29 @@ describe('Companies model tests', () => {
     expect(financialInfo.currency).toBe(doc.currency);
     expect(financialInfo.isUpToDateSSP).toBe(doc.isUpToDateSSP);
     expect(financialInfo.isUpToDateCTP).toBe(doc.isUpToDateCTP);
+
+    const [at1, at2] = financialInfo.annualTurnover;
+    expect(at1.toJSON()).toEqual(doc.annualTurnover[0]);
+    expect(at2.toJSON()).toEqual(doc.annualTurnover[1]);
+
+    const [ptp1, ptp2] = financialInfo.preTaxProfit;
+    expect(ptp1.toJSON()).toEqual(doc.preTaxProfit[0]);
+    expect(ptp2.toJSON()).toEqual(doc.preTaxProfit[1]);
+
+    const [ta1, ta2] = financialInfo.totalAssets;
+    expect(ta1.toJSON()).toEqual(doc.totalAssets[0]);
+    expect(ta2.toJSON()).toEqual(doc.totalAssets[1]);
+
+    const [tca1, tca2] = financialInfo.totalCurrentAssets;
+    expect(tca1.toJSON()).toEqual(doc.totalCurrentAssets[0]);
+    expect(tca2.toJSON()).toEqual(doc.totalCurrentAssets[1]);
+
+    const [tse1, tse2] = financialInfo.totalShareholderEquity;
+    expect(tse1.toJSON()).toEqual(doc.totalShareholderEquity[0]);
+    expect(tse2.toJSON()).toEqual(doc.totalShareholderEquity[1]);
+
+    const [cpri1, cpri2] = financialInfo.canProvideRecordsInfo;
+    expect(cpri1.toJSON()).toEqual(doc.canProvideRecordsInfo[0]);
+    expect(cpri2.toJSON()).toEqual(doc.canProvideRecordsInfo[1]);
   });
 });
