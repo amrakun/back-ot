@@ -30,7 +30,6 @@ const BasicInfoSchema = mongoose.Schema({
 const ContactInfoSchema = mongoose.Schema({
   name: field({ type: String }),
   jobTitle: field({ type: String }),
-  isRegisteredOnSup: field({ type: Boolean }),
   address: field({ type: String }),
   address2: field({ type: String, optional: true }),
   address3: field({ type: String, optional: true }),
@@ -38,7 +37,6 @@ const ContactInfoSchema = mongoose.Schema({
   province: field({ type: String }),
   zipCode: field({ type: Number }),
   country: field({ type: String }),
-  registrationNumber: field({ type: Number }),
   phone: field({ type: Number }),
   phone2: field({ type: Number }),
   email: field({ type: String }),

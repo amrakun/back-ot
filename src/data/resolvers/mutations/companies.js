@@ -16,6 +16,14 @@ const companyMutations = {
   async companiesEditBasicInfo(root, { _id, basicInfo }) {
     return Companies.updateBasicInfo(_id, basicInfo);
   },
+
+  /**
+   * Update company contact info
+   * @return {Promise} company object
+   */
+  async companiesEditContactInfo(root, { _id, contactInfo }) {
+    return Companies.updateContactInfo(_id, contactInfo);
+  },
 };
 
 export default companyMutations;

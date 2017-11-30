@@ -22,6 +22,21 @@ const basicInfoFields = `
   totalIntOfUmnugoviEmployees: Int!,
 `;
 
+const contactInfoFields = `
+  name: String!,
+  jobTitle: String!,
+  address: String!,
+  address2: String,
+  address3: String,
+  townOrCity: String!,
+  province: String!,
+  zipCode: Int!,
+  country: String!,
+  phone: Float!,
+  phone2: Float,
+  email: String!,
+`;
+
 export const types = `
   type CompanyBasicInfo {
     ${basicInfoFields}
@@ -31,9 +46,18 @@ export const types = `
     ${basicInfoFields}
   }
 
+  type CompanyContactInfo {
+    ${contactInfoFields}
+  }
+
+  input CompanyContactInfoInput {
+    ${contactInfoFields}
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
+    contactInfo: CompanyContactInfo,
   }
 `;
 
@@ -45,4 +69,5 @@ export const queries = `
 export const mutations = `
   companiesAdd(basicInfo: CompanyBasicInfoInput): Company
   companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
+  companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
 `;
