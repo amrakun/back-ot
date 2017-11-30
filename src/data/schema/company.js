@@ -59,6 +59,12 @@ const groupInfoFields = `
   countryOfPrimaryManufacturer: String!,
 `;
 
+const certificateInfoFields = `
+  isReceived: Boolean,
+  isOTSupplier: Boolean,
+  cwpo: String!,
+`
+
 export const types = `
   type CompanyBasicInfo { ${basicInfoFields} }
   input CompanyBasicInfoInput { ${basicInfoFields} }
@@ -120,6 +126,9 @@ export const types = `
     shareholders: [CompanyShareholderInput]
   }
 
+  type CompanyCertificateInfo { ${certificateInfoFields} }
+  input CompanyCertificateInfoInput { ${certificateInfoFields} }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
@@ -127,6 +136,7 @@ export const types = `
     managementTeam: CompanyManagementTeam,
     shareholderInfo: CompanyShareholders,
     groupInfo: CompanyGroupInfo,
+    certificateInfo: CompanyCertificateInfo,
   }
 `;
 
@@ -142,4 +152,5 @@ export const mutations = `
   companiesEditManagementTeam(_id: String!, managementTeam: CompanyManagementTeamInput): Company
   companiesEditShareholders(_id: String!, shareholders: CompanyShareholdersInput): Company
   companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
+  companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
 `;

@@ -43,6 +43,13 @@ const companyMutations = {
   async companiesEditGroupInfo(root, { _id, groupInfo }) {
     return Companies.updateGroupInfo(_id, groupInfo);
   },
+
+  /**
+   * Update company certificate info
+   */
+  async companiesEditCertificateInfo(root, { _id, certificateInfo }) {
+    return Companies.updateCertificateInfo(_id, certificateInfo);
+  },
 };
 
 export default companyMutations;
