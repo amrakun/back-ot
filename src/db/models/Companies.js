@@ -2,99 +2,140 @@ import mongoose from 'mongoose';
 import { field } from './utils';
 
 // basic info ===========
-const BasicInfoSchema = mongoose.Schema({
-  enName: field({ type: String }),
-  mnName: field({ type: String }),
-  isRegisteredOnSup: field({ type: Boolean }),
-  address: field({ type: String }),
-  address2: field({ type: String, optional: true }),
-  address3: field({ type: String, optional: true }),
-  townOrCity: field({ type: String }),
-  province: field({ type: String }),
-  zipCode: field({ type: Number }),
-  country: field({ type: String }),
-  registeredInCountry: field({ type: String }),
-  registeredInAimag: field({ type: String }),
-  registeredInSum: field({ type: String }),
-  isSubContractor: field({ type: Boolean }),
-  corporateStructure: field({ type: String }),
-  registrationNumber: field({ type: Number }),
-  email: field({ type: String }),
-  foreignOwnershipPercentage: field({ type: Number }),
-  totalNumberOfEmployees: field({ type: Number }),
-  totalNumberOfMongolianEmployees: field({ type: Number }),
-  totalNumberOfUmnugoviEmployees: field({ type: Number }),
-}, { _id: false });
+const BasicInfoSchema = mongoose.Schema(
+  {
+    enName: field({ type: String }),
+    mnName: field({ type: String }),
+    isRegisteredOnSup: field({ type: Boolean }),
+    address: field({ type: String }),
+    address2: field({ type: String, optional: true }),
+    address3: field({ type: String, optional: true }),
+    townOrCity: field({ type: String }),
+    province: field({ type: String }),
+    zipCode: field({ type: Number }),
+    country: field({ type: String }),
+    registeredInCountry: field({ type: String }),
+    registeredInAimag: field({ type: String }),
+    registeredInSum: field({ type: String }),
+    isSubContractor: field({ type: Boolean }),
+    corporateStructure: field({ type: String }),
+    registrationNumber: field({ type: Number }),
+    email: field({ type: String }),
+    foreignOwnershipPercentage: field({ type: Number }),
+    totalNumberOfEmployees: field({ type: Number }),
+    totalNumberOfMongolianEmployees: field({ type: Number }),
+    totalNumberOfUmnugoviEmployees: field({ type: Number }),
+  },
+  { _id: false },
+);
 
 // contact info ==================
-const ContactInfoSchema = mongoose.Schema({
-  name: field({ type: String }),
-  jobTitle: field({ type: String }),
-  address: field({ type: String }),
-  address2: field({ type: String, optional: true }),
-  address3: field({ type: String, optional: true }),
-  townOrCity: field({ type: String }),
-  province: field({ type: String }),
-  zipCode: field({ type: Number }),
-  country: field({ type: String }),
-  phone: field({ type: Number }),
-  phone2: field({ type: Number }),
-  email: field({ type: String }),
-}, { _id: false });
+const ContactInfoSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    jobTitle: field({ type: String }),
+    address: field({ type: String }),
+    address2: field({ type: String, optional: true }),
+    address3: field({ type: String, optional: true }),
+    townOrCity: field({ type: String }),
+    province: field({ type: String }),
+    zipCode: field({ type: Number }),
+    country: field({ type: String }),
+    phone: field({ type: Number }),
+    phone2: field({ type: Number }),
+    email: field({ type: String }),
+  },
+  { _id: false },
+);
 
 // management team ================
-const PersonSchema = mongoose.Schema({
-  name: field({ type: String }),
-  jobTitle: field({ type: String }),
-  phone: field({ type: Number }),
-  email: field({ type: String }),
-}, { _id: false });
+const PersonSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    jobTitle: field({ type: String }),
+    phone: field({ type: Number }),
+    email: field({ type: String }),
+  },
+  { _id: false },
+);
 
-const ManagementTeamSchema = mongoose.Schema({
-  managingDirector: PersonSchema,
-  executiveOfficer: PersonSchema,
-  salesDirector: PersonSchema,
-  financialDirector: PersonSchema,
-  otherMember1: PersonSchema,
-  otherMember2: PersonSchema,
-  otherMember3: PersonSchema,
-}, { _id: false });
+const ManagementTeamSchema = mongoose.Schema(
+  {
+    managingDirector: PersonSchema,
+    executiveOfficer: PersonSchema,
+    salesDirector: PersonSchema,
+    financialDirector: PersonSchema,
+    otherMember1: PersonSchema,
+    otherMember2: PersonSchema,
+    otherMember3: PersonSchema,
+  },
+  { _id: false },
+);
 
 // shareholder information =========
-const ShareholderSchema = mongoose.Schema({
-  name: field({ type: String }),
-  jobTitle: field({ type: String }),
-  percentage: field({ type: Number }),
-}, { _id: false });
+const ShareholderSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    jobTitle: field({ type: String }),
+    percentage: field({ type: Number }),
+  },
+  { _id: false },
+);
 
-const ShareholderInfoSchema = mongoose.Schema({
-  attachments: [String],
-  shareholder1: ShareholderSchema,
-  shareholder2: ShareholderSchema,
-  shareholder3: ShareholderSchema,
-  shareholder4: ShareholderSchema,
-  shareholder5: ShareholderSchema,
-}, { _id: false });
+const ShareholderInfoSchema = mongoose.Schema(
+  {
+    attachments: [String],
+    shareholder1: ShareholderSchema,
+    shareholder2: ShareholderSchema,
+    shareholder3: ShareholderSchema,
+    shareholder4: ShareholderSchema,
+    shareholder5: ShareholderSchema,
+  },
+  { _id: false },
+);
 
 // group information =========
-const GroupInfoSchema = mongoose.Schema({
-  hasParent: field({ type: Boolean }),
-  // manufacturer, distributor, stocklist
-  role: field({ type: String }),
-  isExclusiveDistributor: field({ type: Boolean }),
-  attachments: [String],
-  primaryManufacturerName: field({ type: String }),
-  countryOfPrimaryManufacturer: field({ type: String }),
-  shareholders: [ShareholderSchema],
-}, { _id: false });
+const GroupInfoSchema = mongoose.Schema(
+  {
+    hasParent: field({ type: Boolean }),
+    // manufacturer, distributor, stocklist
+    role: field({ type: String }),
+    isExclusiveDistributor: field({ type: Boolean }),
+    attachments: [String],
+    primaryManufacturerName: field({ type: String }),
+    countryOfPrimaryManufacturer: field({ type: String }),
+    shareholders: [ShareholderSchema],
+  },
+  { _id: false },
+);
 
 // capacity building certificate =========
-const CertificateInfoSchema = mongoose.Schema({
-  isReceived: field({ type: Boolean }),
-  isOTSupplier: field({ type: Boolean }),
-  cwpo: field({ type: String }),
-}, { _id: false });
+const CertificateInfoSchema = mongoose.Schema(
+  {
+    isReceived: field({ type: Boolean }),
+    isOTSupplier: field({ type: Boolean }),
+    cwpo: field({ type: String }),
+  },
+  { _id: false },
+);
 
+// financial information =========
+
+const FinancialInfoSchema = mongoose.Schema(
+  {
+    // Can you provide accounts for the last 3 financial year?
+    canProvideAccountsInfo: field({ type: Boolean }),
+
+    currency: field({ type: String }),
+
+    // Is your company up to date with Social Security payments?
+    isUpToDateSSP: field({ type: Boolean }),
+
+    // Is your company up to date with Corporation Tax payments?
+    isUpToDateCTP: field({ type: Boolean }),
+  },
+  { _id: false },
+);
 
 // Main schema ============
 const CompanySchema = mongoose.Schema({
@@ -105,8 +146,8 @@ const CompanySchema = mongoose.Schema({
   groupInfo: GroupInfoSchema,
   products: [String],
   certificateInfo: CertificateInfoSchema,
+  financialInfo: FinancialInfoSchema,
 });
-
 
 class Company {
   /**
@@ -190,6 +231,13 @@ class Company {
    */
   static async updateCertificateInfo(_id, certificateInfo) {
     return this.commonUpdate(_id, 'certificateInfo', certificateInfo);
+  }
+
+  /**
+   * Update financial info
+   */
+  static async updateFinancialInfo(_id, financialInfo) {
+    return this.commonUpdate(_id, 'financialInfo', financialInfo);
   }
 
   /*

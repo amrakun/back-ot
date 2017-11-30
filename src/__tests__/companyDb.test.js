@@ -9,7 +9,6 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
-
 const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.enName).toBe(doc.enName);
   expect(basicInfo.mnName).toBe(doc.mnName);
@@ -31,7 +30,7 @@ const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.totalNumberOfEmployees).toBe(doc.totalNumberOfEmployees);
   expect(basicInfo.totalNumberOfMongolianEmployees).toBe(doc.totalNumberOfMongolianEmployees);
   expect(basicInfo.totalNumberOfUmnugoviEmployees).toBe(doc.totalNumberOfUmnugoviEmployees);
-}
+};
 
 describe('Companies model tests', () => {
   let _company;
@@ -86,7 +85,7 @@ describe('Companies model tests', () => {
       totalNumberOfEmployees: 100,
       totalNumberOfMongolianEmployees: 80,
       totalNumberOfUmnugoviEmployees: 10,
-    }
+    };
 
     const company = await Companies.createCompany(doc);
 
@@ -138,7 +137,7 @@ describe('Companies model tests', () => {
       totalNumberOfEmployees: 101,
       totalNumberOfMongolianEmployees: 81,
       totalNumberOfUmnugoviEmployees: 11,
-    }
+    };
 
     const updatedCompany = await Companies.updateBasicInfo(company._id, doc);
 
@@ -160,7 +159,7 @@ describe('Companies model tests', () => {
       phone: 24224242,
       phone2: 24224243,
       email: 'contact@gmail.com',
-    }
+    };
 
     const updatedCompany = await Companies.updateContactInfo(company._id, doc);
     const contactInfo = updatedCompany.contactInfo;
@@ -186,8 +185,8 @@ describe('Companies model tests', () => {
         jobTitle: `${Math.random()}jobTitle`,
         phone: Math.random(),
         email: `${Math.random()}@gmail.com`,
-      }
-    }
+      };
+    };
 
     const doc = {
       managingDirector: generatePersonDoc(),
@@ -197,7 +196,7 @@ describe('Companies model tests', () => {
       otherMember1: generatePersonDoc(),
       otherMember2: generatePersonDoc(),
       otherMember3: generatePersonDoc(),
-    }
+    };
 
     const updatedCompany = await Companies.updateManagementTeam(company._id, doc);
     const managementTeam = updatedCompany.managementTeam;
@@ -219,8 +218,8 @@ describe('Companies model tests', () => {
         name: `${Math.random()}name`,
         jobTitle: `${Math.random()}jobTitle`,
         percentage: Math.random(),
-      }
-    }
+      };
+    };
 
     const doc = {
       attachments: ['/path1'],
@@ -229,7 +228,7 @@ describe('Companies model tests', () => {
       shareholder3: generateShareholderDoc(),
       shareholder4: generateShareholderDoc(),
       shareholder5: generateShareholderDoc(),
-    }
+    };
 
     const updatedCompany = await Companies.updateShareholderInfo(company._id, doc);
     const shareholderInfo = updatedCompany.shareholderInfo;
@@ -250,8 +249,8 @@ describe('Companies model tests', () => {
         name: `${Math.random()}name`,
         jobTitle: `${Math.random()}jobTitle`,
         percentage: Math.random(),
-      }
-    }
+      };
+    };
 
     const doc = {
       hasParent: true,
@@ -261,7 +260,7 @@ describe('Companies model tests', () => {
       primaryManufacturerName: 'primaryManufacturerName',
       countryOfPrimaryManufacturer: 'countryOfPrimaryManufacturer',
       shareholders: [generateShareholderDoc()],
-    }
+    };
 
     const updatedCompany = await Companies.updateGroupInfo(company._id, doc);
     const groupInfo = updatedCompany.groupInfo;
@@ -273,7 +272,7 @@ describe('Companies model tests', () => {
     expect(groupInfo.primaryManufacturerName).toBe(doc.primaryManufacturerName);
     expect(groupInfo.countryOfPrimaryManufacturer).toBe(doc.countryOfPrimaryManufacturer);
 
-    const [ shareholder ] = groupInfo.shareholders;
+    const [shareholder] = groupInfo.shareholders;
 
     expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
   });
@@ -296,7 +295,7 @@ describe('Companies model tests', () => {
       isReceived: true,
       isOTSupplier: false,
       cwpo: 'CW49108',
-    }
+    };
 
     const updatedCompany = await Companies.updateCertificateInfo(company._id, doc);
     const certificateInfo = updatedCompany.certificateInfo;
@@ -304,5 +303,22 @@ describe('Companies model tests', () => {
     expect(certificateInfo.isReceived).toBe(doc.isReceived);
     expect(certificateInfo.isOTSupplier).toBe(doc.isOTSupplier);
     expect(certificateInfo.cwpo).toBe(doc.cwpo);
+  });
+  test('Update Financial Info', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      canProvideAccountsInfo: true,
+      currency: 'Euro (EUR)',
+      isUpToDateSSP: true,
+      isUpToDateCTP: true,
+    };
+    const updatedCompany = await Companies.updateFinancialInfo(company._id, doc);
+    const financialInfo = updatedCompany.financialInfo;
+
+    expect(financialInfo.canProvideAccountsInfo).toBe(doc.canProvideAccountsInfo);
+    expect(financialInfo.currency).toBe(doc.currency);
+    expect(financialInfo.isUpToDateSSP).toBe(doc.isUpToDateSSP);
+    expect(financialInfo.isUpToDateCTP).toBe(doc.isUpToDateCTP);
   });
 });
