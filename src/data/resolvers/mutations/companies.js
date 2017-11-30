@@ -5,16 +5,16 @@ const companyMutations = {
    * Create new company also adds Company registration log
    * @return {Promise} company object
    */
-  async companiesAdd(root, doc) {
-    return Companies.createCompany(doc);
+  async companiesAdd(root, { basicInfo }) {
+    return Companies.createCompany(basicInfo);
   },
 
   /**
-   * Update company
+   * Update company basic info
    * @return {Promise} company object
    */
-  async companiesEdit(root, { _id, ...doc }) {
-    return Companies.updateCompany(_id, doc);
+  async companiesEditBasicInfo(root, { _id, basicInfo }) {
+    return Companies.updateBasicInfo(_id, basicInfo);
   },
 };
 

@@ -1,7 +1,39 @@
+const basicInfoFields = `
+  enName: String!,
+  mnName: String!,
+  isRegisteredOnSup: Boolean,
+  address: String!,
+  address2: String,
+  address3: String,
+  townOrCity: String!,
+  province: String!,
+  zipCode: Int!,
+  country: String!,
+  registeredInCountry: String!,
+  registeredInAimag: String!,
+  registeredInSum: String!,
+  isSubContractor: Boolean,
+  corporateStructure: String!,
+  registrationNumber: Int!,
+  email: String!,
+  foreignOwnershipPercentage: Int!,
+  totalIntOfEmployees: Int!,
+  totalIntOfMongolianEmployees: Int!,
+  totalIntOfUmnugoviEmployees: Int!,
+`;
+
 export const types = `
+  type CompanyBasicInfo {
+    ${basicInfoFields}
+  }
+
+  input CompanyBasicInfoInput {
+    ${basicInfoFields}
+  }
+
   type Company {
     _id: String!
-    name: String
+    basicInfo: CompanyBasicInfo,
   }
 `;
 
@@ -11,6 +43,6 @@ export const queries = `
 `;
 
 export const mutations = `
-  companiesAdd(name: String): Company
-  companiesEdit(_id: String!, name: String): Company
+  companiesAdd(basicInfo: CompanyBasicInfoInput): Company
+  companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
 `;
