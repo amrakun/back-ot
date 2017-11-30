@@ -50,6 +50,15 @@ const shareholderFields = `
   percentage: Int!,
 `;
 
+const groupInfoFields = `
+  hasParent: Boolean,
+  role: String!,
+  isExclusiveDistributor: Boolean,
+  attachments: [String],
+  primaryManufacturerName: String!,
+  countryOfPrimaryManufacturer: String!,
+`;
+
 export const types = `
   type CompanyBasicInfo { ${basicInfoFields} }
   input CompanyBasicInfoInput { ${basicInfoFields} }
@@ -101,12 +110,23 @@ export const types = `
     shareholder5: CompanyShareholderInput,
   }
 
+  type CompanyGroupInfo {
+    ${groupInfoFields}
+    shareholders: [CompanyShareholder]
+  }
+
+  input CompanyGroupInfoInput {
+    ${groupInfoFields}
+    shareholders: [CompanyShareholderInput]
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
     contactInfo: CompanyContactInfo,
     managementTeam: CompanyManagementTeam,
     shareholderInfo: CompanyShareholders,
+    groupInfo: CompanyGroupInfo,
   }
 `;
 
@@ -121,4 +141,5 @@ export const mutations = `
   companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
   companiesEditManagementTeam(_id: String!, managementTeam: CompanyManagementTeamInput): Company
   companiesEditShareholders(_id: String!, shareholders: CompanyShareholdersInput): Company
+  companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
 `;
