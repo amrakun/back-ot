@@ -277,4 +277,15 @@ describe('Companies model tests', () => {
 
     expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
   });
+
+  test('Update products info', async () => {
+    const company = await companyFactory();
+
+    const productCodes = ['a10', 'c12'];
+
+    const updatedCompany = await Companies.updateProductsInfo(company._id, productCodes);
+    const productsInfo = updatedCompany.products;
+
+    expect(productsInfo).toContain(...productCodes);
+  });
 });

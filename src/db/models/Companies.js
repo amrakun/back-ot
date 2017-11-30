@@ -98,6 +98,7 @@ const CompanySchema = mongoose.Schema({
   managementTeam: ManagementTeamSchema,
   shareholderInfo: ShareholderInfoSchema,
   groupInfo: GroupInfoSchema,
+  products: [String],
 });
 
 
@@ -181,6 +182,19 @@ class Company {
   static async updateGroupInfo(_id, groupInfo) {
     // update
     await Companies.update({ _id }, { $set: { groupInfo } });
+
+    return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update products info
+   * @param  {String} _id - company id
+   * @param  {Object} products - company product codes
+   * @return {Promise} Updated company object
+   */
+  static async updateProductsInfo(_id, products) {
+    // update
+    await Companies.update({ _id }, { $set: { products } });
 
     return Companies.findOne({ _id });
   }
