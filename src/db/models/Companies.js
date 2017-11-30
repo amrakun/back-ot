@@ -26,10 +26,29 @@ const BasicInfoSchema = mongoose.Schema({
   totalNumberOfUmnugoviEmployees: field({ type: Number }),
 }, { _id: false });
 
+// contact info
+const ContactInfoSchema = mongoose.Schema({
+  name: field({ type: String }),
+  jobTitle: field({ type: String }),
+  isRegisteredOnSup: field({ type: Boolean }),
+  address: field({ type: String }),
+  address2: field({ type: String, optional: true }),
+  address3: field({ type: String, optional: true }),
+  townOrCity: field({ type: String }),
+  province: field({ type: String }),
+  zipCode: field({ type: Number }),
+  country: field({ type: String }),
+  registrationNumber: field({ type: Number }),
+  phone: field({ type: Number }),
+  phone2: field({ type: Number }),
+  email: field({ type: String }),
+}, { _id: false });
+
 
 // Main schema
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
+  contactInfo: ContactInfoSchema
 });
 
 
@@ -61,6 +80,19 @@ class Company {
 
     // update
     await Companies.update({ _id }, { $set: { basicInfo } });
+
+    return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update contact info
+   * @param  {String} _id - company id
+   * @param  {Object} contactInfo - company contact info
+   * @return {Promise} Updated company object
+   */
+  static async updateContactInfo(_id, contactInfo) {
+    // update
+    await Companies.update({ _id }, { $set: { contactInfo } });
 
     return Companies.findOne({ _id });
   }

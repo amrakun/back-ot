@@ -144,4 +144,36 @@ describe('Companies model tests', () => {
 
     checkBasicInfo(updatedCompany.basicInfo, doc);
   });
+
+  test('Update contact info', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      name: 'name',
+      address: 'Address',
+      address2: 'Address2',
+      address3: 'Address3',
+      townOrCity: 'Ulaanbaatar',
+      province: 'Ulaanbaatar',
+      zipCode: 976,
+      country: 'Mongolia',
+      phone: 24224242,
+      phone2: 24224243,
+      email: 'contact@gmail.com',
+    }
+
+    const updatedCompany = await Companies.updateContactInfo(company._id, doc);
+    const contactInfo = updatedCompany.contactInfo;
+
+    expect(contactInfo.name).toBe(doc.name);
+    expect(contactInfo.address).toBe(doc.address);
+    expect(contactInfo.address2).toBe(doc.address2);
+    expect(contactInfo.townOrCity).toBe(doc.townOrCity);
+    expect(contactInfo.province).toBe(doc.province);
+    expect(contactInfo.zipCode).toBe(doc.zipCode);
+    expect(contactInfo.country).toBe(doc.country);
+    expect(contactInfo.email).toBe(doc.email);
+    expect(contactInfo.phone).toBe(doc.phone);
+    expect(contactInfo.phone2).toBe(doc.phone2);
+  });
 });
