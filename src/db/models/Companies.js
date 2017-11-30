@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 
-// basic info
+// basic info ===========
 const BasicInfoSchema = mongoose.Schema({
   enName: field({ type: String }),
   mnName: field({ type: String }),
@@ -26,7 +26,7 @@ const BasicInfoSchema = mongoose.Schema({
   totalNumberOfUmnugoviEmployees: field({ type: Number }),
 }, { _id: false });
 
-// contact info
+// contact info ==================
 const ContactInfoSchema = mongoose.Schema({
   name: field({ type: String }),
   jobTitle: field({ type: String }),
@@ -44,7 +44,7 @@ const ContactInfoSchema = mongoose.Schema({
   email: field({ type: String }),
 }, { _id: false });
 
-// management team helper schema
+// management team ================
 const PersonSchema = mongoose.Schema({
   name: field({ type: String }),
   jobTitle: field({ type: String }),
@@ -52,7 +52,6 @@ const PersonSchema = mongoose.Schema({
   email: field({ type: String }),
 }, { _id: false });
 
-// management team
 const ManagementTeamSchema = mongoose.Schema({
   managingDirector: PersonSchema,
   executiveOfficer: PersonSchema,
@@ -79,6 +78,18 @@ const ShareholderInfoSchema = mongoose.Schema({
   shareholder5: ShareholderSchema,
 }, { _id: false });
 
+// group information =========
+const GroupInfoSchema = mongoose.Schema({
+  hasParent: field({ type: Boolean }),
+  // manufacturer, distributor, stocklist
+  role: field({ type: String }),
+  isExclusiveDistributor: field({ type: Boolean }),
+  attachments: [String],
+  primaryManufacturerName: field({ type: String }),
+  countryOfPrimaryManufacturer: field({ type: String }),
+  shareholders: [ShareholderSchema],
+}, { _id: false });
+
 
 // Main schema ============
 const CompanySchema = mongoose.Schema({
@@ -86,6 +97,7 @@ const CompanySchema = mongoose.Schema({
   contactInfo: ContactInfoSchema,
   managementTeam: ManagementTeamSchema,
   shareholderInfo: ShareholderInfoSchema,
+  groupInfo: GroupInfoSchema,
 });
 
 
@@ -156,6 +168,19 @@ class Company {
   static async updateShareholderInfo(_id, shareholderInfo) {
     // update
     await Companies.update({ _id }, { $set: { shareholderInfo } });
+
+    return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update group info
+   * @param  {String} _id - company id
+   * @param  {Object} groupInfo - company group info
+   * @return {Promise} Updated company object
+   */
+  static async updateGroupInfo(_id, groupInfo) {
+    // update
+    await Companies.update({ _id }, { $set: { groupInfo } });
 
     return Companies.findOne({ _id });
   }

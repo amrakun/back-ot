@@ -223,6 +223,7 @@ describe('Companies model tests', () => {
     }
 
     const doc = {
+      attachments: ['/path1'],
       shareholder1: generateShareholderDoc(),
       shareholder2: generateShareholderDoc(),
       shareholder3: generateShareholderDoc(),
@@ -233,10 +234,47 @@ describe('Companies model tests', () => {
     const updatedCompany = await Companies.updateShareholderInfo(company._id, doc);
     const shareholderInfo = updatedCompany.shareholderInfo;
 
+    expect(shareholderInfo.attachments).toContain('/path1');
     expect(shareholderInfo.shareholder1.toJSON()).toEqual(doc.shareholder1);
     expect(shareholderInfo.shareholder2.toJSON()).toEqual(doc.shareholder2);
     expect(shareholderInfo.shareholder3.toJSON()).toEqual(doc.shareholder3);
     expect(shareholderInfo.shareholder4.toJSON()).toEqual(doc.shareholder4);
     expect(shareholderInfo.shareholder5.toJSON()).toEqual(doc.shareholder5);
+  });
+
+  test('Update group info', async () => {
+    const company = await companyFactory();
+
+    const generateShareholderDoc = () => {
+      return {
+        name: `${Math.random()}name`,
+        jobTitle: `${Math.random()}jobTitle`,
+        percentage: Math.random(),
+      }
+    }
+
+    const doc = {
+      hasParent: true,
+      role: 'manufacturer',
+      isExclusiveDistributor: false,
+      attachments: ['/path1'],
+      primaryManufacturerName: 'primaryManufacturerName',
+      countryOfPrimaryManufacturer: 'countryOfPrimaryManufacturer',
+      shareholders: [generateShareholderDoc()],
+    }
+
+    const updatedCompany = await Companies.updateGroupInfo(company._id, doc);
+    const groupInfo = updatedCompany.groupInfo;
+
+    expect(groupInfo.attachments).toContain('/path1');
+    expect(groupInfo.hasParent).toBe(doc.hasParent);
+    expect(groupInfo.role).toBe(doc.role);
+    expect(groupInfo.isExclusiveDistributor).toBe(doc.isExclusiveDistributor);
+    expect(groupInfo.primaryManufacturerName).toBe(doc.primaryManufacturerName);
+    expect(groupInfo.countryOfPrimaryManufacturer).toBe(doc.countryOfPrimaryManufacturer);
+
+    const [ shareholder ] = groupInfo.shareholders;
+
+    expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
   });
 });
