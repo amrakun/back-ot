@@ -136,6 +136,7 @@ export const types = `
     managementTeam: CompanyManagementTeam,
     shareholderInfo: CompanyShareholders,
     groupInfo: CompanyGroupInfo,
+    products: [String],
     certificateInfo: CompanyCertificateInfo,
   }
 `;
@@ -153,4 +154,5 @@ export const mutations = `
   companiesEditShareholders(_id: String!, shareholders: CompanyShareholdersInput): Company
   companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
+  companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
 `;
