@@ -210,4 +210,33 @@ describe('Companies model tests', () => {
     expect(managementTeam.otherMember2.toJSON()).toEqual(doc.otherMember2);
     expect(managementTeam.otherMember3.toJSON()).toEqual(doc.otherMember3);
   });
+
+  test('Update shareholder info', async () => {
+    const company = await companyFactory();
+
+    const generateShareholderDoc = () => {
+      return {
+        name: `${Math.random()}name`,
+        jobTitle: `${Math.random()}jobTitle`,
+        percentage: Math.random(),
+      }
+    }
+
+    const doc = {
+      shareholder1: generateShareholderDoc(),
+      shareholder2: generateShareholderDoc(),
+      shareholder3: generateShareholderDoc(),
+      shareholder4: generateShareholderDoc(),
+      shareholder5: generateShareholderDoc(),
+    }
+
+    const updatedCompany = await Companies.updateShareholderInfo(company._id, doc);
+    const shareholderInfo = updatedCompany.shareholderInfo;
+
+    expect(shareholderInfo.shareholder1.toJSON()).toEqual(doc.shareholder1);
+    expect(shareholderInfo.shareholder2.toJSON()).toEqual(doc.shareholder2);
+    expect(shareholderInfo.shareholder3.toJSON()).toEqual(doc.shareholder3);
+    expect(shareholderInfo.shareholder4.toJSON()).toEqual(doc.shareholder4);
+    expect(shareholderInfo.shareholder5.toJSON()).toEqual(doc.shareholder5);
+  });
 });

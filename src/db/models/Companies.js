@@ -63,12 +63,29 @@ const ManagementTeamSchema = mongoose.Schema({
   otherMember3: PersonSchema,
 }, { _id: false });
 
+// shareholder information =========
+const ShareholderSchema = mongoose.Schema({
+  name: field({ type: String }),
+  jobTitle: field({ type: String }),
+  percentage: field({ type: Number }),
+}, { _id: false });
 
-// Main schema
+const ShareholderInfoSchema = mongoose.Schema({
+  attachments: [String],
+  shareholder1: ShareholderSchema,
+  shareholder2: ShareholderSchema,
+  shareholder3: ShareholderSchema,
+  shareholder4: ShareholderSchema,
+  shareholder5: ShareholderSchema,
+}, { _id: false });
+
+
+// Main schema ============
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
   contactInfo: ContactInfoSchema,
   managementTeam: ManagementTeamSchema,
+  shareholderInfo: ShareholderInfoSchema,
 });
 
 
@@ -126,6 +143,19 @@ class Company {
   static async updateManagementTeam(_id, doc) {
     // update
     await Companies.update({ _id }, { $set: { managementTeam: doc } });
+
+    return Companies.findOne({ _id });
+  }
+
+  /**
+   * Update shareholder info
+   * @param  {String} _id - company id
+   * @param  {Object} shareholderInfo - company shareholder info
+   * @return {Promise} Updated company object
+   */
+  static async updateShareholderInfo(_id, shareholderInfo) {
+    // update
+    await Companies.update({ _id }, { $set: { shareholderInfo } });
 
     return Companies.findOne({ _id });
   }
