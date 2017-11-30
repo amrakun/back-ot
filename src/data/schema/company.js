@@ -44,6 +44,12 @@ const personFields = `
   email: String!,
 `;
 
+const shareholderFields = `
+  name: String!,
+  jobTitle: String!,
+  percentage: Int!,
+`;
+
 export const types = `
   type CompanyBasicInfo { ${basicInfoFields} }
   input CompanyBasicInfoInput { ${basicInfoFields} }
@@ -74,11 +80,33 @@ export const types = `
     otherMember3: CompanyManagementTeamPersonInput,
   }
 
+  type CompanyShareholder { ${shareholderFields} }
+  input CompanyShareholderInput { ${shareholderFields} }
+
+  type CompanyShareholders {
+    attachments: [String],
+    shareholder1: CompanyShareholder,
+    shareholder2: CompanyShareholder,
+    shareholder3: CompanyShareholder,
+    shareholder4: CompanyShareholder,
+    shareholder5: CompanyShareholder,
+  }
+
+  input CompanyShareholdersInput {
+    attachments: [String],
+    shareholder1: CompanyShareholderInput,
+    shareholder2: CompanyShareholderInput,
+    shareholder3: CompanyShareholderInput,
+    shareholder4: CompanyShareholderInput,
+    shareholder5: CompanyShareholderInput,
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
     contactInfo: CompanyContactInfo,
     managementTeam: CompanyManagementTeam,
+    shareholderInfo: CompanyShareholders,
   }
 `;
 
@@ -92,4 +120,5 @@ export const mutations = `
   companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
   companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
   companiesEditManagementTeam(_id: String!, managementTeam: CompanyManagementTeamInput): Company
+  companiesEditShareholders(_id: String!, shareholders: CompanyShareholdersInput): Company
 `;

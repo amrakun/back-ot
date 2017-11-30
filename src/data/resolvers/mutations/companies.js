@@ -29,6 +29,13 @@ const companyMutations = {
   async companiesEditManagementTeam(root, { _id, managementTeam }) {
     return Companies.updateManagementTeam(_id, managementTeam);
   },
+
+  /**
+   * Update company shareholders
+   */
+  async companiesEditShareholders(root, { _id, shareholders }) {
+    return Companies.updateShareholderInfo(_id, shareholders);
+  },
 };
 
 export default companyMutations;
