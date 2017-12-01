@@ -445,4 +445,41 @@ describe('Companies model tests', () => {
     expect(enviromentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
     expect(enviromentalManagement.additionalInformation).toBe(doc.additionalInformation);
   });
+
+  test('Update health and safety management system', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesHaveHealthSafety: true,
+      areHSEResourcesClearlyIdentified: true,
+      doesHaveDocumentedProcessToEnsure: true,
+      areEmployeesUnderYourControl: true,
+      doesHaveDocumentForRiskAssesment: true,
+      doesHaveDocumentForIncidentInvestigation: false,
+      doesHaveDocumentedFitness: false,
+      isWillingToComply: true,
+    };
+
+    const updatedCompany = await Companies.updateHealthAndSafetyManagement(company._id, doc);
+    const healthAndSafetyManagement = updatedCompany.healthAndSafetyManagement;
+
+    expect(healthAndSafetyManagement.doesHaveHealthSafety).toBe(doc.doesHaveHealthSafety);
+    expect(healthAndSafetyManagement.areHSEResourcesClearlyIdentified).toBe(
+      doc.areHSEResourcesClearlyIdentified,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentedProcessToEnsure).toBe(
+      doc.doesHaveDocumentedProcessToEnsure,
+    );
+    expect(healthAndSafetyManagement.areEmployeesUnderYourControl).toBe(
+      doc.areEmployeesUnderYourControl,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentForRiskAssesment).toBe(
+      doc.doesHaveDocumentForRiskAssesment,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentForIncidentInvestigation).toBe(
+      doc.doesHaveDocumentForIncidentInvestigation,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
+    expect(healthAndSafetyManagement.isWillingToComply).toBe(doc.isWillingToComply);
+  });
 });

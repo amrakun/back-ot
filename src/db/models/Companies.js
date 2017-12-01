@@ -257,6 +257,37 @@ const EnviromentalManagementSchema = mongoose.Schema(
   { _id: false },
 );
 
+// Health & safety management system =========
+
+const HealthAndSafetyManagementSchema = mongoose.Schema(
+  {
+    // Does the organisation have a Health Safety & Environment management system?
+    doesHaveHealthSafety: field({ type: Boolean }),
+
+    // Are HSE resources, roles, responsibilities and authority levels clearly identified and defined within your Organisation?
+    areHSEResourcesClearlyIdentified: field({ type: Boolean }),
+
+    // Does your company have a documented process to ensure all staff receive health and safety training and induction?
+    doesHaveDocumentedProcessToEnsure: field({ type: Boolean }),
+
+    // Are all employees under your control required to utilise appropriate Personal Protective Equipment (PPE) at all times?
+    areEmployeesUnderYourControl: field({ type: Boolean }),
+
+    //  Does the company have a documented process or guidelines for risk assessment (including CRM)?
+    doesHaveDocumentForRiskAssesment: field({ type: Boolean }),
+
+    // Does the company have a documented process for incident investigation?
+    doesHaveDocumentForIncidentInvestigation: field({ type: Boolean }),
+
+    // Does your company have a documented Fitness for Work (FFW) policy?
+    doesHaveDocumentedFitness: field({ type: Boolean }),
+
+    //  Is your company willing to comply with Oyu Tolgoi/RT HSE management system?
+    isWillingToComply: field({ type: Boolean }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
@@ -269,6 +300,7 @@ const CompanySchema = mongoose.Schema({
   financialInfo: FinancialInfoSchema,
   businessAndHumanResource: BusinessAndHumanResourceSchema,
   enviromentalManagement: EnviromentalManagementSchema,
+  healthAndSafetyManagement: HealthAndSafetyManagementSchema,
 });
 
 class Company {
@@ -374,6 +406,13 @@ class Company {
    */
   static async updateEnviromentalManagement(_id, enviromentalManagement) {
     return this.commonUpdate(_id, 'enviromentalManagement', enviromentalManagement);
+  }
+
+  /**
+   * Update Health and Safety Management System
+   */
+  static async updateHealthAndSafetyManagement(_id, healthAndSafetyManagement) {
+    return this.commonUpdate(_id, 'healthAndSafetyManagement', healthAndSafetyManagement);
   }
 
   /*
