@@ -354,4 +354,61 @@ describe('Companies model tests', () => {
     expect(cpri1.toJSON()).toEqual(doc.canProvideRecordsInfo[0]);
     expect(cpri2.toJSON()).toEqual(doc.canProvideRecordsInfo[1]);
   });
+
+  test('Update Business integrity and Human resource', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesMeetMinimumStandarts: true,
+      doesHaveJobDescription: true,
+      doesConcludeValidContracts: true,
+      employeeTurnoverRate: 12,
+      doesHaveLiabilityInsurance: false,
+      doesHaveCodeEthics: true,
+      doesHaveResponsiblityPolicy: true,
+      hasConvictedLabourLaws: true,
+      hasConvictedForHumanRights: true,
+      hasConvictedForBusinessIntegrity: false,
+      proveHasNotConvicted: 'Lorem ipsum',
+      hasLeadersConvicted: true,
+      investigations: [
+        { name: 'Name', date: '2010.01.01', status: 'Status', statusDate: '2011.01.01' },
+      ],
+      doesEmployeePoliticallyExposed: true,
+      additionalInformation: 'Lorem ipsum',
+    };
+
+    const updatedCompany = await Companies.updateBusinessAndHumanResource(company._id, doc);
+    const businessAndHumanResource = updatedCompany.businessAndHumanResource;
+
+    expect(businessAndHumanResource.doesMeetMinimumStandarts).toBe(doc.doesMeetMinimumStandarts);
+    expect(businessAndHumanResource.doesHaveJobDescription).toBe(doc.doesHaveJobDescription);
+    expect(businessAndHumanResource.doesConcludeValidContracts).toBe(
+      doc.doesConcludeValidContracts,
+    );
+    expect(businessAndHumanResource.employeeTurnoverRate).toBe(doc.employeeTurnoverRate);
+    expect(businessAndHumanResource.doesHaveLiabilityInsurance).toBe(
+      doc.doesHaveLiabilityInsurance,
+    );
+    expect(businessAndHumanResource.doesHaveCodeEthics).toBe(doc.doesHaveCodeEthics);
+    expect(businessAndHumanResource.doesHaveResponsiblityPolicy).toBe(
+      doc.doesHaveResponsiblityPolicy,
+    );
+    expect(businessAndHumanResource.hasConvictedLabourLaws).toBe(doc.hasConvictedLabourLaws);
+    expect(businessAndHumanResource.hasConvictedForHumanRights).toBe(
+      doc.hasConvictedForHumanRights,
+    );
+    expect(businessAndHumanResource.hasConvictedForBusinessIntegrity).toBe(
+      doc.hasConvictedForBusinessIntegrity,
+    );
+    expect(businessAndHumanResource.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(businessAndHumanResource.hasLeadersConvicted).toBe(doc.hasLeadersConvicted);
+    expect(businessAndHumanResource.doesEmployeePoliticallyExposed).toBe(
+      doc.doesEmployeePoliticallyExposed,
+    );
+    expect(businessAndHumanResource.additionalInformation).toBe(doc.additionalInformation);
+
+    const [i1] = businessAndHumanResource.investigations;
+    expect(i1.toJSON()).toEqual(doc.investigations[0]);
+  });
 });

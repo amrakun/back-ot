@@ -160,6 +160,74 @@ const FinancialInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
+// Business integrity & human resource =========
+
+const InvestigationSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    date: field({ type: String }),
+    status: field({ type: String }),
+    statusDate: field({ type: String }),
+  },
+  { _id: false },
+);
+
+const BusinessAndHumanResourceSchema = mongoose.Schema(
+  {
+    // Does your company meet minimum standards of fair employment
+    // practice required by Mongolian labor laws and regulations
+    doesMeetMinimumStandarts: field({ type: Boolean }),
+
+    // Does the Company have a job description procedure in place?
+    doesHaveJobDescription: field({ type: Boolean }),
+
+    // Does the company conclude valid contracts with all employees. (include skilled/unskilled,
+    // temporary and permanent, and underage workers, etc)
+    doesConcludeValidContracts: field({ type: Boolean }),
+
+    // Please provide the employee turnover rate within your company in the last 12 months
+    employeeTurnoverRate: field({ type: Number }),
+
+    // Does the organisation have Liability insurance which meets
+    // Oyu Tolgoi’s minimum requirements and valid worker compensation insurance or enrolment
+    // in an applicable occupational injury/illness insurance programme?
+    doesHaveLiabilityInsurance: field({ type: Boolean }),
+
+    // Does your company have a documented code of ethics/conduct?
+    doesHaveCodeEthics: field({ type: Boolean }),
+
+    // Does your company have a documented Corporate Social Responsibility policy?
+    doesHaveResponsiblityPolicy: field({ type: Boolean }),
+
+    // Has your company ever been convicted for a breach of any labour
+    // laws in the countries you operate within the last five years?
+    hasConvictedLabourLaws: field({ type: Boolean }),
+
+    // Has your company ever been convicted for a breach of any human
+    // rights in the countries you operate within the last five years?
+    hasConvictedForHumanRights: field({ type: Boolean }),
+
+    // Has your company ever been convicted for a breach of any business
+    // integrity in the countries you operate within the last five years?
+    hasConvictedForBusinessIntegrity: field({ type: Boolean }),
+
+    // If Yes, what steps have you taken to ensure this does not happen again?
+    proveHasNotConvicted: field({ type: String }),
+
+    // Has your company or any of its directors been investigated or convicted of
+    // any other legal infringement not described above within the last five years?
+    hasLeadersConvicted: field({ type: Boolean }),
+
+    investigations: [InvestigationSchema],
+
+    // Does your company employ any politically exposed person? If yes, provide list of PEP name
+    doesEmployeePoliticallyExposed: field({ type: Boolean }),
+
+    additionalInformation: field({ type: String }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
@@ -170,6 +238,7 @@ const CompanySchema = mongoose.Schema({
   products: [String],
   certificateInfo: CertificateInfoSchema,
   financialInfo: FinancialInfoSchema,
+  businessAndHumanResource: BusinessAndHumanResourceSchema,
 });
 
 class Company {
@@ -261,6 +330,13 @@ class Company {
    */
   static async updateFinancialInfo(_id, financialInfo) {
     return this.commonUpdate(_id, 'financialInfo', financialInfo);
+  }
+
+  /**
+   * Update Business integrity & human resource
+   */
+  static async updateBusinessAndHumanResource(_id, businessAndHumanResource) {
+    return this.commonUpdate(_id, 'businessAndHumanResource', businessAndHumanResource);
   }
 
   /*
