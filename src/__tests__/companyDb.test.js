@@ -411,4 +411,38 @@ describe('Companies model tests', () => {
     const [i1] = businessAndHumanResource.investigations;
     expect(i1.toJSON()).toEqual(doc.investigations[0]);
   });
+  test('Update enviromental management', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesHaveEnviromentalManagementPlan: true,
+      hasEnviromentalRegulatorInvestigated: true,
+      dateOfInvestigation: '2010.01.01',
+      reasonForInvestigation: 'Lorem ipsum',
+      actionStatus: 'In Progress',
+      investigationDocumentation: 'path1',
+      hasConvictedForEnvironmentalLaws: true,
+      proveHasNotConvicted: 'Lorem ipsum',
+      additionalInformation: 'Lorem ipsum',
+    };
+
+    const updatedCompany = await Companies.updateEnviromentalManagement(company._id, doc);
+    const enviromentalManagement = updatedCompany.enviromentalManagement;
+
+    expect(enviromentalManagement.doesHaveEnviromentalManagementPlan).toBe(
+      doc.doesHaveEnviromentalManagementPlan,
+    );
+    expect(enviromentalManagement.hasEnviromentalRegulatorInvestigated).toBe(
+      doc.hasEnviromentalRegulatorInvestigated,
+    );
+    expect(enviromentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
+    expect(enviromentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
+    expect(enviromentalManagement.actionStatus).toBe(doc.actionStatus);
+    expect(enviromentalManagement.investigationDocumentation).toBe(doc.investigationDocumentation);
+    expect(enviromentalManagement.hasConvictedForEnvironmentalLaws).toBe(
+      doc.hasConvictedForEnvironmentalLaws,
+    );
+    expect(enviromentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(enviromentalManagement.additionalInformation).toBe(doc.additionalInformation);
+  });
 });

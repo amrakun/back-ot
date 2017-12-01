@@ -228,6 +228,35 @@ const BusinessAndHumanResourceSchema = mongoose.Schema(
   { _id: false },
 );
 
+// Enviromental management =========
+const EnviromentalManagementSchema = mongoose.Schema(
+  {
+    // Does the organisation have environmental management plans or procedures(including air quality,
+    // greenhouse gases emissions, water and contamination prevention, noise and vibration, Waste Management)?
+    doesHaveEnviromentalManagementPlan: field({ type: Boolean }),
+
+    // Has any environmental regulator inspected / investigated your company within the last 5 years?
+    hasEnviromentalRegulatorInvestigated: field({ type: Boolean }),
+
+    dateOfInvestigation: field({ type: String }),
+
+    reasonForInvestigation: field({ type: String }),
+
+    actionStatus: field({ type: String }),
+
+    investigationDocumentation: field({ type: String }),
+
+    // Has your company ever been convicted for a breach of any Environmental laws in the countries you operate?
+    hasConvictedForEnvironmentalLaws: field({ type: Boolean }),
+
+    // If Yes, what steps have you taken to ensure this does not happen again?
+    proveHasNotConvicted: field({ type: String }),
+
+    additionalInformation: field({ type: String }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
@@ -239,6 +268,7 @@ const CompanySchema = mongoose.Schema({
   certificateInfo: CertificateInfoSchema,
   financialInfo: FinancialInfoSchema,
   businessAndHumanResource: BusinessAndHumanResourceSchema,
+  enviromentalManagement: EnviromentalManagementSchema,
 });
 
 class Company {
@@ -337,6 +367,13 @@ class Company {
    */
   static async updateBusinessAndHumanResource(_id, businessAndHumanResource) {
     return this.commonUpdate(_id, 'businessAndHumanResource', businessAndHumanResource);
+  }
+
+  /**
+   * Update  Enviromental management
+   */
+  static async updateEnviromentalManagement(_id, enviromentalManagement) {
+    return this.commonUpdate(_id, 'enviromentalManagement', enviromentalManagement);
   }
 
   /*
