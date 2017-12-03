@@ -63,15 +63,36 @@ const certificateInfoFields = `
   isReceived: Boolean,
   isOTSupplier: Boolean,
   cwpo: String!,
-`
+`;
+
+const yearAmountFields = `
+  year: Int!,
+  amount: Float!,
+`;
+
+const datePathFields = `
+  date: String!,
+  path: String!,
+`;
+
+const financialInfoFields = `
+  canProvideAccountsInfo: Boolean,
+  currency: String!,
+  isUpToDateSSP: Boolean,
+  isUpToDateCTP: Boolean,
+`;
 
 export const types = `
+  #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields} }
   input CompanyBasicInfoInput { ${basicInfoFields} }
 
+  #  contact info ======================
   type CompanyContactInfo { ${contactInfoFields} }
   input CompanyContactInfoInput { ${contactInfoFields} }
 
+
+  # management team ==================
   type CompanyManagementTeamPerson { ${personFields} }
   input CompanyManagementTeamPersonInput { ${personFields} }
 
@@ -95,6 +116,7 @@ export const types = `
     otherMember3: CompanyManagementTeamPersonInput,
   }
 
+  #  shareholder =======================
   type CompanyShareholder { ${shareholderFields} }
   input CompanyShareholderInput { ${shareholderFields} }
 
@@ -116,6 +138,7 @@ export const types = `
     shareholder5: CompanyShareholderInput,
   }
 
+  # group info =========================
   type CompanyGroupInfo {
     ${groupInfoFields}
     shareholders: [CompanyShareholder]
@@ -126,8 +149,36 @@ export const types = `
     shareholders: [CompanyShareholderInput]
   }
 
+  # certificate info ====================
   type CompanyCertificateInfo { ${certificateInfoFields} }
   input CompanyCertificateInfoInput { ${certificateInfoFields} }
+
+  # financial info =====================
+  type CompanyYearAmount { ${yearAmountFields} }
+  input CompanyYearAmountInput { ${yearAmountFields} }
+
+  type CompanyDatePath { ${datePathFields} }
+  input CompanyDatePathInput { ${datePathFields} }
+
+  type CompanyFinancialInfo {
+    ${financialInfoFields}
+    annualTurnover: [CompanyYearAmount]
+    preTaxProfit: [CompanyYearAmount]
+    totalAssets: [CompanyYearAmount]
+    totalCurrentAssets: [CompanyYearAmount]
+    totalShareholderEquity: [CompanyYearAmount]
+    canProvideRecordsInfo: [CompanyDatePath]
+  }
+
+  input CompanyFinancialInfoInput {
+    ${financialInfoFields}
+    annualTurnover: [CompanyYearAmountInput]
+    preTaxProfit: [CompanyYearAmountInput]
+    totalAssets: [CompanyYearAmountInput]
+    totalCurrentAssets: [CompanyYearAmountInput]
+    totalShareholderEquity: [CompanyYearAmountInput]
+    canProvideRecordsInfo: [CompanyDatePathInput]
+  }
 
   type Company {
     _id: String!
@@ -138,6 +189,7 @@ export const types = `
     groupInfo: CompanyGroupInfo,
     products: [String],
     certificateInfo: CompanyCertificateInfo,
+    financialInfo: CompanyFinancialInfo,
   }
 `;
 
@@ -155,4 +207,6 @@ export const mutations = `
   companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
+  companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
+
 `;

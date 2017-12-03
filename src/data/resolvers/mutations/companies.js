@@ -57,6 +57,13 @@ const companyMutations = {
   async companiesEditProductsInfo(root, { _id, productsInfo }) {
     return Companies.updateProductsInfo(_id, productsInfo);
   },
+
+  /**
+   * Update company financial info
+   */
+  async companiesEditFinancialInfo(root, { _id, financialInfo }) {
+    return Companies.updateFinancialInfo(_id, financialInfo);
+  },
 };
 
 export default companyMutations;
