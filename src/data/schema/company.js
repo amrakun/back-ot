@@ -81,6 +81,29 @@ const financialInfoFields = `
   isUpToDateSSP: Boolean,
   isUpToDateCTP: Boolean,
 `;
+const investigationFields = `
+  name: String!,
+  date: String!,
+  status: String!,
+  statusDate: String!,
+`;
+
+const businessAndHumanResourceFields = `
+  doesMeetMinimumStandarts: Boolean,
+  doesHaveJobDescription: Boolean,
+  doesConcludeValidContracts: Boolean,
+  employeeTurnoverRate: Int,
+  doesHaveLiabilityInsurance: Boolean,
+  doesHaveCodeEthics: Boolean,
+  doesHaveResponsiblityPolicy: Boolean,
+  hasConvictedLabourLaws: Boolean,
+  hasConvictedForHumanRights: Boolean,
+  hasConvictedForBusinessIntegrity: Boolean,
+  proveHasNotConvicted: String!,
+  hasLeadersConvicted: Boolean,
+  doesEmployeePoliticallyExposed: Boolean,
+  additionalInformation: String!,
+`;
 
 export const types = `
   #  basic info ========================
@@ -180,6 +203,20 @@ export const types = `
     canProvideRecordsInfo: [CompanyDatePathInput]
   }
 
+  # business and human resource ====
+  type CompanyInvestigation { ${investigationFields} }
+  input CompanyInvestigationtInput { ${investigationFields} }
+
+  type CompanyBusinessAndHumanResource {
+    ${businessAndHumanResourceFields}
+    investigations: [CompanyInvestigation]
+  }
+
+  input CompanyBusinessAndHumanResourceInput {
+    ${businessAndHumanResourceFields}
+    investigations: [CompanyInvestigationtInput]
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
@@ -190,6 +227,7 @@ export const types = `
     products: [String],
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
+    businessAndHumanResource: CompanyBusinessAndHumanResource,
   }
 `;
 
@@ -208,5 +246,5 @@ export const mutations = `
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
-
+  companiesEditBusinessAndHumanResource(_id: String!, businessAndHumanResource: CompanyBusinessAndHumanResourceInput): Company
 `;
