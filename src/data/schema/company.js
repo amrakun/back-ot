@@ -116,7 +116,16 @@ const enviromentalManagementFields = `
   proveHasNotConvicted: String!,
   additionalInformation: String!,
 `;
-
+const healthAndSafetyManagementFields = `
+  doesHaveHealthSafety: Boolean,
+  areHSEResourcesClearlyIdentified: Boolean,
+  doesHaveDocumentedProcessToEnsure: Boolean,
+  areEmployeesUnderYourControl: Boolean,
+  doesHaveDocumentForRiskAssesment: Boolean,
+  doesHaveDocumentForIncidentInvestigation: Boolean,
+  doesHaveDocumentedFitness: Boolean,
+  isWillingToComply: Boolean,
+`;
 export const types = `
   #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields} }
@@ -229,9 +238,13 @@ export const types = `
     investigations: [CompanyInvestigationtInput]
   }
 
-  # enviromental management =============
+  # environmental management =============
   type CompanyEnviromentalManagement { ${enviromentalManagementFields} }
   input CompanyEnviromentalManagementInput { ${enviromentalManagementFields} }
+
+   # health and safety management system  ==========
+  type CompanyHealthAndSafetyManagement { ${healthAndSafetyManagementFields} }
+  input CompanyHealthAndSafetyManagementInput { ${healthAndSafetyManagementFields} }
 
   type Company {
     _id: String!
@@ -245,6 +258,7 @@ export const types = `
     financialInfo: CompanyFinancialInfo,
     businessAndHumanResource: CompanyBusinessAndHumanResource,
     enviromentalManagement: CompanyEnviromentalManagement,
+    healthAndSafetyManagement: CompanyHealthAndSafetyManagement,
   }
 `;
 
@@ -265,4 +279,5 @@ export const mutations = `
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
   companiesEditBusinessAndHumanResource(_id: String!, businessAndHumanResource: CompanyBusinessAndHumanResourceInput): Company
   companiesEditEnviromentalManagement(_id: String!, enviromentalManagement: CompanyEnviromentalManagementInput): Company
+  companiesEditHealthAndSafetyManagement(_id: String!, healthAndSafetyManagement: CompanyHealthAndSafetyManagementInput): Company
 `;
