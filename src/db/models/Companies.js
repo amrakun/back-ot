@@ -228,15 +228,15 @@ const BusinessAndHumanResourceSchema = mongoose.Schema(
   { _id: false },
 );
 
-// Enviromental management =========
-const EnviromentalManagementSchema = mongoose.Schema(
+// Environmental management =========
+const EnvironmentalManagementSchema = mongoose.Schema(
   {
     // Does the organisation have environmental management plans or procedures(including air quality,
     // greenhouse gases emissions, water and contamination prevention, noise and vibration, Waste Management)?
-    doesHaveEnviromentalManagementPlan: field({ type: Boolean }),
+    doesHavePlan: field({ type: Boolean }),
 
     // Has any environmental regulator inspected / investigated your company within the last 5 years?
-    hasEnviromentalRegulatorInvestigated: field({ type: Boolean }),
+    hasEnvironmentalRegulatorInvestigated: field({ type: Boolean }),
 
     dateOfInvestigation: field({ type: String }),
 
@@ -299,7 +299,7 @@ const CompanySchema = mongoose.Schema({
   certificateInfo: CertificateInfoSchema,
   financialInfo: FinancialInfoSchema,
   businessAndHumanResource: BusinessAndHumanResourceSchema,
-  enviromentalManagement: EnviromentalManagementSchema,
+  environmentalManagement: EnvironmentalManagementSchema,
   healthAndSafetyManagement: HealthAndSafetyManagementSchema,
 });
 
@@ -402,10 +402,10 @@ class Company {
   }
 
   /**
-   * Update  Enviromental management
+   * Update  Environmental management
    */
-  static async updateEnviromentalManagement(_id, enviromentalManagement) {
-    return this.commonUpdate(_id, 'enviromentalManagement', enviromentalManagement);
+  static async updateEnvironmentalManagement(_id, environmentalManagement) {
+    return this.commonUpdate(_id, 'environmentalManagement', environmentalManagement);
   }
 
   /**

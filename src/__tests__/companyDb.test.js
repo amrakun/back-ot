@@ -411,12 +411,12 @@ describe('Companies model tests', () => {
     const [i1] = businessAndHumanResource.investigations;
     expect(i1.toJSON()).toEqual(doc.investigations[0]);
   });
-  test('Update enviromental management', async () => {
+  test('Update environmental management', async () => {
     const company = await companyFactory();
 
     const doc = {
-      doesHaveEnviromentalManagementPlan: true,
-      hasEnviromentalRegulatorInvestigated: true,
+      doesHavePlan: true,
+      hasEnvironmentalRegulatorInvestigated: true,
       dateOfInvestigation: '2010.01.01',
       reasonForInvestigation: 'Lorem ipsum',
       actionStatus: 'In Progress',
@@ -426,24 +426,22 @@ describe('Companies model tests', () => {
       additionalInformation: 'Lorem ipsum',
     };
 
-    const updatedCompany = await Companies.updateEnviromentalManagement(company._id, doc);
-    const enviromentalManagement = updatedCompany.enviromentalManagement;
+    const updatedCompany = await Companies.updateEnvironmentalManagement(company._id, doc);
+    const environmentalManagement = updatedCompany.environmentalManagement;
 
-    expect(enviromentalManagement.doesHaveEnviromentalManagementPlan).toBe(
-      doc.doesHaveEnviromentalManagementPlan,
+    expect(environmentalManagement.doesHavePlan).toBe(doc.doesHavePlan);
+    expect(environmentalManagement.hasEnvironmentalRegulatorInvestigated).toBe(
+      doc.hasEnvironmentalRegulatorInvestigated,
     );
-    expect(enviromentalManagement.hasEnviromentalRegulatorInvestigated).toBe(
-      doc.hasEnviromentalRegulatorInvestigated,
-    );
-    expect(enviromentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
-    expect(enviromentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
-    expect(enviromentalManagement.actionStatus).toBe(doc.actionStatus);
-    expect(enviromentalManagement.investigationDocumentation).toBe(doc.investigationDocumentation);
-    expect(enviromentalManagement.hasConvictedForEnvironmentalLaws).toBe(
+    expect(environmentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
+    expect(environmentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
+    expect(environmentalManagement.actionStatus).toBe(doc.actionStatus);
+    expect(environmentalManagement.investigationDocumentation).toBe(doc.investigationDocumentation);
+    expect(environmentalManagement.hasConvictedForEnvironmentalLaws).toBe(
       doc.hasConvictedForEnvironmentalLaws,
     );
-    expect(enviromentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
-    expect(enviromentalManagement.additionalInformation).toBe(doc.additionalInformation);
+    expect(environmentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(environmentalManagement.additionalInformation).toBe(doc.additionalInformation);
   });
 
   test('Update health and safety management system', async () => {

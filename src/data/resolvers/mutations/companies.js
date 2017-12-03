@@ -73,14 +73,14 @@ const companyMutations = {
   },
 
   /**
-   * Update company enviromental management
+   * Update company environmental management
    */
-  async companiesEditEnviromentalManagement(root, { _id, enviromentalManagement }) {
-    return Companies.updateEnviromentalManagement(_id, enviromentalManagement);
+  async companiesEditEnvironmentalManagement(root, { _id, environmentalManagement }) {
+    return Companies.updateEnvironmentalManagement(_id, environmentalManagement);
   },
 
   /**
-   * Update company enviromental management
+   * Update company health and safety management system
    */
   async companiesEditHealthAndSafetyManagement(root, { _id, healthAndSafetyManagement }) {
     return Companies.updateHealthAndSafetyManagement(_id, healthAndSafetyManagement);

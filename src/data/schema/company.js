@@ -105,9 +105,9 @@ const businessAndHumanResourceFields = `
   additionalInformation: String!,
 `;
 
-const enviromentalManagementFields = `
-  doesHaveEnviromentalManagementPlan: Boolean,
-  hasEnviromentalRegulatorInvestigated: Boolean,
+const environmentalManagementFields = `
+  doesHavePlan: Boolean,
+  hasEnvironmentalRegulatorInvestigated: Boolean,
   dateOfInvestigation: String!,
   reasonForInvestigation: String!,
   actionStatus: String!,
@@ -239,8 +239,8 @@ export const types = `
   }
 
   # environmental management =============
-  type CompanyEnviromentalManagement { ${enviromentalManagementFields} }
-  input CompanyEnviromentalManagementInput { ${enviromentalManagementFields} }
+  type CompanyEnvironmentalManagement { ${environmentalManagementFields} }
+  input CompanyEnvironmentalManagementInput { ${environmentalManagementFields} }
 
    # health and safety management system  ==========
   type CompanyHealthAndSafetyManagement { ${healthAndSafetyManagementFields} }
@@ -257,7 +257,7 @@ export const types = `
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
     businessAndHumanResource: CompanyBusinessAndHumanResource,
-    enviromentalManagement: CompanyEnviromentalManagement,
+    environmentalManagement: CompanyEnvironmentalManagement,
     healthAndSafetyManagement: CompanyHealthAndSafetyManagement,
   }
 `;
@@ -278,6 +278,6 @@ export const mutations = `
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
   companiesEditBusinessAndHumanResource(_id: String!, businessAndHumanResource: CompanyBusinessAndHumanResourceInput): Company
-  companiesEditEnviromentalManagement(_id: String!, enviromentalManagement: CompanyEnviromentalManagementInput): Company
+  companiesEditEnvironmentalManagement(_id: String!, environmentalManagement: CompanyEnvironmentalManagementInput): Company
   companiesEditHealthAndSafetyManagement(_id: String!, healthAndSafetyManagement: CompanyHealthAndSafetyManagementInput): Company
 `;
