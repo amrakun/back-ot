@@ -71,6 +71,13 @@ const companyMutations = {
   async companiesEditBusinessAndHumanResource(root, { _id, businessAndHumanResource }) {
     return Companies.updateBusinessAndHumanResource(_id, businessAndHumanResource);
   },
+
+  /**
+   * Update company enviromental management
+   */
+  async companiesEditEnviromentalManagement(root, { _id, enviromentalManagement }) {
+    return Companies.updateEnviromentalManagement(_id, enviromentalManagement);
+  },
 };
 
 export default companyMutations;

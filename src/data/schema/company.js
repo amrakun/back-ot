@@ -105,6 +105,18 @@ const businessAndHumanResourceFields = `
   additionalInformation: String!,
 `;
 
+const enviromentalManagementFields = `
+  doesHaveEnviromentalManagementPlan: Boolean,
+  hasEnviromentalRegulatorInvestigated: Boolean,
+  dateOfInvestigation: String!,
+  reasonForInvestigation: String!,
+  actionStatus: String!,
+  investigationDocumentation: String!,
+  hasConvictedForEnvironmentalLaws: Boolean,
+  proveHasNotConvicted: String!,
+  additionalInformation: String!,
+`;
+
 export const types = `
   #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields} }
@@ -217,6 +229,10 @@ export const types = `
     investigations: [CompanyInvestigationtInput]
   }
 
+  # enviromental management =============
+  type CompanyEnviromentalManagement { ${enviromentalManagementFields} }
+  input CompanyEnviromentalManagementInput { ${enviromentalManagementFields} }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
@@ -228,6 +244,7 @@ export const types = `
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
     businessAndHumanResource: CompanyBusinessAndHumanResource,
+    enviromentalManagement: CompanyEnviromentalManagement,
   }
 `;
 
@@ -247,4 +264,5 @@ export const mutations = `
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
   companiesEditBusinessAndHumanResource(_id: String!, businessAndHumanResource: CompanyBusinessAndHumanResourceInput): Company
+  companiesEditEnviromentalManagement(_id: String!, enviromentalManagement: CompanyEnviromentalManagementInput): Company
 `;
