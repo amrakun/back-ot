@@ -9,7 +9,6 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
-
 const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.enName).toBe(doc.enName);
   expect(basicInfo.mnName).toBe(doc.mnName);
@@ -31,7 +30,7 @@ const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.totalNumberOfEmployees).toBe(doc.totalNumberOfEmployees);
   expect(basicInfo.totalNumberOfMongolianEmployees).toBe(doc.totalNumberOfMongolianEmployees);
   expect(basicInfo.totalNumberOfUmnugoviEmployees).toBe(doc.totalNumberOfUmnugoviEmployees);
-}
+};
 
 describe('Companies model tests', () => {
   let _company;
@@ -86,7 +85,7 @@ describe('Companies model tests', () => {
       totalNumberOfEmployees: 100,
       totalNumberOfMongolianEmployees: 80,
       totalNumberOfUmnugoviEmployees: 10,
-    }
+    };
 
     const company = await Companies.createCompany(doc);
 
@@ -138,7 +137,7 @@ describe('Companies model tests', () => {
       totalNumberOfEmployees: 101,
       totalNumberOfMongolianEmployees: 81,
       totalNumberOfUmnugoviEmployees: 11,
-    }
+    };
 
     const updatedCompany = await Companies.updateBasicInfo(company._id, doc);
 
@@ -160,7 +159,7 @@ describe('Companies model tests', () => {
       phone: 24224242,
       phone2: 24224243,
       email: 'contact@gmail.com',
-    }
+    };
 
     const updatedCompany = await Companies.updateContactInfo(company._id, doc);
     const contactInfo = updatedCompany.contactInfo;
@@ -186,8 +185,8 @@ describe('Companies model tests', () => {
         jobTitle: `${Math.random()}jobTitle`,
         phone: Math.random(),
         email: `${Math.random()}@gmail.com`,
-      }
-    }
+      };
+    };
 
     const doc = {
       managingDirector: generatePersonDoc(),
@@ -197,7 +196,7 @@ describe('Companies model tests', () => {
       otherMember1: generatePersonDoc(),
       otherMember2: generatePersonDoc(),
       otherMember3: generatePersonDoc(),
-    }
+    };
 
     const updatedCompany = await Companies.updateManagementTeam(company._id, doc);
     const managementTeam = updatedCompany.managementTeam;
@@ -219,8 +218,8 @@ describe('Companies model tests', () => {
         name: `${Math.random()}name`,
         jobTitle: `${Math.random()}jobTitle`,
         percentage: Math.random(),
-      }
-    }
+      };
+    };
 
     const doc = {
       attachments: ['/path1'],
@@ -229,7 +228,7 @@ describe('Companies model tests', () => {
       shareholder3: generateShareholderDoc(),
       shareholder4: generateShareholderDoc(),
       shareholder5: generateShareholderDoc(),
-    }
+    };
 
     const updatedCompany = await Companies.updateShareholderInfo(company._id, doc);
     const shareholderInfo = updatedCompany.shareholderInfo;
@@ -250,8 +249,8 @@ describe('Companies model tests', () => {
         name: `${Math.random()}name`,
         jobTitle: `${Math.random()}jobTitle`,
         percentage: Math.random(),
-      }
-    }
+      };
+    };
 
     const doc = {
       hasParent: true,
@@ -261,7 +260,7 @@ describe('Companies model tests', () => {
       primaryManufacturerName: 'primaryManufacturerName',
       countryOfPrimaryManufacturer: 'countryOfPrimaryManufacturer',
       shareholders: [generateShareholderDoc()],
-    }
+    };
 
     const updatedCompany = await Companies.updateGroupInfo(company._id, doc);
     const groupInfo = updatedCompany.groupInfo;
@@ -273,7 +272,7 @@ describe('Companies model tests', () => {
     expect(groupInfo.primaryManufacturerName).toBe(doc.primaryManufacturerName);
     expect(groupInfo.countryOfPrimaryManufacturer).toBe(doc.countryOfPrimaryManufacturer);
 
-    const [ shareholder ] = groupInfo.shareholders;
+    const [shareholder] = groupInfo.shareholders;
 
     expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
   });
@@ -296,7 +295,7 @@ describe('Companies model tests', () => {
       isReceived: true,
       isOTSupplier: false,
       cwpo: 'CW49108',
-    }
+    };
 
     const updatedCompany = await Companies.updateCertificateInfo(company._id, doc);
     const certificateInfo = updatedCompany.certificateInfo;
@@ -304,5 +303,181 @@ describe('Companies model tests', () => {
     expect(certificateInfo.isReceived).toBe(doc.isReceived);
     expect(certificateInfo.isOTSupplier).toBe(doc.isOTSupplier);
     expect(certificateInfo.cwpo).toBe(doc.cwpo);
+  });
+  test('Update Financial Info', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      canProvideAccountsInfo: true,
+      currency: 'Euro (EUR)',
+      annualTurnover: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      preTaxProfit: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalAssets: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalCurrentAssets: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      totalShareholderEquity: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
+      canProvideRecordsInfo: [
+        { date: '2010/10/1', path: 'path1' },
+        { date: '2008/10/05', path: 'path2' },
+      ],
+      isUpToDateSSP: true,
+      isUpToDateCTP: true,
+    };
+    const updatedCompany = await Companies.updateFinancialInfo(company._id, doc);
+    const financialInfo = updatedCompany.financialInfo;
+
+    expect(financialInfo.canProvideAccountsInfo).toBe(doc.canProvideAccountsInfo);
+    expect(financialInfo.currency).toBe(doc.currency);
+    expect(financialInfo.isUpToDateSSP).toBe(doc.isUpToDateSSP);
+    expect(financialInfo.isUpToDateCTP).toBe(doc.isUpToDateCTP);
+
+    const [at1, at2] = financialInfo.annualTurnover;
+    expect(at1.toJSON()).toEqual(doc.annualTurnover[0]);
+    expect(at2.toJSON()).toEqual(doc.annualTurnover[1]);
+
+    const [ptp1, ptp2] = financialInfo.preTaxProfit;
+    expect(ptp1.toJSON()).toEqual(doc.preTaxProfit[0]);
+    expect(ptp2.toJSON()).toEqual(doc.preTaxProfit[1]);
+
+    const [ta1, ta2] = financialInfo.totalAssets;
+    expect(ta1.toJSON()).toEqual(doc.totalAssets[0]);
+    expect(ta2.toJSON()).toEqual(doc.totalAssets[1]);
+
+    const [tca1, tca2] = financialInfo.totalCurrentAssets;
+    expect(tca1.toJSON()).toEqual(doc.totalCurrentAssets[0]);
+    expect(tca2.toJSON()).toEqual(doc.totalCurrentAssets[1]);
+
+    const [tse1, tse2] = financialInfo.totalShareholderEquity;
+    expect(tse1.toJSON()).toEqual(doc.totalShareholderEquity[0]);
+    expect(tse2.toJSON()).toEqual(doc.totalShareholderEquity[1]);
+
+    const [cpri1, cpri2] = financialInfo.canProvideRecordsInfo;
+    expect(cpri1.toJSON()).toEqual(doc.canProvideRecordsInfo[0]);
+    expect(cpri2.toJSON()).toEqual(doc.canProvideRecordsInfo[1]);
+  });
+
+  test('Update Business integrity and Human resource', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesMeetMinimumStandarts: true,
+      doesHaveJobDescription: true,
+      doesConcludeValidContracts: true,
+      employeeTurnoverRate: 12,
+      doesHaveLiabilityInsurance: false,
+      doesHaveCodeEthics: true,
+      doesHaveResponsiblityPolicy: true,
+      hasConvictedLabourLaws: true,
+      hasConvictedForHumanRights: true,
+      hasConvictedForBusinessIntegrity: false,
+      proveHasNotConvicted: 'Lorem ipsum',
+      hasLeadersConvicted: true,
+      investigations: [
+        { name: 'Name', date: '2010.01.01', status: 'Status', statusDate: '2011.01.01' },
+      ],
+      doesEmployeePoliticallyExposed: true,
+      additionalInformation: 'Lorem ipsum',
+    };
+
+    const updatedCompany = await Companies.updateBusinessAndHumanResource(company._id, doc);
+    const businessAndHumanResource = updatedCompany.businessAndHumanResource;
+
+    expect(businessAndHumanResource.doesMeetMinimumStandarts).toBe(doc.doesMeetMinimumStandarts);
+    expect(businessAndHumanResource.doesHaveJobDescription).toBe(doc.doesHaveJobDescription);
+    expect(businessAndHumanResource.doesConcludeValidContracts).toBe(
+      doc.doesConcludeValidContracts,
+    );
+    expect(businessAndHumanResource.employeeTurnoverRate).toBe(doc.employeeTurnoverRate);
+    expect(businessAndHumanResource.doesHaveLiabilityInsurance).toBe(
+      doc.doesHaveLiabilityInsurance,
+    );
+    expect(businessAndHumanResource.doesHaveCodeEthics).toBe(doc.doesHaveCodeEthics);
+    expect(businessAndHumanResource.doesHaveResponsiblityPolicy).toBe(
+      doc.doesHaveResponsiblityPolicy,
+    );
+    expect(businessAndHumanResource.hasConvictedLabourLaws).toBe(doc.hasConvictedLabourLaws);
+    expect(businessAndHumanResource.hasConvictedForHumanRights).toBe(
+      doc.hasConvictedForHumanRights,
+    );
+    expect(businessAndHumanResource.hasConvictedForBusinessIntegrity).toBe(
+      doc.hasConvictedForBusinessIntegrity,
+    );
+    expect(businessAndHumanResource.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(businessAndHumanResource.hasLeadersConvicted).toBe(doc.hasLeadersConvicted);
+    expect(businessAndHumanResource.doesEmployeePoliticallyExposed).toBe(
+      doc.doesEmployeePoliticallyExposed,
+    );
+    expect(businessAndHumanResource.additionalInformation).toBe(doc.additionalInformation);
+
+    const [i1] = businessAndHumanResource.investigations;
+    expect(i1.toJSON()).toEqual(doc.investigations[0]);
+  });
+  test('Update environmental management', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesHavePlan: true,
+      hasEnvironmentalRegulatorInvestigated: true,
+      dateOfInvestigation: '2010.01.01',
+      reasonForInvestigation: 'Lorem ipsum',
+      actionStatus: 'In Progress',
+      investigationDocumentation: 'path1',
+      hasConvictedForEnvironmentalLaws: true,
+      proveHasNotConvicted: 'Lorem ipsum',
+      additionalInformation: 'Lorem ipsum',
+    };
+
+    const updatedCompany = await Companies.updateEnvironmentalManagement(company._id, doc);
+    const environmentalManagement = updatedCompany.environmentalManagement;
+
+    expect(environmentalManagement.doesHavePlan).toBe(doc.doesHavePlan);
+    expect(environmentalManagement.hasEnvironmentalRegulatorInvestigated).toBe(
+      doc.hasEnvironmentalRegulatorInvestigated,
+    );
+    expect(environmentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
+    expect(environmentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
+    expect(environmentalManagement.actionStatus).toBe(doc.actionStatus);
+    expect(environmentalManagement.investigationDocumentation).toBe(doc.investigationDocumentation);
+    expect(environmentalManagement.hasConvictedForEnvironmentalLaws).toBe(
+      doc.hasConvictedForEnvironmentalLaws,
+    );
+    expect(environmentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(environmentalManagement.additionalInformation).toBe(doc.additionalInformation);
+  });
+
+  test('Update health and safety management system', async () => {
+    const company = await companyFactory();
+
+    const doc = {
+      doesHaveHealthSafety: true,
+      areHSEResourcesClearlyIdentified: true,
+      doesHaveDocumentedProcessToEnsure: true,
+      areEmployeesUnderYourControl: true,
+      doesHaveDocumentForRiskAssesment: true,
+      doesHaveDocumentForIncidentInvestigation: false,
+      doesHaveDocumentedFitness: false,
+      isWillingToComply: true,
+    };
+
+    const updatedCompany = await Companies.updateHealthAndSafetyManagement(company._id, doc);
+    const healthAndSafetyManagement = updatedCompany.healthAndSafetyManagement;
+
+    expect(healthAndSafetyManagement.doesHaveHealthSafety).toBe(doc.doesHaveHealthSafety);
+    expect(healthAndSafetyManagement.areHSEResourcesClearlyIdentified).toBe(
+      doc.areHSEResourcesClearlyIdentified,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentedProcessToEnsure).toBe(
+      doc.doesHaveDocumentedProcessToEnsure,
+    );
+    expect(healthAndSafetyManagement.areEmployeesUnderYourControl).toBe(
+      doc.areEmployeesUnderYourControl,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentForRiskAssesment).toBe(
+      doc.doesHaveDocumentForRiskAssesment,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentForIncidentInvestigation).toBe(
+      doc.doesHaveDocumentForIncidentInvestigation,
+    );
+    expect(healthAndSafetyManagement.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
+    expect(healthAndSafetyManagement.isWillingToComply).toBe(doc.isWillingToComply);
   });
 });

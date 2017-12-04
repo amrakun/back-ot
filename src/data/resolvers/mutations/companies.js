@@ -57,6 +57,34 @@ const companyMutations = {
   async companiesEditProductsInfo(root, { _id, productsInfo }) {
     return Companies.updateProductsInfo(_id, productsInfo);
   },
+
+  /**
+   * Update company financial info
+   */
+  async companiesEditFinancialInfo(root, { _id, financialInfo }) {
+    return Companies.updateFinancialInfo(_id, financialInfo);
+  },
+
+  /**
+   * Update company business ingegrity and human resource
+   */
+  async companiesEditBusinessAndHumanResource(root, { _id, businessAndHumanResource }) {
+    return Companies.updateBusinessAndHumanResource(_id, businessAndHumanResource);
+  },
+
+  /**
+   * Update company environmental management
+   */
+  async companiesEditEnvironmentalManagement(root, { _id, environmentalManagement }) {
+    return Companies.updateEnvironmentalManagement(_id, environmentalManagement);
+  },
+
+  /**
+   * Update company health and safety management system
+   */
+  async companiesEditHealthAndSafetyManagement(root, { _id, healthAndSafetyManagement }) {
+    return Companies.updateHealthAndSafetyManagement(_id, healthAndSafetyManagement);
+  },
 };
 
 export default companyMutations;
