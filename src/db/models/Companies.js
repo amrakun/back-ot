@@ -7,6 +7,7 @@ const BasicInfoSchema = mongoose.Schema(
     enName: field({ type: String }),
     mnName: field({ type: String }),
     isRegisteredOnSup: field({ type: Boolean }),
+    sapNumber: field({ type: String }),
     address: field({ type: String }),
     address2: field({ type: String, optional: true }),
     address3: field({ type: String, optional: true }),
@@ -17,11 +18,13 @@ const BasicInfoSchema = mongoose.Schema(
     registeredInCountry: field({ type: String }),
     registeredInAimag: field({ type: String }),
     registeredInSum: field({ type: String }),
+    isChinese: field({ type: Boolean }),
     isSubContractor: field({ type: Boolean }),
     corporateStructure: field({ type: String }),
     registrationNumber: field({ type: Number }),
     email: field({ type: String }),
-    foreignOwnershipPercentage: field({ type: Number }),
+    website: field({ type: String }),
+    foreignOwnershipPercentage: field({ type: String }),
     totalNumberOfEmployees: field({ type: Number }),
     totalNumberOfMongolianEmployees: field({ type: Number }),
     totalNumberOfUmnugoviEmployees: field({ type: Number }),
@@ -231,11 +234,14 @@ const BusinessAndHumanResourceSchema = mongoose.Schema(
 // Environmental management =========
 const EnvironmentalManagementSchema = mongoose.Schema(
   {
-    // Does the organisation have environmental management plans or procedures(including air quality,
-    // greenhouse gases emissions, water and contamination prevention, noise and vibration, Waste Management)?
+    // Does the organisation have environmental management plans
+    // or procedures(including air quality,
+    // greenhouse gases emissions, water and contamination prevention,
+    // noise and vibration, Waste Management)?
     doesHavePlan: field({ type: Boolean }),
 
-    // Has any environmental regulator inspected / investigated your company within the last 5 years?
+    // Has any environmental regulator inspected / investigated your
+    // company within the last 5 years?
     hasEnvironmentalRegulatorInvestigated: field({ type: Boolean }),
 
     dateOfInvestigation: field({ type: String }),
@@ -246,7 +252,8 @@ const EnvironmentalManagementSchema = mongoose.Schema(
 
     investigationDocumentation: field({ type: String }),
 
-    // Has your company ever been convicted for a breach of any Environmental laws in the countries you operate?
+    // Has your company ever been convicted for a breach of any
+    // Environmental laws in the countries you operate?
     hasConvictedForEnvironmentalLaws: field({ type: Boolean }),
 
     // If Yes, what steps have you taken to ensure this does not happen again?
@@ -264,16 +271,20 @@ const HealthAndSafetyManagementSchema = mongoose.Schema(
     // Does the organisation have a Health Safety & Environment management system?
     doesHaveHealthSafety: field({ type: Boolean }),
 
-    // Are HSE resources, roles, responsibilities and authority levels clearly identified and defined within your Organisation?
+    // Are HSE resources, roles, responsibilities and authority levels clearly
+    // identified and defined within your Organisation?
     areHSEResourcesClearlyIdentified: field({ type: Boolean }),
 
-    // Does your company have a documented process to ensure all staff receive health and safety training and induction?
+    // Does your company have a documented process to ensure all staff
+    // receive health and safety training and induction?
     doesHaveDocumentedProcessToEnsure: field({ type: Boolean }),
 
-    // Are all employees under your control required to utilise appropriate Personal Protective Equipment (PPE) at all times?
+    // Are all employees under your control required to utilise appropriate
+    // Personal Protective Equipment (PPE) at all times?
     areEmployeesUnderYourControl: field({ type: Boolean }),
 
-    //  Does the company have a documented process or guidelines for risk assessment (including CRM)?
+    //  Does the company have a documented process or guidelines for
+    //  risk assessment (including CRM)?
     doesHaveDocumentForRiskAssesment: field({ type: Boolean }),
 
     // Does the company have a documented process for incident investigation?

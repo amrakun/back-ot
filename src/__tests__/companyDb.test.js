@@ -12,6 +12,7 @@ afterAll(() => disconnect());
 const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.enName).toBe(doc.enName);
   expect(basicInfo.mnName).toBe(doc.mnName);
+  expect(basicInfo.sapNumber).toBe(doc.sapNumber);
   expect(basicInfo.isRegisteredOnSup).toBe(doc.isRegisteredOnSup);
   expect(basicInfo.address).toBe(doc.address);
   expect(basicInfo.address2).toBe(doc.address2);
@@ -22,10 +23,12 @@ const checkBasicInfo = (basicInfo, doc) => {
   expect(basicInfo.registeredInCountry).toBe(doc.registeredInCountry);
   expect(basicInfo.registeredInAimag).toBe(doc.registeredInAimag);
   expect(basicInfo.registeredInSum).toBe(doc.registeredInSum);
+  expect(basicInfo.isChinese).toBe(doc.isChinese);
   expect(basicInfo.isSubContractor).toBe(doc.isSubContractor);
   expect(basicInfo.corporateStructure).toBe(doc.corporateStructure);
   expect(basicInfo.registrationNumber).toBe(doc.registrationNumber);
   expect(basicInfo.email).toBe(doc.email);
+  expect(basicInfo.website).toBe(doc.website);
   expect(basicInfo.foreignOwnershipPercentage).toBe(doc.foreignOwnershipPercentage);
   expect(basicInfo.totalNumberOfEmployees).toBe(doc.totalNumberOfEmployees);
   expect(basicInfo.totalNumberOfMongolianEmployees).toBe(doc.totalNumberOfMongolianEmployees);
@@ -66,6 +69,7 @@ describe('Companies model tests', () => {
     const doc = {
       enName: 'enName',
       mnName: 'mnName',
+      sapNumber: 'sapNumber',
       isRegisteredOnSup: true,
       address: 'Address',
       address2: 'Address2',
@@ -77,11 +81,13 @@ describe('Companies model tests', () => {
       registeredInCountry: 'Mongolia',
       registeredInAimag: 'Umnugiv',
       registeredInSum: 'Bayntsagaan',
+      isChinese: false,
       isSubContractor: true,
       corporateStructure: 'Partnership',
       registrationNumber: 334839483943,
       email: 'company@gmail.com',
-      foreignOwnershipPercentage: 40,
+      website: 'web.com',
+      foreignOwnershipPercentage: '40',
       totalNumberOfEmployees: 100,
       totalNumberOfMongolianEmployees: 80,
       totalNumberOfUmnugoviEmployees: 10,
@@ -118,6 +124,7 @@ describe('Companies model tests', () => {
     const doc = {
       enName: 'enNameUpdated',
       mnName: 'mnNameUpdated',
+      sapNumber: 'sapNumber',
       isRegisteredOnSup: false,
       address: 'AddressUpdated',
       address2: 'Address2Updated',
@@ -129,11 +136,13 @@ describe('Companies model tests', () => {
       registeredInCountry: 'MongoliaUpdated',
       registeredInAimag: 'UmnugivUpdated',
       registeredInSum: 'BayntsagaanUpdated',
+      isChinese: true,
       isSubContractor: false,
       corporateStructure: 'PartnershipUpdated',
       registrationNumber: 33483948394,
       email: 'companyUpdated@gmail.com',
-      foreignOwnershipPercentage: 41,
+      website: 'web.com',
+      foreignOwnershipPercentage: '41',
       totalNumberOfEmployees: 101,
       totalNumberOfMongolianEmployees: 81,
       totalNumberOfUmnugoviEmployees: 11,

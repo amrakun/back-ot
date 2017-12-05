@@ -2,6 +2,7 @@ const basicInfoFields = `
   enName: String!,
   mnName: String!,
   isRegisteredOnSup: Boolean,
+  sapNumber: String!,
   address: String!,
   address2: String,
   address3: String,
@@ -12,14 +13,17 @@ const basicInfoFields = `
   registeredInCountry: String!,
   registeredInAimag: String!,
   registeredInSum: String!,
+  isChinese: Boolean,
   isSubContractor: Boolean,
   corporateStructure: String!,
   registrationNumber: Int!,
+  certificateOfRegistration: String!,
   email: String!,
-  foreignOwnershipPercentage: Int!,
-  totalIntOfEmployees: Int!,
-  totalIntOfMongolianEmployees: Int!,
-  totalIntOfUmnugoviEmployees: Int!,
+  website: String!,
+  foreignOwnershipPercentage: String!,
+  totalNumberOfEmployees: Int!,
+  totalNumberOfMongolianEmployees: Int!,
+  totalNumberOfUmnugoviEmployees: Int!,
 `;
 
 const contactInfoFields = `
@@ -277,7 +281,19 @@ export const mutations = `
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
-  companiesEditBusinessAndHumanResource(_id: String!, businessAndHumanResource: CompanyBusinessAndHumanResourceInput): Company
-  companiesEditEnvironmentalManagement(_id: String!, environmentalManagement: CompanyEnvironmentalManagementInput): Company
-  companiesEditHealthAndSafetyManagement(_id: String!, healthAndSafetyManagement: CompanyHealthAndSafetyManagementInput): Company
+
+  companiesEditBusinessAndHumanResource(
+    _id: String!,
+    businessAndHumanResource: CompanyBusinessAndHumanResourceInput
+  ): Company
+
+  companiesEditEnvironmentalManagement(
+    _id: String!,
+    environmentalManagement: CompanyEnvironmentalManagementInput
+  ): Company
+
+  companiesEditHealthAndSafetyManagement(
+    _id: String!,
+    healthAndSafetyManagement: CompanyHealthAndSafetyManagementInput
+  ): Company
 `;
