@@ -62,7 +62,7 @@ const PersonSchema = mongoose.Schema(
   { _id: false },
 );
 
-const ManagementTeamSchema = mongoose.Schema(
+const ManagementTeamInfoSchema = mongoose.Schema(
   {
     managingDirector: PersonSchema,
     executiveOfficer: PersonSchema,
@@ -88,11 +88,7 @@ const ShareholderSchema = mongoose.Schema(
 const ShareholderInfoSchema = mongoose.Schema(
   {
     attachments: [String],
-    shareholder1: ShareholderSchema,
-    shareholder2: ShareholderSchema,
-    shareholder3: ShareholderSchema,
-    shareholder4: ShareholderSchema,
-    shareholder5: ShareholderSchema,
+    shareholders: [ShareholderSchema],
   },
   { _id: false },
 );
@@ -152,7 +148,7 @@ const FinancialInfoSchema = mongoose.Schema(
     totalCurrentAssets: [YearAmountSchema],
     totalShareholderEquity: [YearAmountSchema],
 
-    canProvideRecordsInfo: [DatePathSchema],
+    recordsInfo: [DatePathSchema],
 
     // Is your company up to date with Social Security payments?
     isUpToDateSSP: field({ type: Boolean }),
@@ -175,7 +171,7 @@ const InvestigationSchema = mongoose.Schema(
   { _id: false },
 );
 
-const BusinessAndHumanResourceSchema = mongoose.Schema(
+const BusinessInfoSchema = mongoose.Schema(
   {
     // Does your company meet minimum standards of fair employment
     // practice required by Mongolian labor laws and regulations
@@ -232,7 +228,7 @@ const BusinessAndHumanResourceSchema = mongoose.Schema(
 );
 
 // Environmental management =========
-const EnvironmentalManagementSchema = mongoose.Schema(
+const EnvironmentalInfoSchema = mongoose.Schema(
   {
     // Does the organisation have environmental management plans
     // or procedures(including air quality,
@@ -266,7 +262,7 @@ const EnvironmentalManagementSchema = mongoose.Schema(
 
 // Health & safety management system =========
 
-const HealthAndSafetyManagementSchema = mongoose.Schema(
+const HealthInfoSchema = mongoose.Schema(
   {
     // Does the organisation have a Health Safety & Environment management system?
     doesHaveHealthSafety: field({ type: Boolean }),
@@ -303,31 +299,27 @@ const HealthAndSafetyManagementSchema = mongoose.Schema(
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
   contactInfo: ContactInfoSchema,
-  managementTeam: ManagementTeamSchema,
+  managementTeamInfo: ManagementTeamInfoSchema,
   shareholderInfo: ShareholderInfoSchema,
   groupInfo: GroupInfoSchema,
   productsInfo: [String],
+
+  // capacity building certificate information
   certificateInfo: CertificateInfoSchema,
+
   financialInfo: FinancialInfoSchema,
-  businessAndHumanResource: BusinessAndHumanResourceSchema,
-  environmentalManagement: EnvironmentalManagementSchema,
-  healthAndSafetyManagement: HealthAndSafetyManagementSchema,
+
+  // business integrity & human resource
+  businessInfo: BusinessInfoSchema,
+
+  // enviromental info
+  environmentalInfo: EnvironmentalInfoSchema,
+
+  // health & safety management system
+  healthInfo: HealthInfoSchema,
 });
 
 class Company {
-  /**
-   * Create a company
-   * @param  {Object} doc object
-   * @return {Promise} Newly created company object
-   */
-  static async createCompany(basicInfo) {
-    const { enName, mnName } = basicInfo;
-
-    await this.checkNames({ enName, mnName });
-
-    return this.create({ basicInfo });
-  }
-
   /**
    * Update basic info
    * @param  {String} _id - company id
@@ -347,83 +339,17 @@ class Company {
   }
 
   /**
-   * Update info helper
+   * Update sub section info
+   * @param {String } _id - Company id
+   * @param {String} key - basicInfo, contactInfo etc ...
+   * @param {Object} value - related update doc
+   * @return Updated company object
    */
-  static async commonUpdate(_id, key, value) {
+  static async updateSection(_id, key, value) {
     // update
     await Companies.update({ _id }, { $set: { [key]: value } });
 
     return Companies.findOne({ _id });
-  }
-
-  /**
-   * Update contact info
-   */
-  static async updateContactInfo(_id, contactInfo) {
-    return this.commonUpdate(_id, 'contactInfo', contactInfo);
-  }
-
-  /**
-   * Update management team
-   */
-  static async updateManagementTeam(_id, doc) {
-    return this.commonUpdate(_id, 'managementTeam', doc);
-  }
-
-  /**
-   * Update shareholder info
-   */
-  static async updateShareholderInfo(_id, shareholderInfo) {
-    return this.commonUpdate(_id, 'shareholderInfo', shareholderInfo);
-  }
-
-  /**
-   * Update group info
-   */
-  static async updateGroupInfo(_id, groupInfo) {
-    return this.commonUpdate(_id, 'groupInfo', groupInfo);
-  }
-
-  /**
-   * Update products info
-   */
-  static async updateProductsInfo(_id, productsInfo) {
-    return this.commonUpdate(_id, 'productsInfo', productsInfo);
-  }
-
-  /**
-   * Update certificate info
-   */
-  static async updateCertificateInfo(_id, certificateInfo) {
-    return this.commonUpdate(_id, 'certificateInfo', certificateInfo);
-  }
-
-  /**
-   * Update financial info
-   */
-  static async updateFinancialInfo(_id, financialInfo) {
-    return this.commonUpdate(_id, 'financialInfo', financialInfo);
-  }
-
-  /**
-   * Update Business integrity & human resource
-   */
-  static async updateBusinessAndHumanResource(_id, businessAndHumanResource) {
-    return this.commonUpdate(_id, 'businessAndHumanResource', businessAndHumanResource);
-  }
-
-  /**
-   * Update  Environmental management
-   */
-  static async updateEnvironmentalManagement(_id, environmentalManagement) {
-    return this.commonUpdate(_id, 'environmentalManagement', environmentalManagement);
-  }
-
-  /**
-   * Update Health and Safety Management System
-   */
-  static async updateHealthAndSafetyManagement(_id, healthAndSafetyManagement) {
-    return this.commonUpdate(_id, 'healthAndSafetyManagement', healthAndSafetyManagement);
   }
 
   /*

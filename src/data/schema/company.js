@@ -42,10 +42,10 @@ const contactInfoFields = `
 `;
 
 const personFields = `
-  name: String!,
-  jobTitle: String!,
-  phone: Float!,
-  email: String!,
+  name: String,
+  jobTitle: String,
+  phone: Float,
+  email: String,
 `;
 
 const shareholderFields = `
@@ -70,13 +70,13 @@ const certificateInfoFields = `
 `;
 
 const yearAmountFields = `
-  year: Int!,
-  amount: Float!,
+  year: Int,
+  amount: Float,
 `;
 
 const datePathFields = `
-  date: String!,
-  path: String!,
+  date: String,
+  path: String,
 `;
 
 const financialInfoFields = `
@@ -92,7 +92,7 @@ const investigationFields = `
   statusDate: String!,
 `;
 
-const businessAndHumanResourceFields = `
+const businessInfoFields = `
   doesMeetMinimumStandarts: Boolean,
   doesHaveJobDescription: Boolean,
   doesConcludeValidContracts: Boolean,
@@ -109,7 +109,7 @@ const businessAndHumanResourceFields = `
   additionalInformation: String!,
 `;
 
-const environmentalManagementFields = `
+const environmentalInfoFields = `
   doesHavePlan: Boolean,
   hasEnvironmentalRegulatorInvestigated: Boolean,
   dateOfInvestigation: String!,
@@ -120,7 +120,7 @@ const environmentalManagementFields = `
   proveHasNotConvicted: String!,
   additionalInformation: String!,
 `;
-const healthAndSafetyManagementFields = `
+const healthInfoFields = `
   doesHaveHealthSafety: Boolean,
   areHSEResourcesClearlyIdentified: Boolean,
   doesHaveDocumentedProcessToEnsure: Boolean,
@@ -144,7 +144,7 @@ export const types = `
   type CompanyManagementTeamPerson { ${personFields} }
   input CompanyManagementTeamPersonInput { ${personFields} }
 
-  type CompanyManagementTeam {
+  type CompanyManagementTeamInfo {
     managingDirector: CompanyManagementTeamPerson,
     executiveOfficer: CompanyManagementTeamPerson,
     salesDirector: CompanyManagementTeamPerson,
@@ -154,7 +154,7 @@ export const types = `
     otherMember3: CompanyManagementTeamPerson,
   }
 
-  input CompanyManagementTeamInput {
+  input CompanyManagementTeamInfoInput {
     managingDirector: CompanyManagementTeamPersonInput,
     executiveOfficer: CompanyManagementTeamPersonInput,
     salesDirector: CompanyManagementTeamPersonInput,
@@ -170,20 +170,12 @@ export const types = `
 
   type CompanyShareholderInfo {
     attachments: [String],
-    shareholder1: CompanyShareholder,
-    shareholder2: CompanyShareholder,
-    shareholder3: CompanyShareholder,
-    shareholder4: CompanyShareholder,
-    shareholder5: CompanyShareholder,
+    shareholders: [CompanyShareholder],
   }
 
   input CompanyShareholderInfoInput {
     attachments: [String],
-    shareholder1: CompanyShareholderInput,
-    shareholder2: CompanyShareholderInput,
-    shareholder3: CompanyShareholderInput,
-    shareholder4: CompanyShareholderInput,
-    shareholder5: CompanyShareholderInput,
+    shareholders: [CompanyShareholderInput],
   }
 
   # group info =========================
@@ -215,7 +207,7 @@ export const types = `
     totalAssets: [CompanyYearAmount]
     totalCurrentAssets: [CompanyYearAmount]
     totalShareholderEquity: [CompanyYearAmount]
-    canProvideRecordsInfo: [CompanyDatePath]
+    recordsInfo: [CompanyDatePath]
   }
 
   input CompanyFinancialInfoInput {
@@ -225,44 +217,44 @@ export const types = `
     totalAssets: [CompanyYearAmountInput]
     totalCurrentAssets: [CompanyYearAmountInput]
     totalShareholderEquity: [CompanyYearAmountInput]
-    canProvideRecordsInfo: [CompanyDatePathInput]
+    recordsInfo: [CompanyDatePathInput]
   }
 
   # business and human resource ====
   type CompanyInvestigation { ${investigationFields} }
   input CompanyInvestigationtInput { ${investigationFields} }
 
-  type CompanyBusinessAndHumanResource {
-    ${businessAndHumanResourceFields}
+  type CompanyBusinessInfo {
+    ${businessInfoFields}
     investigations: [CompanyInvestigation]
   }
 
-  input CompanyBusinessAndHumanResourceInput {
-    ${businessAndHumanResourceFields}
+  input CompanyBusinessInfoInput {
+    ${businessInfoFields}
     investigations: [CompanyInvestigationtInput]
   }
 
   # environmental management =============
-  type CompanyEnvironmentalManagement { ${environmentalManagementFields} }
-  input CompanyEnvironmentalManagementInput { ${environmentalManagementFields} }
+  type CompanyEnvironmentalInfo { ${environmentalInfoFields} }
+  input CompanyEnvironmentalInfoInput { ${environmentalInfoFields} }
 
    # health and safety management system  ==========
-  type CompanyHealthAndSafetyManagement { ${healthAndSafetyManagementFields} }
-  input CompanyHealthAndSafetyManagementInput { ${healthAndSafetyManagementFields} }
+  type CompanyHealthInfo { ${healthInfoFields} }
+  input CompanyHealthInfoInput { ${healthInfoFields} }
 
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
     contactInfo: CompanyContactInfo,
-    managementTeam: CompanyManagementTeam,
+    managementTeamInfo: CompanyManagementTeamInfo,
     shareholderInfo: CompanyShareholderInfo,
     groupInfo: CompanyGroupInfo,
     productsInfo: [String],
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
-    businessAndHumanResource: CompanyBusinessAndHumanResource,
-    environmentalManagement: CompanyEnvironmentalManagement,
-    healthAndSafetyManagement: CompanyHealthAndSafetyManagement,
+    businessInfo: CompanyBusinessInfo,
+    environmentalInfo: CompanyEnvironmentalInfo,
+    healthInfo: CompanyHealthInfo,
   }
 `;
 
@@ -272,28 +264,25 @@ export const queries = `
 `;
 
 export const mutations = `
-  companiesAdd(basicInfo: CompanyBasicInfoInput): Company
   companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
   companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
-  companiesEditManagementTeam(_id: String!, managementTeam: CompanyManagementTeamInput): Company
+
+  companiesEditManagementTeamInfo(
+    _id: String!,
+    managementTeamInfo: CompanyManagementTeamInfoInput
+  ): Company
+
   companiesEditShareholderInfo(_id: String!, shareholderInfo: CompanyShareholderInfoInput): Company
   companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
   companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
+  companiesEditBusinessInfo(_id: String!, businessInfo: CompanyBusinessInfoInput): Company
 
-  companiesEditBusinessAndHumanResource(
+  companiesEditEnvironmentalInfo(
     _id: String!,
-    businessAndHumanResource: CompanyBusinessAndHumanResourceInput
+    environmentalInfo: CompanyEnvironmentalInfoInput
   ): Company
 
-  companiesEditEnvironmentalManagement(
-    _id: String!,
-    environmentalManagement: CompanyEnvironmentalManagementInput
-  ): Company
-
-  companiesEditHealthAndSafetyManagement(
-    _id: String!,
-    healthAndSafetyManagement: CompanyHealthAndSafetyManagementInput
-  ): Company
+  companiesEditHealthInfo(_id: String!, healthInfo: CompanyHealthInfoInput): Company
 `;
