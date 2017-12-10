@@ -306,7 +306,7 @@ const CompanySchema = mongoose.Schema({
   managementTeam: ManagementTeamSchema,
   shareholderInfo: ShareholderInfoSchema,
   groupInfo: GroupInfoSchema,
-  products: [String],
+  productsInfo: [String],
   certificateInfo: CertificateInfoSchema,
   financialInfo: FinancialInfoSchema,
   businessAndHumanResource: BusinessAndHumanResourceSchema,
@@ -387,8 +387,8 @@ class Company {
   /**
    * Update products info
    */
-  static async updateProductsInfo(_id, products) {
-    return this.commonUpdate(_id, 'products', products);
+  static async updateProductsInfo(_id, productsInfo) {
+    return this.commonUpdate(_id, 'productsInfo', productsInfo);
   }
 
   /**

@@ -49,9 +49,9 @@ const personFields = `
 `;
 
 const shareholderFields = `
-  name: String!,
-  jobTitle: String!,
-  percentage: Int!,
+  name: String,
+  jobTitle: String,
+  percentage: Int,
 `;
 
 const groupInfoFields = `
@@ -168,7 +168,7 @@ export const types = `
   type CompanyShareholder { ${shareholderFields} }
   input CompanyShareholderInput { ${shareholderFields} }
 
-  type CompanyShareholders {
+  type CompanyShareholderInfo {
     attachments: [String],
     shareholder1: CompanyShareholder,
     shareholder2: CompanyShareholder,
@@ -177,7 +177,7 @@ export const types = `
     shareholder5: CompanyShareholder,
   }
 
-  input CompanyShareholdersInput {
+  input CompanyShareholderInfoInput {
     attachments: [String],
     shareholder1: CompanyShareholderInput,
     shareholder2: CompanyShareholderInput,
@@ -255,9 +255,9 @@ export const types = `
     basicInfo: CompanyBasicInfo,
     contactInfo: CompanyContactInfo,
     managementTeam: CompanyManagementTeam,
-    shareholderInfo: CompanyShareholders,
+    shareholderInfo: CompanyShareholderInfo,
     groupInfo: CompanyGroupInfo,
-    products: [String],
+    productsInfo: [String],
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
     businessAndHumanResource: CompanyBusinessAndHumanResource,
@@ -276,7 +276,7 @@ export const mutations = `
   companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
   companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
   companiesEditManagementTeam(_id: String!, managementTeam: CompanyManagementTeamInput): Company
-  companiesEditShareholders(_id: String!, shareholders: CompanyShareholdersInput): Company
+  companiesEditShareholderInfo(_id: String!, shareholderInfo: CompanyShareholderInfoInput): Company
   companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
   companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company

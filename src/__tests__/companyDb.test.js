@@ -292,7 +292,7 @@ describe('Companies model tests', () => {
     const productCodes = ['a10', 'c12'];
 
     const updatedCompany = await Companies.updateProductsInfo(company._id, productCodes);
-    const productsInfo = updatedCompany.products;
+    const productsInfo = updatedCompany.productsInfo;
 
     expect(productsInfo).toContain(...productCodes);
   });

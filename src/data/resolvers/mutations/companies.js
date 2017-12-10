@@ -33,8 +33,8 @@ const companyMutations = {
   /**
    * Update company shareholders
    */
-  async companiesEditShareholders(root, { _id, shareholders }) {
-    return Companies.updateShareholderInfo(_id, shareholders);
+  async companiesEditShareholderInfo(root, { _id, shareholderInfo }) {
+    return Companies.updateShareholderInfo(_id, shareholderInfo);
   },
 
   /**
