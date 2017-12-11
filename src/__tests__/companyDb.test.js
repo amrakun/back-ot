@@ -261,6 +261,7 @@ describe('Companies model tests', () => {
 
     const doc = {
       canProvideAccountsInfo: true,
+      reasonToCannotNotProvide: 'I dont know',
       currency: 'Euro (EUR)',
       annualTurnover: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
       preTaxProfit: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
@@ -278,6 +279,7 @@ describe('Companies model tests', () => {
     const financialInfo = updatedCompany.financialInfo;
 
     expect(financialInfo.canProvideAccountsInfo).toBe(doc.canProvideAccountsInfo);
+    expect(financialInfo.reasonToCannotNotProvide).toBe(doc.reasonToCannotNotProvide);
     expect(financialInfo.currency).toBe(doc.currency);
     expect(financialInfo.isUpToDateSSP).toBe(doc.isUpToDateSSP);
     expect(financialInfo.isUpToDateCTP).toBe(doc.isUpToDateCTP);

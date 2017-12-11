@@ -83,6 +83,7 @@ const datePathFields = `
 
 const financialInfoFields = `
   canProvideAccountsInfo: Boolean,
+  reasonToCannotNotProvide: String,
   currency: String!,
   isUpToDateSSP: Boolean,
   isUpToDateCTP: Boolean,
