@@ -193,11 +193,12 @@ describe('Companies model tests', () => {
   test('Update group info', async () => {
     const company = await companyFactory();
 
-    const generateShareholderDoc = () => {
+    const generateFactoryDoc = () => {
       return {
         name: `${Math.random()}name`,
-        jobTitle: `${Math.random()}jobTitle`,
-        percentage: Math.random(),
+        townOrCity: `${Math.random()}townOrCity`,
+        country: `${Math.random()}country`,
+        productCodes: ['code'],
       };
     };
 
@@ -210,7 +211,7 @@ describe('Companies model tests', () => {
       attachments: ['/path1'],
       primaryManufacturerName: 'primaryManufacturerName',
       countryOfPrimaryManufacturer: 'countryOfPrimaryManufacturer',
-      shareholders: [generateShareholderDoc()],
+      factories: [generateFactoryDoc()],
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'groupInfo', doc);
@@ -225,8 +226,8 @@ describe('Companies model tests', () => {
     expect(groupInfo.primaryManufacturerName).toBe(doc.primaryManufacturerName);
     expect(groupInfo.countryOfPrimaryManufacturer).toBe(doc.countryOfPrimaryManufacturer);
 
-    const [shareholder] = groupInfo.shareholders;
-    expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
+    const [factory] = groupInfo.factories;
+    expect(factory.toJSON()).toEqual(doc.factories[0]);
   });
 
   test('Update products info', async () => {

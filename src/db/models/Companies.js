@@ -94,6 +94,16 @@ const ShareholderInfoSchema = mongoose.Schema(
 );
 
 // group information =========
+const FactorySchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    townOrCity: field({ type: String }),
+    country: field({ type: String }),
+    productCodes: field({ type: [String] }),
+  },
+  { _id: false },
+);
+
 const GroupInfoSchema = mongoose.Schema(
   {
     // Do you have an Ultimate Parent Company?
@@ -108,11 +118,14 @@ const GroupInfoSchema = mongoose.Schema(
     // manufacturer, distributor, stocklist
     role: field({ type: String }),
 
+    // Please provide details of the factory or factories involved in the
+    // manufacture of this product
+    factories: [FactorySchema],
+
     isExclusiveDistributor: field({ type: Boolean }),
     attachments: [String],
     primaryManufacturerName: field({ type: String }),
     countryOfPrimaryManufacturer: field({ type: String }),
-    shareholders: [ShareholderSchema],
   },
   { _id: false },
 );
@@ -171,7 +184,6 @@ const FinancialInfoSchema = mongoose.Schema(
 );
 
 // Business integrity & human resource =========
-
 const InvestigationSchema = mongoose.Schema(
   {
     name: field({ type: String }),

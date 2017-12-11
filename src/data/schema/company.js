@@ -54,6 +54,13 @@ const shareholderFields = `
   percentage: Int,
 `;
 
+const factoryFields = `
+  name: String,
+  townOrCity: String,
+  country: String,
+  productCodes: [String],
+`;
+
 const groupInfoFields = `
   hasParent: Boolean,
   parentAddress: String,
@@ -106,7 +113,7 @@ const businessInfoFields = `
   hasConvictedLabourLaws: Boolean,
   hasConvictedForHumanRights: Boolean,
   hasConvictedForBusinessIntegrity: Boolean,
-  proveHasNotConvicted: String!,
+  proveHasNotConvicted: String,
   hasLeadersConvicted: Boolean,
   doesEmployeePoliticallyExposed: Boolean,
   additionalInformation: String!,
@@ -182,14 +189,17 @@ export const types = `
   }
 
   # group info =========================
+  type CompanyFactory { ${factoryFields} }
+  input CompanyFactoryInput { ${factoryFields} }
+
   type CompanyGroupInfo {
     ${groupInfoFields}
-    shareholders: [CompanyShareholder]
+    factories: [CompanyFactory]
   }
 
   input CompanyGroupInfoInput {
     ${groupInfoFields}
-    shareholders: [CompanyShareholderInput]
+    factories: [CompanyFactoryInput]
   }
 
   # certificate info ====================
