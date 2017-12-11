@@ -96,9 +96,18 @@ const ShareholderInfoSchema = mongoose.Schema(
 // group information =========
 const GroupInfoSchema = mongoose.Schema(
   {
+    // Do you have an Ultimate Parent Company?
     hasParent: field({ type: Boolean }),
+
+    // Ultimate parent company address
+    parentAddress: field({ type: String }),
+
+    // Ultimate parent registration number
+    parentRegistrationNumber: field({ type: String }),
+
     // manufacturer, distributor, stocklist
     role: field({ type: String }),
+
     isExclusiveDistributor: field({ type: Boolean }),
     attachments: [String],
     primaryManufacturerName: field({ type: String }),

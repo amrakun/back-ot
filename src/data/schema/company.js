@@ -56,6 +56,8 @@ const shareholderFields = `
 
 const groupInfoFields = `
   hasParent: Boolean,
+  parentAddress: String,
+  parentRegistrationNumber: String,
   role: String!,
   isExclusiveDistributor: Boolean,
   attachments: [String],

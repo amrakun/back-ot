@@ -203,6 +203,8 @@ describe('Companies model tests', () => {
 
     const doc = {
       hasParent: true,
+      parentAddress: 'parentAddress',
+      parentRegistrationNumber: 'parentRegistrationNumber',
       role: 'manufacturer',
       isExclusiveDistributor: false,
       attachments: ['/path1'],
@@ -216,13 +218,14 @@ describe('Companies model tests', () => {
 
     expect(groupInfo.attachments).toContain('/path1');
     expect(groupInfo.hasParent).toBe(doc.hasParent);
+    expect(groupInfo.parentAddress).toBe(doc.parentAddress);
+    expect(groupInfo.parentRegistrationNumber).toBe(doc.parentRegistrationNumber);
     expect(groupInfo.role).toBe(doc.role);
     expect(groupInfo.isExclusiveDistributor).toBe(doc.isExclusiveDistributor);
     expect(groupInfo.primaryManufacturerName).toBe(doc.primaryManufacturerName);
     expect(groupInfo.countryOfPrimaryManufacturer).toBe(doc.countryOfPrimaryManufacturer);
 
     const [shareholder] = groupInfo.shareholders;
-
     expect(shareholder.toJSON()).toEqual(doc.shareholders[0]);
   });
 
