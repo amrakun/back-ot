@@ -312,8 +312,37 @@ const HealthInfoSchema = mongoose.Schema(
     // Does your company have a documented Fitness for Work (FFW) policy?
     doesHaveDocumentedFitness: field({ type: Boolean }),
 
-    //  Is your company willing to comply with Oyu Tolgoi/RT HSE management system?
-    isWillingToComply: field({ type: Boolean }),
+    // Has there been any industrial accident in the last 5 financial years ?
+    hasIndustrialAccident: field({ type: Boolean }),
+
+    // Provide lost time injury frequency rate
+    ltifr: field({ type: Boolean }),
+
+    // Provide a summary explaining the fatality or injury event(s)
+    // that contributed to the above
+    injuryExplanation: field({ type: Boolean }),
+
+    // Details of how senior management demonstrates its commitment to the
+    // oyutolgoi hse policy and management system
+    seniorManagement: field({ type: Boolean }),
+
+    // Is your company willing commmit itself
+    isWillingToCommit: field({ type: Boolean }),
+
+    // Is your company perpared to compile weekly and monthly safety
+    // statistics for the work performed on site ?
+    isPerparedToCompile: field({ type: Boolean }),
+
+    // Has your company previously worked on Word bank or international
+    // finance corporation project
+    hasWorkedOnWorldBank: field({ type: Boolean }),
+
+    // Has your company previously worked on large scale mining construction
+    // projects
+    hasWorkedOnLargeProjects: field({ type: Boolean }),
+
+    // Does the organization have valid industry certificates
+    doesHaveLicense: field({ type: Boolean }),
   },
   { _id: false },
 );

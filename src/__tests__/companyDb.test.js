@@ -410,7 +410,6 @@ describe('Companies model tests', () => {
       doesHaveDocumentForRiskAssesment: true,
       doesHaveDocumentForIncidentInvestigation: false,
       doesHaveDocumentedFitness: false,
-      isWillingToComply: true,
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
@@ -433,6 +432,5 @@ describe('Companies model tests', () => {
       doc.doesHaveDocumentForIncidentInvestigation,
     );
     expect(health.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
-    expect(health.isWillingToComply).toBe(doc.isWillingToComply);
   });
 });
