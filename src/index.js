@@ -5,9 +5,11 @@ import express from 'express';
 import { createServer } from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import formidable from 'formidable';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import schema from './data';
+import { uploadFile } from './data/utils';
 
 // load environment variables
 dotenv.config();
@@ -21,6 +23,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(cors());
+
+// file upload
+app.post('/upload-file', async (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async (err, fields, response) => {
+    const url = await uploadFile(response.file);
+
+    return res.end(url);
+  });
+});
 
 app.use(
   '/graphql',

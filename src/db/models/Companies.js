@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 
+const FileSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    url: field({ type: String }),
+  },
+  { _id: false },
+);
+
 // basic info ===========
 const BasicInfoSchema = mongoose.Schema(
   {
@@ -22,6 +30,7 @@ const BasicInfoSchema = mongoose.Schema(
     isSubContractor: field({ type: Boolean }),
     corporateStructure: field({ type: String }),
     registrationNumber: field({ type: Number }),
+    certificateOfRegistration: FileSchema,
     email: field({ type: String }),
     website: field({ type: String }),
     foreignOwnershipPercentage: field({ type: String }),

@@ -17,7 +17,7 @@ const basicInfoFields = `
   isSubContractor: Boolean,
   corporateStructure: String!,
   registrationNumber: Int!,
-  certificateOfRegistration: String!,
+  certificateOfRegistration: JSON,
   email: String!,
   website: String!,
   foreignOwnershipPercentage: String!,
@@ -130,6 +130,7 @@ const environmentalInfoFields = `
   proveHasNotConvicted: String!,
   additionalInformation: String!,
 `;
+
 const healthInfoFields = `
   doesHaveHealthSafety: Boolean,
   areHSEResourcesClearlyIdentified: Boolean,
@@ -140,6 +141,7 @@ const healthInfoFields = `
   doesHaveDocumentedFitness: Boolean,
   isWillingToComply: Boolean,
 `;
+
 export const types = `
   #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields} }

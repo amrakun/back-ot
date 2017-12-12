@@ -63,6 +63,7 @@ describe('Companies model tests', () => {
       isSubContractor: false,
       corporateStructure: 'PartnershipUpdated',
       registrationNumber: 33483948394,
+      certificateOfRegistration: { name: 'name', url: '/path' },
       email: 'companyUpdated@gmail.com',
       website: 'web.com',
       foreignOwnershipPercentage: '41',
@@ -92,6 +93,7 @@ describe('Companies model tests', () => {
     expect(basicInfo.isSubContractor).toBe(doc.isSubContractor);
     expect(basicInfo.corporateStructure).toBe(doc.corporateStructure);
     expect(basicInfo.registrationNumber).toBe(doc.registrationNumber);
+    expect(basicInfo.certificateOfRegistration.toJSON()).toEqual(doc.certificateOfRegistration);
     expect(basicInfo.email).toBe(doc.email);
     expect(basicInfo.website).toBe(doc.website);
     expect(basicInfo.foreignOwnershipPercentage).toBe(doc.foreignOwnershipPercentage);
