@@ -180,14 +180,14 @@ describe('Companies model tests', () => {
     };
 
     const doc = {
-      attachments: ['/path1'],
+      attachments: [{name: 'name', url: '/path1'}],
       shareholders: [generateShareholderDoc(), generateShareholderDoc()],
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'shareholderInfo', doc);
     const [sh1, sh2] = updatedCompany.shareholderInfo.shareholders;
 
-    expect(updatedCompany.shareholderInfo.attachments).toContain(doc.attachments[0]);
+    expect(updatedCompany.shareholderInfo.attachments[0].toJSON()).toEqual(doc.attachments[0]);
     expect(sh1.toJSON()).toEqual(doc.shareholders[0]);
     expect(sh2.toJSON()).toEqual(doc.shareholders[1]);
   });
@@ -412,6 +412,15 @@ describe('Companies model tests', () => {
       doesHaveDocumentForRiskAssesment: true,
       doesHaveDocumentForIncidentInvestigation: false,
       doesHaveDocumentedFitness: false,
+      hasIndustrialAccident: false,
+      ltifr: false,
+      injuryExplanation: false,
+      seniorManagement: false,
+      isWillingToCommit: false,
+      isPerparedToCompile: false,
+      hasWorkedOnWorldBank: false,
+      hasWorkedOnLargeProjects: false,
+      doesHaveLicense: false,
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
@@ -434,5 +443,14 @@ describe('Companies model tests', () => {
       doc.doesHaveDocumentForIncidentInvestigation,
     );
     expect(health.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
+    expect(health.hasIndustrialAccident).toBe(doc.hasIndustrialAccident);
+    expect(health.ltifr).toBe(doc.ltifr);
+    expect(health.injuryExplanation).toBe(doc.injuryExplanation);
+    expect(health.seniorManagement).toBe(doc.seniorManagement);
+    expect(health.isWillingToCommit).toBe(doc.isWillingToCommit);
+    expect(health.isPerparedToCompile).toBe(doc.isPerparedToCompile);
+    expect(health.hasWorkedOnWorldBank).toBe(doc.hasWorkedOnWorldBank);
+    expect(health.hasWorkedOnLargeProjects).toBe(doc.hasWorkedOnLargeProjects);
+    expect(health.doesHaveLicense).toBe(doc.doesHaveLicense);
   });
 });

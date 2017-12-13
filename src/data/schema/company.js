@@ -127,7 +127,7 @@ const environmentalInfoFields = `
   actionStatus: String!,
   investigationDocumentation: String!,
   hasConvictedForEnvironmentalLaws: Boolean,
-  proveHasNotConvicted: String!,
+  proveHasNotConvicted: String,
   additionalInformation: String!,
 `;
 
@@ -139,7 +139,15 @@ const healthInfoFields = `
   doesHaveDocumentForRiskAssesment: Boolean,
   doesHaveDocumentForIncidentInvestigation: Boolean,
   doesHaveDocumentedFitness: Boolean,
-  isWillingToComply: Boolean,
+  hasIndustrialAccident: Boolean,
+  ltifr: Boolean,
+  injuryExplanation: Boolean,
+  seniorManagement: Boolean,
+  isWillingToCommit: Boolean,
+  isPerparedToCompile: Boolean,
+  hasWorkedOnWorldBank: Boolean,
+  hasWorkedOnLargeProjects: Boolean,
+  doesHaveLicense: Boolean,
 `;
 
 export const types = `
@@ -181,12 +189,12 @@ export const types = `
   input CompanyShareholderInput { ${shareholderFields} }
 
   type CompanyShareholderInfo {
-    attachments: [String],
+    attachments: [JSON],
     shareholders: [CompanyShareholder],
   }
 
   input CompanyShareholderInfoInput {
-    attachments: [String],
+    attachments: [JSON],
     shareholders: [CompanyShareholderInput],
   }
 

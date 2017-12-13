@@ -96,7 +96,7 @@ const ShareholderSchema = mongoose.Schema(
 
 const ShareholderInfoSchema = mongoose.Schema(
   {
-    attachments: [String],
+    attachments: [FileSchema],
     shareholders: [ShareholderSchema],
   },
   { _id: false },
