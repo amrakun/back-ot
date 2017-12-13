@@ -189,8 +189,15 @@ export const types = `
   type CompanyShareholder { ${shareholderFields} }
   input CompanyShareholderInput { ${shareholderFields} }
 
-  type CompanyShareholderInfo { shareholders: [CompanyShareholder] }
-  input CompanyShareholderInfoInput { shareholders: [CompanyShareholderInput] }
+  type CompanyShareholderInfo {
+    attachments: [JSON]
+    shareholders: [CompanyShareholder]
+  }
+
+  input CompanyShareholderInfoInput {
+    attachments: [JSON]
+    shareholders: [CompanyShareholderInput]
+  }
 
   # group info =========================
   type CompanyFactory { ${factoryFields} }
