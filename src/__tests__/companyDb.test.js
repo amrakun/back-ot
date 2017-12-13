@@ -414,18 +414,22 @@ describe('Companies model tests', () => {
       doesHaveDocumentForRiskAssesment: true,
       doesHaveDocumentForIncidentInvestigation: false,
       doesHaveDocumentedFitness: false,
+      isWillingToComply: false,
       hasIndustrialAccident: false,
-      ltifr: false,
-      injuryExplanation: false,
-      seniorManagement: false,
-      isWillingToCommit: false,
-      isPerparedToCompile: false,
-      hasWorkedOnWorldBank: false,
-      hasWorkedOnLargeProjects: false,
-      doesHaveLicense: false,
+      tmha: 'tmha',
+      ltifr: 'ltifr',
+      injuryExplanation: 'injuryExplanation',
+      seniorManagement: 'seniorManagement',
+      isWillingToCommit: true,
+      isPerparedToCompile: true,
+      hasWorkedOnWorldBank: true,
+      hasWorkedOnWorldBankDescription: 'description',
+      hasWorkedOnLargeProjects: true,
+      hasWorkedOnLargeProjectsDescription: 'description',
+      doesHaveLicense: true,
+      doesHaveLicenseDescription: 'description',
     };
-
-    const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
+const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
     const health = updatedCompany.healthInfo;
 
     expect(health.doesHaveHealthSafety).toBe(doc.doesHaveHealthSafety);
@@ -444,15 +448,20 @@ describe('Companies model tests', () => {
     expect(health.doesHaveDocumentForIncidentInvestigation).toBe(
       doc.doesHaveDocumentForIncidentInvestigation,
     );
+    expect(health.isWillingToComply).toBe(doc.isWillingToComply);
     expect(health.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
     expect(health.hasIndustrialAccident).toBe(doc.hasIndustrialAccident);
+    expect(health.tmha).toBe(doc.tmha);
     expect(health.ltifr).toBe(doc.ltifr);
     expect(health.injuryExplanation).toBe(doc.injuryExplanation);
     expect(health.seniorManagement).toBe(doc.seniorManagement);
     expect(health.isWillingToCommit).toBe(doc.isWillingToCommit);
     expect(health.isPerparedToCompile).toBe(doc.isPerparedToCompile);
     expect(health.hasWorkedOnWorldBank).toBe(doc.hasWorkedOnWorldBank);
+    expect(health.hasWorkedOnWorldBankDescription).toBe(doc.hasWorkedOnWorldBankDescription);
     expect(health.hasWorkedOnLargeProjects).toBe(doc.hasWorkedOnLargeProjects);
+    expect(health.hasWorkedOnLargeProjectsDescription).toBe(doc.hasWorkedOnLargeProjectsDescription);
     expect(health.doesHaveLicense).toBe(doc.doesHaveLicense);
+    expect(health.doesHaveLicenseDescription).toBe(doc.doesHaveLicenseDescription);
   });
 });

@@ -140,15 +140,20 @@ const healthInfoFields = `
   doesHaveDocumentForRiskAssesment: Boolean,
   doesHaveDocumentForIncidentInvestigation: Boolean,
   doesHaveDocumentedFitness: Boolean,
+  isWillingToComply: Boolean,
   hasIndustrialAccident: Boolean,
+  tmha: String,
   ltifr: Boolean,
   injuryExplanation: Boolean,
   seniorManagement: Boolean,
   isWillingToCommit: Boolean,
   isPerparedToCompile: Boolean,
   hasWorkedOnWorldBank: Boolean,
+  hasWorkedOnWorldBankDescription: String,
   hasWorkedOnLargeProjects: Boolean,
+  hasWorkedOnLargeProjectsDescription: String,
   doesHaveLicense: Boolean,
+  doesHaveLicenseDescription: String,
 `;
 
 export const types = `
