@@ -145,6 +145,7 @@ const CertificateInfoSchema = mongoose.Schema(
   {
     isReceived: field({ type: Boolean }),
     isOTSupplier: field({ type: Boolean }),
+    file: FileSchema,
     cwpo: field({ type: String }),
   },
   { _id: false },

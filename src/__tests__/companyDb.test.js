@@ -251,6 +251,7 @@ describe('Companies model tests', () => {
     const doc = {
       isReceived: true,
       isOTSupplier: false,
+      file: {name: 'name', url: 'url'},
       cwpo: 'CW49108',
     };
 
@@ -259,6 +260,7 @@ describe('Companies model tests', () => {
 
     expect(certificateInfo.isReceived).toBe(doc.isReceived);
     expect(certificateInfo.isOTSupplier).toBe(doc.isOTSupplier);
+    expect(certificateInfo.file.toJSON()).toEqual(doc.file);
     expect(certificateInfo.cwpo).toBe(doc.cwpo);
   });
   test('Update Financial Info', async () => {

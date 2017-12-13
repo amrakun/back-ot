@@ -77,6 +77,7 @@ const groupInfoFields = `
 const certificateInfoFields = `
   isReceived: Boolean,
   isOTSupplier: Boolean,
+  file: JSON,
   cwpo: String!,
 `;
 
