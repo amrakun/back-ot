@@ -14,6 +14,7 @@ export const companyFactory = (params = {}) => {
 export const userFactory = (params = {}) => {
   const user = new Users({
     username: params.username || faker.internet.userName(),
+    role: params.role || 'contributor',
     details: {
       fullName: params.fullName || faker.random.word(),
       avatar: params.avatar || faker.image.imageUrl(),

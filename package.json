@@ -41,6 +41,7 @@
     "moment": "^2.18.1",
     "mongoose": "^4.9.2",
     "mongoose-type-email": "^1.0.5",
+    "nodemailer": "^4.4.1",
     "sha256": "^0.2.0"
   },
   "devDependencies": {

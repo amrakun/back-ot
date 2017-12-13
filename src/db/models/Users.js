@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
+import { ROLES } from '../../data/constants';
 import { field } from './utils';
 
 const SALT_WORK_FACTOR = 10;
@@ -22,6 +23,10 @@ const UserSchema = mongoose.Schema({
   password: field({ type: String }),
   resetPasswordToken: field({ type: String }),
   resetPasswordExpires: field({ type: Date }),
+  role: field({
+    type: String,
+    enum: [ROLES.ADMIN, ROLES.CONTRIBUTOR],
+  }),
   isSupplier: field({ type: Boolean }),
   email: field({
     type: String,
@@ -42,10 +47,11 @@ class User {
    * @param {Object} doc - user fields
    * @return {Promise} newly created user object
    */
-  static async createUser({ username, email, password, details }) {
+  static async createUser({ username, email, password, role, details }) {
     return this.create({
       username,
       email,
+      role,
       details,
       // hash password
       password: await this.generatePassword(password),
@@ -58,8 +64,8 @@ class User {
    * @param {Object} doc - user fields
    * @return {Promise} updated user info
    */
-  static async updateUser(_id, { username, email, password, details }) {
-    const doc = { username, email, password, details };
+  static async updateUser(_id, { username, email, password, role, details }) {
+    const doc = { username, email, password, role, details };
 
     // change password
     if (password) {
@@ -222,6 +228,7 @@ class User {
       _id: _user._id,
       email: _user.email,
       details: _user.details,
+      role: _user.role,
       isSupplier: _user.isSupplier,
     };
 

@@ -29,6 +29,7 @@ describe('User db utils', () => {
 
     const userObj = await Users.createUser({
       ..._user._doc,
+      role: 'admin',
       email: 'test@gmail.com',
       details: _user.details.toJSON(),
       password: testPassword,
@@ -38,7 +39,7 @@ describe('User db utils', () => {
     expect(userObj._id).toBeDefined();
     expect(userObj.username).toBe(_user.username);
     expect(userObj.email).toBe('test@gmail.com');
-    expect(userObj.role).toBe(_user.role);
+    expect(userObj.role).toBe('admin');
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
     expect(userObj.details.fullName).toBe(_user.details.fullName);
     expect(userObj.details.avatar).toBe(_user.details.avatar);

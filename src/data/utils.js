@@ -1,5 +1,7 @@
 import AWS from 'aws-sdk';
 import fs from 'fs';
+import nodemailer from 'nodemailer';
+import Handlebars from 'handlebars';
 
 /*
  * Save binary data to amazon s3
@@ -47,4 +49,95 @@ export const uploadFile = async file => {
   });
 
   return `https://s3.amazonaws.com/${AWS_BUCKET}/${fileName}`;
+};
+
+/**
+ * Read contents of a file
+ * @param {string} filename - relative file path
+ * @return {Promise} returns promise resolving file contents
+ */
+export const readFile = filename => {
+  const filePath = `${__dirname}/../private/emailTemplates/${filename}.html`;
+
+  return fs.readFileSync(filePath, 'utf8');
+};
+
+/**
+ * SendEmail template helper
+ * @param {Object} data data
+ * @param {String} templateName
+ * @return email with template as text
+ */
+const applyTemplate = async (data, templateName) => {
+  let template = await readFile(templateName);
+
+  template = Handlebars.compile(template.toString());
+
+  return template(data);
+};
+
+/**
+ * Create transporter
+ * @return nodemailer transporter
+ */
+export const createTransporter = async () => {
+  const { MAIL_SERVICE, MAIL_USER, MAIL_PASS } = process.env;
+
+  return nodemailer.createTransport({
+    service: MAIL_SERVICE,
+    auth: {
+      user: MAIL_USER,
+      pass: MAIL_PASS,
+    },
+  });
+};
+
+/**
+ * Send email
+ * @param {Array} args.toEmails
+ * @param {String} args.fromEmail
+ * @param {String} args.title
+ * @param {String} args.templateArgs.name
+ * @param {Object} args.templateArgs.data
+ * @param {Boolean} args.templateArgs.isCustom
+ * @return {Promise}
+ */
+export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
+  const { NODE_ENV } = process.env;
+
+  // do not send email it is running in test mode
+  if (NODE_ENV == 'test') {
+    return;
+  }
+
+  const transporter = await createTransporter();
+
+  const { isCustom, data, name } = template;
+
+  // generate email content by given template
+  let html = await applyTemplate(data, name);
+
+  if (!isCustom) {
+    html = await applyTemplate({ content: html }, 'base');
+  }
+
+  return toEmails.map(toEmail => {
+    const mailOptions = {
+      from: fromEmail,
+      to: toEmail,
+      subject: title,
+      html,
+    };
+
+    return transporter.sendMail(mailOptions, (error, info) => {
+      console.log(error); // eslint-disable-line
+      console.log(info); // eslint-disable-line
+    });
+  });
+};
+
+export default {
+  sendEmail,
+  readFile,
+  createTransporter,
 };
