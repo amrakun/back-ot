@@ -101,10 +101,12 @@ describe('User mutations', () => {
       }
     };
 
-    expect.assertions(1);
+    expect.assertions(3);
 
-    // users remove
+    // admin required actions
     checkLogin(userMutations.usersRemove);
+    checkLogin(userMutations.usersAdd);
+    checkLogin(userMutations.usersEdit);
   });
 
   test('Users add & edit: wrong password confirmation', async () => {
@@ -114,6 +116,8 @@ describe('User mutations', () => {
       password: 'password',
       passwordConfirmation: 'wrong',
     };
+
+    user.role = 'admin';
 
     try {
       await userMutations.usersAdd({}, doc, { user });
@@ -129,7 +133,7 @@ describe('User mutations', () => {
   });
 
   test('Users add', async () => {
-    const user = { _id: 'DFAFDFDFD' };
+    const user = { _id: 'DFAFDFDFD', role: 'admin' };
 
     Users.createUser = jest.fn(() => ({ _id: '_id' }));
 
@@ -148,7 +152,7 @@ describe('User mutations', () => {
   });
 
   test('Users edit', async () => {
-    const creatingUser = { _id: 'DFAFDFDFD' };
+    const creatingUser = { _id: 'DFAFDFDFD', role: 'admin' };
 
     Users.updateUser = jest.fn();
 

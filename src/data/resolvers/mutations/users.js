@@ -119,8 +119,8 @@ const userMutations = {
   },
 };
 
-requireLogin(userMutations, 'usersAdd');
-requireLogin(userMutations, 'usersEdit');
+requireAdmin(userMutations, 'usersAdd');
+requireAdmin(userMutations, 'usersEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
 requireAdmin(userMutations, 'usersRemove');
