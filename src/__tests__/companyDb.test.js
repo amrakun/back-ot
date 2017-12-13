@@ -210,6 +210,7 @@ describe('Companies model tests', () => {
       parentRegistrationNumber: 'parentRegistrationNumber',
       role: 'manufacturer',
       isExclusiveDistributor: false,
+      authorizedDistributions: ['1', '2'],
       attachments: [{ name: 'name', url: '/path1' }],
       primaryManufacturerName: 'primaryManufacturerName',
       countryOfPrimaryManufacturer: 'countryOfPrimaryManufacturer',
@@ -220,6 +221,7 @@ describe('Companies model tests', () => {
     const groupInfo = updatedCompany.groupInfo;
 
     expect(groupInfo.attachments[0].toJSON()).toEqual(doc.attachments[0]);
+    expect(groupInfo.authorizedDistributions).toContain('1', '2');
     expect(groupInfo.hasParent).toBe(doc.hasParent);
     expect(groupInfo.parentAddress).toBe(doc.parentAddress);
     expect(groupInfo.parentRegistrationNumber).toBe(doc.parentRegistrationNumber);

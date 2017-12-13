@@ -132,6 +132,7 @@ const GroupInfoSchema = mongoose.Schema(
     factories: [FactorySchema],
 
     isExclusiveDistributor: field({ type: Boolean }),
+    authorizedDistributions: [String],
     attachments: [FileSchema],
     primaryManufacturerName: field({ type: String }),
     countryOfPrimaryManufacturer: field({ type: String }),
