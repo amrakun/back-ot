@@ -1,4 +1,4 @@
-import { Users } from '../../../db/models';
+import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
 import { requireLogin, requireAdmin } from '../../permissions';
 
@@ -9,14 +9,19 @@ const userMutations = {
    * @param {String} password - User password
    * @return - Newly created user object
    */
-  register(root, args) {
+  async register(root, args) {
     const { password, passwordConfirmation, email } = args;
 
     if (password !== passwordConfirmation) {
       throw new Error('Incorrect password confirmation');
     }
 
-    return Users.register({ email, password });
+    const user = await Users.register({ email, password });
+
+    // create company for new user
+    await Companies.createCompany(user._id);
+
+    return user;
   },
 
   /*

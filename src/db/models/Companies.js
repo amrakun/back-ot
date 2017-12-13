@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
+import { Users } from './';
 
 const FileSchema = mongoose.Schema(
   {
@@ -392,6 +393,19 @@ const CompanySchema = mongoose.Schema({
 });
 
 class Company {
+  /**
+   * Create a company
+   * @param userId - Permforming user id
+   * @return {Promise} Newly created company object
+   */
+  static async createCompany(userId) {
+    const company = await this.create({});
+
+    await Users.update({ _id: userId }, { $set: { companyId: company._id } });
+
+    return company;
+  }
+
   /**
    * Update basic info
    * @param  {String} _id - company id

@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { Companies } from '../db/models';
-import { companyFactory } from '../db/factories';
+import { Users, Companies } from '../db/models';
+import { userFactory, companyFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -19,6 +19,18 @@ describe('Companies model tests', () => {
   afterEach(async () => {
     // Clearing test data
     await Companies.remove({});
+  });
+
+  test('Create', async () => {
+    const user = await userFactory({});
+    const company = await Companies.createCompany(user._id);
+
+    expect(company).toBeDefined();
+    expect(company._id).toBeDefined();
+
+    const updatedUser = await Users.findOne({ _id: user._id });
+
+    expect(updatedUser.companyId).toEqual(company._id);
   });
 
   test('Update basic info: validations', async () => {
@@ -180,7 +192,7 @@ describe('Companies model tests', () => {
     };
 
     const doc = {
-      attachments: [{name: 'name', url: '/path1'}],
+      attachments: [{ name: 'name', url: '/path1' }],
       shareholders: [generateShareholderDoc(), generateShareholderDoc()],
     };
 
@@ -251,7 +263,7 @@ describe('Companies model tests', () => {
     const doc = {
       isReceived: true,
       isOTSupplier: false,
-      file: {name: 'name', url: 'url'},
+      file: { name: 'name', url: 'url' },
       cwpo: 'CW49108',
     };
 
@@ -381,7 +393,7 @@ describe('Companies model tests', () => {
       dateOfInvestigation: '2010.01.01',
       reasonForInvestigation: 'Lorem ipsum',
       actionStatus: 'In Progress',
-      investigationDocumentation: {name: 'name', url: 'path1'},
+      investigationDocumentation: { name: 'name', url: 'path1' },
       hasConvictedForEnvironmentalLaws: true,
       proveHasNotConvicted: 'Lorem ipsum',
       additionalInformation: 'Lorem ipsum',
@@ -398,7 +410,7 @@ describe('Companies model tests', () => {
     expect(environmentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
     expect(environmentalManagement.actionStatus).toBe(doc.actionStatus);
     expect(environmentalManagement.investigationDocumentation.toJSON()).toEqual(
-      doc.investigationDocumentation
+      doc.investigationDocumentation,
     );
     expect(environmentalManagement.hasConvictedForEnvironmentalLaws).toBe(
       doc.hasConvictedForEnvironmentalLaws,
@@ -433,22 +445,14 @@ describe('Companies model tests', () => {
       doesHaveLicense: true,
       doesHaveLicenseDescription: 'description',
     };
-const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
+    const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', doc);
     const health = updatedCompany.healthInfo;
 
     expect(health.doesHaveHealthSafety).toBe(doc.doesHaveHealthSafety);
-    expect(health.areHSEResourcesClearlyIdentified).toBe(
-      doc.areHSEResourcesClearlyIdentified,
-    );
-    expect(health.doesHaveDocumentedProcessToEnsure).toBe(
-      doc.doesHaveDocumentedProcessToEnsure,
-    );
-    expect(health.areEmployeesUnderYourControl).toBe(
-      doc.areEmployeesUnderYourControl,
-    );
-    expect(health.doesHaveDocumentForRiskAssesment).toBe(
-      doc.doesHaveDocumentForRiskAssesment,
-    );
+    expect(health.areHSEResourcesClearlyIdentified).toBe(doc.areHSEResourcesClearlyIdentified);
+    expect(health.doesHaveDocumentedProcessToEnsure).toBe(doc.doesHaveDocumentedProcessToEnsure);
+    expect(health.areEmployeesUnderYourControl).toBe(doc.areEmployeesUnderYourControl);
+    expect(health.doesHaveDocumentForRiskAssesment).toBe(doc.doesHaveDocumentForRiskAssesment);
     expect(health.doesHaveDocumentForIncidentInvestigation).toBe(
       doc.doesHaveDocumentForIncidentInvestigation,
     );
@@ -464,7 +468,9 @@ const updatedCompany = await Companies.updateSection(company._id, 'healthInfo', 
     expect(health.hasWorkedOnWorldBank).toBe(doc.hasWorkedOnWorldBank);
     expect(health.hasWorkedOnWorldBankDescription).toBe(doc.hasWorkedOnWorldBankDescription);
     expect(health.hasWorkedOnLargeProjects).toBe(doc.hasWorkedOnLargeProjects);
-    expect(health.hasWorkedOnLargeProjectsDescription).toBe(doc.hasWorkedOnLargeProjectsDescription);
+    expect(health.hasWorkedOnLargeProjectsDescription).toBe(
+      doc.hasWorkedOnLargeProjectsDescription,
+    );
     expect(health.doesHaveLicense).toBe(doc.doesHaveLicense);
     expect(health.doesHaveLicenseDescription).toBe(doc.doesHaveLicenseDescription);
   });

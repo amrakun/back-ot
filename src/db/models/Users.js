@@ -19,6 +19,7 @@ const DetailSchema = mongoose.Schema(
 
 // User schema
 const UserSchema = mongoose.Schema({
+  companyId: field({ type: mongoose.Schema.Types.ObjectId }),
   username: field({ type: String }),
   password: field({ type: String }),
   resetPasswordToken: field({ type: String }),

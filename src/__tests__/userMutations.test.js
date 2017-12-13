@@ -3,7 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { ROLES } from '../data/constants';
-import { Users } from '../db/models';
+import { Users, Companies } from '../db/models';
 import { userFactory } from '../db/factories';
 import userMutations from '../data/resolvers/mutations/users';
 
@@ -22,6 +22,7 @@ describe('User mutations', () => {
 
   test('Register', async () => {
     Users.register = jest.fn(() => ({ _id: '_id' }));
+    Companies.createCompany = jest.fn(() => ({ _id: '_id' }));
 
     const doc = {
       password: 'password',
@@ -32,6 +33,9 @@ describe('User mutations', () => {
 
     // register must be called
     expect(Users.register).toBeCalledWith(doc);
+
+    // create company must be called
+    expect(Companies.createCompany).toBeCalledWith('_id');
   });
 
   test('Login', async () => {
