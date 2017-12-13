@@ -1,5 +1,4 @@
 import Companies from './Companies';
+import Users from './Users';
 
-export {
-  Companies,
-};
+export { Companies, Users };
