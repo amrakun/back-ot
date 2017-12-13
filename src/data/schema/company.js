@@ -52,6 +52,7 @@ const shareholderFields = `
   name: String,
   jobTitle: String,
   percentage: Int,
+  attachments: [JSON],
 `;
 
 const factoryFields = `
@@ -125,7 +126,7 @@ const environmentalInfoFields = `
   dateOfInvestigation: String!,
   reasonForInvestigation: String!,
   actionStatus: String!,
-  investigationDocumentation: String!,
+  investigationDocumentation: JSON!,
   hasConvictedForEnvironmentalLaws: Boolean,
   proveHasNotConvicted: String,
   additionalInformation: String!,
@@ -188,15 +189,8 @@ export const types = `
   type CompanyShareholder { ${shareholderFields} }
   input CompanyShareholderInput { ${shareholderFields} }
 
-  type CompanyShareholderInfo {
-    attachments: [JSON],
-    shareholders: [CompanyShareholder],
-  }
-
-  input CompanyShareholderInfoInput {
-    attachments: [JSON],
-    shareholders: [CompanyShareholderInput],
-  }
+  type CompanyShareholderInfo { shareholders: [CompanyShareholder] }
+  input CompanyShareholderInfoInput { shareholders: [CompanyShareholderInput] }
 
   # group info =========================
   type CompanyFactory { ${factoryFields} }

@@ -278,7 +278,7 @@ const EnvironmentalInfoSchema = mongoose.Schema(
 
     actionStatus: field({ type: String }),
 
-    investigationDocumentation: field({ type: String }),
+    investigationDocumentation: FileSchema,
 
     // Has your company ever been convicted for a breach of any
     // Environmental laws in the countries you operate?

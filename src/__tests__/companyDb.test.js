@@ -377,7 +377,7 @@ describe('Companies model tests', () => {
       dateOfInvestigation: '2010.01.01',
       reasonForInvestigation: 'Lorem ipsum',
       actionStatus: 'In Progress',
-      investigationDocumentation: 'path1',
+      investigationDocumentation: {name: 'name', url: 'path1'},
       hasConvictedForEnvironmentalLaws: true,
       proveHasNotConvicted: 'Lorem ipsum',
       additionalInformation: 'Lorem ipsum',
@@ -393,7 +393,9 @@ describe('Companies model tests', () => {
     expect(environmentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
     expect(environmentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
     expect(environmentalManagement.actionStatus).toBe(doc.actionStatus);
-    expect(environmentalManagement.investigationDocumentation).toBe(doc.investigationDocumentation);
+    expect(environmentalManagement.investigationDocumentation.toJSON()).toEqual(
+      doc.investigationDocumentation
+    );
     expect(environmentalManagement.hasConvictedForEnvironmentalLaws).toBe(
       doc.hasConvictedForEnvironmentalLaws,
     );
