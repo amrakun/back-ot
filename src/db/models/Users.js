@@ -52,6 +52,7 @@ class User {
       username,
       email,
       role,
+      isSupplier: false,
       details,
       // hash password
       password: await this.generatePassword(password),
@@ -268,6 +269,21 @@ class User {
       refreshToken: newRefreshToken,
       user,
     };
+  }
+
+  /**
+   * Register
+   * @param {Object} doc - user fields
+   * @return {Promise} newly created user object
+   */
+  static async register({ email, password }) {
+    return this.create({
+      username: email,
+      email,
+      isSupplier: true,
+      // hash password
+      password: await this.generatePassword(password),
+    });
   }
 
   /*

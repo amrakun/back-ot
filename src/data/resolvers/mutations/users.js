@@ -4,6 +4,22 @@ import { requireLogin, requireAdmin } from '../../permissions';
 
 const userMutations = {
   /*
+   * Register
+   * @param {String} email - User email
+   * @param {String} password - User password
+   * @return - Newly created user object
+   */
+  register(root, args) {
+    const { password, passwordConfirmation, email } = args;
+
+    if (password !== passwordConfirmation) {
+      throw new Error('Incorrect password confirmation');
+    }
+
+    return Users.register({ email, password });
+  },
+
+  /*
    * Login
    * @param {String} email - User email
    * @param {String} password - User password

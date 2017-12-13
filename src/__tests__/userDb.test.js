@@ -40,6 +40,7 @@ describe('User db utils', () => {
     expect(userObj.username).toBe(_user.username);
     expect(userObj.email).toBe('test@gmail.com');
     expect(userObj.role).toBe('admin');
+    expect(userObj.isSupplier).toBe(false);
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
     expect(userObj.details.fullName).toBe(_user.details.fullName);
     expect(userObj.details.avatar).toBe(_user.details.avatar);
@@ -214,6 +215,22 @@ describe('User db utils', () => {
 
     expect(token).toBeDefined();
     expect(refreshToken).toBeDefined();
+  });
+
+  test('Register', async () => {
+    const testPassword = 'test';
+
+    const userObj = await Users.register({
+      email: 'test@gmail.com',
+      password: testPassword,
+    });
+
+    expect(userObj).toBeDefined();
+    expect(userObj._id).toBeDefined();
+    expect(userObj.email).toBe('test@gmail.com');
+    expect(userObj.isSupplier).toBe(true);
+    expect(userObj.role).toBe(undefined);
+    expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
   });
 
   test('Refresh tokens', async () => {

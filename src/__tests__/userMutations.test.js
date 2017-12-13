@@ -20,6 +20,20 @@ describe('User mutations', () => {
     await Users.remove({});
   });
 
+  test('Register', async () => {
+    Users.register = jest.fn(() => ({ _id: '_id' }));
+
+    const doc = {
+      password: 'password',
+      email: 'info@erxes.io',
+    };
+
+    await userMutations.register({}, { ...doc, passwordConfirmation: 'password' });
+
+    // register must be called
+    expect(Users.register).toBeCalledWith(doc);
+  });
+
   test('Login', async () => {
     Users.login = jest.fn();
 
