@@ -159,10 +159,10 @@ const YearAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const DatePathSchema = mongoose.Schema(
+const DateFileSchema = mongoose.Schema(
   {
     date: field({ type: String }),
-    path: field({ type: String }),
+    file: FileSchema,
   },
   { _id: false },
 );
@@ -181,7 +181,7 @@ const FinancialInfoSchema = mongoose.Schema(
     totalCurrentAssets: [YearAmountSchema],
     totalShareholderEquity: [YearAmountSchema],
 
-    recordsInfo: [DatePathSchema],
+    recordsInfo: [DateFileSchema],
 
     // Is your company up to date with Social Security payments?
     isUpToDateSSP: field({ type: Boolean }),

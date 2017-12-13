@@ -272,8 +272,8 @@ describe('Companies model tests', () => {
       totalCurrentAssets: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
       totalShareholderEquity: [{ year: 2010, amount: 1000 }, { year: 2008, amount: 2000 }],
       recordsInfo: [
-        { date: '2010/10/1', path: 'path1' },
-        { date: '2008/10/05', path: 'path2' },
+        { date: '2010/10/1', file: { name: 'name', url: 'path1' } },
+        { date: '2008/10/05', file: { name: 'name', url: 'path2' } },
       ],
       isUpToDateSSP: true,
       isUpToDateCTP: true,

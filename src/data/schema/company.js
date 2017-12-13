@@ -84,9 +84,9 @@ const yearAmountFields = `
   amount: Float,
 `;
 
-const datePathFields = `
+const dateFileFields = `
   date: String,
-  path: String,
+  file: JSON,
 `;
 
 const financialInfoFields = `
@@ -214,8 +214,8 @@ export const types = `
   type CompanyYearAmount { ${yearAmountFields} }
   input CompanyYearAmountInput { ${yearAmountFields} }
 
-  type CompanyDatePath { ${datePathFields} }
-  input CompanyDatePathInput { ${datePathFields} }
+  type CompanyDateFile { ${dateFileFields} }
+  input CompanyDateFileInput { ${dateFileFields} }
 
   type CompanyFinancialInfo {
     ${financialInfoFields}
@@ -224,7 +224,7 @@ export const types = `
     totalAssets: [CompanyYearAmount]
     totalCurrentAssets: [CompanyYearAmount]
     totalShareholderEquity: [CompanyYearAmount]
-    recordsInfo: [CompanyDatePath]
+    recordsInfo: [CompanyDateFile]
   }
 
   input CompanyFinancialInfoInput {
@@ -234,7 +234,7 @@ export const types = `
     totalAssets: [CompanyYearAmountInput]
     totalCurrentAssets: [CompanyYearAmountInput]
     totalShareholderEquity: [CompanyYearAmountInput]
-    recordsInfo: [CompanyDatePathInput]
+    recordsInfo: [CompanyDateFileInput]
   }
 
   # business and human resource ====
