@@ -8,6 +8,7 @@ import cors from 'cors';
 import formidable from 'formidable';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
+import { userMiddleware } from './auth';
 import schema from './data';
 import { uploadFile } from './data/utils';
 
@@ -37,6 +38,7 @@ app.post('/upload-file', async (req, res) => {
 
 app.use(
   '/graphql',
+  userMiddleware,
   graphqlExpress(req => ({ schema, context: { user: req.user } })),
 );
 
