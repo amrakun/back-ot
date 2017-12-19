@@ -232,6 +232,7 @@ class User {
       details: _user.details,
       role: _user.role,
       isSupplier: _user.isSupplier,
+      companyId: _user.companyId,
     };
 
     const createToken = await jwt.sign({ user }, secret, { expiresIn: '20m' });

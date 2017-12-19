@@ -292,28 +292,19 @@ export const types = `
 export const queries = `
   companies(page: Int, perPage: Int): [Company]
   companyDetail(_id: String!): Company
+  companyByUser: Company
 `;
 
 export const mutations = `
-  companiesEditBasicInfo(_id: String!, basicInfo: CompanyBasicInfoInput): Company
-  companiesEditContactInfo(_id: String!, contactInfo: CompanyContactInfoInput): Company
-
-  companiesEditManagementTeamInfo(
-    _id: String!,
-    managementTeamInfo: CompanyManagementTeamInfoInput
-  ): Company
-
-  companiesEditShareholderInfo(_id: String!, shareholderInfo: CompanyShareholderInfoInput): Company
-  companiesEditGroupInfo(_id: String!, groupInfo: CompanyGroupInfoInput): Company
-  companiesEditCertificateInfo(_id: String!, certificateInfo: CompanyCertificateInfoInput): Company
-  companiesEditProductsInfo(_id: String!, productsInfo: [String]): Company
-  companiesEditFinancialInfo(_id: String!, financialInfo: CompanyFinancialInfoInput): Company
-  companiesEditBusinessInfo(_id: String!, businessInfo: CompanyBusinessInfoInput): Company
-
-  companiesEditEnvironmentalInfo(
-    _id: String!,
-    environmentalInfo: CompanyEnvironmentalInfoInput
-  ): Company
-
-  companiesEditHealthInfo(_id: String!, healthInfo: CompanyHealthInfoInput): Company
+  companiesEditBasicInfo(basicInfo: CompanyBasicInfoInput): Company
+  companiesEditContactInfo(contactInfo: CompanyContactInfoInput): Company
+  companiesEditManagementTeamInfo(managementTeamInfo: CompanyManagementTeamInfoInput): Company
+  companiesEditShareholderInfo(shareholderInfo: CompanyShareholderInfoInput): Company
+  companiesEditGroupInfo(groupInfo: CompanyGroupInfoInput): Company
+  companiesEditCertificateInfo(certificateInfo: CompanyCertificateInfoInput): Company
+  companiesEditProductsInfo(productsInfo: [String]): Company
+  companiesEditFinancialInfo(financialInfo: CompanyFinancialInfoInput): Company
+  companiesEditBusinessInfo(businessInfo: CompanyBusinessInfoInput): Company
+  companiesEditEnvironmentalInfo(environmentalInfo: CompanyEnvironmentalInfoInput): Company
+  companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
 `;

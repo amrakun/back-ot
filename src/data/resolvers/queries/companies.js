@@ -16,12 +16,21 @@ const companyQueries = {
   },
 
   /**
+   * Get logged in user's company
+   * @param {Object} args
+   * @return {Promise} found company
+   */
+  companyByUser(root, args, { user }) {
+    return Companies.findOne({ _id: user.companyId });
+  },
+
+  /**
    * Get one company
    * @param {Object} args
    * @param {String} args._id
    * @return {Promise} found company
    */
-  companyDetail(root, { _id }) {
+  companyDetail(root, args, { _id }) {
     return Companies.findOne({ _id });
   },
 };
