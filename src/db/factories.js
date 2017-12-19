@@ -1,6 +1,6 @@
 import faker from 'faker';
 
-import { Companies, Users } from './models';
+import { Companies, Users, Tenders } from './models';
 
 export const companyFactory = (params = {}) => {
   const company = new Companies({
@@ -25,4 +25,19 @@ export const userFactory = (params = {}) => {
   });
 
   return user.save();
+};
+
+export const tenderFactory = (params = {}) => {
+  const tender = new Tenders({
+    number: params.number || faker.random.number(),
+    name: params.number || faker.random.word(),
+    publishDate: params.publishDate || new Date(),
+    closeDate: params.closeDate || new Date(),
+    reminderDay: params.reminderDay || faker.random.number(),
+    file: params.file || { name: 'name', url: 'url' },
+    supplierIds: params.supplierIds || ['id1', 'id2'],
+    requestedProducts: params.requestedProducts || [{ code: 'code' }],
+  });
+
+  return tender.save();
 };
