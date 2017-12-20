@@ -61,6 +61,7 @@ describe('Tender db', () => {
 
   test('Create tender', async () => {
     const tenderObj = await Tenders.create({
+      type: _tender.type,
       number: _tender.number,
       name: _tender.name,
       publishDate: _tender.publishDate,
@@ -72,6 +73,7 @@ describe('Tender db', () => {
     });
 
     expect(tenderObj).toBeDefined();
+    expect(tenderObj.type).toBe(_tender.type);
     expect(tenderObj.number).toBe(_tender.number);
     expect(tenderObj.name).toBe(_tender.name);
     expect(tenderObj.publishDate).toEqual(_tender.publishDate);

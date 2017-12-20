@@ -29,6 +29,7 @@ export const userFactory = (params = {}) => {
 
 export const tenderFactory = (params = {}) => {
   const tender = new Tenders({
+    type: params.type || 'rfq',
     number: params.number || faker.random.number(),
     name: params.number || faker.random.word(),
     publishDate: params.publishDate || new Date(),

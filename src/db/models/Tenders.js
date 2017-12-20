@@ -31,8 +31,12 @@ const ProductSchema = mongoose.Schema(
 
 // Tender schema
 const TenderSchema = mongoose.Schema({
+  // rfq, eoi
+  type: field({ type: String }),
+
   number: field({ type: Number }),
   name: field({ type: String }),
+  content: field({ type: String }),
   publishDate: field({ type: Date }),
   closeDate: field({ type: Date }),
   file: field({ type: FileSchema }),

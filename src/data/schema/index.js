@@ -6,7 +6,11 @@ import {
   mutations as CompanyMutations,
 } from './company';
 
-import { types as TenderTypes, mutations as TenderMutations } from './tender';
+import {
+  types as TenderTypes,
+  queries as TenderQueries,
+  mutations as TenderMutations,
+} from './tender';
 
 export const types = `
   scalar JSON
@@ -20,6 +24,7 @@ export const types = `
 export const queries = `
   type Query {
     ${CompanyQueries}
+    ${TenderQueries}
     ${UserQueries}
   }
 `;

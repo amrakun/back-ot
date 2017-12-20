@@ -28,6 +28,7 @@ export const types = `
     _id: String!
     number: Float!,
     name: String!,
+    content: String!,
     publishDate: Date!,
     closeDate: Date!,
     file: JSON!,
@@ -39,11 +40,13 @@ export const types = `
 
 export const queries = `
   tenders(page: Int, perPage: Int): [Tender]
+  tenderDetail(_id: String!): Tender
 `;
 
 const commonParams = `
   number: Float!,
   name: String!,
+  content: String!,
   publishDate: Date!,
   closeDate: Date!,
   file: JSON!,
@@ -53,7 +56,7 @@ const commonParams = `
 `;
 
 export const mutations = `
-  tendersAdd(${commonParams}): Tender
+  tendersAdd(type: String!, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
 `;
