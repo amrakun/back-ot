@@ -7,11 +7,7 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered companies list by given parameters
    */
-  async companies(root, { ids, ...params }) {
-    if (params.ids) {
-      return paginate(Companies.find({ _id: { $in: ids } }), params);
-    }
-
+  async companies(root, params) {
     return paginate(Companies.find({}), params);
   },
 

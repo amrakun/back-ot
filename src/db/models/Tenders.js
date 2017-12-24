@@ -96,6 +96,28 @@ const TenderResponseSchema = mongoose.Schema({
   respondedProducts: [RespondedProductSchema],
 });
 
+class TenderResponse {
+  /**
+   * Create new tender response
+   * @param {Object} doc - tender response fields
+   * @return {Promise} newly created tender response object
+   */
+  static async createTenderResponse(doc) {
+    const { tenderId, supplierId } = doc;
+
+    const previousEntry = await this.findOne({ tenderId, supplierId });
+
+    // prevent duplications
+    if (previousEntry) {
+      return previousEntry;
+    }
+
+    return this.create(doc);
+  }
+}
+
+TenderResponseSchema.loadClass(TenderResponse);
+
 const TenderResponses = mongoose.model('tender_responses', TenderResponseSchema);
 
 export { Tenders, TenderResponses };

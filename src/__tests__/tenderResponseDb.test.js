@@ -52,7 +52,9 @@ describe('Tender response db', () => {
   };
 
   test('Create tender response', async () => {
-    const tenderResponseObj = await TenderResponses.create({
+    expect(await TenderResponses.find().count()).toBe(0);
+
+    const tenderResponseObj = await TenderResponses.createTenderResponse({
       tenderId: _tender._id,
       supplierId: _company._id,
       respondedProducts,
@@ -63,5 +65,14 @@ describe('Tender response db', () => {
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
 
     checkProducts(tenderResponseObj.respondedProducts[0], respondedProducts[0]);
+
+    // check duplications
+    await TenderResponses.createTenderResponse({
+      tenderId: _tender._id,
+      supplierId: _company._id,
+      respondedProducts,
+    });
+
+    expect(await TenderResponses.find().count()).toBe(1);
   });
 });

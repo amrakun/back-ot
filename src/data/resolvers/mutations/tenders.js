@@ -8,7 +8,7 @@ const tenderMutations = {
    * @return {Promise} newly created tender object
    */
   tendersAdd(root, doc) {
-    return Tenders.create(doc);
+    return Tenders.createTender(doc);
   },
 
   /**

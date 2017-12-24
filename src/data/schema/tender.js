@@ -40,11 +40,29 @@ export const types = `
     supplierIds: [String]!,
     requestedProducts: [TenderRequestedProduct]!
   }
+
+  type TenderRespondedProduct {
+    ${respondedProductFields}
+  }
+
+  input TenderRespondedProductInput {
+    ${respondedProductFields}
+  }
+
+  type TenderResponse {
+    _id: String!
+    tenderId: String!
+    supplierId: String!
+    respondedProducts: [TenderRespondedProduct]!
+  }
 `;
 
 export const queries = `
   tenders(page: Int, perPage: Int): [Tender]
   tenderDetail(_id: String!): Tender
+
+  tenderResponses(page: Int, perPage: Int): [TenderResponse]
+  tenderResponseDetail(_id: String!): TenderResponse
 `;
 
 const commonParams = `
@@ -59,8 +77,16 @@ const commonParams = `
   requestedProducts: [TenderRequestedProductInput]!
 `;
 
+const responseCommonParams = `
+  tenderId: String!,
+  supplierId: String!,
+  respondedProducts: [TenderRespondedProductInput]!
+`;
+
 export const mutations = `
   tendersAdd(type: String!, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
+
+  tenderResponsesAdd(${responseCommonParams}): TenderResponse
 `;
