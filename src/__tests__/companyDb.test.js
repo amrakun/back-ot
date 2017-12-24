@@ -402,6 +402,7 @@ describe('Companies model tests', () => {
 
     const doc = {
       doesHavePlan: true,
+      doesHavePlanFile: { name: 'name', url: 'url' },
       hasEnvironmentalRegulatorInvestigated: true,
       dateOfInvestigation: '2010.01.01',
       reasonForInvestigation: 'Lorem ipsum',
@@ -409,13 +410,13 @@ describe('Companies model tests', () => {
       investigationDocumentation: { name: 'name', url: 'path1' },
       hasConvictedForEnvironmentalLaws: true,
       proveHasNotConvicted: 'Lorem ipsum',
-      additionalInformation: 'Lorem ipsum',
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'environmentalInfo', doc);
     const environmentalInfo = updatedCompany.environmentalInfo;
 
     expect(environmentalInfo.doesHavePlan).toBe(doc.doesHavePlan);
+    expect(environmentalInfo.doesHavePlanFile.toJSON()).toEqual(doc.doesHavePlanFile);
     expect(environmentalInfo.hasEnvironmentalRegulatorInvestigated).toBe(
       doc.hasEnvironmentalRegulatorInvestigated,
     );
@@ -429,7 +430,6 @@ describe('Companies model tests', () => {
       doc.hasConvictedForEnvironmentalLaws,
     );
     expect(environmentalInfo.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
-    expect(environmentalInfo.additionalInformation).toBe(doc.additionalInformation);
   });
 
   test('Update health and safety management system', async () => {

@@ -135,6 +135,7 @@ const businessInfoFields = `
 
 const environmentalInfoFields = `
   doesHavePlan: Boolean,
+  doesHavePlanFile: JSON!,
   hasEnvironmentalRegulatorInvestigated: Boolean,
   dateOfInvestigation: String!,
   reasonForInvestigation: String!,
@@ -142,7 +143,6 @@ const environmentalInfoFields = `
   investigationDocumentation: JSON!,
   hasConvictedForEnvironmentalLaws: Boolean,
   proveHasNotConvicted: String,
-  additionalInformation: String!,
 `;
 
 const healthInfoFields = `

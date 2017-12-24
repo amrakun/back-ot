@@ -278,6 +278,7 @@ const EnvironmentalInfoSchema = mongoose.Schema(
     // greenhouse gases emissions, water and contamination prevention,
     // noise and vibration, Waste Management)?
     doesHavePlan: field({ type: Boolean }),
+    doesHavePlanFile: FileSchema,
 
     // Has any environmental regulator inspected / investigated your
     // company within the last 5 years?
@@ -297,8 +298,6 @@ const EnvironmentalInfoSchema = mongoose.Schema(
 
     // If Yes, what steps have you taken to ensure this does not happen again?
     proveHasNotConvicted: field({ type: String }),
-
-    additionalInformation: field({ type: String }),
   },
   { _id: false },
 );
