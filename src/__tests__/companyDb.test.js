@@ -437,12 +437,17 @@ describe('Companies model tests', () => {
 
     const doc = {
       doesHaveHealthSafety: true,
+      doesHaveHealthSafetyFile: { name: 'name', url: 'url' },
       areHSEResourcesClearlyIdentified: true,
       doesHaveDocumentedProcessToEnsure: true,
+      doesHaveDocumentedProcessToEnsureFile: { name: 'name', url: 'url' },
       areEmployeesUnderYourControl: true,
       doesHaveDocumentForRiskAssesment: true,
+      doesHaveDocumentForRiskAssesmentFile: { name: 'name', url: 'url' },
       doesHaveDocumentForIncidentInvestigation: false,
+      doesHaveDocumentForIncidentInvestigationFile: { name: 'name', url: 'url' },
       doesHaveDocumentedFitness: false,
+      doesHaveDocumentedFitnessFile: { name: 'name', url: 'url' },
       isWillingToComply: false,
       hasIndustrialAccident: false,
       tmha: 'tmha',
@@ -462,15 +467,36 @@ describe('Companies model tests', () => {
     const health = updatedCompany.healthInfo;
 
     expect(health.doesHaveHealthSafety).toBe(doc.doesHaveHealthSafety);
+    expect(health.doesHaveHealthSafetyFile.toJSON()).toEqual(doc.doesHaveHealthSafetyFile);
+
     expect(health.areHSEResourcesClearlyIdentified).toBe(doc.areHSEResourcesClearlyIdentified);
+
     expect(health.doesHaveDocumentedProcessToEnsure).toBe(doc.doesHaveDocumentedProcessToEnsure);
+    expect(health.doesHaveDocumentedProcessToEnsureFile.toJSON()).toEqual(
+      doc.doesHaveDocumentedProcessToEnsureFile,
+    );
+
     expect(health.areEmployeesUnderYourControl).toBe(doc.areEmployeesUnderYourControl);
+
     expect(health.doesHaveDocumentForRiskAssesment).toBe(doc.doesHaveDocumentForRiskAssesment);
+    expect(health.doesHaveDocumentForRiskAssesmentFile.toJSON()).toEqual(
+      doc.doesHaveDocumentForRiskAssesmentFile,
+    );
+
     expect(health.doesHaveDocumentForIncidentInvestigation).toBe(
       doc.doesHaveDocumentForIncidentInvestigation,
     );
+    expect(health.doesHaveDocumentForIncidentInvestigationFile.toJSON()).toEqual(
+      doc.doesHaveDocumentForIncidentInvestigationFile,
+    );
+
     expect(health.isWillingToComply).toBe(doc.isWillingToComply);
+
     expect(health.doesHaveDocumentedFitness).toBe(doc.doesHaveDocumentedFitness);
+    expect(health.doesHaveDocumentedFitnessFile.toJSON()).toEqual(
+      doc.doesHaveDocumentedFitnessFile,
+    );
+
     expect(health.hasIndustrialAccident).toBe(doc.hasIndustrialAccident);
     expect(health.tmha).toBe(doc.tmha);
     expect(health.ltifr).toBe(doc.ltifr);

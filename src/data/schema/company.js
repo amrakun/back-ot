@@ -147,12 +147,24 @@ const environmentalInfoFields = `
 
 const healthInfoFields = `
   doesHaveHealthSafety: Boolean,
+  doesHaveHealthSafetyFile: JSON,
+
   areHSEResourcesClearlyIdentified: Boolean,
+
   doesHaveDocumentedProcessToEnsure: Boolean,
+  doesHaveDocumentedProcessToEnsureFile: JSON,
+
   areEmployeesUnderYourControl: Boolean,
+
   doesHaveDocumentForRiskAssesment: Boolean,
+  doesHaveDocumentForRiskAssesmentFile: JSON,
+
   doesHaveDocumentForIncidentInvestigation: Boolean,
+  doesHaveDocumentForIncidentInvestigationFile: JSON,
+
   doesHaveDocumentedFitness: Boolean,
+  doesHaveDocumentedFitnessFile: JSON,
+
   isWillingToComply: Boolean,
   hasIndustrialAccident: Boolean,
   tmha: String,

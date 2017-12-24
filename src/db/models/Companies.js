@@ -308,6 +308,7 @@ const HealthInfoSchema = mongoose.Schema(
   {
     // Does the organisation have a Health Safety & Environment management system?
     doesHaveHealthSafety: field({ type: Boolean }),
+    doesHaveHealthSafetyFile: FileSchema,
 
     // Are HSE resources, roles, responsibilities and authority levels clearly
     // identified and defined within your Organisation?
@@ -316,6 +317,7 @@ const HealthInfoSchema = mongoose.Schema(
     // Does your company have a documented process to ensure all staff
     // receive health and safety training and induction?
     doesHaveDocumentedProcessToEnsure: field({ type: Boolean }),
+    doesHaveDocumentedProcessToEnsureFile: FileSchema,
 
     // Are all employees under your control required to utilise appropriate
     // Personal Protective Equipment (PPE) at all times?
@@ -324,12 +326,15 @@ const HealthInfoSchema = mongoose.Schema(
     //  Does the company have a documented process or guidelines for
     //  risk assessment (including CRM)?
     doesHaveDocumentForRiskAssesment: field({ type: Boolean }),
+    doesHaveDocumentForRiskAssesmentFile: FileSchema,
 
     // Does the company have a documented process for incident investigation?
     doesHaveDocumentForIncidentInvestigation: field({ type: Boolean }),
+    doesHaveDocumentForIncidentInvestigationFile: FileSchema,
 
     // Does your company have a documented Fitness for Work (FFW) policy?
     doesHaveDocumentedFitness: field({ type: Boolean }),
+    doesHaveDocumentedFitnessFile: FileSchema,
 
     // Is your company willing comply with Oyu Tolgoi
     isWillingToComply: field({ type: Boolean }),
