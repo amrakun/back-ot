@@ -30,14 +30,7 @@ describe('Tender db', () => {
       quantity: 10,
       uom: 'uom',
       manufacturer: 'manufacturer',
-      manufacturerPart: 'manufacturerPart',
-      suggestedManufacturer: 'suggestedManufacturer',
-      suggestedManufacturerPart: 'suggestedManufacturerPart',
-      unitPrice: 10000,
-      totalPrice: 10000,
-      leadTime: 10,
-      comment: 'comment',
-      picture: { name: 'file', url: 'url' },
+      manufacturerPartNumber: 10,
     },
   ];
 
@@ -48,15 +41,7 @@ describe('Tender db', () => {
     expect(product.quantity).toBe(doc.quantity);
     expect(product.uom).toBe(doc.uom);
     expect(product.manufacturer).toBe(doc.manufacturer);
-    expect(product.manufacturerPart).toBe(doc.manufacturerPart);
-    expect(product.suggestedManufacturer).toBe(doc.suggestedManufacturer);
-    expect(product.suggestedManufacturerPart).toBe(doc.suggestedManufacturerPart);
-    expect(product.unitPrice).toBe(doc.unitPrice);
-    expect(product.totalPrice).toBe(doc.totalPrice);
-    expect(product.leadTime).toBe(doc.leadTime);
-    expect(product.comment).toBe(doc.comment);
-    expect(product.picture.name).toBe(doc.picture.name);
-    expect(product.picture.url).toBe(doc.picture.url);
+    expect(product.manufacturerPartNumber).toBe(doc.manufacturerPartNumber);
   };
 
   test('Create tender', async () => {

@@ -17,14 +17,7 @@ const ProductSchema = mongoose.Schema(
     quantity: field({ type: Number }),
     uom: field({ type: String }),
     manufacturer: field({ type: String }),
-    manufacturerPart: field({ type: String }),
-    suggestedManufacturer: field({ type: String }),
-    suggestedManufacturerPart: field({ type: String }),
-    unitPrice: field({ type: Number }),
-    totalPrice: field({ type: Number }),
-    leadTime: field({ type: Number }),
-    comment: field({ type: String }),
-    picture: field({ type: FileSchema }),
+    manufacturerPartNumber: field({ type: Number }),
   },
   { _id: false },
 );
@@ -81,4 +74,28 @@ TenderSchema.loadClass(Tender);
 
 const Tenders = mongoose.model('tenders', TenderSchema);
 
-export default Tenders;
+// Tender responses =====================
+const RespondedProductSchema = mongoose.Schema(
+  {
+    code: field({ type: String }),
+    suggestedManufacturer: field({ type: String }),
+    suggestedManufacturerPartNumber: field({ type: Number }),
+    unitPrice: field({ type: Number }),
+    totalPrice: field({ type: Number }),
+    leadTime: field({ type: Number }),
+    shippingTerms: field({ type: String }),
+    comment: field({ type: String }),
+    file: field({ type: FileSchema }),
+  },
+  { _id: false },
+);
+
+const TenderResponseSchema = mongoose.Schema({
+  tenderId: field({ type: String }),
+  supplierId: field({ type: String }),
+  respondedProducts: [RespondedProductSchema],
+});
+
+const TenderResponses = mongoose.model('tender_responses', TenderResponseSchema);
+
+export { Tenders, TenderResponses };

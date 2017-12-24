@@ -1,4 +1,4 @@
-const productFields = `
+const requestedProductFields = `
   code: String,
   purchaseRequestNumber: Float,
   shortText: String,
@@ -6,22 +6,26 @@ const productFields = `
   uom: String,
   manufacturer: String,
   manufacturerPart: String,
+`;
+
+const respondedProductFields = `
+  code: String,
   suggestedManufacturer: String,
   suggestedManufacturerPart: String,
   unitPrice: Float,
   totalPrice: Float,
   leadTime: Float,
   comment: String,
-  picture: JSON,
+  file: JSON,
 `;
 
 export const types = `
   type TenderRequestedProduct {
-    ${productFields}
+    ${requestedProductFields}
   }
 
   input TenderRequestedProductInput {
-    ${productFields}
+    ${requestedProductFields}
   }
 
   type Tender {

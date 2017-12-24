@@ -1,5 +1,5 @@
 import Companies from './Companies';
 import Users from './Users';
-import Tenders from './Tenders';
+import { Tenders, TenderResponses } from './Tenders';
 
-export { Companies, Users, Tenders };
+export { Companies, Users, Tenders, TenderResponses };
