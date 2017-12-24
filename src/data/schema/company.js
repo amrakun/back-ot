@@ -1,8 +1,8 @@
 const basicInfoFields = `
   enName: String!,
-  mnName: String!,
+  mnName: String,
   isRegisteredOnSup: Boolean,
-  sapNumber: String!,
+  sapNumber: String,
   address: String!,
   address2: String,
   address3: String,
@@ -76,9 +76,7 @@ const groupInfoFields = `
 
 const certificateInfoFields = `
   isReceived: Boolean,
-  isOTSupplier: Boolean,
   file: JSON,
-  cwpo: String!,
 `;
 
 const yearAmountFields = `
@@ -107,19 +105,32 @@ const investigationFields = `
 
 const businessInfoFields = `
   doesMeetMinimumStandarts: Boolean,
+  doesMeetMinimumStandartsFile: JSON,
+
   doesHaveJobDescription: Boolean,
+  doesHaveJobDescriptionFile: JSON,
+
   doesConcludeValidContracts: Boolean,
   employeeTurnoverRate: Int,
+
   doesHaveLiabilityInsurance: Boolean,
+  doesHaveLiabilityInsuranceFile: JSON,
+
   doesHaveCodeEthics: Boolean,
+  doesHaveCodeEthicsFile: JSON,
+
   doesHaveResponsiblityPolicy: Boolean,
+  doesHaveResponsiblityPolicyFile: JSON,
+
   hasConvictedLabourLaws: Boolean,
   hasConvictedForHumanRights: Boolean,
   hasConvictedForBusinessIntegrity: Boolean,
   proveHasNotConvicted: String,
   hasLeadersConvicted: Boolean,
   doesEmployeePoliticallyExposed: Boolean,
-  additionalInformation: String!,
+  pepName: String,
+
+  organizationChartFile: JSON,
 `;
 
 const environmentalInfoFields = `

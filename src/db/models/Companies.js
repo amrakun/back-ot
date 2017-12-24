@@ -14,9 +14,9 @@ const FileSchema = mongoose.Schema(
 const BasicInfoSchema = mongoose.Schema(
   {
     enName: field({ type: String }),
-    mnName: field({ type: String }),
+    mnName: field({ type: String, optional: true }),
     isRegisteredOnSup: field({ type: Boolean }),
-    sapNumber: field({ type: String }),
+    sapNumber: field({ type: String, optional: true }),
     address: field({ type: String }),
     address2: field({ type: String, optional: true }),
     address3: field({ type: String, optional: true }),
@@ -145,9 +145,7 @@ const GroupInfoSchema = mongoose.Schema(
 const CertificateInfoSchema = mongoose.Schema(
   {
     isReceived: field({ type: Boolean }),
-    isOTSupplier: field({ type: Boolean }),
     file: FileSchema,
-    cwpo: field({ type: String }),
   },
   { _id: false },
 );
@@ -211,9 +209,11 @@ const BusinessInfoSchema = mongoose.Schema(
     // Does your company meet minimum standards of fair employment
     // practice required by Mongolian labor laws and regulations
     doesMeetMinimumStandarts: field({ type: Boolean }),
+    doesMeetMinimumStandartsFile: FileSchema,
 
     // Does the Company have a job description procedure in place?
     doesHaveJobDescription: field({ type: Boolean }),
+    doesHaveJobDescriptionFile: FileSchema,
 
     // Does the company conclude valid contracts with all employees. (include skilled/unskilled,
     // temporary and permanent, and underage workers, etc)
@@ -226,12 +226,15 @@ const BusinessInfoSchema = mongoose.Schema(
     // Oyu Tolgoi’s minimum requirements and valid worker compensation insurance or enrolment
     // in an applicable occupational injury/illness insurance programme?
     doesHaveLiabilityInsurance: field({ type: Boolean }),
+    doesHaveLiabilityInsuranceFile: FileSchema,
 
     // Does your company have a documented code of ethics/conduct?
     doesHaveCodeEthics: field({ type: Boolean }),
+    doesHaveCodeEthicsFile: FileSchema,
 
     // Does your company have a documented Corporate Social Responsibility policy?
     doesHaveResponsiblityPolicy: field({ type: Boolean }),
+    doesHaveResponsiblityPolicyFile: FileSchema,
 
     // Has your company ever been convicted for a breach of any labour
     // laws in the countries you operate within the last five years?
@@ -254,10 +257,15 @@ const BusinessInfoSchema = mongoose.Schema(
 
     investigations: [InvestigationSchema],
 
-    // Does your company employ any politically exposed person? If yes, provide list of PEP name
+    // Does your company employ any politically exposed person?
+    // If yes, provide list of PEP name
     doesEmployeePoliticallyExposed: field({ type: Boolean }),
 
-    additionalInformation: field({ type: String }),
+    /// Does your company employ any politically exposed person?
+    // If yes, provide list of PEP name
+    pepName: field({ type: String, optional: true }),
+
+    organizationChartFile: FileSchema,
   },
   { _id: false },
 );

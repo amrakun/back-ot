@@ -262,18 +262,14 @@ describe('Companies model tests', () => {
 
     const doc = {
       isReceived: true,
-      isOTSupplier: false,
       file: { name: 'name', url: 'url' },
-      cwpo: 'CW49108',
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'certificateInfo', doc);
     const certificateInfo = updatedCompany.certificateInfo;
 
     expect(certificateInfo.isReceived).toBe(doc.isReceived);
-    expect(certificateInfo.isOTSupplier).toBe(doc.isOTSupplier);
     expect(certificateInfo.file.toJSON()).toEqual(doc.file);
-    expect(certificateInfo.cwpo).toBe(doc.cwpo);
   });
   test('Update Financial Info', async () => {
     const company = await companyFactory();
@@ -333,12 +329,17 @@ describe('Companies model tests', () => {
 
     const doc = {
       doesMeetMinimumStandarts: true,
+      doesMeetMinimumStandartsFile: { name: 'name', url: 'url' },
       doesHaveJobDescription: true,
+      doesHaveJobDescriptionFile: { name: 'name', url: 'url' },
       doesConcludeValidContracts: true,
       employeeTurnoverRate: 12,
       doesHaveLiabilityInsurance: false,
+      doesHaveLiabilityInsuranceFile: { name: 'name', url: 'url' },
       doesHaveCodeEthics: true,
+      doesHaveCodeEthicsFile: { name: 'name', url: 'url' },
       doesHaveResponsiblityPolicy: true,
+      doesHaveResponsiblityPolicyFile: { name: 'name', url: 'url' },
       hasConvictedLabourLaws: true,
       hasConvictedForHumanRights: true,
       hasConvictedForBusinessIntegrity: false,
@@ -348,41 +349,53 @@ describe('Companies model tests', () => {
         { name: 'Name', date: '2010.01.01', status: 'Status', statusDate: '2011.01.01' },
       ],
       doesEmployeePoliticallyExposed: true,
-      additionalInformation: 'Lorem ipsum',
+      pepName: 'Lorem ipsum',
+      organizationChartFile: { name: 'name', url: 'url' },
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'businessInfo', doc);
-    const businessAndHumanResource = updatedCompany.businessInfo;
+    const businessInfo = updatedCompany.businessInfo;
 
-    expect(businessAndHumanResource.doesMeetMinimumStandarts).toBe(doc.doesMeetMinimumStandarts);
-    expect(businessAndHumanResource.doesHaveJobDescription).toBe(doc.doesHaveJobDescription);
-    expect(businessAndHumanResource.doesConcludeValidContracts).toBe(
-      doc.doesConcludeValidContracts,
+    expect(businessInfo.doesMeetMinimumStandarts).toBe(doc.doesMeetMinimumStandarts);
+    expect(businessInfo.doesMeetMinimumStandartsFile.toJSON()).toEqual(
+      doc.doesMeetMinimumStandartsFile,
     );
-    expect(businessAndHumanResource.employeeTurnoverRate).toBe(doc.employeeTurnoverRate);
-    expect(businessAndHumanResource.doesHaveLiabilityInsurance).toBe(
-      doc.doesHaveLiabilityInsurance,
+
+    expect(businessInfo.doesHaveJobDescription).toBe(doc.doesHaveJobDescription);
+    expect(businessInfo.doesHaveJobDescriptionFile.toJSON()).toEqual(
+      doc.doesHaveJobDescriptionFile,
     );
-    expect(businessAndHumanResource.doesHaveCodeEthics).toBe(doc.doesHaveCodeEthics);
-    expect(businessAndHumanResource.doesHaveResponsiblityPolicy).toBe(
-      doc.doesHaveResponsiblityPolicy,
+
+    expect(businessInfo.doesConcludeValidContracts).toBe(doc.doesConcludeValidContracts);
+    expect(businessInfo.employeeTurnoverRate).toBe(doc.employeeTurnoverRate);
+
+    expect(businessInfo.doesHaveLiabilityInsurance).toBe(doc.doesHaveLiabilityInsurance);
+    expect(businessInfo.doesHaveLiabilityInsuranceFile.toJSON()).toEqual(
+      doc.doesHaveLiabilityInsuranceFile,
     );
-    expect(businessAndHumanResource.hasConvictedLabourLaws).toBe(doc.hasConvictedLabourLaws);
-    expect(businessAndHumanResource.hasConvictedForHumanRights).toBe(
-      doc.hasConvictedForHumanRights,
+
+    expect(businessInfo.doesHaveCodeEthics).toBe(doc.doesHaveCodeEthics);
+    expect(businessInfo.doesHaveCodeEthicsFile.toJSON()).toEqual(doc.doesHaveCodeEthicsFile);
+
+    expect(businessInfo.doesHaveResponsiblityPolicy).toBe(doc.doesHaveResponsiblityPolicy);
+    expect(businessInfo.doesHaveResponsiblityPolicyFile.toJSON()).toEqual(
+      doc.doesHaveResponsiblityPolicyFile,
     );
-    expect(businessAndHumanResource.hasConvictedForBusinessIntegrity).toBe(
+
+    expect(businessInfo.hasConvictedLabourLaws).toBe(doc.hasConvictedLabourLaws);
+    expect(businessInfo.hasConvictedForHumanRights).toBe(doc.hasConvictedForHumanRights);
+    expect(businessInfo.hasConvictedForBusinessIntegrity).toBe(
       doc.hasConvictedForBusinessIntegrity,
     );
-    expect(businessAndHumanResource.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
-    expect(businessAndHumanResource.hasLeadersConvicted).toBe(doc.hasLeadersConvicted);
-    expect(businessAndHumanResource.doesEmployeePoliticallyExposed).toBe(
-      doc.doesEmployeePoliticallyExposed,
-    );
-    expect(businessAndHumanResource.additionalInformation).toBe(doc.additionalInformation);
+    expect(businessInfo.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(businessInfo.hasLeadersConvicted).toBe(doc.hasLeadersConvicted);
+    expect(businessInfo.doesEmployeePoliticallyExposed).toBe(doc.doesEmployeePoliticallyExposed);
+    expect(businessInfo.pepName).toBe(doc.pepName);
 
-    const [i1] = businessAndHumanResource.investigations;
+    const [i1] = businessInfo.investigations;
     expect(i1.toJSON()).toEqual(doc.investigations[0]);
+
+    expect(businessInfo.organizationChartFile.toJSON()).toEqual(doc.organizationChartFile);
   });
   test('Update environmental management', async () => {
     const company = await companyFactory();
@@ -400,23 +413,23 @@ describe('Companies model tests', () => {
     };
 
     const updatedCompany = await Companies.updateSection(company._id, 'environmentalInfo', doc);
-    const environmentalManagement = updatedCompany.environmentalInfo;
+    const environmentalInfo = updatedCompany.environmentalInfo;
 
-    expect(environmentalManagement.doesHavePlan).toBe(doc.doesHavePlan);
-    expect(environmentalManagement.hasEnvironmentalRegulatorInvestigated).toBe(
+    expect(environmentalInfo.doesHavePlan).toBe(doc.doesHavePlan);
+    expect(environmentalInfo.hasEnvironmentalRegulatorInvestigated).toBe(
       doc.hasEnvironmentalRegulatorInvestigated,
     );
-    expect(environmentalManagement.dateOfInvestigation).toBe(doc.dateOfInvestigation);
-    expect(environmentalManagement.reasonForInvestigation).toBe(doc.reasonForInvestigation);
-    expect(environmentalManagement.actionStatus).toBe(doc.actionStatus);
-    expect(environmentalManagement.investigationDocumentation.toJSON()).toEqual(
+    expect(environmentalInfo.dateOfInvestigation).toBe(doc.dateOfInvestigation);
+    expect(environmentalInfo.reasonForInvestigation).toBe(doc.reasonForInvestigation);
+    expect(environmentalInfo.actionStatus).toBe(doc.actionStatus);
+    expect(environmentalInfo.investigationDocumentation.toJSON()).toEqual(
       doc.investigationDocumentation,
     );
-    expect(environmentalManagement.hasConvictedForEnvironmentalLaws).toBe(
+    expect(environmentalInfo.hasConvictedForEnvironmentalLaws).toBe(
       doc.hasConvictedForEnvironmentalLaws,
     );
-    expect(environmentalManagement.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
-    expect(environmentalManagement.additionalInformation).toBe(doc.additionalInformation);
+    expect(environmentalInfo.proveHasNotConvicted).toBe(doc.proveHasNotConvicted);
+    expect(environmentalInfo.additionalInformation).toBe(doc.additionalInformation);
   });
 
   test('Update health and safety management system', async () => {
