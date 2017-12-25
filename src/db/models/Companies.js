@@ -119,6 +119,10 @@ const GroupInfoSchema = mongoose.Schema(
     // Do you have an Ultimate Parent Company?
     hasParent: field({ type: Boolean }),
 
+    isParentExistingSup: field({ type: Boolean }),
+
+    parentName: field({ type: String }),
+
     // Ultimate parent company address
     parentAddress: field({ type: String }),
 

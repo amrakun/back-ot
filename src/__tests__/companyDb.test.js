@@ -218,6 +218,8 @@ describe('Companies model tests', () => {
 
     const doc = {
       hasParent: true,
+      isParentExistingSup: true,
+      parentName: 'parentName',
       parentAddress: 'parentAddress',
       parentRegistrationNumber: 'parentRegistrationNumber',
       role: 'manufacturer',
@@ -235,6 +237,8 @@ describe('Companies model tests', () => {
     expect(groupInfo.attachments[0].toJSON()).toEqual(doc.attachments[0]);
     expect(groupInfo.authorizedDistributions).toContain('1', '2');
     expect(groupInfo.hasParent).toBe(doc.hasParent);
+    expect(groupInfo.isParentExistingSup).toBe(doc.isParentExistingSup);
+    expect(groupInfo.parentName).toBe(doc.parentName);
     expect(groupInfo.parentAddress).toBe(doc.parentAddress);
     expect(groupInfo.parentRegistrationNumber).toBe(doc.parentRegistrationNumber);
     expect(groupInfo.role).toBe(doc.role);

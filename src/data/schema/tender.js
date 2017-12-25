@@ -30,6 +30,7 @@ export const types = `
 
   type Tender {
     _id: String!
+    type: String!
     number: Float!,
     name: String!,
     content: String!,
@@ -38,6 +39,7 @@ export const types = `
     file: JSON!,
     reminderDay: Float!,
     supplierIds: [String]!,
+    suppliers: [Company]!,
     requestedProducts: [TenderRequestedProduct]!
   }
 
@@ -58,7 +60,7 @@ export const types = `
 `;
 
 export const queries = `
-  tenders(page: Int, perPage: Int): [Tender]
+  tenders(page: Int, perPage: Int, type: String): [Tender]
   tenderDetail(_id: String!): Tender
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]

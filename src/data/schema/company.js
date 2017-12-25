@@ -64,6 +64,8 @@ const factoryFields = `
 
 const groupInfoFields = `
   hasParent: Boolean,
+  isParentExistingSup: Boolean,
+  parentName: String,
   parentAddress: String,
   parentRegistrationNumber: String,
   role: String!,
@@ -135,7 +137,7 @@ const businessInfoFields = `
 
 const environmentalInfoFields = `
   doesHavePlan: Boolean,
-  doesHavePlanFile: JSON!,
+  doesHavePlanFile: JSON,
   hasEnvironmentalRegulatorInvestigated: Boolean,
   dateOfInvestigation: String!,
   reasonForInvestigation: String!,
@@ -309,6 +311,8 @@ export const types = `
     businessInfo: CompanyBusinessInfo,
     environmentalInfo: CompanyEnvironmentalInfo,
     healthInfo: CompanyHealthInfo,
+
+    tenders: [Tender]
   }
 `;
 
