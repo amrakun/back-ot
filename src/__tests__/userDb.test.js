@@ -27,11 +27,13 @@ describe('User db utils', () => {
   test('Create user', async () => {
     const testPassword = 'test';
 
+    delete _user._id;
+
     const userObj = await Users.createUser({
-      ..._user._doc,
+      ..._user,
       role: 'admin',
       email: 'test@gmail.com',
-      details: _user.details.toJSON(),
+      details: _user.details,
       password: testPassword,
     });
 
@@ -48,6 +50,7 @@ describe('User db utils', () => {
 
   test('Update user', async () => {
     const updateDoc = await userFactory();
+    delete updateDoc._id;
 
     const testPassword = 'updatedPass';
     const testEmail = 'test@gmail.com';
@@ -57,7 +60,7 @@ describe('User db utils', () => {
       email: testEmail,
       username: updateDoc.username,
       password: testPassword,
-      details: updateDoc._doc.details.toJSON(),
+      details: updateDoc.details,
     });
 
     let userObj = await Users.findOne({ _id: _user._id });
@@ -73,7 +76,7 @@ describe('User db utils', () => {
     await Users.updateUser(_user._id, {
       email: testEmail,
       username: updateDoc.username,
-      details: updateDoc._doc.details.toJSON(),
+      details: updateDoc.details,
     });
 
     userObj = await Users.findOne({ _id: _user._id });
@@ -95,7 +98,7 @@ describe('User db utils', () => {
     await Users.editProfile(_user._id, {
       email: 'test@gmail.com',
       username: updateDoc.username,
-      details: updateDoc._doc.details,
+      details: updateDoc.details,
     });
 
     const userObj = await Users.findOne({ _id: _user._id });

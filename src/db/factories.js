@@ -36,7 +36,7 @@ export const userFactory = (params = {}) => {
     isSupplier: params.isSupplier || false,
   });
 
-  return user.save();
+  return save(user);
 };
 
 export const tenderFactory = async (params = {}) => {
