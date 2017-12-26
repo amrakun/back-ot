@@ -38,6 +38,7 @@ export const tenderFactory = (params = {}) => {
     file: params.file || { name: 'name', url: 'url' },
     supplierIds: params.supplierIds || ['id1', 'id2'],
     requestedProducts: params.requestedProducts || [{ code: 'code' }],
+    requestedDocuments: params.requestedDocuments || ['Document1'],
   });
 
   return tender.save();

@@ -36,6 +36,9 @@ const TenderSchema = mongoose.Schema({
   reminderDay: field({ type: Number }),
   supplierIds: field({ type: [String] }),
   requestedProducts: field({ type: [ProductSchema] }),
+
+  // eoi documents
+  requestedDocuments: field({ type: [String] }),
 });
 
 class Tender {
@@ -90,10 +93,23 @@ const RespondedProductSchema = mongoose.Schema(
   { _id: false },
 );
 
+const RespondedDocumentSchema = mongoose.Schema(
+  {
+    name: field({ type: String }),
+    isSubmitted: field({ type: Boolean }),
+    notes: field({ type: String }),
+    file: field({ type: FileSchema }),
+  },
+  { _id: false },
+);
+
 const TenderResponseSchema = mongoose.Schema({
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
+  respondedDocuments: [RespondedDocumentSchema],
+
+  isNotInterested: field({ type: Boolean, default: false }),
 });
 
 class TenderResponse {
