@@ -5,13 +5,13 @@ const requestedProductFields = `
   quantity: Float,
   uom: String,
   manufacturer: String,
-  manufacturerPart: String,
+  manufacturerPartNumber: Float,
 `;
 
 const respondedProductFields = `
   code: String,
   suggestedManufacturer: String,
-  suggestedManufacturerPart: String,
+  suggestedManufacturerPartNumber: Float,
   unitPrice: Float,
   totalPrice: Float,
   leadTime: Float,

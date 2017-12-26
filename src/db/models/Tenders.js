@@ -50,7 +50,7 @@ class Tender {
    * @param {Object} doc - tender fields
    * @return {Promise} newly created tender object
    */
-  static async createTender(doc) {
+  static createTender(doc) {
     return this.create(doc);
   }
 
