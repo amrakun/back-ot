@@ -97,6 +97,7 @@ const RespondedDocumentSchema = mongoose.Schema(
   {
     name: field({ type: String }),
     isSubmitted: field({ type: Boolean }),
+    notes: field({ type: String }),
     file: field({ type: FileSchema }),
   },
   { _id: false },

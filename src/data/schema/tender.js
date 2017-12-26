@@ -22,6 +22,7 @@ const respondedProductFields = `
 const respondedDocumentFields = `
   name: String,
   isSubmitted: Boolean,
+  notes: String,
   file: JSON,
 `;
 

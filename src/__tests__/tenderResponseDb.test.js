@@ -43,6 +43,7 @@ describe('Tender response db', () => {
     {
       name: 'name',
       isSubmitted: true,
+      notes: 'notes',
       file: { name: 'file', url: 'url' },
     },
   ];
@@ -62,6 +63,7 @@ describe('Tender response db', () => {
   const checkDocuments = (document, doc) => {
     expect(document.name).toBe(doc.name);
     expect(document.isSubmitted).toBe(doc.isSubmitted);
+    expect(document.notes).toBe(doc.notes);
     expect(document.file.name).toBe(doc.file.name);
     expect(document.file.url).toBe(doc.file.url);
   };
