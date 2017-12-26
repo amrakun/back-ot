@@ -19,6 +19,12 @@ const respondedProductFields = `
   file: JSON,
 `;
 
+const respondedDocumentFields = `
+  name: String,
+  isSubmitted: Boolean,
+  file: JSON,
+`;
+
 export const types = `
   type TenderRequestedProduct {
     ${requestedProductFields}
@@ -39,8 +45,11 @@ export const types = `
     file: JSON!,
     reminderDay: Float!,
     supplierIds: [String]!,
-    suppliers: [Company]!,
     requestedProducts: [TenderRequestedProduct]!
+    requestedDocuments: [String]!
+
+    suppliers: [Company]!,
+    submittedCount: Int,
   }
 
   type TenderRespondedProduct {
@@ -51,11 +60,20 @@ export const types = `
     ${respondedProductFields}
   }
 
+  type TenderRespondedDocument {
+    ${respondedDocumentFields}
+  }
+
+  input TenderRespondedDocumentInput {
+    ${respondedDocumentFields}
+  }
+
   type TenderResponse {
     _id: String!
     tenderId: String!
     supplierId: String!
     respondedProducts: [TenderRespondedProduct]!
+    respondedDocuments: [TenderRespondedDocument]!
   }
 `;
 
@@ -76,13 +94,15 @@ const commonParams = `
   file: JSON!,
   reminderDay: Float!,
   supplierIds: [String]!,
-  requestedProducts: [TenderRequestedProductInput]!
+  requestedProducts: [TenderRequestedProductInput]
+  requestedDocuments: [String]
 `;
 
 const responseCommonParams = `
   tenderId: String!,
   supplierId: String!,
-  respondedProducts: [TenderRespondedProductInput]!
+  respondedProducts: [TenderRespondedProductInput]
+  respondedDocuments: [TenderRespondedDocumentInput]
 `;
 
 export const mutations = `

@@ -55,6 +55,7 @@ describe('Tender db', () => {
       reminderDay: _tender.reminderDay,
       supplierIds: _tender.supplierIds,
       requestedProducts,
+      requestedDocuments: ['Document1'],
     });
 
     expect(tenderObj).toBeDefined();
@@ -66,6 +67,7 @@ describe('Tender db', () => {
     expect(tenderObj.file.toJSON()).toEqual(_tender.file.toJSON());
     expect(tenderObj.supplierIds).toContain(..._tender.supplierIds);
     expect(tenderObj.reminderDay).toBe(_tender.reminderDay);
+    expect(tenderObj.requestedDocuments).toContain(..._tender.requestedDocuments);
 
     checkProducts(tenderObj.requestedProducts[0], requestedProducts[0]);
   });
@@ -80,6 +82,7 @@ describe('Tender db', () => {
       file: { name: 'file', url: 'url ' },
       reminderDay: 1,
       requestedProducts,
+      requestedDocuments: ['Document1'],
     };
 
     const tenderObj = await Tenders.updateTender(_tender.id, doc);
@@ -91,6 +94,7 @@ describe('Tender db', () => {
     expect(tenderObj.supplierIds).toContain(...doc.supplierIds);
     expect(tenderObj.file.toJSON()).toEqual(doc.file);
     expect(tenderObj.reminderDay).toBe(doc.reminderDay);
+    expect(tenderObj.requestedDocuments).toContain(...doc.requestedDocuments);
 
     checkProducts(tenderObj.requestedProducts[0], requestedProducts[0]);
   });

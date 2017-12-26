@@ -1,7 +1,11 @@
-import { Companies } from '../../db/models';
+import { TenderResponses, Companies } from '../../db/models';
 
 export default {
-  async suppliers(tender) {
+  suppliers(tender) {
     return Companies.find({ _id: { $in: tender.supplierIds } });
+  },
+
+  submittedCount(tender) {
+    return TenderResponses.find({ tenderId: tender._id }).count();
   },
 };
