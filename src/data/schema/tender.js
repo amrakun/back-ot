@@ -86,7 +86,7 @@ export const types = `
 `;
 
 export const queries = `
-  tenders(page: Int, perPage: Int, type: String): [Tender]
+  tenders(page: Int, perPage: Int, type: String, supplierId: String): [Tender]
   tenderDetail(_id: String!): Tender
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]
