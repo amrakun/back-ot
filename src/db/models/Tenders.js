@@ -37,6 +37,9 @@ const TenderSchema = mongoose.Schema({
   supplierIds: field({ type: [String] }),
   requestedProducts: field({ type: [ProductSchema] }),
 
+  // Awarded response id
+  winnerId: field({ type: String, optional: true }),
+
   // eoi documents
   requestedDocuments: field({ type: [String] }),
 });
@@ -69,7 +72,19 @@ class Tender {
    * @return {Promise} - remove method response
    */
   static removeTender(_id) {
-    return Tenders.remove({ _id });
+    return this.remove({ _id });
+  }
+
+  /*
+   * Choose tender winner
+   * @param {String} _id - Tender id
+   * @param {String} responseId - Tender response id
+   * @return {Promise} - Updated tender object
+   */
+  static async award(_id, responseId) {
+    await this.update({ _id }, { $set: { winnerId: responseId } });
+
+    return this.findOne({ _id });
   }
 }
 

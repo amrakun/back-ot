@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 
+import { graphql } from 'graphql';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import schema from '../data/';
 
 dotenv.config();
 
@@ -40,3 +42,16 @@ export function connect() {
 export function disconnect() {
   return mongoose.connection.close();
 }
+
+export const graphqlRequest = async (mutation, name, args) => {
+  const rootValue = {};
+  const context = { user: { _id: '_id' } };
+
+  const response = await graphql(schema, mutation, rootValue, context, args);
+
+  if (response.errors) {
+    throw response.errors;
+  }
+
+  return response.data[name];
+};
