@@ -15,7 +15,8 @@ export const types = `
     email: String
     role: String
     isSupplier: Boolean,
-    details: UserDetailsType
+    details: UserDetailsType,
+    companyId: String,
   }
 
   type AuthPayload {
