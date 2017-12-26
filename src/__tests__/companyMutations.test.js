@@ -72,4 +72,42 @@ describe('Company mutations', () => {
     expect(Companies.updateSection.mock.calls.length).toBe(1);
     expect(Companies.updateSection).toBeCalledWith(_company._id, 'basicInfo', doc.basicInfo);
   });
+
+  test('companiesEditContactInfo', async () => {
+    Companies.updateSection = jest.fn(() => ({ _id: 'DFAFDA' }));
+
+    const doc = {
+      contactInfo: {
+        name: 'name',
+        jobTitle: 'jobTitle',
+        address: 'Address',
+        address2: 'Address2',
+        address3: 'Address3',
+        townOrCity: 'Ulaanbaatar',
+        province: 'Ulaanbaatar',
+        zipCode: 976,
+        country: 'Mongolia',
+        phone: 24224242,
+        phone2: 24224243,
+        email: 'contact@gmail.com',
+      },
+    };
+
+    const mutation = `
+      mutation companiesEditContactInfo($contactInfo: CompanyContactInfoInput) {
+        companiesEditContactInfo(contactInfo: $contactInfo) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id }),
+    };
+
+    await graphqlRequest(mutation, 'companiesEditContactInfo', doc, context);
+
+    expect(Companies.updateSection.mock.calls.length).toBe(1);
+    expect(Companies.updateSection).toBeCalledWith(_company._id, 'contactInfo', doc.contactInfo);
+  });
 });
