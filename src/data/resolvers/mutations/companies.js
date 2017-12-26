@@ -8,6 +8,7 @@ const companyMutations = {
 };
 
 const sections = [
+  'basic',
   'contact',
   'managementTeam',
   'shareholder',
