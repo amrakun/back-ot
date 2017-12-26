@@ -1,7 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import { connect, disconnect } from '../db/connection';
+import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Tenders, Users } from '../db/models';
 import { tenderFactory, userFactory } from '../db/factories';
 import tenderMutations from '../data/resolvers/mutations/tenders';
@@ -79,5 +79,23 @@ describe('Tender mutations', () => {
 
     expect(Tenders.removeTender.mock.calls.length).toBe(1);
     expect(Tenders.removeTender).toBeCalledWith(_tender.id);
+  });
+
+  test('Award', async () => {
+    const responseId = 'DFDAFFDSAFSDF';
+
+    const mutation = `
+      mutation tendersAward($_id: String!, $responseId: String!) {
+        tendersAward(_id: $_id, responseId: $responseId) {
+          winnerId
+        }
+      }
+    `;
+
+    const args = { _id: _tender._id.toString(), responseId };
+
+    const tender = await graphqlRequest(mutation, 'tendersAward', args);
+
+    expect(tender.winnerId).toBe(responseId);
   });
 });

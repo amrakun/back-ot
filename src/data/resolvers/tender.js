@@ -13,6 +13,10 @@ const notInterestedCount = tender => {
 };
 
 export default {
+  isAwarded(tender) {
+    return tender.winnerId;
+  },
+
   suppliers(tender) {
     return Companies.find({ _id: { $in: tender.supplierIds } });
   },
@@ -20,9 +24,11 @@ export default {
   requestedCount(tender) {
     return requestedCount(tender);
   },
+
   submittedCount(tender) {
     return submittedCount(tender);
   },
+
   notInterestedCount(tender) {
     return notInterestedCount(tender);
   },

@@ -29,6 +29,16 @@ const tenderMutations = {
   tendersRemove(root, { _id }) {
     return Tenders.removeTender(_id);
   },
+
+  /**
+   * Choose winner
+   * @param {String} _id - Tender id
+   * @param {String} responseId - Tender response id
+   * @return {Promise} - updated tender
+   */
+  tendersAward(root, { _id, responseId }) {
+    return Tenders.award(_id, responseId);
+  },
 };
 
 moduleRequireLogin(tenderMutations);

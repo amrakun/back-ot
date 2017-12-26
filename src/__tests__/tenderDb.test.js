@@ -104,4 +104,14 @@ describe('Tender db', () => {
 
     expect(await Tenders.find({ _id: _tender.id }).count()).toBe(0);
   });
+
+  test('Award', async () => {
+    expect(_tender.winnerId).toBe(undefined);
+
+    const responseId = 'DFAFDSFDSF';
+
+    const updatedTender = await Tenders.award(_tender.id, responseId);
+
+    expect(updatedTender.winnerId).toBe(responseId);
+  });
 });
