@@ -4,6 +4,9 @@ import faker from 'faker';
 
 import { Companies, Users, Tenders } from './models';
 
+/*
+ * Remove mongoose functionalities & convert to raw object
+ */
 const save = async object => {
   const savedObject = await object.save();
 
@@ -20,7 +23,7 @@ export const companyFactory = (params = {}) => {
     mnName: params.mnName || faker.random.word(),
   });
 
-  return company.save();
+  return save(company);
 };
 
 export const userFactory = (params = {}) => {
