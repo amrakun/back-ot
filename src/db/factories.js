@@ -37,6 +37,7 @@ export const userFactory = (params = {}) => {
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
+    companyId: params.companyId || 'DFADFDSFSAFD',
   });
 
   return save(user);

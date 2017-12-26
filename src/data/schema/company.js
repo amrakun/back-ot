@@ -16,7 +16,7 @@ const basicInfoFields = `
   isChinese: Boolean,
   isSubContractor: Boolean,
   corporateStructure: String!,
-  registrationNumber: Int!,
+  registrationNumber: Float!,
   certificateOfRegistration: JSON,
   email: String!,
   website: String!,
