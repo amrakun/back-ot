@@ -48,26 +48,6 @@ describe('Tender response db', () => {
     },
   ];
 
-  const checkProducts = (product, doc) => {
-    expect(product.code).toBe(doc.code);
-    expect(product.suggestedManufacturer).toBe(doc.suggestedManufacturer);
-    expect(product.suggestedManufacturerPartNumber).toBe(doc.suggestedManufacturerPartNumber);
-    expect(product.unitPrice).toBe(doc.unitPrice);
-    expect(product.totalPrice).toBe(doc.totalPrice);
-    expect(product.leadTime).toBe(doc.leadTime);
-    expect(product.comment).toBe(doc.comment);
-    expect(product.file.name).toBe(doc.file.name);
-    expect(product.file.url).toBe(doc.file.url);
-  };
-
-  const checkDocuments = (document, doc) => {
-    expect(document.name).toBe(doc.name);
-    expect(document.isSubmitted).toBe(doc.isSubmitted);
-    expect(document.notes).toBe(doc.notes);
-    expect(document.file.name).toBe(doc.file.name);
-    expect(document.file.url).toBe(doc.file.url);
-  };
-
   test('Create tender response', async () => {
     expect(await TenderResponses.find().count()).toBe(0);
 
@@ -83,8 +63,12 @@ describe('Tender response db', () => {
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
     expect(tenderResponseObj.isNotInterested).toBe(false);
 
-    checkProducts(tenderResponseObj.respondedProducts[0], respondedProducts[0]);
-    checkDocuments(tenderResponseObj.respondedDocuments[0], respondedDocuments[0]);
+    const toObject = data => {
+      return JSON.parse(JSON.stringify(data));
+    };
+
+    expect(toObject(tenderResponseObj.respondedProducts)).toEqual(respondedProducts);
+    expect(toObject(tenderResponseObj.respondedDocuments)).toEqual(respondedDocuments);
 
     // check duplications
     await TenderResponses.createTenderResponse({

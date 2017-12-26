@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Tenders, Users } from '../db/models';
-import { tenderFactory, userFactory } from '../db/factories';
+import { Tenders } from '../db/models';
+import { tenderFactory } from '../db/factories';
 import tenderMutations from '../data/resolvers/mutations/tenders';
 
 beforeAll(() => connect());
@@ -12,18 +12,41 @@ afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
   let _tender;
-  let _user;
+
+  const commonParams = `
+    $number: Float!,
+    $name: String!,
+    $content: String!,
+    $publishDate: Date!,
+    $closeDate: Date!,
+    $file: JSON!,
+    $reminderDay: Float!,
+    $supplierIds: [String]!,
+    $requestedProducts: [TenderRequestedProductInput]
+    $requestedDocuments: [String]
+  `;
+
+  const commonValues = `
+    number: $number,
+    name: $name,
+    content: $content,
+    publishDate: $publishDate,
+    closeDate: $closeDate,
+    file: $file,
+    reminderDay: $reminderDay,
+    supplierIds: $supplierIds,
+    requestedProducts: $requestedProducts,
+    requestedDocuments: $requestedDocuments
+  `;
 
   beforeEach(async () => {
     // Creating test data
     _tender = await tenderFactory();
-    _user = await userFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
     await Tenders.remove({});
-    await Users.remove({});
   });
 
   test('Tenders login required functions', async () => {
@@ -35,7 +58,7 @@ describe('Tender mutations', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     // add tender
     checkLogin(tenderMutations.tendersAdd, {
@@ -48,41 +71,74 @@ describe('Tender mutations', () => {
 
     // remove tender
     checkLogin(tenderMutations.tendersRemove, { _id: _tender.id });
+
+    // award tender
+    checkLogin(tenderMutations.tendersAward, { _id: _tender.id });
   });
 
   test('Create tender', async () => {
-    Tenders.create = jest.fn();
+    Tenders.createTender = jest.fn(() => ({ _id: 'DFAFSFASDF' }));
 
-    const _doc = { name: _tender.name, content: _tender.content };
+    const mutation = `
+      mutation tendersAdd($type: String!  ${commonParams}) {
+        tendersAdd(type: $type, ${commonValues}) {
+          _id
+        }
+      }
+    `;
 
-    await tenderMutations.tendersAdd({}, _doc, { user: _user });
+    delete _tender._id;
+    await graphqlRequest(mutation, 'tendersAdd', _tender);
 
-    expect(Tenders.create.mock.calls.length).toBe(1);
-    expect(Tenders.create).toBeCalledWith(_doc);
+    expect(Tenders.createTender.mock.calls.length).toBe(1);
+
+    _tender.publishDate = new Date(_tender.publishDate);
+    _tender.closeDate = new Date(_tender.closeDate);
+
+    expect(Tenders.createTender).toBeCalledWith(_tender);
   });
 
   test('Update tender', async () => {
-    Tenders.updateTender = jest.fn();
+    Tenders.updateTender = jest.fn(() => _tender);
 
-    const _doc = { name: _tender.name, content: _tender.content };
+    const mutation = `
+      mutation tendersEdit($_id: String!  ${commonParams}) {
+        tendersEdit(_id: $_id, ${commonValues}) {
+          _id
+        }
+      }
+    `;
 
-    await tenderMutations.tendersEdit({}, { _id: _tender.id, ..._doc }, { user: _user });
+    await graphqlRequest(mutation, 'tendersEdit', _tender);
 
     expect(Tenders.updateTender.mock.calls.length).toBe(1);
-    expect(Tenders.updateTender).toBeCalledWith(_tender.id, _doc);
+
+    const { _id, ...restParams } = _tender;
+
+    delete restParams.type;
+    restParams.publishDate = new Date(restParams.publishDate);
+    restParams.closeDate = new Date(restParams.closeDate);
+
+    expect(Tenders.updateTender).toBeCalledWith(_id, restParams);
   });
 
   test('Delete tender', async () => {
-    Tenders.removeTender = jest.fn();
+    Tenders.removeTender = jest.fn(() => ({}));
 
-    await tenderMutations.tendersRemove({}, { _id: _tender.id }, { user: _user });
+    const mutation = `
+      mutation tendersRemove($_id: String!) {
+        tendersRemove(_id: $_id)
+      }
+    `;
+
+    await graphqlRequest(mutation, 'tendersRemove', { _id: _tender._id });
 
     expect(Tenders.removeTender.mock.calls.length).toBe(1);
-    expect(Tenders.removeTender).toBeCalledWith(_tender.id);
+    expect(Tenders.removeTender).toBeCalledWith(_tender._id);
   });
 
   test('Award', async () => {
-    const responseId = 'DFDAFFDSAFSDF';
+    Tenders.award = jest.fn(() => ({}));
 
     const mutation = `
       mutation tendersAward($_id: String!, $responseId: String!) {
@@ -92,10 +148,11 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const args = { _id: _tender._id.toString(), responseId };
+    const args = { _id: _tender._id.toString(), responseId: 'DFDAFFDSAFSDF' };
 
-    const tender = await graphqlRequest(mutation, 'tendersAward', args);
+    await graphqlRequest(mutation, 'tendersAward', args);
 
-    expect(tender.winnerId).toBe(responseId);
+    expect(Tenders.award.mock.calls.length).toBe(1);
+    expect(Tenders.award).toBeCalledWith(args._id, args.responseId);
   });
 });

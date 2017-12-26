@@ -1,9 +1,9 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import { connect, disconnect } from '../db/connection';
-import { Tenders, TenderResponses, Users, Companies } from '../db/models';
-import { userFactory, tenderFactory, companyFactory } from '../db/factories';
+import { graphqlRequest, connect, disconnect } from '../db/connection';
+import { Tenders, TenderResponses, Companies } from '../db/models';
+import { tenderFactory, companyFactory } from '../db/factories';
 import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 
 beforeAll(() => connect());
@@ -11,20 +11,33 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
-  let _user;
   let _tender;
   let _company;
 
+  const commonParams = `
+    $tenderId: String!,
+    $supplierId: String!,
+    $isNotInterested: Boolean,
+    $respondedProducts: [TenderRespondedProductInput]
+    $respondedDocuments: [TenderRespondedDocumentInput]
+  `;
+
+  const commonValues = `
+    tenderId: $tenderId,
+    supplierId: $supplierId,
+    isNotInterested: $isNotInterested,
+    respondedProducts: $respondedProducts
+    respondedDocuments: $respondedDocuments
+  `;
+
   beforeEach(async () => {
     // Creating test data
-    _user = await userFactory();
     _tender = await tenderFactory();
     _company = await companyFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
-    await Users.remove({});
     await Tenders.remove({});
     await TenderResponses.remove({});
     await Companies.remove({});
@@ -49,13 +62,45 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender response', async () => {
-    TenderResponses.create = jest.fn();
+    TenderResponses.createTenderResponse = jest.fn(() => ({ _id: 'DFAFDA' }));
 
-    const _doc = { tenderId: _tender._id, supplierId: _company._id };
+    const doc = {
+      tenderId: 'tenderId',
+      supplierId: 'supplierId',
+      isNotInterested: false,
+      respondedProducts: [
+        {
+          code: 'code',
+          suggestedManufacturer: 'suggestedManufacturer',
+          suggestedManufacturerPartNumber: 1,
+          unitPrice: 1000,
+          totalPrice: 20000,
+          leadTime: 1,
+          comment: 'comment',
+          file: { name: 'name', url: 'url' },
+        },
+      ],
+      respondedDocuments: [
+        {
+          name: 'name',
+          isSubmitted: true,
+          notes: 'notes',
+          file: { name: 'name', url: 'url' },
+        },
+      ],
+    };
 
-    await tenderResponseMutations.tenderResponsesAdd({}, _doc, { user: _user });
+    const mutation = `
+      mutation tenderResponsesAdd(${commonParams}) {
+        tenderResponsesAdd(${commonValues}) {
+          _id
+        }
+      }
+    `;
 
-    expect(TenderResponses.create.mock.calls.length).toBe(1);
-    expect(TenderResponses.create).toBeCalledWith(_doc);
+    await graphqlRequest(mutation, 'tenderResponsesAdd', doc);
+
+    expect(TenderResponses.createTenderResponse.mock.calls.length).toBe(1);
+    expect(TenderResponses.createTenderResponse).toBeCalledWith(doc);
   });
 });

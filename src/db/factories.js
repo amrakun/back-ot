@@ -1,6 +1,21 @@
+/* eslint-disable no-underscore-dangle */
+
 import faker from 'faker';
 
 import { Companies, Users, Tenders } from './models';
+
+/*
+ * Remove mongoose functionalities & convert to raw object
+ */
+const save = async object => {
+  const savedObject = await object.save();
+
+  const fixedObject = JSON.parse(JSON.stringify(savedObject));
+
+  delete fixedObject.__v;
+
+  return fixedObject;
+};
 
 export const companyFactory = (params = {}) => {
   const company = new Companies({
@@ -8,7 +23,7 @@ export const companyFactory = (params = {}) => {
     mnName: params.mnName || faker.random.word(),
   });
 
-  return company.save();
+  return save(company);
 };
 
 export const userFactory = (params = {}) => {
@@ -24,22 +39,32 @@ export const userFactory = (params = {}) => {
     isSupplier: params.isSupplier || false,
   });
 
-  return user.save();
+  return save(user);
 };
 
-export const tenderFactory = (params = {}) => {
+export const tenderFactory = async (params = {}) => {
+  const requestedProduct = {
+    purchaseRequestNumber: faker.random.number(),
+    shortText: faker.random.word(),
+    quantity: faker.random.number(),
+    uom: faker.random.word(),
+    manufacturer: faker.random.word(),
+    manufacturerPartNumber: faker.random.number(),
+  };
+
   const tender = new Tenders({
     type: params.type || 'rfq',
     number: params.number || faker.random.number(),
     name: params.number || faker.random.word(),
+    content: params.content || faker.random.word(),
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
     reminderDay: params.reminderDay || faker.random.number(),
     file: params.file || { name: 'name', url: 'url' },
     supplierIds: params.supplierIds || ['id1', 'id2'],
-    requestedProducts: params.requestedProducts || [{ code: 'code' }],
+    requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocuments || ['Document1'],
   });
 
-  return tender.save();
+  return save(tender);
 };

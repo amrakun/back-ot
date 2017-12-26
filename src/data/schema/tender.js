@@ -5,13 +5,13 @@ const requestedProductFields = `
   quantity: Float,
   uom: String,
   manufacturer: String,
-  manufacturerPart: String,
+  manufacturerPartNumber: Float,
 `;
 
 const respondedProductFields = `
   code: String,
   suggestedManufacturer: String,
-  suggestedManufacturerPart: String,
+  suggestedManufacturerPartNumber: Float,
   unitPrice: Float,
   totalPrice: Float,
   leadTime: Float,
@@ -86,7 +86,7 @@ export const types = `
 `;
 
 export const queries = `
-  tenders(page: Int, perPage: Int, type: String): [Tender]
+  tenders(page: Int, perPage: Int, type: String, supplierId: String): [Tender]
   tenderDetail(_id: String!): Tender
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]

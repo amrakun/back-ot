@@ -22,87 +22,37 @@ describe('Tender db', () => {
     await Tenders.remove({});
   });
 
-  const requestedProducts = [
-    {
-      code: 'code',
-      purchaseRequestNumber: 90,
-      shortText: 'shorttext',
-      quantity: 10,
-      uom: 'uom',
-      manufacturer: 'manufacturer',
-      manufacturerPartNumber: 10,
-    },
-  ];
-
-  const checkProducts = (product, doc) => {
-    expect(product.code).toBe(doc.code);
-    expect(product.purchaseRequestNumber).toBe(doc.purchaseRequestNumber);
-    expect(product.shortText).toBe(doc.shortText);
-    expect(product.quantity).toBe(doc.quantity);
-    expect(product.uom).toBe(doc.uom);
-    expect(product.manufacturer).toBe(doc.manufacturer);
-    expect(product.manufacturerPartNumber).toBe(doc.manufacturerPartNumber);
-  };
-
   test('Create tender', async () => {
-    const tenderObj = await Tenders.create({
-      type: _tender.type,
-      number: _tender.number,
-      name: _tender.name,
-      publishDate: _tender.publishDate,
-      closeDate: _tender.closeDate,
-      file: _tender.file,
-      reminderDay: _tender.reminderDay,
-      supplierIds: _tender.supplierIds,
-      requestedProducts,
-      requestedDocuments: ['Document1'],
-    });
+    delete _tender._id;
 
-    expect(tenderObj).toBeDefined();
-    expect(tenderObj.type).toBe(_tender.type);
-    expect(tenderObj.number).toBe(_tender.number);
-    expect(tenderObj.name).toBe(_tender.name);
-    expect(tenderObj.publishDate).toEqual(_tender.publishDate);
-    expect(tenderObj.closeDate).toEqual(_tender.closeDate);
-    expect(tenderObj.file.toJSON()).toEqual(_tender.file.toJSON());
-    expect(tenderObj.supplierIds).toContain(..._tender.supplierIds);
-    expect(tenderObj.reminderDay).toBe(_tender.reminderDay);
-    expect(tenderObj.requestedDocuments).toContain(..._tender.requestedDocuments);
+    let tenderObj = await Tenders.createTender(_tender);
 
-    checkProducts(tenderObj.requestedProducts[0], requestedProducts[0]);
+    tenderObj = JSON.parse(JSON.stringify(tenderObj));
+    delete tenderObj._id;
+    delete tenderObj.__v;
+
+    expect(tenderObj).toEqual(_tender);
   });
 
   test('Update tender', async () => {
-    const doc = {
-      number: 90,
-      name: 'name',
-      publishDate: new Date(),
-      closeDate: new Date(),
-      supplierIds: ['1', '2'],
-      file: { name: 'file', url: 'url ' },
-      reminderDay: 1,
-      requestedProducts,
-      requestedDocuments: ['Document1'],
-    };
+    const doc = await tenderFactory();
+    delete doc._id;
 
-    const tenderObj = await Tenders.updateTender(_tender.id, doc);
+    let tenderObj = await Tenders.updateTender(_tender._id, doc);
 
-    expect(tenderObj.number).toBe(doc.number);
-    expect(tenderObj.name).toBe(doc.name);
-    expect(tenderObj.publishDate).toEqual(doc.publishDate);
-    expect(tenderObj.closeDate).toEqual(doc.closeDate);
-    expect(tenderObj.supplierIds).toContain(...doc.supplierIds);
-    expect(tenderObj.file.toJSON()).toEqual(doc.file);
-    expect(tenderObj.reminderDay).toBe(doc.reminderDay);
-    expect(tenderObj.requestedDocuments).toContain(...doc.requestedDocuments);
+    tenderObj = JSON.parse(JSON.stringify(tenderObj));
+    delete tenderObj._id;
+    delete tenderObj.__v;
+    tenderObj.publishDate = tenderObj.publishDate.toString();
+    tenderObj.closeDate = tenderObj.closeDate.toString();
 
-    checkProducts(tenderObj.requestedProducts[0], requestedProducts[0]);
+    expect(tenderObj).toEqual(doc);
   });
 
   test('Delete tender', async () => {
-    await Tenders.removeTender(_tender.id);
+    await Tenders.removeTender(_tender._id);
 
-    expect(await Tenders.find({ _id: _tender.id }).count()).toBe(0);
+    expect(await Tenders.find({ _id: _tender._id }).count()).toBe(0);
   });
 
   test('Award', async () => {
@@ -110,7 +60,7 @@ describe('Tender db', () => {
 
     const responseId = 'DFAFDSFDSF';
 
-    const updatedTender = await Tenders.award(_tender.id, responseId);
+    const updatedTender = await Tenders.award(_tender._id, responseId);
 
     expect(updatedTender.winnerId).toBe(responseId);
   });

@@ -7,11 +7,15 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
-  async tenders(root, { type, ...params }) {
+  async tenders(root, { type, supplierId, ...params }) {
     const query = {};
 
     if (type) {
       query.type = type;
+    }
+
+    if (supplierId) {
+      query.supplierIds = { $in: [supplierId] };
     }
 
     return paginate(Tenders.find(query), params);
