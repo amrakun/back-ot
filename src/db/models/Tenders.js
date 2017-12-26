@@ -108,6 +108,8 @@ const TenderResponseSchema = mongoose.Schema({
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
   respondedDocuments: [RespondedDocumentSchema],
+
+  isNotInterested: field({ type: Boolean, default: false }),
 });
 
 class TenderResponse {

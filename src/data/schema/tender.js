@@ -50,7 +50,10 @@ export const types = `
     requestedDocuments: [String]!
 
     suppliers: [Company]!,
+    requestedCount: Int,
     submittedCount: Int,
+    notInterestedCount: Int,
+    notRespondedCount: Int,
   }
 
   type TenderRespondedProduct {
@@ -73,6 +76,7 @@ export const types = `
     _id: String!
     tenderId: String!
     supplierId: String!
+    isNotInterested: Boolean,
     respondedProducts: [TenderRespondedProduct]!
     respondedDocuments: [TenderRespondedDocument]!
   }
@@ -102,6 +106,7 @@ const commonParams = `
 const responseCommonParams = `
   tenderId: String!,
   supplierId: String!,
+  isNotInterested: Boolean,
   respondedProducts: [TenderRespondedProductInput]
   respondedDocuments: [TenderRespondedDocumentInput]
 `;

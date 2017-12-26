@@ -81,6 +81,7 @@ describe('Tender response db', () => {
     expect(tenderResponseObj).toBeDefined();
     expect(tenderResponseObj.tenderId.toString()).toBe(_tender._id.toString());
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
+    expect(tenderResponseObj.isNotInterested).toBe(false);
 
     checkProducts(tenderResponseObj.respondedProducts[0], respondedProducts[0]);
     checkDocuments(tenderResponseObj.respondedDocuments[0], respondedDocuments[0]);
