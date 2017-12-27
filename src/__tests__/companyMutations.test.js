@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies } from '../db/models';
-import { userFactory, companyFactory } from '../db/factories';
+import { userFactory, companyFactory, companyDocs } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -22,39 +22,23 @@ describe('Company mutations', () => {
     await Companies.remove({});
   });
 
-  test('companiesEditBasicInfo', async () => {
+  const callMutation = async (mutation, name) => {
     Companies.updateSection = jest.fn(() => ({ _id: 'DFAFDA' }));
 
-    const doc = {
-      basicInfo: {
-        enName: 'enNameUpdated',
-        mnName: 'mnNameUpdated',
-        sapNumber: 'sapNumber',
-        isRegisteredOnSup: false,
-        address: 'AddressUpdated',
-        address2: 'Address2Updated',
-        address3: 'Address3Updated',
-        townOrCity: 'UlaanbaatarUpdated',
-        province: 'UlaanbaatarUpdated',
-        zipCode: 977,
-        country: 'MongoliaUpdated',
-        registeredInCountry: 'MongoliaUpdated',
-        registeredInAimag: 'UmnugivUpdated',
-        registeredInSum: 'BayntsagaanUpdated',
-        isChinese: true,
-        isSubContractor: false,
-        corporateStructure: 'PartnershipUpdated',
-        registrationNumber: 33483948394,
-        certificateOfRegistration: { name: 'name', url: '/path' },
-        email: 'companyUpdated@gmail.com',
-        website: 'web.com',
-        foreignOwnershipPercentage: '41',
-        totalNumberOfEmployees: 101,
-        totalNumberOfMongolianEmployees: 81,
-        totalNumberOfUmnugoviEmployees: 11,
-      },
+    const context = {
+      user: await userFactory({ companyId: _company._id }),
     };
 
+    const doc = companyDocs[name]();
+    const key = `${name}Info`;
+
+    await graphqlRequest(mutation, key, { [key]: doc }, context);
+
+    expect(Companies.updateSection.mock.calls.length).toBe(1);
+    expect(Companies.updateSection).toBeCalledWith(_company._id, key, doc);
+  };
+
+  test('companiesEditBasicInfo', async () => {
     const mutation = `
       mutation companiesEditBasicInfo($basicInfo: CompanyBasicInfoInput) {
         companiesEditBasicInfo(basicInfo: $basicInfo) {
@@ -63,36 +47,10 @@ describe('Company mutations', () => {
       }
     `;
 
-    const context = {
-      user: await userFactory({ companyId: _company._id }),
-    };
-
-    await graphqlRequest(mutation, 'companiesEditBasicInfo', doc, context);
-
-    expect(Companies.updateSection.mock.calls.length).toBe(1);
-    expect(Companies.updateSection).toBeCalledWith(_company._id, 'basicInfo', doc.basicInfo);
+    await callMutation(mutation, 'basic');
   });
 
   test('companiesEditContactInfo', async () => {
-    Companies.updateSection = jest.fn(() => ({ _id: 'DFAFDA' }));
-
-    const doc = {
-      contactInfo: {
-        name: 'name',
-        jobTitle: 'jobTitle',
-        address: 'Address',
-        address2: 'Address2',
-        address3: 'Address3',
-        townOrCity: 'Ulaanbaatar',
-        province: 'Ulaanbaatar',
-        zipCode: 976,
-        country: 'Mongolia',
-        phone: 24224242,
-        phone2: 24224243,
-        email: 'contact@gmail.com',
-      },
-    };
-
     const mutation = `
       mutation companiesEditContactInfo($contactInfo: CompanyContactInfoInput) {
         companiesEditContactInfo(contactInfo: $contactInfo) {
@@ -101,13 +59,132 @@ describe('Company mutations', () => {
       }
     `;
 
-    const context = {
-      user: await userFactory({ companyId: _company._id }),
-    };
+    await callMutation(mutation, 'contact');
+  });
 
-    await graphqlRequest(mutation, 'companiesEditContactInfo', doc, context);
+  test('companiesEditManagementTeamInfo', async () => {
+    const mutation = `
+      mutation companiesEditManagementTeamInfo(
+        $managementTeamInfo: CompanyManagementTeamInfoInput
+      ) {
+        companiesEditManagementTeamInfo(managementTeamInfo: $managementTeamInfo) {
+          _id
+        }
+      }
+    `;
 
-    expect(Companies.updateSection.mock.calls.length).toBe(1);
-    expect(Companies.updateSection).toBeCalledWith(_company._id, 'contactInfo', doc.contactInfo);
+    await callMutation(mutation, 'managementTeam');
+  });
+
+  test('companiesEditShareholderInfo', async () => {
+    const mutation = `
+      mutation companiesEditShareholderInfo(
+        $shareholderInfo: CompanyShareholderInfoInput
+      ) {
+        companiesEditShareholderInfo(shareholderInfo: $shareholderInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'shareholder');
+  });
+
+  test('companiesEditGroupInfo', async () => {
+    const mutation = `
+      mutation companiesEditGroupInfo(
+        $groupInfo: CompanyGroupInfoInput
+      ) {
+        companiesEditGroupInfo(groupInfo: $groupInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'group');
+  });
+
+  test('companiesEditProductsInfo', async () => {
+    const mutation = `
+      mutation companiesEditProductsInfo(
+        $productsInfo: [String]
+      ) {
+        companiesEditProductsInfo(productsInfo: $productsInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'products');
+  });
+
+  test('companiesEditCertificateInfo', async () => {
+    const mutation = `
+      mutation companiesEditCertificateInfo(
+        $certificateInfo: CompanyCertificateInfoInput
+      ) {
+        companiesEditCertificateInfo(certificateInfo: $certificateInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'certificate');
+  });
+
+  test('companiesEditFinancialInfo', async () => {
+    const mutation = `
+      mutation companiesEditFinancialInfo(
+        $financialInfo: CompanyFinancialInfoInput
+      ) {
+        companiesEditFinancialInfo(financialInfo: $financialInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'financial');
+  });
+
+  test('companiesEditBusinessInfo', async () => {
+    const mutation = `
+      mutation companiesEditBusinessInfo(
+        $businessInfo: CompanyBusinessInfoInput
+      ) {
+        companiesEditBusinessInfo(businessInfo: $businessInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'business');
+  });
+
+  test('companiesEditEnvironmentalInfo', async () => {
+    const mutation = `
+      mutation companiesEditEnvironmentalInfo(
+        $environmentalInfo: CompanyEnvironmentalInfoInput
+      ) {
+        companiesEditEnvironmentalInfo(environmentalInfo: $environmentalInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'environmental');
+  });
+
+  test('companiesEditHealthInfo', async () => {
+    const mutation = `
+      mutation companiesEditHealthInfo(
+        $healthInfo: CompanyHealthInfoInput
+      ) {
+        companiesEditHealthInfo(healthInfo: $healthInfo) {
+          _id
+        }
+      }
+    `;
+
+    await callMutation(mutation, 'health');
   });
 });
