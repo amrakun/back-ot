@@ -141,18 +141,18 @@ describe('Tender mutations', () => {
     Tenders.award = jest.fn(() => ({}));
 
     const mutation = `
-      mutation tendersAward($_id: String!, $responseId: String!) {
-        tendersAward(_id: $_id, responseId: $responseId) {
+      mutation tendersAward($_id: String!, $supplierId: String!) {
+        tendersAward(_id: $_id, supplierId: $supplierId) {
           winnerId
         }
       }
     `;
 
-    const args = { _id: _tender._id.toString(), responseId: 'DFDAFFDSAFSDF' };
+    const args = { _id: _tender._id.toString(), supplierId: 'DFDAFFDSAFSDF' };
 
     await graphqlRequest(mutation, 'tendersAward', args);
 
     expect(Tenders.award.mock.calls.length).toBe(1);
-    expect(Tenders.award).toBeCalledWith(args._id, args.responseId);
+    expect(Tenders.award).toBeCalledWith(args._id, args.supplierId);
   });
 });

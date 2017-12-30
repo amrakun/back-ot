@@ -118,7 +118,7 @@ export const mutations = `
   tendersAdd(type: String!, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
-  tendersAward(_id: String!, responseId: String!): Tender
+  tendersAward(_id: String!, supplierId: String!): Tender
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
 `;
