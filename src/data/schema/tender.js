@@ -92,6 +92,7 @@ export const queries = `
     type: String,
     supplierId: String
     ignoreNotInterested: Boolean,
+    ignoreSubmitted: Boolean,
   ): [Tender]
 
   tenderDetail(_id: String!): Tender

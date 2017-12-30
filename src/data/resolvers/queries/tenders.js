@@ -1,4 +1,4 @@
-import { Tenders } from '../../../db/models';
+import { Tenders, TenderResponses } from '../../../db/models';
 import { paginate } from './utils';
 
 const tenderQueries = {
@@ -7,8 +7,8 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
-  async tenders(root, args) {
-    const { type, supplierId, ignoreNotInterested, ...params } = args;
+  async tenders(root, args, { user }) {
+    const { type, supplierId, ignoreNotInterested, ignoreSubmitted, ...params } = args;
 
     const query = {};
 
@@ -22,6 +22,13 @@ const tenderQueries = {
 
     if (ignoreNotInterested) {
       query.isNotInterested = { $ne: true };
+    }
+
+    if (ignoreSubmitted) {
+      const submittedTenders = await TenderResponses.find({ supplierId: user.companyId });
+      const submittedTenderIds = submittedTenders.map(response => response.tenderId);
+
+      query._id = { $nin: submittedTenderIds };
     }
 
     return paginate(Tenders.find(query), params);
