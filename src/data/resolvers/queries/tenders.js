@@ -7,7 +7,9 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
-  async tenders(root, { type, supplierId, ...params }) {
+  async tenders(root, args) {
+    const { type, supplierId, ignoreNotInterested, ...params } = args;
+
     const query = {};
 
     if (type) {
@@ -16,6 +18,10 @@ const tenderQueries = {
 
     if (supplierId) {
       query.supplierIds = { $in: [supplierId] };
+    }
+
+    if (ignoreNotInterested) {
+      query.isNotInterested = { $ne: true };
     }
 
     return paginate(Tenders.find(query), params);
