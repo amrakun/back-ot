@@ -58,10 +58,10 @@ describe('Tender db', () => {
   test('Award', async () => {
     expect(_tender.winnerId).toBe(undefined);
 
-    const responseId = 'DFAFDSFDSF';
+    const supplierId = 'DFAFDSFDSF';
 
-    const updatedTender = await Tenders.award(_tender._id, responseId);
+    const updatedTender = await Tenders.award(_tender._id, supplierId);
 
-    expect(updatedTender.winnerId).toBe(responseId);
+    expect(updatedTender.winnerId).toBe(supplierId);
   });
 });

@@ -78,11 +78,11 @@ class Tender {
   /*
    * Choose tender winner
    * @param {String} _id - Tender id
-   * @param {String} responseId - Tender response id
+   * @param {String} supplierId - Company id
    * @return {Promise} - Updated tender object
    */
-  static async award(_id, responseId) {
-    await this.update({ _id }, { $set: { winnerId: responseId } });
+  static async award(_id, supplierId) {
+    await this.update({ _id }, { $set: { winnerId: supplierId } });
 
     return this.findOne({ _id });
   }

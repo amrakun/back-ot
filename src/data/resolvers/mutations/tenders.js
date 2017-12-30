@@ -33,11 +33,11 @@ const tenderMutations = {
   /**
    * Choose winner
    * @param {String} _id - Tender id
-   * @param {String} responseId - Tender response id
+   * @param {String} supplierId - Company id
    * @return {Promise} - updated tender
    */
-  tendersAward(root, { _id, responseId }) {
-    return Tenders.award(_id, responseId);
+  tendersAward(root, { _id, supplierId }) {
+    return Tenders.award(_id, supplierId);
   },
 };
 
