@@ -24,6 +24,7 @@ export const companyFactory = (params = {}) => {
       mnName: params.mnName || faker.random.word(),
       sapNumber: params.sapNumber || faker.random.word(),
     },
+    productsInfo: params.productsInfo || [],
   });
 
   return save(company);

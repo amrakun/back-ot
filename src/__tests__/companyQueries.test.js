@@ -33,6 +33,7 @@ describe('Company queries', () => {
           enName
           sapNumber
         }
+        productsInfo
       }
     }
   `;
@@ -44,7 +45,7 @@ describe('Company queries', () => {
 
   test('companies', async () => {
     // Creating test data ==============
-    await companyFactory({ mnName: 'mn name' });
+    await companyFactory({ mnName: 'mn name', productsInfo: ['code1', 'code2'] });
     await companyFactory({ enName: 'en name', sapNumber: '1441aabb' });
 
     // When there is no filter, it must return all companies =============
@@ -73,5 +74,24 @@ describe('Company queries', () => {
 
     expect(response.length).toBe(1);
     expect(response[0].basicInfo.sapNumber).toBe('1441aabb');
+
+    // filter by products & services =============
+    // one value
+    response = await graphqlRequest(query, 'companies', { productCodes: 'code1' });
+
+    expect(response.length).toBe(1);
+    expect(response[0].productsInfo).toContain('code1');
+
+    // two values ======
+    response = await graphqlRequest(query, 'companies', { productCodes: 'code1,code2' });
+
+    expect(response.length).toBe(1);
+    expect(response[0].productsInfo).toContain('code1');
+    expect(response[0].productsInfo).toContain('code2');
+
+    // no result
+    response = await graphqlRequest(query, 'companies', { productCodes: 'code3' });
+
+    expect(response.length).toBe(0);
   });
 });
