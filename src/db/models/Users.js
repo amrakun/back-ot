@@ -51,6 +51,10 @@ class User {
    * @return {Promise} newly created user object
    */
   static async createUser({ username, email, password, role, details }) {
+    if (await this.findOne({ email })) {
+      throw new Error('Duplicated email');
+    }
+
     return this.create({
       username,
       email,
@@ -70,6 +74,10 @@ class User {
    */
   static async updateUser(_id, { username, email, password, role, details }) {
     const doc = { username, email, password, role, details };
+
+    if (await this.findOne({ _id: { $ne: _id }, email })) {
+      throw new Error('Duplicated email');
+    }
 
     // change password
     if (password) {

@@ -24,6 +24,16 @@ describe('User db utils', () => {
     await Users.remove({});
   });
 
+  test('Create user: duplicated email', async () => {
+    expect.assertions(1);
+
+    try {
+      await Users.createUser(_user);
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
+  });
+
   test('Create user', async () => {
     const testPassword = 'test';
 
@@ -46,6 +56,23 @@ describe('User db utils', () => {
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
     expect(userObj.details.fullName).toBe(_user.details.fullName);
     expect(userObj.details.avatar).toBe(_user.details.avatar);
+  });
+
+  test('Update user: duplicated email', async () => {
+    expect.assertions(2);
+
+    const user = await userFactory();
+
+    try {
+      await Users.updateUser(_user._id, { email: user.email });
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
+
+    // valid email
+    const updatedUser = await Users.updateUser(_user._id, { email: 'email@gmail.com' });
+
+    expect(updatedUser.email).toBe('email@gmail.com');
   });
 
   test('Update user', async () => {
@@ -93,7 +120,15 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
+    expect.assertions(5);
+
     const updateDoc = await userFactory();
+
+    try {
+      await Users.updateUser(_user._id, { email: updateDoc.email });
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
 
     await Users.editProfile(_user._id, {
       email: 'test@gmail.com',
