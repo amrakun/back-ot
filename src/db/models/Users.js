@@ -22,6 +22,8 @@ const UserSchema = mongoose.Schema({
   companyId: field({ type: mongoose.Schema.Types.ObjectId }),
   username: field({ type: String }),
   password: field({ type: String }),
+  registrationToken: field({ type: String }),
+  registrationTokenExpires: field({ type: Date }),
   resetPasswordToken: field({ type: String }),
   resetPasswordExpires: field({ type: Date }),
   role: field({
@@ -116,6 +118,15 @@ class User {
   }
 
   /*
+   * Create the random token
+   */
+  static async generateRandomToken() {
+    const buffer = await crypto.randomBytes(20);
+
+    return buffer.toString('hex');
+  }
+
+  /*
     Compare password
     @param {String} password
     @param {String} userPassword - Current password
@@ -203,9 +214,7 @@ class User {
       throw new Error('Invalid email');
     }
 
-    // create the random token
-    const buffer = await crypto.randomBytes(20);
-    const token = buffer.toString('hex');
+    const token = await this.generateRandomToken();
 
     // save token & expiration date
     await this.findByIdAndUpdate(
@@ -275,17 +284,57 @@ class User {
 
   /**
    * Register
-   * @param {Object} doc - user fields
+   * @param {String} email - user email
    * @return {Promise} newly created user object
    */
-  static async register({ email, password }) {
+  static async register(email) {
+    if (await Users.findOne({ email })) {
+      throw new Error('Invalid email');
+    }
+
     return this.create({
       username: email,
       email,
       isSupplier: true,
-      // hash password
-      password: await this.generatePassword(password),
+      registrationToken: await this.generateRandomToken(),
+      registrationTokenExpires: Date.now() + 86400000,
     });
+  }
+
+  /*
+   * Confirms user registration by given token & password
+   * @param {String} token - User's temporary token for registration
+   * @param {String} password - Password
+   * @return {Promise} - Updated user information
+   */
+  static async confirmRegistration(token, password) {
+    // find user by token
+    const user = await this.findOne({
+      registrationToken: token,
+      registrationTokenExpires: {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      throw new Error('Token is invalid or has expired.');
+    }
+
+    if (!password) {
+      throw new Error('Password is required.');
+    }
+
+    // set new password
+    await this.findByIdAndUpdate(
+      { _id: user._id },
+      {
+        password: await this.generatePassword(password),
+        registrationToken: undefined,
+        registrationTokenExpires: undefined,
+      },
+    );
+
+    return this.findOne({ _id: user._id });
   }
 
   /*
