@@ -8,7 +8,7 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tenders(root, args, { user }) {
-    const { type, supplierId, ignoreNotInterested, ignoreSubmitted, ...params } = args;
+    const { type, supplierId, ignoreSubmitted, ...params } = args;
 
     const query = {};
 
@@ -18,10 +18,6 @@ const tenderQueries = {
 
     if (supplierId) {
       query.supplierIds = { $in: [supplierId] };
-    }
-
-    if (ignoreNotInterested) {
-      query.isNotInterested = { $ne: true };
     }
 
     if (ignoreSubmitted) {

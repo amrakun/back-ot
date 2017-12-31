@@ -2,7 +2,7 @@
 
 import faker from 'faker';
 
-import { Companies, Users, Tenders } from './models';
+import { Companies, Users, Tenders, TenderResponses } from './models';
 
 /*
  * Remove mongoose functionalities & convert to raw object
@@ -266,4 +266,16 @@ export const tenderFactory = async (params = {}) => {
   });
 
   return save(tender);
+};
+
+export const tenderResponseFactory = async (params = {}) => {
+  const tenderResponse = new TenderResponses({
+    tenderId: params.tenderId || 'DFAFDFDASFDFAD',
+    supplierId: params.supplierId || 'IJIUDFAFDFDASFDFAD',
+    respondedProducts: params.respondedProducts || {},
+    respondedDocuments: params.respondedDocuments || {},
+    isNotInterested: params.isNotInterested || false,
+  });
+
+  return save(tenderResponse);
 };

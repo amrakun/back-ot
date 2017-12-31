@@ -91,7 +91,6 @@ export const queries = `
     perPage: Int,
     type: String,
     supplierId: String
-    ignoreNotInterested: Boolean,
     ignoreSubmitted: Boolean,
   ): [Tender]
 
