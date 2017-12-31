@@ -7,8 +7,18 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered companies list by given parameters
    */
-  async companies(root, params) {
-    return paginate(Companies.find({}), params);
+  async companies(root, { search, ...params }) {
+    const selector = {};
+
+    if (search) {
+      selector.$or = [
+        { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
+        { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
+        { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
+      ];
+    }
+
+    return paginate(Companies.find(selector), params);
   },
 
   /**

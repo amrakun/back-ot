@@ -19,8 +19,11 @@ const save = async object => {
 
 export const companyFactory = (params = {}) => {
   const company = new Companies({
-    enName: params.enName || faker.random.word(),
-    mnName: params.mnName || faker.random.word(),
+    basicInfo: {
+      enName: params.enName || faker.random.word(),
+      mnName: params.mnName || faker.random.word(),
+      sapNumber: params.sapNumber || faker.random.word(),
+    },
   });
 
   return save(company);
