@@ -42,7 +42,14 @@ const commonParams = `
 `;
 
 export const mutations = `
-  register(email: String!, password: String!, passwordConfirmation: String!): User!
+  register(email: String!): String!
+
+  confirmRegistration(
+    token: String!,
+    password: String!,
+    passwordConfirmation: String!
+  ): User
+
   login(email: String!, password: String!): AuthPayload!
   forgotPassword(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String

@@ -241,6 +241,8 @@ describe('User db utils', () => {
   });
 
   test('Confirm registration', async () => {
+    expect.assertions(5);
+
     // token expired ==============
     try {
       await Users.confirmRegistration('', '');

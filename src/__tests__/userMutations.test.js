@@ -1,7 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import { connect, disconnect } from '../db/connection';
+import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { ROLES } from '../data/constants';
 import { Users, Companies } from '../db/models';
 import { userFactory } from '../db/factories';
@@ -22,17 +22,49 @@ describe('User mutations', () => {
 
   test('Register', async () => {
     Users.register = jest.fn(() => ({ _id: '_id' }));
-    Companies.createCompany = jest.fn(() => ({ _id: '_id' }));
 
-    const doc = {
-      password: 'password',
-      email: 'info@erxes.io',
-    };
+    const mutation = `
+      mutation register($email: String!) {
+        register(email: $email)
+      }
+    `;
 
-    await userMutations.register({}, { ...doc, passwordConfirmation: 'password' });
+    await graphqlRequest(mutation, 'register', { email: 'test@erxes.io' });
 
     // register must be called
-    expect(Users.register).toBeCalledWith(doc);
+    expect(Users.register).toBeCalledWith('test@erxes.io');
+  });
+
+  test('Confirm registration', async () => {
+    Users.confirmRegistration = jest.fn(() => ({ _id: '_id' }));
+    Companies.createCompany = jest.fn(() => ({ _id: '_id' }));
+
+    const mutation = `
+      mutation confirmRegistration(
+        $token: String!,
+        $password: String!,
+        $passwordConfirmation: String!,
+      ) {
+        confirmRegistration(
+          token: $token,
+          password: $password,
+          passwordConfirmation: $passwordConfirmation
+        ) {
+          _id
+        }
+      }
+    `;
+
+    const args = {
+      token: 'token',
+      password: 'password',
+      passwordConfirmation: 'password',
+    };
+
+    await graphqlRequest(mutation, 'confirmRegistration', args);
+
+    // confirmRegistration must be called
+    expect(Users.confirmRegistration).toBeCalledWith(args.token, args.password);
 
     // create company must be called
     expect(Companies.createCompany).toBeCalledWith('_id');
