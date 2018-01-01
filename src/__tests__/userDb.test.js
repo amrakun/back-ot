@@ -24,6 +24,16 @@ describe('User db utils', () => {
     await Users.remove({});
   });
 
+  test('Create user: duplicated email', async () => {
+    expect.assertions(1);
+
+    try {
+      await Users.createUser(_user);
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
+  });
+
   test('Create user', async () => {
     const testPassword = 'test';
 
@@ -46,6 +56,23 @@ describe('User db utils', () => {
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
     expect(userObj.details.fullName).toBe(_user.details.fullName);
     expect(userObj.details.avatar).toBe(_user.details.avatar);
+  });
+
+  test('Update user: duplicated email', async () => {
+    expect.assertions(2);
+
+    const user = await userFactory();
+
+    try {
+      await Users.updateUser(_user._id, { email: user.email });
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
+
+    // valid email
+    const updatedUser = await Users.updateUser(_user._id, { email: 'email@gmail.com' });
+
+    expect(updatedUser.email).toBe('email@gmail.com');
   });
 
   test('Update user', async () => {
@@ -93,7 +120,15 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
+    expect.assertions(5);
+
     const updateDoc = await userFactory();
+
+    try {
+      await Users.updateUser(_user._id, { email: updateDoc.email });
+    } catch (e) {
+      expect(e.message).toBe('Duplicated email');
+    }
 
     await Users.editProfile(_user._id, {
       email: 'test@gmail.com',
@@ -119,7 +154,7 @@ describe('User db utils', () => {
       expect(e.message).toBe('Password reset token is invalid or has expired.');
     }
 
-    // invalid password =================
+    // valid tokens & invalid password =================
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
@@ -221,19 +256,62 @@ describe('User db utils', () => {
   });
 
   test('Register', async () => {
-    const testPassword = 'test';
+    expect.assertions(8);
 
-    const userObj = await Users.register({
-      email: 'test@gmail.com',
-      password: testPassword,
-    });
+    try {
+      await Users.register(_user.email);
+    } catch (e) {
+      expect(e.message).toBe('Invalid email');
+    }
+
+    const userObj = await Users.register('test@gmail.com');
 
     expect(userObj).toBeDefined();
     expect(userObj._id).toBeDefined();
+    expect(userObj.registrationToken).toBeDefined();
+    expect(userObj.registrationTokenExpires).toBeDefined();
     expect(userObj.email).toBe('test@gmail.com');
     expect(userObj.isSupplier).toBe(true);
     expect(userObj.role).toBe(undefined);
-    expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
+  });
+
+  test('Confirm registration', async () => {
+    expect.assertions(5);
+
+    // token expired ==============
+    try {
+      await Users.confirmRegistration('', '');
+    } catch (e) {
+      expect(e.message).toBe('Token is invalid or has expired.');
+    }
+
+    // valid tokens & invalid password =================
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: tomorrow,
+        },
+      },
+    );
+
+    try {
+      await Users.confirmRegistration('token', '');
+    } catch (e) {
+      expect(e.message).toBe('Password is required.');
+    }
+
+    // valid
+    const user = await Users.confirmRegistration('token', 'password');
+
+    expect(user.registrationToken).toBe(null);
+    expect(user.registrationTokenExpires).toBe(null);
+    expect(bcrypt.compare('password', user.password)).toBeTruthy();
   });
 
   test('Refresh tokens', async () => {

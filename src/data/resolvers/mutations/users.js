@@ -6,17 +6,47 @@ const userMutations = {
   /*
    * Register
    * @param {String} email - User email
-   * @param {String} password - User password
-   * @return - Newly created user object
+   * @return - Confirmation link
    */
   async register(root, args) {
-    const { password, passwordConfirmation, email } = args;
+    const { email } = args;
+
+    const user = await Users.register(email);
+
+    // send email ==============
+    const { COMPANY_EMAIL_FROM, MAIN_APP_DOMAIN } = process.env;
+
+    const link = `${MAIN_APP_DOMAIN}/confirm-registration?token=${user.registrationToken}`;
+
+    utils.sendEmail({
+      toEmails: [email],
+      fromEmail: COMPANY_EMAIL_FROM,
+      title: 'Registration',
+      template: {
+        name: 'registration',
+        data: {
+          content: link,
+        },
+      },
+    });
+
+    return link;
+  },
+
+  /*
+   * Confirm registration
+   * @param {String} token - Temporary token
+   * @param {String} password - User password
+   * @return - Updated user object
+   */
+  async confirmRegistration(root, args) {
+    const { password, passwordConfirmation, token } = args;
 
     if (password !== passwordConfirmation) {
       throw new Error('Incorrect password confirmation');
     }
 
-    const user = await Users.register({ email, password });
+    const user = await Users.confirmRegistration(token, password);
 
     // create company for new user
     await Companies.createCompany(user._id);

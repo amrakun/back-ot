@@ -317,7 +317,14 @@ export const types = `
 `;
 
 export const queries = `
-  companies(page: Int, perPage: Int): [Company]
+  companies(
+    page: Int,
+    perPage: Int,
+    search: String,
+    region: String,
+    status: String,
+    productCodes: String
+  ): [Company]
   companyDetail(_id: String!): Company
   companyByUser: Company
 `;
