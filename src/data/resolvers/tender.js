@@ -38,4 +38,17 @@ export default {
 
     return requestedCount(tender) - respondedCount;
   },
+
+  async responses(tender) {
+    const responses = await TenderResponses.find({ tenderId: tender._id });
+
+    return responses.map(async response => {
+      const supplier = await Companies.findOne({ _id: response.supplierId });
+
+      return {
+        supplier,
+        response,
+      };
+    });
+  },
 };

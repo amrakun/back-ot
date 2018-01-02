@@ -35,6 +35,11 @@ export const types = `
     ${requestedProductFields}
   }
 
+  type TenderResponseSub {
+    supplier: Company,
+    response: TenderResponse
+  }
+
   type Tender {
     _id: String!
     type: String!
@@ -57,6 +62,8 @@ export const types = `
     submittedCount: Int,
     notInterestedCount: Int,
     notRespondedCount: Int,
+
+    responses: [TenderResponseSub],
   }
 
   type TenderRespondedProduct {
