@@ -19,7 +19,7 @@ const basicInfoFields = `
   registrationNumber: Float!,
   certificateOfRegistration: JSON,
   email: String!,
-  website: String!,
+  website: String,
   foreignOwnershipPercentage: String!,
   totalNumberOfEmployees: Int!,
   totalNumberOfMongolianEmployees: Int!,

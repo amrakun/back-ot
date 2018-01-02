@@ -33,7 +33,7 @@ const BasicInfoSchema = mongoose.Schema(
     registrationNumber: field({ type: Number }),
     certificateOfRegistration: FileSchema,
     email: field({ type: String }),
-    website: field({ type: String }),
+    website: field({ type: String, optional: true }),
     foreignOwnershipPercentage: field({ type: String }),
     totalNumberOfEmployees: field({ type: Number }),
     totalNumberOfMongolianEmployees: field({ type: Number }),
