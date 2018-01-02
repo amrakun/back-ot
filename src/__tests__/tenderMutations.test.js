@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Tenders } from '../db/models';
-import { tenderFactory } from '../db/factories';
+import { tenderFactory, companyFactory } from '../db/factories';
 import tenderMutations from '../data/resolvers/mutations/tenders';
 
 beforeAll(() => connect());
@@ -77,7 +77,9 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender', async () => {
-    Tenders.createTender = jest.fn(() => ({ _id: 'DFAFSFASDF' }));
+    const supplier = await companyFactory();
+
+    Tenders.createTender = jest.fn(() => ({ _id: 'DFAFSFASDF', supplierIds: [supplier._id] }));
 
     const mutation = `
       mutation tendersAdd($type: String!  ${commonParams}) {

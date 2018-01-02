@@ -1,4 +1,5 @@
-import { Tenders } from '../../../db/models';
+import { Tenders, Companies } from '../../../db/models';
+import utils from '../../../data/utils';
 import { moduleRequireLogin } from '../../permissions';
 
 const tenderMutations = {
@@ -7,8 +8,26 @@ const tenderMutations = {
    * @param {Object} doc - tenders fields
    * @return {Promise} newly created tender object
    */
-  tendersAdd(root, doc) {
-    return Tenders.createTender(doc);
+  async tendersAdd(root, doc) {
+    const tender = await Tenders.createTender(doc);
+
+    // send email ==============
+    for (let supplierId of tender.supplierIds) {
+      const supplier = await Companies.findOne({ _id: supplierId });
+
+      utils.sendEmail({
+        toEmails: [supplier.basicInfo.email],
+        title: tender.name,
+        template: {
+          name: 'tender',
+          data: {
+            content: tender.content,
+          },
+        },
+      });
+    }
+
+    return tender;
   },
 
   /**

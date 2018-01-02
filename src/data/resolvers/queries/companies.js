@@ -7,7 +7,7 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered companies list by given parameters
    */
-  async companies(root, { search, productCodes, ...params }) {
+  async companies(root, { search, productCodes, _ids, ...params }) {
     const selector = { basicInfo: { $ne: null } };
 
     // main filter
@@ -22,6 +22,11 @@ const companyQueries = {
     // product & services filter
     if (productCodes) {
       selector.productsInfo = { $in: productCodes.split(',') };
+    }
+
+    // ids filter
+    if (_ids) {
+      selector._id = { $in: _ids };
     }
 
     return paginate(Companies.find(selector), params);

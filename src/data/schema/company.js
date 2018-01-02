@@ -323,7 +323,8 @@ export const queries = `
     search: String,
     region: String,
     status: String,
-    productCodes: String
+    productCodes: String,
+    _ids: [String],
   ): [Company]
   companyDetail(_id: String!): Company
   companyByUser: Company

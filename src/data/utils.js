@@ -105,7 +105,7 @@ export const createTransporter = async () => {
  * @return {Promise}
  */
 export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
-  const { NODE_ENV } = process.env;
+  const { COMPANY_EMAIL_FROM, NODE_ENV } = process.env;
 
   // do not send email it is running in test mode
   if (NODE_ENV == 'test') {
@@ -125,7 +125,7 @@ export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
 
   return toEmails.map(toEmail => {
     const mailOptions = {
-      from: fromEmail,
+      from: fromEmail || COMPANY_EMAIL_FROM,
       to: toEmail,
       subject: title,
       html,

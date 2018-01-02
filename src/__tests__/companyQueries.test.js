@@ -15,6 +15,7 @@ describe('Company queries', () => {
     $region: String,
     $status: String,
     $productCodes: String,
+    $_ids: [String]
   `;
 
   const commonValues = `
@@ -22,6 +23,7 @@ describe('Company queries', () => {
     region: $region,
     status: $status,
     productCodes: $productCodes,
+    _ids: $_ids
   `;
 
   const query = `
@@ -46,7 +48,12 @@ describe('Company queries', () => {
   test('companies', async () => {
     // Creating test data ==============
     await Companies.create({}); // to check empty company ignorance
-    await companyFactory({ mnName: 'mn name', productsInfo: ['code1', 'code2'] });
+
+    const company1 = await companyFactory({
+      mnName: 'mn name',
+      productsInfo: ['code1', 'code2'],
+    });
+
     await companyFactory({ enName: 'en name', sapNumber: '1441aabb' });
 
     // When there is no filter, it must return all companies =============
@@ -83,7 +90,7 @@ describe('Company queries', () => {
     expect(response.length).toBe(1);
     expect(response[0].productsInfo).toContain('code1');
 
-    // two values ======
+    // two values
     response = await graphqlRequest(query, 'companies', { productCodes: 'code1,code2' });
 
     expect(response.length).toBe(1);
@@ -94,5 +101,10 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'companies', { productCodes: 'code3' });
 
     expect(response.length).toBe(0);
+
+    // filter by _ids =============
+    response = await graphqlRequest(query, 'companies', { _ids: [company1._id] });
+
+    expect(response.length).toBe(1);
   });
 });
