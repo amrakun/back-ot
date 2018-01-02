@@ -45,6 +45,7 @@ describe('Company queries', () => {
 
   test('companies', async () => {
     // Creating test data ==============
+    await Companies.create({}); // to check empty company ignorance
     await companyFactory({ mnName: 'mn name', productsInfo: ['code1', 'code2'] });
     await companyFactory({ enName: 'en name', sapNumber: '1441aabb' });
 

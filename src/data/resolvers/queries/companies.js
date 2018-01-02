@@ -8,7 +8,7 @@ const companyQueries = {
    * @return {Promise} filtered companies list by given parameters
    */
   async companies(root, { search, productCodes, ...params }) {
-    const selector = {};
+    const selector = { basicInfo: { $ne: null } };
 
     // main filter
     if (search) {
