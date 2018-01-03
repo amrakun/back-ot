@@ -288,11 +288,11 @@ const EnvironmentalInfoSchema = mongoose.Schema(
     // company within the last 5 years?
     hasEnvironmentalRegulatorInvestigated: field({ type: Boolean }),
 
-    dateOfInvestigation: field({ type: String }),
+    dateOfInvestigation: field({ type: String, optional: true }),
 
-    reasonForInvestigation: field({ type: String }),
+    reasonForInvestigation: field({ type: String, optional: true }),
 
-    actionStatus: field({ type: String }),
+    actionStatus: field({ type: String, optional: true }),
 
     investigationDocumentation: FileSchema,
 
