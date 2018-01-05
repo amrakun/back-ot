@@ -66,8 +66,6 @@ const tenderResponseMutations = {
       });
     });
 
-    sheet.usedRange().style({ fontFamily: 'Calibri' });
-
     return generateXlsx(workbook, `rfq_bid_summary_${tender._id}`);
   },
 
@@ -125,8 +123,6 @@ const tenderResponseMutations = {
       // overall points
       sheet.cell(14, 3 + index).value(score);
     }
-
-    sheet.usedRange().style({ fontFamily: 'Calibri' });
 
     // Write to file.
     return generateXlsx(workbook, `eoi_short_list${tender._id}`);
