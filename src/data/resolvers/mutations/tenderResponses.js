@@ -3,6 +3,16 @@ import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { moduleRequireLogin } from '../../permissions';
 import { readTemplate, generateXlsx } from '../../utils';
 
+const prepare = async ({ tenderId, supplierIds, template }) => {
+  const tender = await Tenders.findOne({ _id: tenderId });
+  const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
+
+  // read template
+  const { workbook, sheet } = await readTemplate(template);
+
+  return { tender, responses, workbook, sheet };
+};
+
 const tenderResponseMutations = {
   /**
    * Create new tender response
@@ -20,11 +30,11 @@ const tenderResponseMutations = {
    * @return {String} generated file link
    */
   async tenderResponsesRfqBidSummaryReport(root, { tenderId, supplierIds }) {
-    const tender = await Tenders.findOne({ _id: tenderId });
-    const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
-
-    // read template
-    const { workbook, sheet } = await readTemplate('rfq_bid');
+    const { tender, responses, workbook, sheet } = await prepare({
+      tenderId,
+      supplierIds,
+      template: 'rfq_bid',
+    });
 
     tender.requestedProducts.forEach((product, index) => {
       const rowIndex = 13 + index;
@@ -56,6 +66,8 @@ const tenderResponseMutations = {
       });
     });
 
+    sheet.usedRange().style({ fontFamily: 'Calibri' });
+
     return generateXlsx(workbook, `rfq_bid_summary_${tender._id}`);
   },
 
@@ -66,12 +78,13 @@ const tenderResponseMutations = {
    * @return {String} generated file link
    */
   async tenderResponsesEoiShortList(root, { tenderId, supplierIds }) {
-    const tender = await Tenders.findOne({ _id: tenderId });
-    const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
-    const maxColumns = 2 + responses.length;
+    const { tender, responses, workbook, sheet } = await prepare({
+      tenderId,
+      supplierIds,
+      template: 'eoi_short_list',
+    });
 
-    // read template
-    const { workbook, sheet } = await readTemplate('eoi_short_list');
+    const maxColumns = 2 + responses.length;
 
     // complete colored titles
     sheet.range(`${cf('R1C1')}:${cf(`R1C${maxColumns}`)}`).merged(true);
@@ -113,8 +126,136 @@ const tenderResponseMutations = {
       sheet.cell(14, 3 + index).value(score);
     }
 
+    sheet.usedRange().style({ fontFamily: 'Calibri' });
+
     // Write to file.
     return generateXlsx(workbook, `eoi_short_list${tender._id}`);
+  },
+
+  /**
+   * Generate eoi bidder list report file
+   * @param {String} tenderId - Tender id
+   * @param {[String]} supplierIds - Selected supplier ids
+   * @return {String} generated file link
+   */
+  async tenderResponsesEoiBidderList(root, { tenderId, supplierIds }) {
+    const { tender, responses, workbook, sheet } = await prepare({
+      tenderId,
+      supplierIds,
+      template: 'eoi_bidder_list',
+    });
+
+    let rowIndex = 21;
+
+    // identified potential suppliers information ============
+    let addRow = (colIndex, value) => {
+      sheet
+        .cell(rowIndex, colIndex)
+        .style({ fontSize: 9 })
+        .value(value);
+    };
+
+    for (let [index, response] of responses.entries()) {
+      const supplier = await Companies.findOne({ _id: response.supplierId });
+      const basicInfo = supplier.basicInfo || {};
+
+      addRow(1, index + 1);
+      addRow(2, basicInfo.enName);
+      addRow(3, basicInfo.totalNumberOfEmployees);
+      addRow(8, 'YES');
+
+      // go down 1 line
+      rowIndex++;
+    }
+
+    // go down 1 line and add JUSTIFICATION: text and merge next 9 cells ========
+    sheet
+      .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
+      .merged(true)
+      .style({ border: true })
+      .value('JUSTIFICATION:');
+
+    // go down 1 line and merge next 9 cells ========
+    rowIndex++;
+    sheet
+      .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
+      .merged(true)
+      .value('');
+
+    // go down 3 line and add below text ========
+    rowIndex += 3;
+    sheet
+      .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
+      .merged(true)
+      .value(
+        `DETAILED INFORMATION OF SUPPLIERS INCLUDED IN
+      BIDDERS LIST ONLY: to be filled by sourcing analyst`,
+      )
+      .style({ bold: true });
+
+    // go down 1 line ========
+    rowIndex++;
+    sheet.cell(rowIndex, 1).value('');
+
+    // detailed information of suppliers ============
+    // add header
+    rowIndex++;
+    sheet.cell(rowIndex, 1).value('#');
+    sheet.cell(rowIndex, 2).value('REQUIRED INFO');
+    sheet.cell(rowIndex, 3).value('DETAILS');
+    sheet.range(`${cf(`R${rowIndex}C3`)}:${cf(`R${rowIndex}C9`)}`).merged(true);
+    sheet
+      .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
+      .style({ fontColor: 'ffffff', fill: '595959', bold: true });
+
+    addRow = (text, value) => {
+      rowIndex++;
+      sheet.cell(rowIndex, 2).value(text);
+      sheet
+        .cell(rowIndex, 3)
+        .value(value)
+        .style({ horizontalAlignment: 'left' });
+      sheet.range(`${cf(`R${rowIndex}C3`)}:${cf(`R${rowIndex}C9`)}`).merged(true);
+      sheet.range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`).style({
+        border: true,
+        fontSize: 9,
+      });
+    };
+
+    for (let [index, response] of responses.entries()) {
+      const supplier = (await Companies.findOne({ _id: response.supplierId })) || {};
+      const contactInfo = supplier.contactInfo || {};
+
+      addRow('SUPPLIER NAME', contactInfo.enName);
+
+      // numbering
+      sheet.cell(rowIndex, 1).value(index + 1);
+
+      // merge index column cells
+      sheet
+        .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex + 5}C1`)}`)
+        .merged(true)
+        .style({
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+          bold: true,
+        });
+
+      addRow('ADDRESS', contactInfo.address);
+      addRow('TELEPHONE', contactInfo.phone);
+      addRow('CONTACT PERSON', '');
+      addRow('EMAIL ADDRESS', contactInfo.email);
+      addRow('WEBSITE', contactInfo.website);
+
+      // go down 1 line ========
+      rowIndex++;
+      sheet.range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C3`)}`).value('');
+    }
+
+    sheet.usedRange().style({ fontFamily: 'Calibri' });
+
+    // Write to file.
+    return generateXlsx(workbook, `eoi_bidder_list${tender._id}`);
   },
 };
 

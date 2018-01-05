@@ -141,4 +141,5 @@ export const mutations = `
 
   tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
   tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
+  tenderResponsesEoiBidderList(tenderId: String!, supplierIds: [String!]!): String
 `;
