@@ -1,4 +1,4 @@
-import { TenderResponses, Companies } from '../../db/models';
+import { Users, TenderResponses, Companies } from '../../db/models';
 
 const requestedCount = tender => {
   return tender.supplierIds.length;
@@ -13,6 +13,10 @@ const notInterestedCount = tender => {
 };
 
 export default {
+  createdUser(tender) {
+    return Users.findOne({ _id: tender.createdUserId });
+  },
+
   isAwarded(tender) {
     return tender.winnerId;
   },

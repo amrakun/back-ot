@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Tenders } from '../db/models';
-import { tenderFactory, companyFactory } from '../db/factories';
+import { Users, Tenders } from '../db/models';
+import { userFactory, tenderFactory, companyFactory } from '../db/factories';
 import tenderMutations from '../data/resolvers/mutations/tenders';
 
 beforeAll(() => connect());
@@ -12,6 +12,7 @@ afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
   let _tender;
+  let _user;
 
   const commonParams = `
     $number: Float!,
@@ -42,11 +43,13 @@ describe('Tender mutations', () => {
   beforeEach(async () => {
     // Creating test data
     _tender = await tenderFactory();
+    _user = await userFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
     await Tenders.remove({});
+    await Users.remove({});
   });
 
   test('Tenders login required functions', async () => {
@@ -90,14 +93,14 @@ describe('Tender mutations', () => {
     `;
 
     delete _tender._id;
-    await graphqlRequest(mutation, 'tendersAdd', _tender);
+    await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
 
     expect(Tenders.createTender.mock.calls.length).toBe(1);
 
     _tender.publishDate = new Date(_tender.publishDate);
     _tender.closeDate = new Date(_tender.closeDate);
 
-    expect(Tenders.createTender).toBeCalledWith(_tender);
+    expect(Tenders.createTender).toBeCalledWith(_tender, _user._id);
   });
 
   test('Update tender', async () => {

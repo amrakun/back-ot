@@ -8,8 +8,8 @@ const tenderMutations = {
    * @param {Object} doc - tenders fields
    * @return {Promise} newly created tender object
    */
-  async tendersAdd(root, doc) {
-    const tender = await Tenders.createTender(doc);
+  async tendersAdd(root, doc, { user }) {
+    const tender = await Tenders.createTender(doc, user._id);
 
     // send email ==============
     for (let supplierId of tender.supplierIds) {

@@ -27,6 +27,8 @@ const TenderSchema = mongoose.Schema({
   // rfq, eoi
   type: field({ type: String }),
 
+  createdUserId: field({ type: String }),
+
   number: field({ type: Number }),
   name: field({ type: String }),
   content: field({ type: String }),
@@ -48,10 +50,11 @@ class Tender {
   /**
    * Create new tender
    * @param {Object} doc - tender fields
+   * @param {Object} userId - Creating user
    * @return {Promise} newly created tender object
    */
-  static createTender(doc) {
-    return this.create(doc);
+  static createTender(doc, userId) {
+    return this.create({ ...doc, createdUserId: userId });
   }
 
   /**

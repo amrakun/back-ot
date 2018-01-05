@@ -43,6 +43,7 @@ export const types = `
   type Tender {
     _id: String!
     type: String!
+    createdUserId: String!
     number: Float!,
     name: String!,
     content: String!,
@@ -56,6 +57,7 @@ export const types = `
 
     winnerId: String,
 
+    createdUser: User,
     isAwarded: Boolean,
     suppliers: [Company]!,
     requestedCount: Int,

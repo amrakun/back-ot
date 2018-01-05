@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { Tenders } from '../db/models';
-import { tenderFactory } from '../db/factories';
+import { Users, Tenders } from '../db/models';
+import { userFactory, tenderFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -11,27 +11,34 @@ afterAll(() => disconnect());
 
 describe('Tender db', () => {
   let _tender;
+  let _user;
 
   beforeEach(async () => {
     // Creating test data
     _tender = await tenderFactory();
+    _user = await userFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
     await Tenders.remove({});
+    await Users.remove({});
   });
 
   test('Create tender', async () => {
     delete _tender._id;
 
-    let tenderObj = await Tenders.createTender(_tender);
+    let tenderObj = await Tenders.createTender(_tender, _user._id);
+
+    const createdUserId = tenderObj.createdUserId;
 
     tenderObj = JSON.parse(JSON.stringify(tenderObj));
     delete tenderObj._id;
     delete tenderObj.__v;
+    delete tenderObj.createdUserId;
 
     expect(tenderObj).toEqual(_tender);
+    expect(createdUserId).toEqual(_user._id);
   });
 
   test('Update tender', async () => {
