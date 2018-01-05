@@ -1,3 +1,4 @@
+import xlsxPopulate from 'xlsx-populate';
 import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
@@ -136,6 +137,28 @@ export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
       console.log(info); // eslint-disable-line
     });
   });
+};
+
+/*
+ * Read xlsx template
+ */
+export const readTemplate = async name => {
+  const workbook = await xlsxPopulate.fromFileAsync(
+    `${__dirname}/../private/templates/${name}.xlsx`,
+  );
+
+  return { workbook, firstSheet: workbook.sheet(0) };
+};
+
+/*
+ * Generate xlsx
+ */
+export const generateXlsx = async (workbook, name) => {
+  const url = `templateOutputs/${name}.xlsx`;
+
+  await workbook.toFileAsync(`${__dirname}/../private/${url}`);
+
+  return `static/${url}`;
 };
 
 export default {

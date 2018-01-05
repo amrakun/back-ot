@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
@@ -22,6 +23,8 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use('/static', express.static(path.join(__dirname, 'private')));
 
 app.use(cors());
 
