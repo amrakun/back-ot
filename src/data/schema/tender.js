@@ -139,11 +139,6 @@ export const mutations = `
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
 
-  tenderResponsesBidSummaryReport(
-    tenderId: String!,
-    supplierIds: [String!]!,
-    type: String,
-  ): String
-
+  tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
   tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
 `;

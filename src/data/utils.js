@@ -154,11 +154,12 @@ export const readTemplate = async name => {
  * Generate xlsx
  */
 export const generateXlsx = async (workbook, name) => {
+  const { DOMAIN } = process.env;
   const url = `templateOutputs/${name}.xlsx`;
 
   await workbook.toFileAsync(`${__dirname}/../private/${url}`);
 
-  return `static/${url}`;
+  return `${DOMAIN}/static/${url}`;
 };
 
 export default {
