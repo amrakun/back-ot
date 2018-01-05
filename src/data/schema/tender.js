@@ -15,6 +15,7 @@ const respondedProductFields = `
   unitPrice: Float,
   totalPrice: Float,
   leadTime: Float,
+  shippingTerms: String,
   comment: String,
   file: JSON,
 `;
