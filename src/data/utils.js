@@ -147,7 +147,7 @@ export const readTemplate = async name => {
     `${__dirname}/../private/templates/${name}.xlsx`,
   );
 
-  return { workbook, firstSheet: workbook.sheet(0) };
+  return { workbook, sheet: workbook.sheet(0) };
 };
 
 /*

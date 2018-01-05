@@ -137,5 +137,12 @@ export const mutations = `
   tendersAward(_id: String!, supplierId: String!): Tender
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
-  tenderResponsesBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
+
+  tenderResponsesBidSummaryReport(
+    tenderId: String!,
+    supplierIds: [String!]!,
+    type: String,
+  ): String
+
+  tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
 `;

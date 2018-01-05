@@ -1,6 +1,55 @@
-import { Tenders, TenderResponses } from '../../../db/models';
+import cf from 'cellref';
+import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { moduleRequireLogin } from '../../permissions';
 import { readTemplate, generateXlsx } from '../../utils';
+
+/*
+ * Generate RFQ bid summary report
+ */
+const rfqBidSummary = async ({ tenderId, supplierIds }) => {
+  const tender = await Tenders.findOne({ _id: tenderId });
+  const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
+
+  // read template
+  const { workbook, sheet } = await readTemplate('rfq_bid');
+
+  tender.requestedProducts.forEach((product, index) => {
+    const rowIndex = 13 + index;
+
+    // fill requested products section
+    sheet.cell(rowIndex, 2).value(product.code);
+    sheet.cell(rowIndex, 3).value(product.shortText);
+    sheet.cell(rowIndex, 4).value(product.quantity);
+    sheet.cell(rowIndex, 5).value(product.uom);
+    sheet.cell(rowIndex, 6).value(product.manufacturer);
+    sheet.cell(rowIndex, 7).value(product.manufacturerPartNumber);
+
+    let columnIndex = 4;
+
+    responses.forEach((response, index) => {
+      // find response by product code
+      const rp = response.respondedProducts.find(p => p.code === product.code);
+
+      columnIndex += 4;
+
+      // title
+      sheet.cell(10, columnIndex).value(`Supplier${index + 1}`);
+
+      // fill suppliers section
+      sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
+      sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
+      sheet.cell(rowIndex, columnIndex + 2).value(rp.totalPrice);
+      sheet.cell(rowIndex, columnIndex + 3).value(rp.suggestedManufacturer);
+    });
+  });
+
+  return generateXlsx(workbook, `rfq_bid_summary_${tender._id}`);
+};
+
+/*
+ * Generate EOI short list
+ */
+const eoiShortList = async () => {};
 
 const tenderResponseMutations = {
   /**
@@ -18,44 +67,72 @@ const tenderResponseMutations = {
    * @param {[String]} supplierIds - Selected supplier ids
    * @return {String} generated file link
    */
-  async tenderResponsesBidSummaryReport(root, { tenderId, supplierIds }) {
+  tenderResponsesBidSummaryReport(root, { tenderId, supplierIds, type }) {
+    if (type === 'rfq') {
+      return rfqBidSummary({ tenderId, supplierIds });
+    }
+
+    if (type === 'eoi') {
+      return eoiShortList({ tenderId, supplierIds });
+    }
+  },
+
+  /**
+   * Generate eoi short list report file
+   * @param {String} tenderId - Tender id
+   * @param {[String]} supplierIds - Selected supplier ids
+   * @return {String} generated file link
+   */
+  async tenderResponsesEoiShortList(root, { tenderId, supplierIds }) {
     const tender = await Tenders.findOne({ _id: tenderId });
     const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
+    const maxColumns = 2 + responses.length;
 
     // read template
-    const { workbook, firstSheet } = await readTemplate('rfq_bid');
+    const { workbook, sheet } = await readTemplate('eoi_short_list');
 
-    tender.requestedProducts.forEach((product, index) => {
-      const rowIndex = 13 + index;
+    // complete colored titles
+    sheet.range(`${cf('R1C1')}:${cf(`R1C${maxColumns}`)}`).merged(true);
+    sheet.range(`${cf('R12C1')}:${cf(`R12C${maxColumns}`)}`).merged(true);
+    sheet.range(`${cf('R16C1')}:${cf(`R16C${maxColumns}`)}`).merged(true);
+    sheet.range(`${cf('R18C2')}:${cf(`R18C${maxColumns}`)}`).merged(true);
 
-      // fill requested products section
-      firstSheet.cell(rowIndex, 2).value(product.code);
-      firstSheet.cell(rowIndex, 3).value(product.shortText);
-      firstSheet.cell(rowIndex, 4).value(product.quantity);
-      firstSheet.cell(rowIndex, 5).value(product.uom);
-      firstSheet.cell(rowIndex, 6).value(product.manufacturer);
-      firstSheet.cell(rowIndex, 7).value(product.manufacturerPartNumber);
+    for (let [index, response] of responses.entries()) {
+      const supplier = await Companies.findOne({ _id: response.supplierId });
 
-      let columnIndex = 4;
+      // evaluation sheet summary ============
+      const basicInfo = supplier.basicInfo || {};
+      const financialInfo = supplier.financialInfo || {};
+      const annualTurnover = financialInfo.annualTurnover || [];
+      const sortedAnnualTurnover = annualTurnover.sort((p, n) => p.year > n.year);
+      const lastAnnualTurnover = sortedAnnualTurnover.pop() || {};
 
-      responses.forEach((response, index) => {
-        // find response by product code
-        const rp = response.respondedProducts.find(p => p.code === product.code);
+      sheet.cell(3, 3 + index).value(basicInfo.enName);
+      sheet.cell(5, 3 + index).value(basicInfo.registrationNumber);
+      sheet.cell(6, 3 + index).value(lastAnnualTurnover.amount);
+      sheet.cell(7, 3 + index).value(basicInfo.totalNumberOfEmployees);
+      sheet.cell(8, 3 + index).value(basicInfo.totalNumberOfMongolianEmployees);
+      sheet.cell(9, 3 + index).value(basicInfo.totalNumberOfUmnugoviEmployees);
 
-        columnIndex += 4;
+      let score = 0;
 
-        // title
-        firstSheet.cell(10, columnIndex).value(`Supplier${index + 1}`);
+      for (let [i, document] of response.respondedDocuments.entries()) {
+        // documents info
+        sheet.cell(19 + i, 1).value(i + 1);
+        sheet.cell(19 + i, 2).value(document.name);
+        sheet.cell(19 + i, 3 + index).value(document.isSubmitted);
 
-        // fill suppliers section
-        firstSheet.cell(rowIndex, columnIndex).value(rp.leadTime);
-        firstSheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
-        firstSheet.cell(rowIndex, columnIndex + 2).value(rp.totalPrice);
-        firstSheet.cell(rowIndex, columnIndex + 3).value(rp.suggestedManufacturer);
-      });
-    });
+        if (document.isSubmitted) {
+          score++;
+        }
+      }
 
-    return generateXlsx(workbook, `bid_summary_${tender._id}`);
+      // overall points
+      sheet.cell(14, 3 + index).value(score);
+    }
+
+    // Write to file.
+    return generateXlsx(workbook, `eoi_short_list${tender._id}`);
   },
 };
 
