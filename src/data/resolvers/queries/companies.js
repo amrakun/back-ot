@@ -1,5 +1,34 @@
 import { Companies } from '../../../db/models';
 import { paginate } from './utils';
+import { readTemplate, generateXlsx } from '../../utils';
+
+/*
+ * Filter companies
+ */
+const companiesFilter = ({ search, _ids, productCodes }) => {
+  const selector = { basicInfo: { $ne: null } };
+
+  // main filter
+  if (search) {
+    selector.$or = [
+      { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
+      { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
+      { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
+    ];
+  }
+
+  // product & services filter
+  if (productCodes) {
+    selector.productsInfo = { $in: productCodes.split(',') };
+  }
+
+  // ids filter
+  if (_ids) {
+    selector._id = { $in: _ids };
+  }
+
+  return Companies.find(selector);
+};
 
 const companyQueries = {
   /**
@@ -8,28 +37,36 @@ const companyQueries = {
    * @return {Promise} filtered companies list by given parameters
    */
   async companies(root, { search, productCodes, _ids, ...params }) {
-    const selector = { basicInfo: { $ne: null } };
+    return paginate(companiesFilter({ search, _ids, productCodes }), params);
+  },
 
-    // main filter
-    if (search) {
-      selector.$or = [
-        { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
-        { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
-        { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
-      ];
+  /**
+   * Export companies list
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async companiesExport(root, { search, productCodes, _ids }) {
+    const companies = await companiesFilter({ search, _ids, productCodes });
+
+    // read template
+    const { workbook, sheet } = await readTemplate('suppliers');
+
+    let rowIndex = 1;
+
+    for (let company of companies) {
+      rowIndex++;
+
+      const basicInfo = company.basicInfo || {};
+      const contactInfo = company.contactInfo || {};
+
+      sheet.cell(rowIndex, 1).value(basicInfo.enName);
+      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+      sheet.cell(rowIndex, 11).value(contactInfo.email);
+      sheet.cell(rowIndex, 12).value(contactInfo.phone);
     }
 
-    // product & services filter
-    if (productCodes) {
-      selector.productsInfo = { $in: productCodes.split(',') };
-    }
-
-    // ids filter
-    if (_ids) {
-      selector._id = { $in: _ids };
-    }
-
-    return paginate(Companies.find(selector), params);
+    // Write to file.
+    return generateXlsx(workbook, 'suppliers');
   },
 
   /**

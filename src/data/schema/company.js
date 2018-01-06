@@ -316,16 +316,20 @@ export const types = `
   }
 `;
 
+const queryParams = `
+  page: Int,
+  perPage: Int,
+  search: String,
+  region: String,
+  status: String,
+  productCodes: String,
+  _ids: [String],
+`;
+
 export const queries = `
-  companies(
-    page: Int,
-    perPage: Int,
-    search: String,
-    region: String,
-    status: String,
-    productCodes: String,
-    _ids: [String],
-  ): [Company]
+  companies(${queryParams}): [Company]
+  companiesExport(${queryParams}): String
+
   companyDetail(_id: String!): Company
   companyByUser: Company
 `;
