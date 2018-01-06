@@ -89,6 +89,24 @@ class Tender {
 
     return this.findOne({ _id });
   }
+
+  requestedCount() {
+    return this.supplierIds.length;
+  }
+
+  submittedCount() {
+    return TenderResponses.find({ tenderId: this._id, isNotInterested: false }).count();
+  }
+
+  notInterestedCount() {
+    return TenderResponses.find({ tenderId: this._id, isNotInterested: true }).count();
+  }
+
+  async notRespondedCount() {
+    const respondedCount = (await this.submittedCount()) + (await this.notInterestedCount());
+
+    return this.requestedCount() - respondedCount;
+  }
 }
 
 TenderSchema.loadClass(Tender);

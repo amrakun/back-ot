@@ -1,17 +1,5 @@
 import { Users, TenderResponses, Companies } from '../../db/models';
 
-const requestedCount = tender => {
-  return tender.supplierIds.length;
-};
-
-const submittedCount = tender => {
-  return TenderResponses.find({ tenderId: tender._id, isNotInterested: false }).count();
-};
-
-const notInterestedCount = tender => {
-  return TenderResponses.find({ tenderId: tender._id, isNotInterested: true }).count();
-};
-
 export default {
   createdUser(tender) {
     return Users.findOne({ _id: tender.createdUserId });
@@ -26,21 +14,19 @@ export default {
   },
 
   requestedCount(tender) {
-    return requestedCount(tender);
+    return tender.requestedCount();
   },
 
   submittedCount(tender) {
-    return submittedCount(tender);
+    return tender.submittedCount();
   },
 
   notInterestedCount(tender) {
-    return notInterestedCount(tender);
+    return tender.notInterestedCount();
   },
 
-  async notRespondedCount(tender) {
-    const respondedCount = (await submittedCount(tender)) + (await notInterestedCount(tender));
-
-    return requestedCount(tender) - respondedCount;
+  notRespondedCount(tender) {
+    return tender.notRespondedCount();
   },
 
   async responses(tender) {

@@ -95,14 +95,17 @@ export const types = `
   }
 `;
 
+const tenderQueryParams = `
+  page: Int,
+  perPage: Int,
+  type: String,
+  supplierId: String
+  ignoreSubmitted: Boolean,
+`;
+
 export const queries = `
-  tenders(
-    page: Int,
-    perPage: Int,
-    type: String,
-    supplierId: String
-    ignoreSubmitted: Boolean,
-  ): [Tender]
+  tenders(${tenderQueryParams}): [Tender]
+  tendersExport(${tenderQueryParams}): String
 
   tenderDetail(_id: String!): Tender
 
