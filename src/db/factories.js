@@ -259,7 +259,7 @@ export const tenderFactory = async (params = {}) => {
     type: params.type || 'rfq',
     status: params.status || 'draft',
     number: params.number || faker.random.number(),
-    name: params.number || faker.random.word(),
+    name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),

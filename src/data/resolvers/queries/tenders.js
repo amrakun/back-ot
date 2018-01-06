@@ -5,7 +5,7 @@ import { paginate } from './utils';
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async ({ type, supplierId, ignoreSubmitted, status }, user) => {
+const tenderFilter = async ({ type, supplierId, ignoreSubmitted, status, search }, user) => {
   const query = {};
 
   if (type) {
@@ -25,6 +25,15 @@ const tenderFilter = async ({ type, supplierId, ignoreSubmitted, status }, user)
     const submittedTenderIds = submittedTenders.map(response => response.tenderId);
 
     query._id = { $nin: submittedTenderIds };
+  }
+
+  // main filter
+  if (search) {
+    query.$or = [{ name: new RegExp(`.*${search}.*`, 'i') }];
+
+    if (Number.isInteger(parseInt(search))) {
+      query.$or.push({ number: parseInt(search) });
+    }
   }
 
   return Tenders.find(query);
