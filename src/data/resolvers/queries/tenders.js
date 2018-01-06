@@ -5,11 +5,15 @@ import { paginate } from './utils';
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async ({ type, supplierId, ignoreSubmitted }, user) => {
+const tenderFilter = async ({ type, supplierId, ignoreSubmitted, status }, user) => {
   const query = {};
 
   if (type) {
     query.type = type;
+  }
+
+  if (status) {
+    query.status = status;
   }
 
   if (supplierId) {
@@ -33,10 +37,9 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tenders(root, args, { user }) {
-    const { type, supplierId, ignoreSubmitted, ...params } = args;
-    const tenders = await tenderFilter({ type, supplierId, ignoreSubmitted }, user);
+    const tenders = await tenderFilter(args, user);
 
-    return paginate(tenders, params);
+    return paginate(tenders, args);
   },
 
   /**

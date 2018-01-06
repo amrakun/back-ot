@@ -25,20 +25,34 @@ describe('Tender db', () => {
     await Users.remove({});
   });
 
-  test('Create tender', async () => {
+  test('Create tender: open status', async () => {
     delete _tender._id;
+    delete _tender.status;
 
     let tenderObj = await Tenders.createTender(_tender, _user._id);
 
+    const status = tenderObj.status;
     const createdUserId = tenderObj.createdUserId;
 
     tenderObj = JSON.parse(JSON.stringify(tenderObj));
+
     delete tenderObj._id;
     delete tenderObj.__v;
     delete tenderObj.createdUserId;
+    delete tenderObj.status;
 
     expect(tenderObj).toEqual(_tender);
     expect(createdUserId).toEqual(_user._id);
+    expect(status).toEqual('open');
+  });
+
+  test('Create tender: draft status', async () => {
+    delete _tender._id;
+    _tender.publishDate = new Date('2040-10-10');
+
+    const tenderObj = await Tenders.createTender(_tender, _user._id);
+
+    expect(tenderObj.status).toEqual('draft');
   });
 
   test('Update tender', async () => {
@@ -69,6 +83,33 @@ describe('Tender db', () => {
 
     const updatedTender = await Tenders.award(_tender._id, supplierId);
 
+    expect(updatedTender.status).toBe('awarded');
     expect(updatedTender.winnerId).toBe(supplierId);
+  });
+
+  test('Publish drafts', async () => {
+    let tender1 = await tenderFactory({ publishDate: new Date() });
+    let tender2 = await tenderFactory({ publishDate: new Date('2040-01-01') });
+
+    await Tenders.publishDrafts();
+
+    tender1 = await Tenders.findOne({ _id: tender1._id });
+    tender2 = await Tenders.findOne({ _id: tender2._id });
+
+    expect(tender1.status).toBe('open');
+    expect(tender2.status).toBe('draft');
+  });
+
+  test('Close opens', async () => {
+    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date() });
+    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2040-01-01') });
+
+    await Tenders.closeOpens();
+
+    tender1 = await Tenders.findOne({ _id: tender1._id });
+    tender2 = await Tenders.findOne({ _id: tender2._id });
+
+    expect(tender1.status).toBe('closed');
+    expect(tender2.status).toBe('open');
   });
 });

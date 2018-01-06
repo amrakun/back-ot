@@ -43,6 +43,7 @@ export const types = `
 
   type Tender {
     _id: String!
+    status: String!
     type: String!
     createdUserId: String!
     number: Float!,
@@ -99,6 +100,7 @@ const tenderQueryParams = `
   page: Int,
   perPage: Int,
   type: String,
+  status: String,
   supplierId: String
   ignoreSubmitted: Boolean,
 `;

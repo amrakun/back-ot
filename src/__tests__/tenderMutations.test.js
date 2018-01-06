@@ -93,6 +93,7 @@ describe('Tender mutations', () => {
     `;
 
     delete _tender._id;
+    delete _tender.status;
     await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
 
     expect(Tenders.createTender.mock.calls.length).toBe(1);
@@ -121,6 +122,7 @@ describe('Tender mutations', () => {
     const { _id, ...restParams } = _tender;
 
     delete restParams.type;
+    delete restParams.status;
     restParams.publishDate = new Date(restParams.publishDate);
     restParams.closeDate = new Date(restParams.closeDate);
 

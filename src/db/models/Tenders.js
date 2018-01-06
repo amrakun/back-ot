@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import { field } from './utils';
 
 const FileSchema = mongoose.Schema(
@@ -27,6 +28,8 @@ const TenderSchema = mongoose.Schema({
   // rfq, eoi
   type: field({ type: String }),
 
+  status: field({ type: String }),
+
   createdUserId: field({ type: String }),
 
   number: field({ type: Number }),
@@ -54,7 +57,16 @@ class Tender {
    * @return {Promise} newly created tender object
    */
   static createTender(doc, userId) {
-    return this.create({ ...doc, createdUserId: userId });
+    const now = new Date();
+
+    let status = 'draft';
+
+    // publish date is today
+    if (moment(doc.publishDate).diff(now, 'days') === 0) {
+      status = 'open';
+    }
+
+    return this.create({ ...doc, status, createdUserId: userId });
   }
 
   /**
@@ -85,23 +97,73 @@ class Tender {
    * @return {Promise} - Updated tender object
    */
   static async award(_id, supplierId) {
-    await this.update({ _id }, { $set: { winnerId: supplierId } });
+    await this.update({ _id }, { $set: { status: 'awarded', winnerId: supplierId } });
 
     return this.findOne({ _id });
   }
 
+  /*
+   * Open drafted tenders
+   * @return null
+   */
+  static async publishDrafts() {
+    const now = new Date();
+    const draftTenders = await Tenders.find({ status: 'draft' });
+
+    for (let draftTender of draftTenders) {
+      // publish date is today
+      if (moment(draftTender.publishDate).diff(now, 'days') === 0) {
+        // change status to open
+        await this.update({ _id: draftTender._id }, { $set: { status: 'open' } });
+      }
+    }
+
+    return 'done';
+  }
+
+  /*
+   * Close open tenders if closeDate is here
+   * @return null
+   */
+  static async closeOpens() {
+    const now = new Date();
+    const openTenders = await Tenders.find({ status: 'open' });
+
+    for (let openTender of openTenders) {
+      // close date is today
+      if (moment(openTender.closeDate).diff(now, 'days') === 0) {
+        // change status to closed
+        await this.update({ _id: openTender._id }, { $set: { status: 'closed' } });
+      }
+    }
+
+    return 'done';
+  }
+
+  /*
+   * total suppliers count
+   */
   requestedCount() {
     return this.supplierIds.length;
   }
 
+  /*
+   * Suppliers that are filled form. Excluded not interested
+   */
   submittedCount() {
     return TenderResponses.find({ tenderId: this._id, isNotInterested: false }).count();
   }
 
+  /*
+   * Count of suppliers that clicked not interested
+   */
   notInterestedCount() {
     return TenderResponses.find({ tenderId: this._id, isNotInterested: true }).count();
   }
 
+  /*
+   * Count of suppliers that not responded
+   */
   async notRespondedCount() {
     const respondedCount = (await this.submittedCount()) + (await this.notInterestedCount());
 

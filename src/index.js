@@ -10,8 +10,9 @@ import formidable from 'formidable';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
-import schema from './data';
 import { uploadFile } from './data/utils';
+import schema from './data';
+import './startup';
 
 // load environment variables
 dotenv.config();

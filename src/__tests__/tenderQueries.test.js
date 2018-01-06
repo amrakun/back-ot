@@ -16,12 +16,14 @@ describe('Tender queries', () => {
 
   const commonParams = `
     $type: String,
+    $status: String,
     $supplierId: String,
     $ignoreSubmitted: Boolean
   `;
 
   const commonValues = `
     type: $type,
+    status: $status,
     supplierId: $supplierId,
     ignoreSubmitted: $ignoreSubmitted
   `;
@@ -31,6 +33,7 @@ describe('Tender queries', () => {
       tenders(${commonValues}) {
         _id
         type
+        status
         supplierIds
       }
     }
@@ -60,7 +63,7 @@ describe('Tender queries', () => {
       isNotInterested: true,
     });
 
-    await tenderFactory({ type: 'rfq' });
+    await tenderFactory({ type: 'rfq', status: 'open' });
     await tenderFactory({ type: 'rfq', supplierIds: [supplier1._id] });
     await tenderFactory({ type: 'eoi', supplierIds: [supplier2._id] });
 
@@ -89,6 +92,13 @@ describe('Tender queries', () => {
     // ignore submitted ===============
     response = await graphqlRequest(query, 'tenders', { ignoreSubmitted: true }, { user });
 
+    expect(response.length).toBe(3);
+
+    // status ===============
+    response = await graphqlRequest(query, 'tenders', { status: 'open' }, { user });
+    expect(response.length).toBe(1);
+
+    response = await graphqlRequest(query, 'tenders', { status: 'draft' }, { user });
     expect(response.length).toBe(3);
   });
 });
