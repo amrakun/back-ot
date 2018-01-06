@@ -108,6 +108,10 @@ export const queries = `
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]
   tenderResponseDetail(_id: String!): TenderResponse
+
+  tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
+  tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
+  tenderResponsesEoiBidderList(tenderId: String!, supplierIds: [String!]!): String
 `;
 
 const commonParams = `
@@ -138,8 +142,4 @@ export const mutations = `
   tendersAward(_id: String!, supplierId: String!): Tender
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
-
-  tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
-  tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
-  tenderResponsesEoiBidderList(tenderId: String!, supplierIds: [String!]!): String
 `;
