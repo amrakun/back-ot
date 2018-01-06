@@ -58,6 +58,7 @@ export const types = `
     requestedDocuments: [String]!
 
     winnerId: String,
+    sentRegretLetter: Boolean,
 
     createdUser: User,
     isAwarded: Boolean,
@@ -146,6 +147,7 @@ export const mutations = `
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
   tendersAward(_id: String!, supplierId: String!): Tender
+  tendersSendRegretLetter(_id: String!, subject: String!, content: String!): [String]
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
 `;

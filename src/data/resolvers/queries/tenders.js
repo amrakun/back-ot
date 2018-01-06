@@ -5,7 +5,8 @@ import { paginate } from './utils';
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async ({ type, supplierId, ignoreSubmitted, status, search }, user) => {
+const tenderFilter = async (args, user) => {
+  const { type, supplierId, ignoreSubmitted, status, search } = args;
   const query = {};
 
   if (type) {

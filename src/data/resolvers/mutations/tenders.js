@@ -1,4 +1,4 @@
-import { Tenders, Companies } from '../../../db/models';
+import { Tenders, TenderResponses, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
 import { moduleRequireLogin } from '../../permissions';
 
@@ -57,6 +57,41 @@ const tenderMutations = {
    */
   tendersAward(root, { _id, supplierId }) {
     return Tenders.award(_id, supplierId);
+  },
+
+  /**
+   * Send regret email
+   * @param {String} _id - Tender id
+   * @param {String} subject - Mail subject
+   * @param {String} content - Mail content
+   * @return {[String]} - send supplier ids
+   */
+  async tendersSendRegretLetter(root, { _id, subject, content }) {
+    const tender = await Tenders.findOne({ _id });
+
+    await tender.sendRegretLetter();
+
+    const notAwardedResponses = await TenderResponses.find({
+      tenderId: _id,
+      supplierId: { $ne: tender.winnerId },
+    });
+
+    // send emai to not awarded suppliers
+    for (let notAwardedResponse of notAwardedResponses) {
+      const supplier = (await Companies.findOne({ _id: notAwardedResponse.supplierId })) || {};
+      const basicInfo = supplier.basicInfo || {};
+
+      utils.sendEmail({
+        toEmails: [basicInfo.email],
+        title: subject,
+        template: {
+          name: 'regretLetter',
+          data: { content },
+        },
+      });
+    }
+
+    return notAwardedResponses.map(response => response.supplierId);
   },
 };
 

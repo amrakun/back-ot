@@ -3,7 +3,8 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Tenders } from '../db/models';
-import { userFactory, tenderFactory, companyFactory } from '../db/factories';
+import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+
 import tenderMutations from '../data/resolvers/mutations/tenders';
 
 beforeAll(() => connect());
@@ -94,6 +95,7 @@ describe('Tender mutations', () => {
 
     delete _tender._id;
     delete _tender.status;
+    delete _tender.sentRegretLetter;
     await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
 
     expect(Tenders.createTender.mock.calls.length).toBe(1);
@@ -123,6 +125,7 @@ describe('Tender mutations', () => {
 
     delete restParams.type;
     delete restParams.status;
+    delete restParams.sentRegretLetter;
     restParams.publishDate = new Date(restParams.publishDate);
     restParams.closeDate = new Date(restParams.closeDate);
 
@@ -161,5 +164,34 @@ describe('Tender mutations', () => {
 
     expect(Tenders.award.mock.calls.length).toBe(1);
     expect(Tenders.award).toBeCalledWith(args._id, args.supplierId);
+  });
+
+  test('Send regret letter', async () => {
+    const supplier = await companyFactory({});
+    const supplierId = supplier._id;
+    const tender = await Tenders.findOne({ _id: _tender._id });
+    const tenderId = tender._id.toString();
+
+    await tender.update({ winnerId: supplierId });
+
+    await tenderResponseFactory({ tenderId, supplierId });
+    const notAwarded1 = await tenderResponseFactory({ tenderId });
+    const notAwarded2 = await tenderResponseFactory({ tenderId });
+
+    const mutation = `
+      mutation tendersSendRegretLetter($_id: String!, $subject: String!, $content: String!) {
+        tendersSendRegretLetter(_id: $_id, subject: $subject, content: $content)
+      }
+    `;
+
+    const args = { _id: tenderId, subject: 'subject', content: 'content' };
+
+    const response = await graphqlRequest(mutation, 'tendersSendRegretLetter', args);
+
+    const updatedTender = await Tenders.findOne({ _id: tenderId });
+
+    expect(response).toContain(notAwarded1.supplierId);
+    expect(response).toContain(notAwarded2.supplierId);
+    expect(updatedTender.sentRegretLetter).toBe(true);
   });
 });

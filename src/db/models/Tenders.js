@@ -45,6 +45,8 @@ const TenderSchema = mongoose.Schema({
   // Awarded response id
   winnerId: field({ type: String, optional: true }),
 
+  sentRegretLetter: field({ type: Boolean, default: false }),
+
   // eoi documents
   requestedDocuments: field({ type: [String] }),
 });
@@ -108,7 +110,7 @@ class Tender {
    */
   static async publishDrafts() {
     const now = new Date();
-    const draftTenders = await Tenders.find({ status: 'draft' });
+    const draftTenders = await this.find({ status: 'draft' });
 
     for (let draftTender of draftTenders) {
       // publish date is today
@@ -127,7 +129,7 @@ class Tender {
    */
   static async closeOpens() {
     const now = new Date();
-    const openTenders = await Tenders.find({ status: 'open' });
+    const openTenders = await this.find({ status: 'open' });
 
     for (let openTender of openTenders) {
       // close date is today
@@ -138,6 +140,21 @@ class Tender {
     }
 
     return 'done';
+  }
+
+  /*
+   * Mark as sent regret letter
+   */
+  sendRegretLetter() {
+    if (!this.winnerId) {
+      throw new Error('Not awarded');
+    }
+
+    if (this.sentRegretLetter) {
+      throw new Error('Already sent');
+    }
+
+    return this.update({ sentRegretLetter: true });
   }
 
   /*

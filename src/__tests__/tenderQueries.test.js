@@ -65,7 +65,14 @@ describe('Tender queries', () => {
       isNotInterested: true,
     });
 
-    await tenderFactory({ type: 'rfq', status: 'open', name: 'test' });
+    await tenderFactory({
+      type: 'rfq',
+      status: 'open',
+      name: 'test',
+      publishDate: new Date('2012-01-01'),
+      closeDate: new Date('2012-02-01'),
+    });
+
     await tenderFactory({ type: 'rfq', supplierIds: [supplier1._id], number: 1 });
     await tenderFactory({ type: 'eoi', supplierIds: [supplier2._id], number: 1 });
 

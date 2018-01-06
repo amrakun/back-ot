@@ -268,15 +268,26 @@ export const tenderFactory = async (params = {}) => {
     supplierIds: params.supplierIds || ['id1', 'id2'],
     requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocuments || ['Document1'],
+    sentRegretLetter: params.sentRegretLetter || false,
   });
 
   return save(tender);
 };
 
 export const tenderResponseFactory = async (params = {}) => {
+  if (!params.tenderId) {
+    const tender = await tenderFactory();
+    params.tenderId = tender._id;
+  }
+
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
   const tenderResponse = new TenderResponses({
-    tenderId: params.tenderId || 'DFAFDFDASFDFAD',
-    supplierId: params.supplierId || 'IJIUDFAFDFDASFDFAD',
+    tenderId: params.tenderId,
+    supplierId: params.supplierId,
     respondedProducts: params.respondedProducts || {},
     respondedDocuments: params.respondedDocuments || {},
     isNotInterested: params.isNotInterested || false,

@@ -112,4 +112,35 @@ describe('Tender db', () => {
     expect(tender1.status).toBe('closed');
     expect(tender2.status).toBe('open');
   });
+
+  test('Send regret letter', async () => {
+    expect.assertions(4);
+
+    let tender = await Tenders.findOne({ _id: _tender._id });
+
+    expect(tender.sentRegretLetter).toBe(false);
+
+    // try not awarded
+    try {
+      await tender.sendRegretLetter();
+    } catch (e) {
+      expect(e.message).toBe('Not awarded');
+    }
+
+    await tender.update({ winnerId: 'DFAFFADSF' });
+    tender = await Tenders.findOne({ _id: tender._id });
+
+    await tender.sendRegretLetter();
+
+    const updatedTender = await Tenders.findOne({ _id: tender._id });
+
+    expect(updatedTender.sentRegretLetter).toBe(true);
+
+    // try to resend
+    try {
+      await updatedTender.sendRegretLetter();
+    } catch (e) {
+      expect(e.message).toBe('Already sent');
+    }
+  });
 });
