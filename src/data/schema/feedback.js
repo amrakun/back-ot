@@ -7,6 +7,8 @@ export const types = `
     content: String,
     createdDate: Date,
     createdUserId: String,
+
+    responses: [FeedbackResponse]
   }
 
   type FeedbackResponse {
