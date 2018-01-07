@@ -2,7 +2,7 @@
 
 import faker from 'faker';
 
-import { Companies, Users, Tenders, TenderResponses } from './models';
+import { Companies, Users, Tenders, TenderResponses, Feedbacks, FeedbackResponses } from './models';
 
 /*
  * Remove mongoose functionalities & convert to raw object
@@ -294,4 +294,44 @@ export const tenderResponseFactory = async (params = {}) => {
   });
 
   return save(tenderResponse);
+};
+
+export const feedbackFactory = async (params = {}) => {
+  const feedback = new Feedbacks({
+    closeDate: params.closeDate || new Date(),
+    supplierIds: params.supplierIds || ['id1', 'id2'],
+    content: params.content || faker.random.word(),
+  });
+
+  return save(feedback);
+};
+
+export const feedbackResponseFactory = async (params = {}) => {
+  if (!params.feedBackId) {
+    const feedback = await feedbackFactory();
+    params.feedbackId = feedback._id;
+  }
+
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
+  const feedbackResponse = new FeedbackResponses({
+    feedbackId: params.feedbackId,
+    supplierId: params.supplierId,
+    employmentNumberBefore: params.employmentNumberBefore || faker.random.number(),
+    employmentNumberNow: params.employmentNumberNow || faker.random.number(),
+    nationalSpendBefore: params.nationalSpendBefore || faker.random.number(),
+    nationalSpendAfter: params.nationalSpendAfter || faker.random.number(),
+    umnugobiSpendBefore: params.umnugobiSpendBefore || faker.random.number(),
+    umnugobiSpendAfter: params.umnugobiSpendAfter || faker.random.number(),
+
+    investment: params.investment || faker.random.word(),
+    trainings: params.trainings || faker.random.word(),
+    corporateSocial: params.corporateSocial || faker.random.word(),
+    technologyImprovement: params.technologyImprovement || faker.random.word(),
+  });
+
+  return save(feedbackResponse);
 };
