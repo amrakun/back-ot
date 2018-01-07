@@ -3,7 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Users, Feedbacks, FeedbackResponses } from '../db/models';
-import { userFactory, feedbackResponseFactory } from '../db/factories';
+import { userFactory, feedbackFactory, feedbackResponseFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -93,5 +93,24 @@ describe('Feedback db', () => {
     } catch (e) {
       expect(e.message).toBe('Already sent');
     }
+  });
+
+  test('Close opens', async () => {
+    let feedback1 = await feedbackFactory({ closeDate: new Date() });
+    let feedback2 = await feedbackFactory({ closeDate: new Date('2040-01-01') });
+
+    await Feedbacks.update(
+      { _id: { $in: [feedback1._id, feedback2._id] } },
+      { $set: { status: 'open' } },
+      { multi: true },
+    );
+
+    await Feedbacks.closeOpens();
+
+    feedback1 = await Feedbacks.findOne({ _id: feedback1._id });
+    feedback2 = await Feedbacks.findOne({ _id: feedback2._id });
+
+    expect(feedback1.status).toBe('closed');
+    expect(feedback2.status).toBe('open');
   });
 });

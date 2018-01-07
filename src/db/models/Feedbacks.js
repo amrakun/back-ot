@@ -1,3 +1,4 @@
+import moment from 'moment';
 import mongoose from 'mongoose';
 import { field } from './utils';
 
@@ -26,6 +27,25 @@ class Feedback {
       createdDate: new Date(),
       createdUserId: userId,
     });
+  }
+
+  /*
+   * Close open success feedbacks if closeDate is here
+   * @return null
+   */
+  static async closeOpens() {
+    const now = new Date();
+    const openFeedbacks = await this.find({ status: 'open' });
+
+    for (let openFeedback of openFeedbacks) {
+      // close date is today
+      if (moment(openFeedback.closeDate).diff(now, 'days') === 0) {
+        // change status to closed
+        await this.update({ _id: openFeedback._id }, { $set: { status: 'closed' } });
+      }
+    }
+
+    return 'done';
   }
 }
 
