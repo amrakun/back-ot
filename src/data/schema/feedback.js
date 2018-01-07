@@ -28,6 +28,8 @@ export const types = `
 `;
 
 export const queries = `
+  feedbacks: [Feedback]
+  feedbackDetail(_id: String!): Feedback
 `;
 
 export const mutations = `
