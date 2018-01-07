@@ -183,6 +183,11 @@ const healthInfoFields = `
   doesHaveLicenseDescription: String,
 `;
 
+const difotScoreFields = `
+  date: Date!,
+  amount: Float!
+`;
+
 export const types = `
   #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields} }
@@ -298,6 +303,12 @@ export const types = `
   type CompanyHealthInfo { ${healthInfoFields} }
   input CompanyHealthInfoInput { ${healthInfoFields} }
 
+  type CompanyDifotScore { ${difotScoreFields} }
+  input CompanyDifotScoreInput {
+    supplierId: String!
+    ${difotScoreFields}
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
@@ -311,8 +322,11 @@ export const types = `
     businessInfo: CompanyBusinessInfo,
     environmentalInfo: CompanyEnvironmentalInfo,
     healthInfo: CompanyHealthInfo,
+    averageDifotScore: Float,
+    difotScores: [CompanyDifotScore]
 
     tenders: [Tender]
+    lastDifotScore: JSON
   }
 `;
 
@@ -346,4 +360,6 @@ export const mutations = `
   companiesEditBusinessInfo(businessInfo: CompanyBusinessInfoInput): Company
   companiesEditEnvironmentalInfo(environmentalInfo: CompanyEnvironmentalInfoInput): Company
   companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
+
+  companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]): Company
 `;

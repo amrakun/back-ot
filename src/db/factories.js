@@ -25,6 +25,8 @@ export const companyFactory = (params = {}) => {
       sapNumber: params.sapNumber || faker.random.word(),
     },
     productsInfo: params.productsInfo || [],
+    difotScores: params.difotScores || [],
+    averageDifotScore: params.averageDifotScore || 0,
   });
 
   return save(company);

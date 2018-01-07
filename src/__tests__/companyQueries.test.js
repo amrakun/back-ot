@@ -36,6 +36,11 @@ describe('Company queries', () => {
           sapNumber
         }
         productsInfo
+        averageDifotScore
+        difotScores {
+          date
+          amount
+        }
       }
     }
   `;

@@ -187,4 +187,41 @@ describe('Company mutations', () => {
 
     await callMutation(mutation, 'health');
   });
+
+  test('add difot score', async () => {
+    const sup1 = await companyFactory({
+      difotScores: [{ date: new Date(), amount: 1 }],
+      averageDifotScore: 1,
+    });
+
+    const sup2 = await companyFactory();
+
+    const mutation = `
+      mutation companiesAddDifotScores($difotScores: [CompanyDifotScoreInput]) {
+        companiesAddDifotScores(difotScores: $difotScores) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id }),
+    };
+
+    const difotScores = [
+      { supplierId: sup1._id, date: new Date(), amount: 10 },
+      { supplierId: sup2._id, date: new Date(), amount: 11 },
+    ];
+
+    await graphqlRequest(mutation, 'companiesAddDifotScores', { difotScores }, context);
+
+    const updatedSup1 = await Companies.findOne({ _id: sup1._id });
+    const updatedSup2 = await Companies.findOne({ _id: sup2._id });
+
+    expect(updatedSup1.difotScores.length).toBe(2);
+    expect(updatedSup1.averageDifotScore).toBe(5.5);
+
+    expect(updatedSup2.difotScores.length).toBe(1);
+    expect(updatedSup2.averageDifotScore).toBe(11);
+  });
 });

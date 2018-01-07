@@ -384,6 +384,14 @@ const HealthInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
+const DateAmountSchema = mongoose.Schema(
+  {
+    date: field({ type: Date }),
+    amount: field({ type: Number }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   basicInfo: BasicInfoSchema,
@@ -406,9 +414,18 @@ const CompanySchema = mongoose.Schema({
 
   // health & safety management system
   healthInfo: HealthInfoSchema,
+
+  difotScores: [DateAmountSchema],
+  averageDifotScore: Number,
 });
 
 class Company {
+  getLastDifotScore() {
+    const sortedDifotScores = (this.difotScores || []).sort((prev, next) => prev.date > next.date);
+
+    return sortedDifotScores.pop();
+  }
+
   /**
    * Create a company
    * @param userId - Permforming user id
@@ -465,6 +482,32 @@ class Company {
     if (await this.findOne({ _id: { $ne: _id }, mnName: mnName })) {
       throw new Error('Duplicated mongolian name');
     }
+  }
+
+  /*
+   * Add new difot score
+   * @param {Date} date
+   * @param {Number} amount
+   * @return updated company
+   */
+  async addDifotScore(date, amount) {
+    const difotScores = this.difotScores || [];
+
+    difotScores.push({ date, amount });
+
+    // calculate average =========
+    let totalAmount = 0;
+
+    for (let difotScore of difotScores) {
+      totalAmount += difotScore.amount;
+    }
+
+    const averageDifotScore = totalAmount / difotScores.length;
+
+    // update fields
+    await this.update({ difotScores, averageDifotScore });
+
+    return Companies.findOne({ _id: this._id });
   }
 }
 

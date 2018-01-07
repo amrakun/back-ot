@@ -5,6 +5,15 @@ const companyMutations = {
   companiesEditBasicInfo(root, { _id, basicInfo }) {
     return Companies.updateBasicInfo(_id, basicInfo);
   },
+
+  async companiesAddDifotScores(root, { difotScores }) {
+    for (let difotScore of difotScores) {
+      const company = await Companies.findOne({ _id: difotScore.supplierId });
+
+      // add new score to every supplier
+      await company.addDifotScore(difotScore.date, difotScore.amount);
+    }
+  },
 };
 
 const sections = [

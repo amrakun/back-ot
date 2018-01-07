@@ -108,4 +108,23 @@ describe('Companies model tests', () => {
   test('Update health and safety management system', async () => {
     await checkSection('health');
   });
+
+  test('Add difot score', async () => {
+    const company = await Companies.findOne({ _id: _company._id });
+    const date = new Date();
+
+    let updatedCompany = await company.addDifotScore(date, 10);
+    updatedCompany = await company.addDifotScore(date, 11);
+
+    expect(updatedCompany.averageDifotScore).toBe(10.5);
+    expect(updatedCompany.difotScores.length).toBe(2);
+
+    const [score1, score2] = updatedCompany.difotScores;
+
+    expect(new Date(score1.date)).toEqual(date);
+    expect(score1.amount).toBe(10);
+
+    expect(new Date(score2.date)).toEqual(date);
+    expect(score2.amount).toBe(11);
+  });
 });

@@ -84,7 +84,7 @@ const companyQueries = {
    * @param {String} args._id
    * @return {Promise} found company
    */
-  companyDetail(root, args, { _id }) {
+  companyDetail(root, { _id }) {
     return Companies.findOne({ _id });
   },
 };
