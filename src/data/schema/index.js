@@ -12,20 +12,28 @@ import {
   mutations as TenderMutations,
 } from './tender';
 
+import {
+  types as FeedbackTypes,
+  queries as FeedbackQueries,
+  mutations as FeedbackMutations,
+} from './feedback';
+
 export const types = `
   scalar JSON
   scalar Date
 
+  ${UserTypes}
   ${CompanyTypes}
   ${TenderTypes}
-  ${UserTypes}
+  ${FeedbackTypes}
 `;
 
 export const queries = `
   type Query {
+    ${UserQueries}
     ${CompanyQueries}
     ${TenderQueries}
-    ${UserQueries}
+    ${FeedbackQueries}
   }
 `;
 
@@ -34,5 +42,6 @@ export const mutations = `
     ${CompanyMutations}
     ${TenderMutations}
     ${UserMutations}
+    ${FeedbackMutations}
   }
 `;
