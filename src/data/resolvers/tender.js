@@ -9,6 +9,14 @@ export default {
     return tender.winnerId;
   },
 
+  async isParticipated(tender, args, { user }) {
+    const supplierId = user.companyId;
+
+    const count = await TenderResponses.count({ tenderId: tender._id, supplierId });
+
+    return count > 0;
+  },
+
   suppliers(tender) {
     return Companies.find({ _id: { $in: tender.supplierIds } });
   },
