@@ -305,7 +305,7 @@ export const types = `
 
   type CompanyDifotScore { ${difotScoreFields} }
   input CompanyDifotScoreInput {
-    supplierId: String!
+    supplierName: String!
     ${difotScoreFields}
   }
 
@@ -375,6 +375,6 @@ export const mutations = `
   companiesEditEnvironmentalInfo(environmentalInfo: CompanyEnvironmentalInfoInput): Company
   companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
 
-  companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]): Company
-  companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]): Company
+  companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
+  companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
 `;

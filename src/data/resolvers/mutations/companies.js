@@ -8,10 +8,16 @@ const companyMutations = {
 
   async companiesAddDifotScores(root, { difotScores }) {
     for (let difotScore of difotScores) {
-      const company = await Companies.findOne({ _id: difotScore.supplierId });
+      let company = await Companies.findOne({ 'basicInfo.enName': difotScore.supplierName });
 
-      // add new score to every supplier
-      await company.addDifotScore(difotScore.date, difotScore.amount);
+      if (!company) {
+        company = await Companies.findOne({ 'basicInfo.mnName': difotScore.supplierName });
+      }
+
+      if (company) {
+        // add new score to every supplier
+        await company.addDifotScore(difotScore.date, difotScore.amount);
+      }
     }
   },
 

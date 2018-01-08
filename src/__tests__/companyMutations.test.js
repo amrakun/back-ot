@@ -197,7 +197,7 @@ describe('Company mutations', () => {
     const sup2 = await companyFactory();
 
     const mutation = `
-      mutation companiesAddDifotScores($difotScores: [CompanyDifotScoreInput]) {
+      mutation companiesAddDifotScores($difotScores: [CompanyDifotScoreInput]!) {
         companiesAddDifotScores(difotScores: $difotScores) {
           _id
         }
@@ -209,8 +209,8 @@ describe('Company mutations', () => {
     };
 
     const difotScores = [
-      { supplierId: sup1._id, date: new Date(), amount: 10 },
-      { supplierId: sup2._id, date: new Date(), amount: 11 },
+      { supplierName: sup1.basicInfo.enName, date: new Date(), amount: 10 },
+      { supplierName: sup2.basicInfo.enName, date: new Date(), amount: 11 },
     ];
 
     await graphqlRequest(mutation, 'companiesAddDifotScores', { difotScores }, context);
@@ -231,7 +231,7 @@ describe('Company mutations', () => {
     });
 
     const mutation = `
-      mutation companiesAddDueDiligences($dueDiligences: [CompanyDueDiligenceInput]) {
+      mutation companiesAddDueDiligences($dueDiligences: [CompanyDueDiligenceInput]!) {
         companiesAddDueDiligences(dueDiligences: $dueDiligences) {
           _id
         }
