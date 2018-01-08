@@ -110,6 +110,9 @@ describe('Tender queries', () => {
     response = await graphqlRequest(query, 'tenders', { status: 'draft' }, { user });
     expect(response.length).toBe(3);
 
+    response = await graphqlRequest(query, 'tenders', { status: 'draft,open' }, { user });
+    expect(response.length).toBe(4);
+
     // name ===============
     response = await graphqlRequest(query, 'tenders', { search: 'test' }, { user });
     expect(response.length).toBe(1);

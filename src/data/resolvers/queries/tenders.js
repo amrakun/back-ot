@@ -14,7 +14,7 @@ const tenderFilter = async (args, user) => {
   }
 
   if (status) {
-    query.status = status;
+    query.status = { $in: status.split(',') };
   }
 
   if (supplierId) {
