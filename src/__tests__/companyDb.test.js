@@ -127,4 +127,21 @@ describe('Companies model tests', () => {
     expect(new Date(score2.date)).toEqual(date);
     expect(score2.amount).toBe(11);
   });
+
+  test('Add due dilingence', async () => {
+    const company = await Companies.findOne({ _id: _company._id });
+
+    let updatedCompany = await company.addDueDiligence({ url: '/path1' });
+    updatedCompany = await company.addDueDiligence({ url: '/path2' });
+
+    expect(updatedCompany.dueDiligences.length).toBe(2);
+
+    const [diligence1, diligence2] = updatedCompany.dueDiligences;
+
+    expect(diligence1.date).toBeDefined();
+    expect(diligence1.file.url).toBe('/path1');
+
+    expect(diligence2.date).toBeDefined();
+    expect(diligence2.file.url).toBe('/path2');
+  });
 });

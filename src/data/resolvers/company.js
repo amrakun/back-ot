@@ -8,4 +8,8 @@ export default {
   lastDifotScore(company) {
     return company.getLastDifotScore();
   },
+
+  lastDueDiligence(company) {
+    return company.getLastDueDiligence();
+  },
 };

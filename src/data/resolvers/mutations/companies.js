@@ -14,6 +14,15 @@ const companyMutations = {
       await company.addDifotScore(difotScore.date, difotScore.amount);
     }
   },
+
+  async companiesAddDueDiligences(root, { dueDiligences }) {
+    for (let dueDiligence of dueDiligences) {
+      const company = await Companies.findOne({ _id: dueDiligence.supplierId });
+
+      // add new due diligence report to every supplier
+      await company.addDueDiligence(dueDiligence.file);
+    }
+  },
 };
 
 const sections = [

@@ -309,6 +309,16 @@ export const types = `
     ${difotScoreFields}
   }
 
+  type CompanyDueDiligence {
+    date: Date
+    file: JSON
+  }
+
+  input CompanyDueDiligenceInput {
+    supplierId: String!
+    file: JSON
+  }
+
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo,
@@ -322,11 +332,15 @@ export const types = `
     businessInfo: CompanyBusinessInfo,
     environmentalInfo: CompanyEnvironmentalInfo,
     healthInfo: CompanyHealthInfo,
+
     averageDifotScore: Float,
     difotScores: [CompanyDifotScore]
 
+    dueDiligences: [CompanyDueDiligence]
+
     tenders: [Tender]
     lastDifotScore: JSON
+    lastDueDiligence: JSON
   }
 `;
 
@@ -362,4 +376,5 @@ export const mutations = `
   companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
 
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]): Company
+  companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]): Company
 `;

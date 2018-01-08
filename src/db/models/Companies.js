@@ -415,15 +415,30 @@ const CompanySchema = mongoose.Schema({
   // health & safety management system
   healthInfo: HealthInfoSchema,
 
+  dueDiligences: [DateFileSchema],
   difotScores: [DateAmountSchema],
   averageDifotScore: Number,
 });
 
 class Company {
+  /*
+   * Sort by date and get last entry from difot scores
+   */
   getLastDifotScore() {
     const sortedDifotScores = (this.difotScores || []).sort((prev, next) => prev.date > next.date);
 
     return sortedDifotScores.pop();
+  }
+
+  /*
+   * Sort by date and get last entry from dueDilgences
+   */
+  getLastDueDiligence() {
+    const sortedDueDiligences = (this.dueDiligences || []).sort(
+      (prev, next) => prev.date > next.date,
+    );
+
+    return sortedDueDiligences.pop();
   }
 
   /**
@@ -506,6 +521,22 @@ class Company {
 
     // update fields
     await this.update({ difotScores, averageDifotScore });
+
+    return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * Add new due diligence report
+   * @param {String} file - File path
+   * @return updated company
+   */
+  async addDueDiligence(file) {
+    const dueDiligences = this.dueDiligences || [];
+
+    dueDiligences.push({ date: new Date(), file });
+
+    // update fields
+    await this.update({ dueDiligences });
 
     return Companies.findOne({ _id: this._id });
   }

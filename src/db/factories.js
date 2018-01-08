@@ -27,6 +27,7 @@ export const companyFactory = (params = {}) => {
     productsInfo: params.productsInfo || [],
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
+    dueDiligences: params.dueDiligences || [],
   });
 
   return save(company);

@@ -224,4 +224,30 @@ describe('Company mutations', () => {
     expect(updatedSup2.difotScores.length).toBe(1);
     expect(updatedSup2.averageDifotScore).toBe(11);
   });
+
+  test('add due diligence', async () => {
+    const supplier = await companyFactory({
+      dueDiligences: [{ date: new Date(), file: { url: '/path1' } }],
+    });
+
+    const mutation = `
+      mutation companiesAddDueDiligences($dueDiligences: [CompanyDueDiligenceInput]) {
+        companiesAddDueDiligences(dueDiligences: $dueDiligences) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id }),
+    };
+
+    const dueDiligences = [{ supplierId: supplier._id, file: { url: '/path2' } }];
+
+    await graphqlRequest(mutation, 'companiesAddDueDiligences', { dueDiligences }, context);
+
+    const updatedSupplier = await Companies.findOne({ _id: supplier._id });
+
+    expect(updatedSupplier.dueDiligences.length).toBe(2);
+  });
 });
