@@ -339,6 +339,7 @@ export const types = `
     dueDiligences: [CompanyDueDiligence]
 
     tenders: [Tender]
+    feedbacks: [Feedback]
     lastDifotScore: JSON
     lastDueDiligence: JSON
   }
