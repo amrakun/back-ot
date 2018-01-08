@@ -146,7 +146,7 @@ class Tender {
    * Mark as sent regret letter
    */
   sendRegretLetter() {
-    if (!this.winnerId) {
+    if (this.type === 'rfq' && !this.winnerId) {
       throw new Error('Not awarded');
     }
 
