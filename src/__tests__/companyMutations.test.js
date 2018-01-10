@@ -250,4 +250,34 @@ describe('Company mutations', () => {
 
     expect(updatedSupplier.dueDiligences.length).toBe(2);
   });
+
+  test('validate products info', async () => {
+    const supplier = await companyFactory({ productsInfo: ['code1', 'code2'] });
+
+    const mutation = `
+      mutation companiesValidateProductsInfo($_id: String!, $codes: [String]!) {
+        companiesValidateProductsInfo(_id: $_id, codes: $codes) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id }),
+    };
+
+    const codes = ['code1', 'code2'];
+
+    await graphqlRequest(
+      mutation,
+      'companiesValidateProductsInfo',
+      { _id: supplier._id, codes },
+      context,
+    );
+
+    const updatedSupplier = await Companies.findOne({ _id: supplier._id });
+
+    expect(updatedSupplier.validatedProductsInfo).toContain('code1');
+    expect(updatedSupplier.validatedProductsInfo).toContain('code2');
+  });
 });

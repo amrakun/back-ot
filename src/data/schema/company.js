@@ -326,7 +326,11 @@ export const types = `
     managementTeamInfo: CompanyManagementTeamInfo,
     shareholderInfo: CompanyShareholderInfo,
     groupInfo: CompanyGroupInfo,
+
     productsInfo: [String],
+    validatedProductsInfo: [String],
+    isProductsInfoValidated: Boolean,
+
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,
     businessInfo: CompanyBusinessInfo,
@@ -381,4 +385,5 @@ export const mutations = `
 
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
+  companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
 `;

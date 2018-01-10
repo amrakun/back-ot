@@ -36,6 +36,8 @@ describe('Company queries', () => {
           sapNumber
         }
         productsInfo
+        validatedProductsInfo
+        isProductsInfoValidated
         averageDifotScore
         difotScores {
           date
@@ -111,5 +113,22 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'companies', { _ids: [company1._id] });
 
     expect(response.length).toBe(1);
+  });
+
+  test('check fields', async () => {
+    await companyFactory({
+      validatedProductsInfo: ['code1', 'code2'],
+      isProductsInfoValidated: true,
+    });
+
+    const response = await graphqlRequest(query, 'companies');
+
+    expect(response.length).toBe(1);
+
+    const [company] = response;
+
+    expect(company.isProductsInfoValidated).toBe(true);
+    expect(company.validatedProductsInfo).toContain('code1');
+    expect(company.validatedProductsInfo).toContain('code2');
   });
 });

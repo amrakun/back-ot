@@ -144,4 +144,29 @@ describe('Companies model tests', () => {
     expect(diligence2.date).toBeDefined();
     expect(diligence2.file.url).toBe('/path2');
   });
+
+  test('Validate product info', async () => {
+    let company = await companyFactory({ productsInfo: ['code1', 'code2', 'code3'] });
+    company = await Companies.findOne({ _id: company._id });
+
+    // checking isProductsInfoValidated
+    let updatedCompany = await company.validateProductsInfo([]);
+    expect(updatedCompany.isProductsInfoValidated).toBe(false);
+
+    updatedCompany = await company.validateProductsInfo(['code1', 'code2']);
+
+    expect(updatedCompany.isProductsInfoValidated).toBe(true);
+    expect(updatedCompany.validatedProductsInfo).toContain('code1');
+    expect(updatedCompany.validatedProductsInfo).toContain('code2');
+
+    // try to readd ==========
+    updatedCompany = await updatedCompany.validateProductsInfo(['code1', 'code2']);
+
+    expect(updatedCompany.validatedProductsInfo.length).toBe(2);
+
+    // try to add non existing code ==========
+    updatedCompany = await updatedCompany.validateProductsInfo(['code10']);
+
+    expect(updatedCompany.validatedProductsInfo).not.toContain('code10');
+  });
 });

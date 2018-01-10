@@ -29,6 +29,12 @@ const companyMutations = {
       await company.addDueDiligence(dueDiligence.file);
     }
   },
+
+  async companiesValidateProductsInfo(root, { _id, codes }) {
+    const company = await Companies.findOne({ _id });
+
+    return company.validateProductsInfo(codes);
+  },
 };
 
 const sections = [

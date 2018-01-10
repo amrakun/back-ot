@@ -399,7 +399,10 @@ const CompanySchema = mongoose.Schema({
   managementTeamInfo: ManagementTeamInfoSchema,
   shareholderInfo: ShareholderInfoSchema,
   groupInfo: GroupInfoSchema,
+
   productsInfo: [String],
+  validatedProductsInfo: [String],
+  isProductsInfoValidated: field({ type: Boolean }),
 
   // capacity building certificate information
   certificateInfo: CertificateInfoSchema,
@@ -551,8 +554,35 @@ class Company {
 
     dueDiligences.push({ date: new Date(), file });
 
-    // update fields
+    // update field
     await this.update({ dueDiligences });
+
+    return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * Validate product codes
+   * @param [String] codes - Product codes to validate
+   * @return updated company
+   */
+  async validateProductsInfo(codes) {
+    const productsInfo = this.productsInfo || [];
+    const validatedProductsInfo = this.validatedProductsInfo || [];
+
+    let isProductsInfoValidated = false;
+
+    codes.forEach(code => {
+      // check duplicate & valid
+      if (!validatedProductsInfo.includes(code) && productsInfo.includes(code)) {
+        validatedProductsInfo.push(code);
+
+        // mark as validated
+        isProductsInfoValidated = true;
+      }
+    });
+
+    // update fields
+    await this.update({ validatedProductsInfo, isProductsInfoValidated });
 
     return Companies.findOne({ _id: this._id });
   }
