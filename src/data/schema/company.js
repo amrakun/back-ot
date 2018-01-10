@@ -330,6 +330,7 @@ export const types = `
     productsInfo: [String],
     validatedProductsInfo: [String],
     isProductsInfoValidated: Boolean,
+    productsInfoLastValidatedDate: Date,
 
     certificateInfo: CompanyCertificateInfo,
     financialInfo: CompanyFinancialInfo,

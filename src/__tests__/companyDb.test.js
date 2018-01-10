@@ -156,6 +156,7 @@ describe('Companies model tests', () => {
     updatedCompany = await company.validateProductsInfo(['code1', 'code2']);
 
     expect(updatedCompany.isProductsInfoValidated).toBe(true);
+    expect(updatedCompany.productsInfoLastValidatedDate).toBeDefined();
     expect(updatedCompany.validatedProductsInfo).toContain('code1');
     expect(updatedCompany.validatedProductsInfo).toContain('code2');
 

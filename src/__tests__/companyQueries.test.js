@@ -35,9 +35,12 @@ describe('Company queries', () => {
           enName
           sapNumber
         }
+
         productsInfo
         validatedProductsInfo
         isProductsInfoValidated
+        productsInfoLastValidatedDate
+
         averageDifotScore
         difotScores {
           date
@@ -116,9 +119,12 @@ describe('Company queries', () => {
   });
 
   test('check fields', async () => {
+    const validatedDate = new Date();
+
     await companyFactory({
       validatedProductsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
+      productsInfoLastValidatedDate: validatedDate,
     });
 
     const response = await graphqlRequest(query, 'companies');
@@ -130,5 +136,6 @@ describe('Company queries', () => {
     expect(company.isProductsInfoValidated).toBe(true);
     expect(company.validatedProductsInfo).toContain('code1');
     expect(company.validatedProductsInfo).toContain('code2');
+    expect(new Date(company.productsInfoLastValidatedDate)).toEqual(validatedDate);
   });
 });

@@ -403,6 +403,7 @@ const CompanySchema = mongoose.Schema({
   productsInfo: [String],
   validatedProductsInfo: [String],
   isProductsInfoValidated: field({ type: Boolean }),
+  productsInfoLastValidatedDate: field({ type: Date }),
 
   // capacity building certificate information
   certificateInfo: CertificateInfoSchema,
@@ -582,7 +583,11 @@ class Company {
     });
 
     // update fields
-    await this.update({ validatedProductsInfo, isProductsInfoValidated });
+    await this.update({
+      validatedProductsInfo,
+      isProductsInfoValidated,
+      productsInfoLastValidatedDate: new Date(),
+    });
 
     return Companies.findOne({ _id: this._id });
   }

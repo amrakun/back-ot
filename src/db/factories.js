@@ -24,9 +24,12 @@ export const companyFactory = (params = {}) => {
       mnName: params.mnName || faker.random.word(),
       sapNumber: params.sapNumber || faker.random.word(),
     },
+
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
     isProductsInfoValidated: params.isProductsInfoValidated || false,
+    productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
+
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
     dueDiligences: params.dueDiligences || [],

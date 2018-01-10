@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { BlockedCompanies } from '../db/models';
+import { Companies, Users, BlockedCompanies } from '../db/models';
 import { userFactory, companyFactory } from '../db/factories';
 
 beforeAll(() => connect());
@@ -10,6 +10,13 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Company queries', () => {
+  afterEach(async () => {
+    // Clearing test data
+    await Companies.remove({});
+    await BlockedCompanies.remove({});
+    await Users.remove({});
+  });
+
   test('blockedCompanies', async () => {
     const query = `
       query blockedCompanies {
