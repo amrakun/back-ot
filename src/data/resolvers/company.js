@@ -1,4 +1,4 @@
-import { Tenders, Feedbacks } from '../../db/models';
+import { Tenders } from '../../db/models';
 
 export default {
   tenders(company) {
@@ -14,6 +14,10 @@ export default {
   },
 
   feedbacks(company) {
-    return Feedbacks.find({ supplierIds: { $in: [company._id] } });
+    return company.getFeedbacks();
+  },
+
+  lastFeedback(company) {
+    return company.getLastFeedback();
   },
 };

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
-import { Users } from './';
+import { Users, Feedbacks } from './';
 
 const FileSchema = mongoose.Schema(
   {
@@ -439,6 +439,22 @@ class Company {
     );
 
     return sortedDueDiligences.pop();
+  }
+
+  /*
+   * Get feedbacks that this supplier can see
+   */
+  getFeedbacks() {
+    return Feedbacks.find({ supplierIds: { $in: [this._id] } });
+  }
+
+  /*
+   * Get get last feedback
+   */
+  async getLastFeedback() {
+    const feedbacks = await this.getFeedbacks();
+
+    return feedbacks.pop();
   }
 
   /**
