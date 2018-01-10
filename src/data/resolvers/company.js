@@ -26,7 +26,7 @@ export default {
     });
 
     return {
-      ...feedback,
+      ...feedback.toJSON(),
       supplierResponse,
     };
   },
