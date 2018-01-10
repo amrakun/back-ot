@@ -7,6 +7,8 @@ const BlockedCompanySchema = mongoose.Schema({
   startDate: field({ type: Date }),
   endDate: field({ type: Date }),
   note: field({ type: String }),
+
+  createdUserId: field({ type: String }),
 });
 
 class BlockedCompany {
@@ -15,15 +17,15 @@ class BlockedCompany {
    * @param {Object} doc - blockedCompany fields
    * @return {Promise} newly created blockedCompany object
    */
-  static block(doc) {
-    return this.create(doc);
+  static block(doc, userId) {
+    return this.create({ ...doc, createdUserId: userId });
   }
 
   /*
    * Remove blocked item
    */
-  static unblock(_id) {
-    return this.remove({ _id });
+  static unblock(supplierId) {
+    return this.remove({ supplierId });
   }
 }
 

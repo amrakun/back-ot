@@ -2,13 +2,26 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { BlockedCompanies } from '../db/models';
+import { Users, BlockedCompanies } from '../db/models';
+import { userFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
 describe('BlockedCompany db', () => {
+  let _user;
+
+  beforeEach(async () => {
+    // Creating test data
+    _user = await userFactory();
+  });
+
+  afterEach(async () => {
+    // Clearing test data
+    await Users.remove({});
+  });
+
   test('base', async () => {
     const doc = {
       supplierId: 'DFAFSFD',
@@ -18,7 +31,7 @@ describe('BlockedCompany db', () => {
     };
 
     // block a company =================
-    const object = await BlockedCompanies.block(doc);
+    const object = await BlockedCompanies.block(doc, _user._id);
 
     let count = await BlockedCompanies.find({}).count();
     expect(count).toBe(1);
@@ -27,9 +40,10 @@ describe('BlockedCompany db', () => {
     expect(object.startDate).toEqual(doc.startDate);
     expect(object.endDate).toEqual(doc.endDate);
     expect(object.note).toEqual(doc.note);
+    expect(object.createdUserId).toEqual(_user._id);
 
     // unblock a company =================
-    await BlockedCompanies.unblock(object._id);
+    await BlockedCompanies.unblock(object.supplierId);
 
     count = await BlockedCompanies.find({}).count();
     expect(count).toBe(0);

@@ -18,6 +18,8 @@ import {
   mutations as FeedbackMutations,
 } from './feedback';
 
+import { types as BlockedCompanyTypes, queries as BlockedCompanyQueries } from './blockedCompany';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -26,6 +28,7 @@ export const types = `
   ${CompanyTypes}
   ${TenderTypes}
   ${FeedbackTypes}
+  ${BlockedCompanyTypes}
 `;
 
 export const queries = `
@@ -34,6 +37,7 @@ export const queries = `
     ${CompanyQueries}
     ${TenderQueries}
     ${FeedbackQueries}
+    ${BlockedCompanyQueries}
   }
 `;
 
