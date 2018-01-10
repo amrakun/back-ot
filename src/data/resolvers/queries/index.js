@@ -4,6 +4,7 @@ import tenders from './tenders';
 import tenderResponses from './tenderResponses';
 import tenderResponseExports from './tenderResponseExports';
 import feedbacks from './feedbacks';
+import blockedCompanies from './blockedCompanies';
 
 export default {
   ...users,
@@ -12,4 +13,5 @@ export default {
   ...tenderResponses,
   ...tenderResponseExports,
   ...feedbacks,
+  ...blockedCompanies,
 };

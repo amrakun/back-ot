@@ -5,6 +5,11 @@ export const types = `
     startDate: Date!,
     endDate: Date!,
     note: String
+
+    createdUserId: String,
+
+    createdUser: User,
+    supplier: Company
   }
 `;
 
@@ -20,4 +25,5 @@ export const mutations = `
 `;
 
 export const queries = `
+  blockedCompanies: [BlockedCompany]
 `;
