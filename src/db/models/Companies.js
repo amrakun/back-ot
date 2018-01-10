@@ -445,7 +445,7 @@ class Company {
    * Get feedbacks that this supplier can see
    */
   getFeedbacks() {
-    return Feedbacks.find({ supplierIds: { $in: [this._id] } });
+    return Feedbacks.find({ supplierIds: { $in: [this._id] } }).sort({ createdDate: -1 });
   }
 
   /*

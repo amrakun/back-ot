@@ -9,6 +9,7 @@ export const types = `
     createdUserId: String,
 
     responses: [FeedbackResponse]
+    supplierResponse: FeedbackResponse
   }
 
   type FeedbackResponse {

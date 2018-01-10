@@ -1,4 +1,4 @@
-import { Tenders } from '../../db/models';
+import { Tenders, FeedbackResponses } from '../../db/models';
 
 export default {
   tenders(company) {
@@ -17,7 +17,17 @@ export default {
     return company.getFeedbacks();
   },
 
-  lastFeedback(company) {
-    return company.getLastFeedback();
+  async lastFeedback(company) {
+    const feedback = await company.getLastFeedback();
+
+    const supplierResponse = await FeedbackResponses.findOne({
+      feedbackId: feedback._id,
+      supplierId: company._id,
+    });
+
+    return {
+      ...feedback,
+      supplierResponse,
+    };
   },
 };
