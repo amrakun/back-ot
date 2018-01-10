@@ -568,7 +568,7 @@ class Company {
    */
   async validateProductsInfo(codes) {
     const productsInfo = this.productsInfo || [];
-    const validatedProductsInfo = this.validatedProductsInfo || [];
+    const validatedProductsInfo = [];
 
     let isProductsInfoValidated = false;
 
