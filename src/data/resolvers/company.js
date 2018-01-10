@@ -20,6 +20,10 @@ export default {
   async lastFeedback(company) {
     const feedback = await company.getLastFeedback();
 
+    if (!feedback) {
+      return;
+    }
+
     const supplierResponse = await FeedbackResponses.findOne({
       feedbackId: feedback._id,
       supplierId: company._id,
