@@ -121,4 +121,38 @@ describe('Tender queries', () => {
     response = await graphqlRequest(query, 'tenders', { search: '1' }, { user });
     expect(response.length).toBe(2);
   });
+
+  test('tenders: always hide draft tenders from supplier', async () => {
+    user = await userFactory({ isSupplier: true });
+
+    await tenderFactory({ status: 'open' });
+    await tenderFactory({ status: 'draft' });
+
+    let response = await graphqlRequest(query, 'tenders', {}, { user });
+
+    expect(response.length).toBe(1);
+  });
+
+  test('tenders: participated status', async () => {
+    user = await userFactory({ isSupplier: true });
+
+    const tender = await tenderFactory({ status: 'open' });
+
+    await tenderFactory({ status: 'closed' });
+    await tenderFactory({ status: 'open' });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: user.companyId,
+    });
+
+    let response = await graphqlRequest(
+      query,
+      'tenders',
+      { status: 'open,participated' },
+      { user },
+    );
+
+    expect(response.length).toBe(2);
+  });
 });

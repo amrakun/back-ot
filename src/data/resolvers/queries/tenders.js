@@ -2,6 +2,12 @@ import { Tenders, TenderResponses } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
 
+const submittedTenderIds = async supplierId => {
+  const submittedTenders = await TenderResponses.find({ supplierId });
+
+  return submittedTenders.map(response => response.tenderId);
+};
+
 /*
  * Tender list & tender export helper
  */
@@ -13,8 +19,28 @@ const tenderFilter = async (args, user) => {
     query.type = type;
   }
 
+  query.status = {};
+  query.$or = [];
+
+  // always hide draft tenders from supplier
+  if (user.isSupplier) {
+    query.status.$ne = 'draft';
+  }
+
   if (status) {
-    query.status = { $in: status.split(',') };
+    if (status.includes('participated')) {
+      query.$or.push({ _id: { $in: await submittedTenderIds(user.companyId) } });
+    }
+
+    query.$or.push({
+      status: {
+        $in: status
+          .replace(',participated', '')
+          .replace('participated,', '')
+          .replace('participated', '')
+          .split(','),
+      },
+    });
   }
 
   if (supplierId) {
@@ -22,19 +48,26 @@ const tenderFilter = async (args, user) => {
   }
 
   if (ignoreSubmitted) {
-    const submittedTenders = await TenderResponses.find({ supplierId: user.companyId });
-    const submittedTenderIds = submittedTenders.map(response => response.tenderId);
-
-    query._id = { $nin: submittedTenderIds };
+    query._id = { $nin: await submittedTenderIds(user.companyId) };
   }
 
   // main filter
   if (search) {
-    query.$or = [{ name: new RegExp(`.*${search}.*`, 'i') }];
+    query.$or.push({ name: new RegExp(`.*${search}.*`, 'i') });
 
     if (Number.isInteger(parseInt(search))) {
       query.$or.push({ number: parseInt(search) });
     }
+  }
+
+  // remove empty status query
+  if (Object.keys(query.status).length === 0) {
+    delete query.status;
+  }
+
+  // remove empty or query
+  if (Object.keys(query.$or).length === 0) {
+    delete query.$or;
   }
 
   return Tenders.find(query);
