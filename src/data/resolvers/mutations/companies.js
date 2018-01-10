@@ -1,4 +1,4 @@
-import { Companies, BlockedCompanies } from '../../../db/models';
+import { Companies } from '../../../db/models';
 import { requireLogin } from '../../permissions';
 
 const companyMutations = {
@@ -34,18 +34,6 @@ const companyMutations = {
     const company = await Companies.findOne({ _id });
 
     return company.validateProductsInfo(codes);
-  },
-
-  async companiesBlock(root, { supplierIds, ...doc }, { user }) {
-    for (let supplierId of supplierIds) {
-      await BlockedCompanies.block({ supplierId, ...doc }, user._id);
-    }
-  },
-
-  async companiesUnblock(root, { supplierIds }) {
-    for (let supplierId of supplierIds) {
-      await BlockedCompanies.unblock(supplierId);
-    }
   },
 };
 

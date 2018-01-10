@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Companies, BlockedCompanies } from '../db/models';
+import { Companies } from '../db/models';
 import { userFactory, companyFactory, companyDocs } from '../db/factories';
 
 beforeAll(() => connect());
@@ -279,57 +279,5 @@ describe('Company mutations', () => {
 
     expect(updatedSupplier.validatedProductsInfo).toContain('code1');
     expect(updatedSupplier.validatedProductsInfo).toContain('code2');
-  });
-
-  test('block a company', async () => {
-    const supplier = await companyFactory({});
-
-    const blockMutation = `
-      mutation companiesBlock(
-        $supplierIds: [String!]!
-        $startDate: Date!
-        $endDate: Date!
-        $note: String
-      ) {
-        companiesBlock(
-          supplierIds: $supplierIds
-          startDate: $startDate
-          endDate: $endDate
-          note: $note
-        )
-      }
-    `;
-
-    const doc = {
-      supplierIds: [supplier._id],
-      startDate: new Date(),
-      endDate: new Date(),
-      note: 'note',
-    };
-
-    const context = {
-      user: await userFactory(),
-    };
-
-    await graphqlRequest(blockMutation, 'companiesBlock', doc, context);
-
-    expect(await BlockedCompanies.find().count()).toBe(1);
-
-    const blockedCompany = await BlockedCompanies.findOne();
-
-    expect(blockedCompany.createdUserId).toBe(context.user._id);
-
-    // unblock  =====================
-    const unblockMutation = `
-      mutation companiesUnblock($supplierIds: [String!]!) {
-        companiesUnblock(supplierIds: $supplierIds)
-      }
-    `;
-
-    const unblockDoc = { supplierIds: [blockedCompany.supplierId] };
-
-    await graphqlRequest(unblockMutation, 'companiesUnblock', unblockDoc, context);
-
-    expect(await BlockedCompanies.find().count()).toBe(0);
   });
 });

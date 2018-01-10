@@ -386,13 +386,4 @@ export const mutations = `
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
   companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
-
-  companiesBlock(
-    supplierIds: [String!]!
-    startDate: Date!
-    endDate: Date!
-    note: String
-  ): String
-
-  companiesUnblock(supplierIds: [String!]!): String
 `;

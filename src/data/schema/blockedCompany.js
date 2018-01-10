@@ -8,5 +8,16 @@ export const types = `
   }
 `;
 
+export const mutations = `
+  blockedCompaniesBlock(
+    supplierIds: [String!]!
+    startDate: Date!
+    endDate: Date!
+    note: String
+  ): String
+
+  blockedCompaniesUnblock(supplierIds: [String!]!): String
+`;
+
 export const queries = `
 `;
