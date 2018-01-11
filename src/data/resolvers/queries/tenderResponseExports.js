@@ -210,9 +210,10 @@ const tenderResponseQueries = {
 
     for (let [index, response] of responses.entries()) {
       const supplier = (await Companies.findOne({ _id: response.supplierId })) || {};
+      const basicInfo = supplier.basicInfo || {};
       const contactInfo = supplier.contactInfo || {};
 
-      addRow('SUPPLIER NAME', contactInfo.enName);
+      addRow('SUPPLIER NAME', basicInfo.enName);
 
       // numbering
       sheet.cell(rowIndex, 1).value(index + 1);
