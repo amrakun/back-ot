@@ -350,6 +350,8 @@ export const types = `
 
     lastDifotScore: JSON
     lastDueDiligence: JSON
+
+    isBlocked: Boolean
   }
 `;
 

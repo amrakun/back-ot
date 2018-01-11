@@ -1,4 +1,4 @@
-import { Tenders, FeedbackResponses } from '../../db/models';
+import { Tenders, FeedbackResponses, BlockedCompanies } from '../../db/models';
 
 export default {
   tenders(company) {
@@ -33,5 +33,9 @@ export default {
       ...feedback.toJSON(),
       supplierResponse,
     };
+  },
+
+  isBlocked(company) {
+    return BlockedCompanies.isBlocked(company._id);
   },
 };
