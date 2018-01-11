@@ -6,7 +6,8 @@ import { readTemplate, generateXlsx } from '../../utils';
  * Filter companies
  */
 const companiesFilter = async args => {
-  const { search, _ids, productCodes, isProductsInfoValidated, includeBlocked } = args;
+  const { search, _ids, productCodes, isProductsInfoValidated, includeBlocked, difotScore } = args;
+
   const selector = { basicInfo: { $ne: null } };
 
   // main filter
@@ -20,7 +21,25 @@ const companiesFilter = async args => {
 
   // product & services filter
   if (productCodes) {
-    selector.productsInfo = { $in: productCodes.split(',') };
+    selector.validatedProductsInfo = { $in: productCodes.split(',') };
+  }
+
+  // difot score
+  if (difotScore) {
+    let max = 50;
+    let min = 26;
+
+    if (difotScore === '51-75') {
+      max = 75;
+      min = 51;
+    }
+
+    if (difotScore === '76-100') {
+      max = 100;
+      min = 76;
+    }
+
+    selector.averageDifotScore = { $gte: min, $lte: max };
   }
 
   selector._id = {};

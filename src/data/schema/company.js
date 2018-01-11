@@ -360,10 +360,10 @@ const queryParams = `
   perPage: Int,
   search: String,
   region: String,
-  status: String,
   productCodes: String,
   isProductsInfoValidated: Boolean,
   includeBlocked: Boolean,
+  difotScore: String,
   _ids: [String],
 `;
 

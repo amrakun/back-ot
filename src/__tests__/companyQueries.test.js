@@ -14,7 +14,6 @@ describe('Company queries', () => {
   const commonParams = `
     $search: String,
     $region: String,
-    $status: String,
     $productCodes: String,
     $isProductsInfoValidated: Boolean,
     $includeBlocked: Boolean,
@@ -24,7 +23,6 @@ describe('Company queries', () => {
   const commonValues = `
     search: $search,
     region: $region,
-    status: $status,
     productCodes: $productCodes,
     isProductsInfoValidated: $isProductsInfoValidated,
     includeBlocked: $includeBlocked,
@@ -66,7 +64,7 @@ describe('Company queries', () => {
 
     const company1 = await companyFactory({
       mnName: 'mn name',
-      productsInfo: ['code1', 'code2'],
+      validatedProductsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
     });
 
@@ -117,14 +115,14 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'companies', { productCodes: 'code1' });
 
     expect(response.length).toBe(1);
-    expect(response[0].productsInfo).toContain('code1');
+    expect(response[0].validatedProductsInfo).toContain('code1');
 
     // two values
     response = await graphqlRequest(query, 'companies', { productCodes: 'code1,code2' });
 
     expect(response.length).toBe(1);
-    expect(response[0].productsInfo).toContain('code1');
-    expect(response[0].productsInfo).toContain('code2');
+    expect(response[0].validatedProductsInfo).toContain('code1');
+    expect(response[0].validatedProductsInfo).toContain('code2');
 
     // no result
     response = await graphqlRequest(query, 'companies', { productCodes: 'code3' });
@@ -145,6 +143,35 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'companies', { includeBlocked: false });
 
     expect(response.length).toBe(2);
+  });
+
+  test('companies: difotScoreRange', async () => {
+    const qry = `
+      query companies($difotScore: String) {
+        companies(difotScore: $difotScore) {
+          averageDifotScore
+        }
+      }
+    `;
+
+    await companyFactory({ mnName: 'sup1', averageDifotScore: 27 });
+    await companyFactory({ mnName: 'sup2', averageDifotScore: 52 });
+    await companyFactory({ mnName: 'sup3', averageDifotScore: 77 });
+
+    // 26-50
+    let response = await graphqlRequest(qry, 'companies', { difotScore: '26-50' });
+    expect(response.length).toBe(1);
+    expect(response[0].averageDifotScore).toBe(27);
+
+    // 51-75
+    response = await graphqlRequest(qry, 'companies', { difotScore: '51-75' });
+    expect(response.length).toBe(1);
+    expect(response[0].averageDifotScore).toBe(52);
+
+    // 76-100
+    response = await graphqlRequest(qry, 'companies', { difotScore: '76-100' });
+    expect(response.length).toBe(1);
+    expect(response[0].averageDifotScore).toBe(77);
   });
 
   test('check fields', async () => {
