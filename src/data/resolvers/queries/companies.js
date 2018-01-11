@@ -1,11 +1,12 @@
-import { Companies } from '../../../db/models';
+import { Companies, BlockedCompanies } from '../../../db/models';
 import { paginate } from './utils';
 import { readTemplate, generateXlsx } from '../../utils';
 
 /*
  * Filter companies
  */
-const companiesFilter = ({ search, _ids, productCodes }) => {
+const companiesFilter = async args => {
+  const { search, _ids, productCodes, isProductsInfoValidated, includeBlocked } = args;
   const selector = { basicInfo: { $ne: null } };
 
   // main filter
@@ -22,9 +23,26 @@ const companiesFilter = ({ search, _ids, productCodes }) => {
     selector.productsInfo = { $in: productCodes.split(',') };
   }
 
+  selector._id = {};
+
   // ids filter
   if (_ids) {
-    selector._id = { $in: _ids };
+    selector._id.$in = _ids;
+  }
+
+  // by is products info validated
+  if (isProductsInfoValidated) {
+    selector.isProductsInfoValidated = isProductsInfoValidated;
+  }
+
+  // include blocked
+  if (!includeBlocked) {
+    selector._id.$nin = await BlockedCompanies.blockedIds();
+  }
+
+  // remove emtpy selector
+  if (Object.keys(selector._id).length === 0) {
+    delete selector._id;
   }
 
   return Companies.find(selector);
@@ -36,8 +54,8 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered companies list by given parameters
    */
-  async companies(root, { search, productCodes, _ids, ...params }) {
-    return paginate(companiesFilter({ search, _ids, productCodes }), params);
+  async companies(root, args) {
+    return paginate(await companiesFilter(args), args);
   },
 
   /**
@@ -45,8 +63,8 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesExport(root, { search, productCodes, _ids }) {
-    const companies = await companiesFilter({ search, _ids, productCodes });
+  async companiesExport(root, args) {
+    const companies = await companiesFilter(args);
 
     // read template
     const { workbook, sheet } = await readTemplate('suppliers');

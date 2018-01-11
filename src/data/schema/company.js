@@ -360,6 +360,8 @@ const queryParams = `
   region: String,
   status: String,
   productCodes: String,
+  isProductsInfoValidated: Boolean,
+  includeBlocked: Boolean,
   _ids: [String],
 `;
 
