@@ -89,26 +89,36 @@ describe('BlockedCompany db', () => {
   });
 
   test('blockedSupplierIds', async () => {
+    const unblockedSupplier = await companyFactory();
     const blockedSupplier = await companyFactory();
 
-    // true =================
-    const today = moment().endOf('day');
-    const tomorrow = moment()
-      .add(1, 'day')
-      .endOf('day');
+    // in blockable range
+    await BlockedCompanies.block(
+      {
+        supplierId: blockedSupplier._id,
+        startDate: moment().endOf('day'), // today
+        endDate: moment()
+          .add(1, 'day')
+          .endOf('day'), // tommorrow
+      },
+      _user._id,
+    );
 
-    const doc = {
-      supplierId: blockedSupplier._id,
-      startDate: today,
-      endDate: tomorrow,
-    };
-
-    // block a company =================
-    await BlockedCompanies.block(doc, _user._id);
+    // do not block until startDate
+    await BlockedCompanies.block(
+      {
+        supplierId: unblockedSupplier._id,
+        startDate: moment().add(2, 'day'), // 2 days after today
+        endDate: moment()
+          .add(4, 'day')
+          .endOf('day'), // 4 days after today
+      },
+      _user._id,
+    );
 
     const ids = await BlockedCompanies.blockedIds();
 
     expect(ids).toContain(blockedSupplier._id);
-    expect(ids).not.toContain(_company._id);
+    expect(ids).not.toContain(unblockedSupplier._id);
   });
 });

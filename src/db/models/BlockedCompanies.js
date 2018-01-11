@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import { field } from './utils';
 
 // Blocked company schema
@@ -37,11 +38,20 @@ class BlockedCompany {
     return this.remove({ supplierId });
   }
 
+  static blockedRangeQuery() {
+    const today = moment().endOf('day');
+
+    return {
+      startDate: { $lte: today },
+      endDate: { $gte: today },
+    };
+  }
+
   /*
    * Check is given supplier blocked
    */
   static async isBlocked(supplierId) {
-    const count = await this.find({ supplierId, endDate: { $gt: new Date() } }).count();
+    const count = await this.find({ supplierId, ...this.blockedRangeQuery() }).count();
 
     return count > 0;
   }
@@ -50,7 +60,7 @@ class BlockedCompany {
    * Blocked supplier ids
    */
   static async blockedIds() {
-    const blockedItems = await this.find({ endDate: { $gt: new Date() } });
+    const blockedItems = await this.find(this.blockedRangeQuery());
 
     return blockedItems.map(i => i.supplierId);
   }
