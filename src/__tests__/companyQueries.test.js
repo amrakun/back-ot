@@ -154,12 +154,18 @@ describe('Company queries', () => {
       }
     `;
 
-    await companyFactory({ mnName: 'sup1', averageDifotScore: 27 });
-    await companyFactory({ mnName: 'sup2', averageDifotScore: 52 });
-    await companyFactory({ mnName: 'sup3', averageDifotScore: 77 });
+    await companyFactory({ mnName: 'sup1', averageDifotScore: 2 });
+    await companyFactory({ mnName: 'sup2', averageDifotScore: 27 });
+    await companyFactory({ mnName: 'sup3', averageDifotScore: 52 });
+    await companyFactory({ mnName: 'sup4', averageDifotScore: 77 });
+
+    // 0-25
+    let response = await graphqlRequest(qry, 'companies', { difotScore: '0-25' });
+    expect(response.length).toBe(1);
+    expect(response[0].averageDifotScore).toBe(2);
 
     // 26-50
-    let response = await graphqlRequest(qry, 'companies', { difotScore: '26-50' });
+    response = await graphqlRequest(qry, 'companies', { difotScore: '26-50' });
     expect(response.length).toBe(1);
     expect(response[0].averageDifotScore).toBe(27);
 

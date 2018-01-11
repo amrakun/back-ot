@@ -26,8 +26,13 @@ const companiesFilter = async args => {
 
   // difot score
   if (difotScore) {
-    let max = 50;
-    let min = 26;
+    let max = 25;
+    let min = 0;
+
+    if (difotScore === '26-50') {
+      max = 50;
+      min = 26;
+    }
 
     if (difotScore === '51-75') {
       max = 75;
