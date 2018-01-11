@@ -352,6 +352,7 @@ export const types = `
     lastDueDiligence: JSON
 
     isBlocked: Boolean
+    openTendersCount: Int
   }
 `;
 

@@ -1,8 +1,8 @@
-import { Tenders, FeedbackResponses, BlockedCompanies } from '../../db/models';
+import { Tenders, TenderResponses, FeedbackResponses, BlockedCompanies } from '../../db/models';
 
 export default {
   tenders(company) {
-    return Tenders.find({ supplierIds: { $in: company._id } });
+    return Tenders.find({ supplierIds: { $in: [company._id] } });
   },
 
   lastDifotScore(company) {
@@ -37,5 +37,18 @@ export default {
 
   isBlocked(company) {
     return BlockedCompanies.isBlocked(company._id);
+  },
+
+  async openTendersCount(company) {
+    const responses = await TenderResponses.find({ supplierId: company._id });
+    const submittedTenderIds = responses.map(r => r.tenderId);
+
+    const openTenders = await Tenders.find({
+      _id: { $nin: submittedTenderIds },
+      supplierIds: { $in: [company._id] },
+      status: 'open',
+    });
+
+    return openTenders.length;
   },
 };
