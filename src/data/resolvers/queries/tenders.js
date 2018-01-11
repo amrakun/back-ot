@@ -11,7 +11,7 @@ const submittedTenderIds = async supplierId => {
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async (args, user) => {
+const tenderFilter = async (args, user = {}) => {
   const { type, supplierId, ignoreSubmitted, status, search } = args;
   const query = {};
 
