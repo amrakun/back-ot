@@ -142,12 +142,12 @@ describe('User mutations', () => {
     checkLogin(userMutations.usersRemove, {});
   });
 
-  test(`test if Error('Permission required') error is working as intended`, async () => {
+  test(`test if Error('Permission denied') error is working as intended`, async () => {
     const checkLogin = async fn => {
       try {
         await fn({}, {}, { user });
       } catch (e) {
-        expect(e.message).toEqual('Permission required');
+        expect(e.message).toEqual('Permission denied');
       }
     };
 

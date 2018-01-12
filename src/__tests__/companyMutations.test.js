@@ -4,6 +4,7 @@
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies } from '../db/models';
 import { userFactory, companyFactory, companyDocs } from '../db/factories';
+import companyMutations from '../data/resolvers/mutations/companies';
 
 beforeAll(() => connect());
 
@@ -22,11 +23,43 @@ describe('Company mutations', () => {
     await Companies.remove({});
   });
 
+  test('Supplier required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(11);
+
+    const mutations = [
+      'companiesEditBasicInfo',
+      'companiesEditContactInfo',
+      'companiesEditManagementTeamInfo',
+      'companiesEditShareholderInfo',
+      'companiesEditGroupInfo',
+      'companiesEditProductsInfo',
+      'companiesEditCertificateInfo',
+      'companiesEditFinancialInfo',
+      'companiesEditBusinessInfo',
+      'companiesEditEnvironmentalInfo',
+      'companiesEditHealthInfo',
+    ];
+
+    const user = await userFactory();
+
+    for (let mutation of mutations) {
+      checkLogin(companyMutations[mutation], {}, { user });
+    }
+  });
+
   const callMutation = async (mutation, name) => {
     Companies.updateSection = jest.fn(() => ({ _id: 'DFAFDA' }));
 
     const context = {
-      user: await userFactory({ companyId: _company._id }),
+      user: await userFactory({ companyId: _company._id, isSupplier: true }),
     };
 
     const doc = companyDocs[name]();

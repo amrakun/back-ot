@@ -1,5 +1,5 @@
 import { Companies } from '../../../db/models';
-import { requireLogin } from '../../permissions';
+import { requireSupplier } from '../../permissions';
 
 const companyMutations = {
   companiesEditBasicInfo(root, { _id, basicInfo }) {
@@ -60,7 +60,7 @@ sections.forEach(section => {
     return Companies.updateSection(user.companyId, `${section}Info`, args[`${section}Info`]);
   };
 
-  requireLogin(companyMutations, name);
+  requireSupplier(companyMutations, name);
 });
 
 export default companyMutations;
