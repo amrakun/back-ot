@@ -53,31 +53,30 @@ describe('Tender mutations', () => {
     await Users.remove({});
   });
 
-  test('Tenders login required functions', async () => {
-    const checkLogin = async (fn, args) => {
+  test('Tenders buyer required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
       try {
-        await fn({}, args, {});
+        await fn({}, args, context);
       } catch (e) {
-        expect(e.message).toEqual('Login required');
+        expect(e.message).toEqual('Permission denied');
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
-    // add tender
-    checkLogin(tenderMutations.tendersAdd, {
-      name: _tender.name,
-      content: _tender.content,
-    });
+    const mutations = [
+      'tendersAdd',
+      'tendersEdit',
+      'tendersRemove',
+      'tendersAward',
+      'tendersSendRegretLetter',
+    ];
 
-    // update tender
-    checkLogin(tenderMutations.tendersEdit, { _id: _tender.id });
+    const user = await userFactory({ isSupplier: true });
 
-    // remove tender
-    checkLogin(tenderMutations.tendersRemove, { _id: _tender.id });
-
-    // award tender
-    checkLogin(tenderMutations.tendersAward, { _id: _tender.id });
+    for (let mutation of mutations) {
+      checkLogin(tenderMutations[mutation], { _id: _tender.id }, { user });
+    }
   });
 
   test('Create tender', async () => {

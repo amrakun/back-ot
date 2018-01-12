@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Tenders, TenderResponses, Companies } from '../db/models';
-import { tenderFactory, companyFactory } from '../db/factories';
+import { userFactory, tenderFactory, companyFactory } from '../db/factories';
 import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 
 beforeAll(() => connect());
@@ -43,22 +43,28 @@ describe('Tender mutations', () => {
     await Companies.remove({});
   });
 
-  test('TenderResponses login required functions', async () => {
-    const checkLogin = async (fn, args) => {
+  test('TenderResponses supplier required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
       try {
-        await fn({}, args, {});
+        await fn({}, args, context);
       } catch (e) {
-        expect(e.message).toEqual('Login required');
+        expect(e.message).toEqual('Permission denied');
       }
     };
 
     expect.assertions(1);
 
+    const user = await userFactory();
+
     // add tender
-    checkLogin(tenderResponseMutations.tenderResponsesAdd, {
-      tenderId: _tender._id,
-      supplierId: _company._id,
-    });
+    checkLogin(
+      tenderResponseMutations.tenderResponsesAdd,
+      {
+        tenderId: _tender._id,
+        supplierId: _company._id,
+      },
+      { user },
+    );
   });
 
   test('Create tender response', async () => {
@@ -98,7 +104,9 @@ describe('Tender mutations', () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'tenderResponsesAdd', doc);
+    const user = await userFactory({ isSupplier: true });
+
+    await graphqlRequest(mutation, 'tenderResponsesAdd', doc, { user });
 
     expect(TenderResponses.createTenderResponse.mock.calls.length).toBe(1);
     expect(TenderResponses.createTenderResponse).toBeCalledWith(doc);

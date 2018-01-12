@@ -1,6 +1,6 @@
 import { Tenders, TenderResponses, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
-import { moduleRequireLogin } from '../../permissions';
+import { moduleRequireBuyer } from '../../permissions';
 
 const tenderMutations = {
   /**
@@ -95,6 +95,6 @@ const tenderMutations = {
   },
 };
 
-moduleRequireLogin(tenderMutations);
+moduleRequireBuyer(tenderMutations);
 
 export default tenderMutations;

@@ -1,5 +1,5 @@
 import { TenderResponses } from '../../../db/models';
-import { moduleRequireLogin } from '../../permissions';
+import { moduleRequireSupplier } from '../../permissions';
 
 const tenderResponseMutations = {
   /**
@@ -12,6 +12,6 @@ const tenderResponseMutations = {
   },
 };
 
-moduleRequireLogin(tenderResponseMutations);
+moduleRequireSupplier(tenderResponseMutations);
 
 export default tenderResponseMutations;
