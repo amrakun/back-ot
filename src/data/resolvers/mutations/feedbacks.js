@@ -1,5 +1,5 @@
 import { Feedbacks } from '../../../db/models';
-import { moduleRequireLogin } from '../../permissions';
+import { moduleRequireBuyer } from '../../permissions';
 
 const feedbackMutations = {
   /**
@@ -12,6 +12,6 @@ const feedbackMutations = {
   },
 };
 
-moduleRequireLogin(feedbackMutations);
+moduleRequireBuyer(feedbackMutations);
 
 export default feedbackMutations;

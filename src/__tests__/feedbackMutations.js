@@ -39,19 +39,21 @@ describe('Feedback mutations', () => {
     await Users.remove({});
   });
 
-  test('Feedbacks login required functions', async () => {
-    const checkLogin = async (fn, args) => {
+  test('Feedbacks buyer required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
       try {
-        await fn({}, args, {});
+        await fn({}, args, context);
       } catch (e) {
-        expect(e.message).toEqual('Login required');
+        expect(e.message).toEqual('Permission denied');
       }
     };
 
     expect.assertions(1);
 
+    const user = await userFactory({ isSupplier: true });
+
     // add feedback
-    checkLogin(feedbackMutations.feedbacksAdd, {});
+    checkLogin(feedbackMutations.feedbacksAdd, {}, { user });
   });
 
   test('Create feedback', async () => {
