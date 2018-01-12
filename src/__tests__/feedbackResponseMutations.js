@@ -3,6 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { FeedbackResponses } from '../db/models';
+import { userFactory } from '../db/factories';
 import feedbackResponseMutations from '../data/resolvers/mutations/feedbackResponses';
 
 beforeAll(() => connect());
@@ -40,19 +41,21 @@ describe('Feedback mutations', () => {
     technologyImprovement: $technologyImprovement,
   `;
 
-  test('FeedbackResponses login required functions', async () => {
-    const checkLogin = async (fn, args) => {
+  test('FeedbackResponses supplier required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
       try {
-        await fn({}, args, {});
+        await fn({}, args, context);
       } catch (e) {
-        expect(e.message).toEqual('Login required');
+        expect(e.message).toEqual('Permission denied');
       }
     };
 
     expect.assertions(1);
 
+    const user = await userFactory();
+
     // add feedback
-    checkLogin(feedbackResponseMutations.feedbackResponsesAdd, {});
+    checkLogin(feedbackResponseMutations.feedbackResponsesAdd, {}, { user });
   });
 
   test('Create feedback response', async () => {
@@ -82,7 +85,9 @@ describe('Feedback mutations', () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'feedbackResponsesAdd', doc);
+    const user = await userFactory({ isSupplier: true });
+
+    await graphqlRequest(mutation, 'feedbackResponsesAdd', doc, { user });
 
     expect(FeedbackResponses.createFeedbackResponse.mock.calls.length).toBe(1);
     expect(FeedbackResponses.createFeedbackResponse).toBeCalledWith(doc);

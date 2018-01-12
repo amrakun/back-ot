@@ -1,5 +1,5 @@
 import { FeedbackResponses } from '../../../db/models';
-import { moduleRequireLogin } from '../../permissions';
+import { moduleRequireSupplier } from '../../permissions';
 
 const feedbackResponseMutations = {
   /**
@@ -12,6 +12,6 @@ const feedbackResponseMutations = {
   },
 };
 
-moduleRequireLogin(feedbackResponseMutations);
+moduleRequireSupplier(feedbackResponseMutations);
 
 export default feedbackResponseMutations;
