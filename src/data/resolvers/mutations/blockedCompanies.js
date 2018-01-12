@@ -1,4 +1,5 @@
 import { BlockedCompanies } from '../../../db/models';
+import { moduleRequireBuyer } from '../../permissions';
 
 const blockedCompanyMutations = {
   async blockedCompaniesBlock(root, { supplierIds, ...doc }, { user }) {
@@ -13,5 +14,7 @@ const blockedCompanyMutations = {
     }
   },
 };
+
+moduleRequireBuyer(blockedCompanyMutations);
 
 export default blockedCompanyMutations;
