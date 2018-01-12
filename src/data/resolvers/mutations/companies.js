@@ -1,5 +1,5 @@
 import { Companies } from '../../../db/models';
-import { requireSupplier } from '../../permissions';
+import { requireSupplier, requireBuyer } from '../../permissions';
 
 const companyMutations = {
   companiesEditBasicInfo(root, { _id, basicInfo }) {
@@ -62,5 +62,9 @@ sections.forEach(section => {
 
   requireSupplier(companyMutations, name);
 });
+
+requireBuyer(companyMutations, 'companiesAddDifotScores');
+requireBuyer(companyMutations, 'companiesAddDueDiligences');
+requireBuyer(companyMutations, 'companiesValidateProductsInfo');
 
 export default companyMutations;

@@ -55,6 +55,30 @@ describe('Company mutations', () => {
     }
   });
 
+  test('Buyer required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(3);
+
+    const mutations = [
+      'companiesAddDifotScores',
+      'companiesAddDueDiligences',
+      'companiesValidateProductsInfo',
+    ];
+
+    const user = await userFactory({ isSupplier: true });
+
+    for (let mutation of mutations) {
+      checkLogin(companyMutations[mutation], {}, { user });
+    }
+  });
+
   const callMutation = async (mutation, name) => {
     Companies.updateSection = jest.fn(() => ({ _id: 'DFAFDA' }));
 

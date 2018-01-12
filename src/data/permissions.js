@@ -67,14 +67,21 @@ export const requireSupplier = (cls, methodName) =>
     }
   });
 
+/**
+ * Require buyer
+ */
+export const requireBuyer = (cls, methodName) =>
+  permissionWrapper(cls, methodName, user => {
+    if (!user) {
+      throw new Error('Login required');
+    }
+
+    if (user.isSupplier) {
+      throw new Error('Permission denied');
+    }
+  });
+
 export const moduleRequireLogin = moduleWrapper(requireLogin);
 export const moduleRequireAdmin = moduleWrapper(requireAdmin);
 export const moduleRequireSupplier = moduleWrapper(requireSupplier);
-
-export default {
-  requireLogin,
-  requireAdmin,
-  moduleRequireLogin,
-  moduleRequireAdmin,
-  moduleRequireSupplier,
-};
+export const moduleRequireBuyer = moduleWrapper(requireBuyer);
