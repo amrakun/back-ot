@@ -1,6 +1,7 @@
 import { Tenders, TenderResponses } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
+import { requireBuyer } from '../../permissions';
 
 const submittedTenderIds = async supplierId => {
   const submittedTenders = await TenderResponses.find({ supplierId });
@@ -126,5 +127,7 @@ const tenderQueries = {
     return Tenders.findOne({ _id });
   },
 };
+
+requireBuyer(tenderQueries, 'tendersExport');
 
 export default tenderQueries;

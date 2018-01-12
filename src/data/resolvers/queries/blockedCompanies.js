@@ -1,4 +1,5 @@
 import { BlockedCompanies } from '../../../db/models';
+import { moduleRequireBuyer } from '../../permissions';
 
 const blockedCompanyQueries = {
   /**
@@ -8,5 +9,7 @@ const blockedCompanyQueries = {
     return BlockedCompanies.find({});
   },
 };
+
+moduleRequireBuyer(blockedCompanyQueries);
 
 export default blockedCompanyQueries;

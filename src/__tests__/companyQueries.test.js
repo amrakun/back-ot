@@ -4,7 +4,8 @@
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, BlockedCompanies } from '../db/models';
-import { companyFactory } from '../db/factories';
+import { userFactory, companyFactory } from '../db/factories';
+import queries from '../data/resolvers/queries/companies';
 
 beforeAll(() => connect());
 
@@ -56,6 +57,24 @@ describe('Company queries', () => {
   afterEach(async () => {
     // Clearing test data
     await Companies.remove({});
+  });
+
+  test('Buyer required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(2);
+
+    const user = await userFactory({ isSupplier: true });
+
+    for (let query of ['companies', 'companiesExport']) {
+      checkLogin(queries[query], {}, { user });
+    }
   });
 
   test('companies', async () => {

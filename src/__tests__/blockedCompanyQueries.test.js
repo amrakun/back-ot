@@ -4,6 +4,7 @@
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, Users, BlockedCompanies } from '../db/models';
 import { userFactory, companyFactory } from '../db/factories';
+import queries from '../data/resolvers/queries/blockedCompanies';
 
 beforeAll(() => connect());
 
@@ -15,6 +16,24 @@ describe('Company queries', () => {
     await Companies.remove({});
     await BlockedCompanies.remove({});
     await Users.remove({});
+  });
+
+  test('Buyer required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(1);
+
+    const user = await userFactory({ isSupplier: true });
+
+    for (let query of ['blockedCompanies']) {
+      checkLogin(queries[query], {}, { user });
+    }
   });
 
   test('blockedCompanies', async () => {

@@ -1,6 +1,7 @@
 import cf from 'cellref';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
+import { moduleRequireBuyer } from '../../permissions';
 
 const prepareReport = async ({ tenderId, supplierIds, template }) => {
   const tender = await Tenders.findOne({ _id: tenderId });
@@ -245,5 +246,7 @@ const tenderResponseQueries = {
     return generateXlsx(workbook, `eoi_bidder_list${tender._id}`);
   },
 };
+
+moduleRequireBuyer(tenderResponseQueries);
 
 export default tenderResponseQueries;

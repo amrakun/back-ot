@@ -1,6 +1,7 @@
 import { Companies, BlockedCompanies } from '../../../db/models';
 import { paginate } from './utils';
 import { readTemplate, generateXlsx } from '../../utils';
+import { requireBuyer } from '../../permissions';
 
 /*
  * Filter companies
@@ -130,5 +131,8 @@ const companyQueries = {
     return Companies.findOne({ _id });
   },
 };
+
+requireBuyer(companyQueries, 'companies');
+requireBuyer(companyQueries, 'companiesExport');
 
 export default companyQueries;

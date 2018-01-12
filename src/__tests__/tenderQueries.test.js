@@ -4,6 +4,8 @@
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses, Companies } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+import tenderQueries from '../data/resolvers/queries/tenders';
+import tenderResponseExports from '../data/resolvers/queries/tenderResponseExports';
 
 beforeAll(() => connect());
 
@@ -49,13 +51,41 @@ describe('Tender queries', () => {
     await Companies.remove({});
   });
 
+  test('Buyer required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(4);
+
+    const user = await userFactory({ isSupplier: true });
+
+    for (let query of ['tendersExport']) {
+      checkLogin(tenderQueries[query], {}, { user });
+    }
+
+    const qs = [
+      'tenderResponsesRfqBidSummaryReport',
+      'tenderResponsesEoiShortList',
+      'tenderResponsesEoiBidderList',
+    ];
+
+    for (let query of qs) {
+      checkLogin(tenderResponseExports[query], {}, { user });
+    }
+  });
+
   test('tenders', async () => {
     // Creating test data ==============
 
     supplier1 = await companyFactory();
     supplier2 = await companyFactory();
 
-    user = await userFactory({ companyId: supplier1._id });
+    user = await userFactory({ companyId: supplier1._id, isSupplier: false });
 
     const tender = await tenderFactory({ type: 'rfq' });
 
