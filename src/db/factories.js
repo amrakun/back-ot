@@ -51,6 +51,8 @@ export const companyFactory = (params = {}) => {
     isProductsInfoValidated: params.isProductsInfoValidated || false,
     productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
 
+    isPrequalified: params.isPrequalified || false,
+
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
     dueDiligences: params.dueDiligences || [],

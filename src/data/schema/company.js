@@ -371,6 +371,7 @@ const queryParams = `
   productCodes: String,
   isProductsInfoValidated: Boolean,
   includeBlocked: Boolean,
+  isPrequalified: Boolean,
   difotScore: String,
   _ids: [String],
 `;

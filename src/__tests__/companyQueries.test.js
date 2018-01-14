@@ -18,6 +18,7 @@ describe('Company queries', () => {
     $productCodes: String,
     $isProductsInfoValidated: Boolean,
     $includeBlocked: Boolean,
+    $isPrequalified: Boolean,
     $_ids: [String]
   `;
 
@@ -27,6 +28,7 @@ describe('Company queries', () => {
     productCodes: $productCodes,
     isProductsInfoValidated: $isProductsInfoValidated,
     includeBlocked: $includeBlocked,
+    isPrequalified: $isPrequalified,
     _ids: $_ids
   `;
 
@@ -199,6 +201,24 @@ describe('Company queries', () => {
     response = await graphqlRequest(qry, 'companies', { difotScore: '76-100' });
     expect(response.length).toBe(1);
     expect(response[0].averageDifotScore).toBe(77);
+  });
+
+  test('companies: isPrequalified', async () => {
+    const qry = `
+      query companies($isPrequalified: Boolean) {
+        companies(isPrequalified: $isPrequalified) {
+          isPrequalified
+        }
+      }
+    `;
+
+    await companyFactory({ isPrequalified: true });
+    await companyFactory({ isPrequalified: false });
+
+    const response = await graphqlRequest(qry, 'companies', { isPrequalified: true });
+
+    expect(response.length).toBe(1);
+    expect(response[0].isPrequalified).toBe(true);
   });
 
   test('check fields', async () => {

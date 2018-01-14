@@ -7,7 +7,15 @@ import { requireBuyer } from '../../permissions';
  * Filter companies
  */
 const companiesFilter = async args => {
-  const { search, _ids, productCodes, isProductsInfoValidated, includeBlocked, difotScore } = args;
+  const {
+    search,
+    _ids,
+    productCodes,
+    isProductsInfoValidated,
+    includeBlocked,
+    isPrequalified,
+    difotScore,
+  } = args;
 
   const selector = { basicInfo: { $ne: null } };
 
@@ -63,6 +71,11 @@ const companiesFilter = async args => {
   // include blocked
   if (!includeBlocked) {
     selector._id.$nin = await BlockedCompanies.blockedIds();
+  }
+
+  // by pre qualified status
+  if (isPrequalified) {
+    selector.isPrequalified = isPrequalified;
   }
 
   // remove emtpy selector
