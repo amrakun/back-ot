@@ -1,190 +1,195 @@
 const basicInfoFields = `
-  enName: String!,
-  mnName: String,
-  isRegisteredOnSup: Boolean,
-  sapNumber: String,
-  address: String!,
-  address2: String,
-  address3: String,
-  townOrCity: String!,
-  province: String!,
-  zipCode: Int,
-  country: String!,
-  registeredInCountry: String!,
-  registeredInAimag: String,
-  registeredInSum: String,
-  isChinese: Boolean,
-  isSubContractor: Boolean,
-  corporateStructure: String!,
-  registrationNumber: Float!,
-  certificateOfRegistration: JSON,
-  email: String!,
-  website: String,
-  foreignOwnershipPercentage: String!,
-  totalNumberOfEmployees: Int!,
-  totalNumberOfMongolianEmployees: Int!,
-  totalNumberOfUmnugoviEmployees: Int!,
+  enName: String!
+  mnName: String
+  isRegisteredOnSup: Boolean
+  sapNumber: String
+  address: String!
+  address2: String
+  address3: String
+  townOrCity: String!
+  province: String!
+  zipCode: Int
+  country: String!
+  registeredInCountry: String!
+  registeredInAimag: String
+  registeredInSum: String
+  isChinese: Boolean
+  isSubContractor: Boolean
+  corporateStructure: String!
+  registrationNumber: Float!
+  certificateOfRegistration: JSON
+  email: String!
+  website: String
+  foreignOwnershipPercentage: String!
+  totalNumberOfEmployees: Int!
+  totalNumberOfMongolianEmployees: Int!
+  totalNumberOfUmnugoviEmployees: Int!
 `;
 
 const contactInfoFields = `
-  name: String!,
-  jobTitle: String!,
-  address: String!,
-  address2: String,
-  address3: String,
-  townOrCity: String!,
-  province: String!,
-  zipCode: Int,
-  country: String!,
-  phone: Float!,
-  phone2: Float,
-  email: String!,
+  name: String!
+  jobTitle: String!
+  address: String!
+  address2: String
+  address3: String
+  townOrCity: String!
+  province: String!
+  zipCode: Int
+  country: String!
+  phone: Float!
+  phone2: Float
+  email: String!
 `;
 
 const personFields = `
-  name: String,
-  jobTitle: String,
-  phone: Float,
-  email: String,
+  name: String
+  jobTitle: String
+  phone: Float
+  email: String
 `;
 
 const shareholderFields = `
-  name: String,
-  jobTitle: String,
-  percentage: Int,
-  attachments: [JSON],
+  name: String
+  jobTitle: String
+  percentage: Int
+  attachments: [JSON]
 `;
 
 const factoryFields = `
-  name: String,
-  townOrCity: String,
-  country: String,
-  productCodes: [String],
+  name: String
+  townOrCity: String
+  country: String
+  productCodes: [String]
 `;
 
 const groupInfoFields = `
-  hasParent: Boolean,
-  isParentExistingSup: Boolean,
-  parentName: String,
-  parentAddress: String,
-  parentRegistrationNumber: String,
-  role: String!,
-  isExclusiveDistributor: Boolean,
-  authorizedDistributions: [String],
-  attachments: [JSON],
-  primaryManufacturerName: String!,
-  countryOfPrimaryManufacturer: String!,
+  hasParent: Boolean
+  isParentExistingSup: Boolean
+  parentName: String
+  parentAddress: String
+  parentRegistrationNumber: String
+  role: String!
+  isExclusiveDistributor: Boolean
+  authorizedDistributions: [String]
+  attachments: [JSON]
+  primaryManufacturerName: String!
+  countryOfPrimaryManufacturer: String!
 `;
 
 const certificateInfoFields = `
-  isReceived: Boolean,
-  file: JSON,
+  isReceived: Boolean
+  file: JSON
 `;
 
 const yearAmountFields = `
-  year: Int,
-  amount: Float,
+  year: Int
+  amount: Float
 `;
 
 const dateFileFields = `
-  date: String,
-  file: JSON,
+  date: String
+  file: JSON
 `;
 
-const financialInfoFields = `
-  canProvideAccountsInfo: Boolean,
-  reasonToCannotNotProvide: String,
-  currency: String!,
-  isUpToDateSSP: Boolean,
-  isUpToDateCTP: Boolean,
+// exporting to use in qualification
+export const financialInfoFields = `
+  canProvideAccountsInfo: Boolean
+  reasonToCannotNotProvide: String
+  currency: String!
+  isUpToDateSSP: Boolean
+  isUpToDateCTP: Boolean
 `;
+
 const investigationFields = `
-  name: String!,
-  date: String!,
-  status: String!,
-  statusDate: String!,
+  name: String!
+  date: String!
+  status: String!
+  statusDate: String!
 `;
 
-const businessInfoFields = `
-  doesMeetMinimumStandarts: Boolean,
-  doesMeetMinimumStandartsFile: JSON,
+// exporting to use in qualification
+export const businessInfoFields = `
+  doesMeetMinimumStandarts: Boolean
+  doesMeetMinimumStandartsFile: JSON
 
-  doesHaveJobDescription: Boolean,
-  doesHaveJobDescriptionFile: JSON,
+  doesHaveJobDescription: Boolean
+  doesHaveJobDescriptionFile: JSON
 
-  doesConcludeValidContracts: Boolean,
-  employeeTurnoverRate: Int,
+  doesConcludeValidContracts: Boolean
+  employeeTurnoverRate: Int
 
-  doesHaveLiabilityInsurance: Boolean,
-  doesHaveLiabilityInsuranceFile: JSON,
+  doesHaveLiabilityInsurance: Boolean
+  doesHaveLiabilityInsuranceFile: JSON
 
-  doesHaveCodeEthics: Boolean,
-  doesHaveCodeEthicsFile: JSON,
+  doesHaveCodeEthics: Boolean
+  doesHaveCodeEthicsFile: JSON
 
-  doesHaveResponsiblityPolicy: Boolean,
-  doesHaveResponsiblityPolicyFile: JSON,
+  doesHaveResponsiblityPolicy: Boolean
+  doesHaveResponsiblityPolicyFile: JSON
 
-  hasConvictedLabourLaws: Boolean,
-  hasConvictedForHumanRights: Boolean,
-  hasConvictedForBusinessIntegrity: Boolean,
-  proveHasNotConvicted: String,
-  hasLeadersConvicted: Boolean,
-  doesEmployeePoliticallyExposed: Boolean,
-  pepName: String,
+  hasConvictedLabourLaws: Boolean
+  hasConvictedForHumanRights: Boolean
+  hasConvictedForBusinessIntegrity: Boolean
+  proveHasNotConvicted: String
+  hasLeadersConvicted: Boolean
+  doesEmployeePoliticallyExposed: Boolean
+  pepName: String
 
-  organizationChartFile: JSON,
+  organizationChartFile: JSON
 `;
 
-const environmentalInfoFields = `
-  doesHavePlan: Boolean,
-  doesHavePlanFile: JSON,
-  hasEnvironmentalRegulatorInvestigated: Boolean,
-  dateOfInvestigation: String,
-  reasonForInvestigation: String,
-  actionStatus: String,
-  investigationDocumentation: JSON,
-  hasConvictedForEnvironmentalLaws: Boolean,
-  proveHasNotConvicted: String,
+// exporting to use in qualification
+export const environmentalInfoFields = `
+  doesHavePlan: Boolean
+  doesHavePlanFile: JSON
+  hasEnvironmentalRegulatorInvestigated: Boolean
+  dateOfInvestigation: String
+  reasonForInvestigation: String
+  actionStatus: String
+  investigationDocumentation: JSON
+  hasConvictedForEnvironmentalLaws: Boolean
+  proveHasNotConvicted: String
 `;
 
-const healthInfoFields = `
-  doesHaveHealthSafety: Boolean,
-  doesHaveHealthSafetyFile: JSON,
+// exporting to use in qualification
+export const healthInfoFields = `
+  doesHaveHealthSafety: Boolean
+  doesHaveHealthSafetyFile: JSON
 
-  areHSEResourcesClearlyIdentified: Boolean,
+  areHSEResourcesClearlyIdentified: Boolean
 
-  doesHaveDocumentedProcessToEnsure: Boolean,
-  doesHaveDocumentedProcessToEnsureFile: JSON,
+  doesHaveDocumentedProcessToEnsure: Boolean
+  doesHaveDocumentedProcessToEnsureFile: JSON
 
-  areEmployeesUnderYourControl: Boolean,
+  areEmployeesUnderYourControl: Boolean
 
-  doesHaveDocumentForRiskAssesment: Boolean,
-  doesHaveDocumentForRiskAssesmentFile: JSON,
+  doesHaveDocumentForRiskAssesment: Boolean
+  doesHaveDocumentForRiskAssesmentFile: JSON
 
-  doesHaveDocumentForIncidentInvestigation: Boolean,
-  doesHaveDocumentForIncidentInvestigationFile: JSON,
+  doesHaveDocumentForIncidentInvestigation: Boolean
+  doesHaveDocumentForIncidentInvestigationFile: JSON
 
-  doesHaveDocumentedFitness: Boolean,
-  doesHaveDocumentedFitnessFile: JSON,
+  doesHaveDocumentedFitness: Boolean
+  doesHaveDocumentedFitnessFile: JSON
 
-  isWillingToComply: Boolean,
-  hasIndustrialAccident: Boolean,
-  tmha: String,
-  ltifr: String,
-  injuryExplanation: String,
-  seniorManagement: String,
-  isWillingToCommit: Boolean,
-  isPerparedToCompile: Boolean,
-  hasWorkedOnWorldBank: Boolean,
-  hasWorkedOnWorldBankDescription: String,
-  hasWorkedOnLargeProjects: Boolean,
-  hasWorkedOnLargeProjectsDescription: String,
-  doesHaveLicense: Boolean,
-  doesHaveLicenseDescription: String,
+  isWillingToComply: Boolean
+  hasIndustrialAccident: Boolean
+  tmha: String
+  ltifr: String
+  injuryExplanation: String
+  seniorManagement: String
+  isWillingToCommit: Boolean
+  isPerparedToCompile: Boolean
+  hasWorkedOnWorldBank: Boolean
+  hasWorkedOnWorldBankDescription: String
+  hasWorkedOnLargeProjects: Boolean
+  hasWorkedOnLargeProjectsDescription: String
+  doesHaveLicense: Boolean
+  doesHaveLicenseDescription: String
 `;
 
 const difotScoreFields = `
-  date: Date!,
+  date: Date!
   amount: Float!
 `;
 
@@ -203,23 +208,23 @@ export const types = `
   input CompanyManagementTeamPersonInput { ${personFields} }
 
   type CompanyManagementTeamInfo {
-    managingDirector: CompanyManagementTeamPerson,
-    executiveOfficer: CompanyManagementTeamPerson,
-    salesDirector: CompanyManagementTeamPerson,
-    financialDirector: CompanyManagementTeamPerson,
-    otherMember1: CompanyManagementTeamPerson,
-    otherMember2: CompanyManagementTeamPerson,
-    otherMember3: CompanyManagementTeamPerson,
+    managingDirector: CompanyManagementTeamPerson
+    executiveOfficer: CompanyManagementTeamPerson
+    salesDirector: CompanyManagementTeamPerson
+    financialDirector: CompanyManagementTeamPerson
+    otherMember1: CompanyManagementTeamPerson
+    otherMember2: CompanyManagementTeamPerson
+    otherMember3: CompanyManagementTeamPerson
   }
 
   input CompanyManagementTeamInfoInput {
-    managingDirector: CompanyManagementTeamPersonInput,
-    executiveOfficer: CompanyManagementTeamPersonInput,
-    salesDirector: CompanyManagementTeamPersonInput,
-    financialDirector: CompanyManagementTeamPersonInput,
-    otherMember1: CompanyManagementTeamPersonInput,
-    otherMember2: CompanyManagementTeamPersonInput,
-    otherMember3: CompanyManagementTeamPersonInput,
+    managingDirector: CompanyManagementTeamPersonInput
+    executiveOfficer: CompanyManagementTeamPersonInput
+    salesDirector: CompanyManagementTeamPersonInput
+    financialDirector: CompanyManagementTeamPersonInput
+    otherMember1: CompanyManagementTeamPersonInput
+    otherMember2: CompanyManagementTeamPersonInput
+    otherMember3: CompanyManagementTeamPersonInput
   }
 
   #  shareholder =======================
@@ -321,24 +326,24 @@ export const types = `
 
   type Company {
     _id: String!
-    basicInfo: CompanyBasicInfo,
-    contactInfo: CompanyContactInfo,
-    managementTeamInfo: CompanyManagementTeamInfo,
-    shareholderInfo: CompanyShareholderInfo,
-    groupInfo: CompanyGroupInfo,
+    basicInfo: CompanyBasicInfo
+    contactInfo: CompanyContactInfo
+    managementTeamInfo: CompanyManagementTeamInfo
+    shareholderInfo: CompanyShareholderInfo
+    groupInfo: CompanyGroupInfo
 
-    productsInfo: [String],
-    validatedProductsInfo: [String],
-    isProductsInfoValidated: Boolean,
-    productsInfoLastValidatedDate: Date,
+    productsInfo: [String]
+    validatedProductsInfo: [String]
+    isProductsInfoValidated: Boolean
+    productsInfoLastValidatedDate: Date
 
-    certificateInfo: CompanyCertificateInfo,
-    financialInfo: CompanyFinancialInfo,
-    businessInfo: CompanyBusinessInfo,
-    environmentalInfo: CompanyEnvironmentalInfo,
-    healthInfo: CompanyHealthInfo,
+    certificateInfo: CompanyCertificateInfo
+    financialInfo: CompanyFinancialInfo
+    businessInfo: CompanyBusinessInfo
+    environmentalInfo: CompanyEnvironmentalInfo
+    healthInfo: CompanyHealthInfo
 
-    averageDifotScore: Float,
+    averageDifotScore: Float
     difotScores: [CompanyDifotScore]
 
     dueDiligences: [CompanyDueDiligence]

@@ -5,6 +5,7 @@ import tenderResponses from './tenderResponses';
 import feedbacks from './feedbacks';
 import feedbackResponses from './feedbackResponses';
 import blockedCompanies from './blockedCompanies';
+import qualifications from './qualifications';
 
 export default {
   ...companies,
@@ -14,4 +15,5 @@ export default {
   ...feedbacks,
   ...feedbackResponses,
   ...blockedCompanies,
+  ...qualifications,
 };

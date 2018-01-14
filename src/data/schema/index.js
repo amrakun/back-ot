@@ -24,6 +24,12 @@ import {
   queries as BlockedCompanyQueries,
 } from './blockedCompany';
 
+import {
+  types as QualificationTypes,
+  queries as QualificationQueries,
+  mutations as QualificationMutations,
+} from './qualification';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -33,6 +39,7 @@ export const types = `
   ${TenderTypes}
   ${FeedbackTypes}
   ${BlockedCompanyTypes}
+  ${QualificationTypes}
 `;
 
 export const queries = `
@@ -42,6 +49,7 @@ export const queries = `
     ${TenderQueries}
     ${FeedbackQueries}
     ${BlockedCompanyQueries}
+    ${QualificationQueries}
   }
 `;
 
@@ -52,5 +60,6 @@ export const mutations = `
     ${UserMutations}
     ${FeedbackMutations}
     ${BlockedCompanyMutations}
+    ${QualificationMutations}
   }
 `;
