@@ -1,12 +1,12 @@
 export const types = `
   type Feedback {
     _id: String!
-    status: String,
-    closeDate: Date,
-    supplierIds: [String],
-    content: String,
-    createdDate: Date,
-    createdUserId: String,
+    status: String
+    closeDate: Date
+    supplierIds: [String]
+    content: String
+    createdDate: Date
+    createdUserId: String
 
     responses: [FeedbackResponse]
     supplierResponse: FeedbackResponse
@@ -14,19 +14,19 @@ export const types = `
 
   type FeedbackResponse {
     _id: String!
-    status: String,
-    feedbackId: String,
-    supplierId: String,
-    employmentNumberBefore: Float,
-    employmentNumberNow: Float,
-    nationalSpendBefore: Float,
-    nationalSpendAfter: Float,
-    umnugobiSpendBefore: Float,
-    umnugobiSpendAfter: Float,
-    investment: String,
-    trainings: String,
-    corporateSocial: String,
-    technologyImprovement: String,
+    status: String
+    feedbackId: String
+    supplierId: String
+    employmentNumberBefore: Float
+    employmentNumberNow: Float
+    nationalSpendBefore: Float
+    nationalSpendAfter: Float
+    umnugobiSpendBefore: Float
+    umnugobiSpendAfter: Float
+    investment: String
+    trainings: String
+    corporateSocial: String
+    technologyImprovement: String
   }
 `;
 

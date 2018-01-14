@@ -1,30 +1,30 @@
 const requestedProductFields = `
-  code: String,
-  purchaseRequestNumber: Float,
-  shortText: String,
-  quantity: Float,
-  uom: String,
-  manufacturer: String,
-  manufacturerPartNumber: Float,
+  code: String
+  purchaseRequestNumber: Float
+  shortText: String
+  quantity: Float
+  uom: String
+  manufacturer: String
+  manufacturerPartNumber: Float
 `;
 
 const respondedProductFields = `
-  code: String,
-  suggestedManufacturer: String,
-  suggestedManufacturerPartNumber: Float,
-  unitPrice: Float,
-  totalPrice: Float,
-  leadTime: Float,
-  shippingTerms: String,
-  comment: String,
-  file: JSON,
+  code: String
+  suggestedManufacturer: String
+  suggestedManufacturerPartNumber: Float
+  unitPrice: Float
+  totalPrice: Float
+  leadTime: Float
+  shippingTerms: String
+  comment: String
+  file: JSON
 `;
 
 const respondedDocumentFields = `
-  name: String,
-  isSubmitted: Boolean,
-  notes: String,
-  file: JSON,
+  name: String
+  isSubmitted: Boolean
+  notes: String
+  file: JSON
 `;
 
 export const types = `
@@ -46,30 +46,30 @@ export const types = `
     status: String!
     type: String!
     createdUserId: String!
-    number: Float!,
-    name: String!,
-    content: String!,
-    publishDate: Date!,
-    closeDate: Date!,
-    file: JSON!,
-    reminderDay: Float!,
-    supplierIds: [String]!,
+    number: Float!
+    name: String!
+    content: String!
+    publishDate: Date!
+    closeDate: Date!
+    file: JSON!
+    reminderDay: Float!
+    supplierIds: [String]!
     requestedProducts: [TenderRequestedProduct]!
     requestedDocuments: [String]!
 
-    winnerId: String,
-    sentRegretLetter: Boolean,
+    winnerId: String
+    sentRegretLetter: Boolean
 
-    createdUser: User,
-    isAwarded: Boolean,
-    isParticipated: Boolean,
-    suppliers: [Company]!,
-    requestedCount: Int,
-    submittedCount: Int,
-    notInterestedCount: Int,
-    notRespondedCount: Int,
+    createdUser: User
+    isAwarded: Boolean
+    isParticipated: Boolean
+    suppliers: [Company]!
+    requestedCount: Int
+    submittedCount: Int
+    notInterestedCount: Int
+    notRespondedCount: Int
 
-    responses: [TenderResponseSub],
+    responses: [TenderResponseSub]
   }
 
   type TenderRespondedProduct {
@@ -92,7 +92,7 @@ export const types = `
     _id: String!
     tenderId: String!
     supplierId: String!
-    isNotInterested: Boolean,
+    isNotInterested: Boolean
     respondedProducts: [TenderRespondedProduct]!
     respondedDocuments: [TenderRespondedDocument]!
   }
