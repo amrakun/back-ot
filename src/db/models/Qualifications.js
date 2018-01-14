@@ -20,6 +20,7 @@ const generateFields = schema => {
 };
 
 const QualificationSchema = mongoose.Schema({
+  supplierId: field({ type: String }),
   financialInfo: generateFields(FinancialInfoSchema),
   businessInfo: generateFields(BusinessInfoSchema),
   environmentalInfo: generateFields(EnvironmentalInfoSchema),
@@ -29,19 +30,19 @@ const QualificationSchema = mongoose.Schema({
 class Qualification {
   /**
    * Update sub section info
-   * @param {String } company - Company id
+   * @param {String } supplierId - Company id
    * @param {String} key - financialInfo etc ...
    * @param {Object} value - related update doc
    * @return Updated validation object
    */
-  static async updateSection(companyId, section, value) {
-    if (await this.findOne({ companyId })) {
+  static async updateSection(supplierId, section, value) {
+    if (await this.findOne({ supplierId })) {
       // update
-      await this.update({ companyId }, { $set: { [section]: value } });
+      await this.update({ supplierId }, { $set: { [section]: value } });
     }
 
     // create
-    return this.create({ companyId, [section]: value });
+    return this.create({ supplierId, [section]: value });
   }
 }
 

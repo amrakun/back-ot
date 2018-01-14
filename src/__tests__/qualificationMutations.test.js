@@ -69,7 +69,7 @@ describe('Company mutations', () => {
     });
 
     const params = {
-      companyId: [_company._id],
+      supplierId: [_company._id],
       [sectionName]: sectionParams,
     };
 
@@ -78,8 +78,8 @@ describe('Company mutations', () => {
     const fieldsToSelect = Object.keys(schema.paths);
 
     const mutation = `
-      mutation ${mutationName}($companyId: String!, $${sectionName}: ${inputName}) {
-        ${mutationName} (companyId: $companyId, ${sectionName}: $${sectionName}) {
+      mutation ${mutationName}($supplierId: String!, $${sectionName}: ${inputName}) {
+        ${mutationName} (supplierId: $supplierId, ${sectionName}: $${sectionName}) {
           ${sectionName} {
             ${fieldsToSelect}
           }

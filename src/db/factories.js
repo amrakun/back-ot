@@ -2,7 +2,15 @@
 
 import faker from 'faker';
 
-import { Companies, Users, Tenders, TenderResponses, Feedbacks, FeedbackResponses } from './models';
+import {
+  Companies,
+  Users,
+  Tenders,
+  TenderResponses,
+  Feedbacks,
+  FeedbackResponses,
+  Qualifications,
+} from './models';
 
 /*
  * Remove mongoose functionalities & convert to raw object
@@ -355,4 +363,18 @@ export const feedbackResponseFactory = async (params = {}) => {
   });
 
   return save(feedbackResponse);
+};
+
+export const qualificationFactory = async (params = {}) => {
+  if (!params.supplierId) {
+    const company = await companyFactory();
+    params.supplierId = company._id;
+  }
+
+  const qualification = new Qualifications({
+    supplierId: params.supplierId,
+    financialInfo: params.financialInfo || {},
+  });
+
+  return save(qualification);
 };

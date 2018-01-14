@@ -14,7 +14,7 @@ sections.forEach(section => {
 
   qualificationMutations[name] = (root, args) => {
     const value = args[`${section}Info`];
-    return Qualifications.updateSection(args.companyId, sectionName, value);
+    return Qualifications.updateSection(args.supplierId, sectionName, value);
   };
 
   requireBuyer(qualificationMutations, name);

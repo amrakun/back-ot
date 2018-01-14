@@ -53,34 +53,38 @@ export const types = `
 
   type Qualification {
     _id: String!
-    companyId: String
+    supplierId: String
     financialInfo: QualificationFinancialInfo
     businessInfo: QualificationBusinessInfo
     environmentalInfo: QualificationEnvironmentalInfo
     healthInfo: QualificationHealthInfo
+
+    company: Company
   }
 `;
 
-export const queries = ``;
+export const queries = `
+  qualificationDetail(supplierId: String!): Qualification
+`;
 
 export const mutations = `
   qualificationsSaveFinancialInfo(
-    companyId: String!,
+    supplierId: String!,
     financialInfo: QualificationFinancialInfoInput
   ): Qualification
 
   qualificationsSaveBusinessInfo(
-    companyId: String!,
+    supplierId: String!,
     businessInfo: QualificationBusinessInfoInput
   ): Qualification
 
   qualificationsSaveEnvironmentalInfo(
-    companyId: String!,
+    supplierId: String!,
     environmentalInfo: QualificationEnvironmentalInfoInput
   ): Qualification
 
   qualificationsSaveHealthInfo(
-    companyId: String!,
+    supplierId: String!,
     healthInfo: QualificationHealthInfoInput
   ): Qualification
 `;
