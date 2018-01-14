@@ -3,6 +3,8 @@ import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
 import { requireBuyer } from '../../permissions';
 
+// TODO check permissions
+
 const submittedTenderIds = async supplierId => {
   const submittedTenders = await TenderResponses.find({ supplierId });
 

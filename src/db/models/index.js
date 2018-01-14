@@ -3,6 +3,7 @@ import Users from './Users';
 import { Tenders, TenderResponses } from './Tenders';
 import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
+import Qualifications from './Qualifications';
 
 export {
   Companies,
@@ -12,4 +13,5 @@ export {
   Feedbacks,
   FeedbackResponses,
   BlockedCompanies,
+  Qualifications,
 };

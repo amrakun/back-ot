@@ -172,7 +172,7 @@ const DateFileSchema = mongoose.Schema(
   { _id: false },
 );
 
-const FinancialInfoSchema = mongoose.Schema(
+export const FinancialInfoSchema = mongoose.Schema(
   {
     // Can you provide accounts for the last 3 financial year?
     canProvideAccountsInfo: field({ type: Boolean }),
@@ -208,7 +208,7 @@ const InvestigationSchema = mongoose.Schema(
   { _id: false },
 );
 
-const BusinessInfoSchema = mongoose.Schema(
+export const BusinessInfoSchema = mongoose.Schema(
   {
     // Does your company meet minimum standards of fair employment
     // practice required by Mongolian labor laws and regulations
@@ -275,7 +275,7 @@ const BusinessInfoSchema = mongoose.Schema(
 );
 
 // Environmental management =========
-const EnvironmentalInfoSchema = mongoose.Schema(
+export const EnvironmentalInfoSchema = mongoose.Schema(
   {
     // Does the organisation have environmental management plans
     // or procedures(including air quality,
@@ -308,7 +308,7 @@ const EnvironmentalInfoSchema = mongoose.Schema(
 
 // Health & safety management system =========
 
-const HealthInfoSchema = mongoose.Schema(
+export const HealthInfoSchema = mongoose.Schema(
   {
     // Does the organisation have a Health Safety & Environment management system?
     doesHaveHealthSafety: field({ type: Boolean }),
@@ -487,9 +487,9 @@ class Company {
     await this.checkNames({ _id, enName, mnName });
 
     // update
-    await Companies.update({ _id }, { $set: { basicInfo } });
+    await this.update({ _id }, { $set: { basicInfo } });
 
-    return Companies.findOne({ _id });
+    return this.findOne({ _id });
   }
 
   /**
@@ -501,9 +501,9 @@ class Company {
    */
   static async updateSection(_id, key, value) {
     // update
-    await Companies.update({ _id }, { $set: { [key]: value } });
+    await this.update({ _id }, { $set: { [key]: value } });
 
-    return Companies.findOne({ _id });
+    return this.findOne({ _id });
   }
 
   /*

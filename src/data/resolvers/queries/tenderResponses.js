@@ -1,6 +1,7 @@
 import { TenderResponses } from '../../../db/models';
 import { paginate } from './utils';
 
+// TODO check permissions
 const tenderResponseQueries = {
   /**
    * TenderResponses list
