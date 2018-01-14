@@ -73,7 +73,7 @@ const tenderFilter = async (args, user = {}) => {
     delete query.$or;
   }
 
-  return Tenders.find(query);
+  return Tenders.find(query).sort({ createdDate: -1 });
 };
 
 const tenderQueries = {

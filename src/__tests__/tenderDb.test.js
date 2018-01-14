@@ -32,16 +32,19 @@ describe('Tender db', () => {
     let tenderObj = await Tenders.createTender(_tender, _user._id);
 
     const status = tenderObj.status;
+    const createdDate = tenderObj.createdDate;
     const createdUserId = tenderObj.createdUserId;
 
     tenderObj = JSON.parse(JSON.stringify(tenderObj));
 
     delete tenderObj._id;
     delete tenderObj.__v;
+    delete tenderObj.createdDate;
     delete tenderObj.createdUserId;
     delete tenderObj.status;
 
     expect(tenderObj).toEqual(_tender);
+    expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('open');
   });

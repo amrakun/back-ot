@@ -8,7 +8,7 @@ const feedbackQueries = {
    * @return {Promise} filtered feedbacks list by given parameters
    */
   async feedbacks(root, args) {
-    const feedbacks = await Feedbacks.find({});
+    const feedbacks = await Feedbacks.find({}).sort({ createdDate: -1 });
 
     return paginate(feedbacks, args);
   },

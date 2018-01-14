@@ -30,6 +30,7 @@ const TenderSchema = mongoose.Schema({
 
   status: field({ type: String }),
 
+  createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
 
   number: field({ type: Number }),
@@ -68,7 +69,7 @@ class Tender {
       status = 'open';
     }
 
-    return this.create({ ...doc, status, createdUserId: userId });
+    return this.create({ ...doc, status, createdDate: now, createdUserId: userId });
   }
 
   /**

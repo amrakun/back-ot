@@ -45,6 +45,7 @@ export const types = `
     _id: String!
     status: String!
     type: String!
+    createdDate: String
     createdUserId: String!
     number: Float!
     name: String!

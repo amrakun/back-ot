@@ -38,6 +38,7 @@ describe('Tender queries', () => {
         _id
         type
         status
+        createdDate
         supplierIds
       }
     }
