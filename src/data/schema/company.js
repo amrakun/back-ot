@@ -72,8 +72,8 @@ const groupInfoFields = `
   isExclusiveDistributor: Boolean
   authorizedDistributions: [String]
   attachments: [JSON]
-  primaryManufacturerName: String!
-  countryOfPrimaryManufacturer: String!
+  primaryManufacturerName: String
+  countryOfPrimaryManufacturer: String
 `;
 
 const certificateInfoFields = `
