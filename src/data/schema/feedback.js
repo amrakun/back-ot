@@ -27,6 +27,8 @@ export const types = `
     trainings: String
     corporateSocial: String
     technologyImprovement: String
+
+    supplier: Company
   }
 `;
 
