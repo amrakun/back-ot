@@ -37,7 +37,7 @@ const TenderSchema = mongoose.Schema({
   content: field({ type: String }),
   publishDate: field({ type: Date }),
   closeDate: field({ type: Date }),
-  file: field({ type: FileSchema }),
+  file: field({ type: FileSchema, optional: true }),
   reminderDay: field({ type: Number }),
   supplierIds: field({ type: [String] }),
   requestedProducts: field({ type: [ProductSchema] }),
