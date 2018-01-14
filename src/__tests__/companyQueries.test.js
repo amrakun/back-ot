@@ -45,6 +45,8 @@ describe('Company queries', () => {
         isProductsInfoValidated
         productsInfoLastValidatedDate
 
+        isPrequalified
+
         averageDifotScore
         difotScores {
           date

@@ -343,6 +343,8 @@ export const types = `
     environmentalInfo: CompanyEnvironmentalInfo
     healthInfo: CompanyHealthInfo
 
+    isPrequalified: Boolean
+
     averageDifotScore: Float
     difotScores: [CompanyDifotScore]
 

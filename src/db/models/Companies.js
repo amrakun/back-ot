@@ -419,6 +419,8 @@ const CompanySchema = mongoose.Schema({
   // health & safety management system
   healthInfo: HealthInfoSchema,
 
+  isPrequalified: field({ type: Boolean }),
+
   dueDiligences: [DateFileSchema],
   difotScores: [DateAmountSchema],
   averageDifotScore: Number,

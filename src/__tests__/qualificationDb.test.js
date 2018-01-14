@@ -15,17 +15,17 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
-const generateDoc = schema => {
+const generateDoc = (schema, qualified) => {
   const doc = {};
 
   Object.keys(schema.paths).forEach((name, index) => {
-    doc[name] = index % 2 === 0;
+    doc[name] = qualified || index % 2 === 0;
   });
 
   return doc;
 };
 
-describe('Valiation db', () => {
+describe('Qualification db', () => {
   let _company;
 
   beforeEach(async () => {
@@ -42,8 +42,10 @@ describe('Valiation db', () => {
     const doc = generateDoc(FinancialInfoSchema);
 
     const savedObject = await Qualifications.updateSection(_company._id, 'financialInfo', doc);
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(savedObject.financialInfo.toJSON()).toEqual(doc);
+    expect(updatedCompany.isPrequalified).toBe(false);
   });
 
   test('Business info', async () => {
@@ -68,5 +70,21 @@ describe('Valiation db', () => {
     const savedObject = await Qualifications.updateSection(_company._id, 'healthInfo', doc);
 
     expect(savedObject.healthInfo.toJSON()).toEqual(doc);
+  });
+
+  test('Pre qualified status', async () => {
+    const financialDoc = generateDoc(FinancialInfoSchema, true);
+    const businessDoc = generateDoc(BusinessInfoSchema, true);
+    const environmentalDoc = generateDoc(EnvironmentalInfoSchema, true);
+    const healthDoc = generateDoc(HealthInfoSchema, true);
+
+    await Qualifications.updateSection(_company._id, 'financialInfo', financialDoc);
+    await Qualifications.updateSection(_company._id, 'businessInfo', businessDoc);
+    await Qualifications.updateSection(_company._id, 'environmentalInfo', environmentalDoc);
+    await Qualifications.updateSection(_company._id, 'healthInfo', healthDoc);
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.isPrequalified).toBe(true);
   });
 });
