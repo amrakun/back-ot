@@ -5,6 +5,7 @@ import Feedback from './feedback';
 import FeedbackResponse from './feedbackResponse';
 import BlockedCompany from './blockedCompany';
 import Qualification from './qualification';
+import ReportsSupplier from './report';
 
 import Mutation from './mutations';
 import Query from './queries';
@@ -21,4 +22,5 @@ export default {
 
   Mutation,
   Query,
+  ReportsSupplier,
 };
