@@ -151,4 +151,16 @@ describe('Audit response db', () => {
   test('Business integrity info', async () => {
     await checkCommonReplyRecommentSection('businessInfo');
   });
+
+  test('Evidence info', async () => {
+    const doc = auditResponseDocs.evidenceInfo();
+
+    const updatedResponse = await AuditResponses.saveEvidenceInfo({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      doc,
+    });
+
+    expect(updatedResponse.evidenceInfo.toJSON()).toEqual(doc);
+  });
 });

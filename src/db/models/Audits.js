@@ -131,6 +131,102 @@ const BusinessInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
+// Evidence info
+const EvidenceInfoSchema = mongoose.Schema(
+  {
+    // Does the organization have a health safety & environmental management
+    doesHaveHealthSafety: field({ type: Boolean }),
+
+    // Does the organization have a documented drug or alcohol policy
+    doesHaveDrugPolicy: field({ type: Boolean }),
+
+    // Does the organization perform pre employment
+    doesPerformPreemployment: field({ type: Boolean }),
+
+    // Do the organizations work procedures conform to local statutory
+    workProceduresConform: field({ type: Boolean }),
+
+    // Does the organization have a formal process for HSE
+    doesHaveFormalProcessForHSE: field({ type: Boolean }),
+
+    // Does the organization have a system or process for current employee
+    doesHaveSystemForTracking: field({ type: Boolean }),
+
+    // Does the organization have valid industry certifictions
+    doesHaveValidCertifications: field({ type: Boolean }),
+
+    // Does the organization have a process for reporting
+    doesHaveSystemForReporting: field({ type: Boolean }),
+
+    // Does the organization have liability insurance
+    doesHaveLiabilityInsurance: field({ type: Boolean }),
+
+    // Does the organization have a formal process for health
+    doesHaveFormalProcessForHealth: field({ type: Boolean }),
+
+    // Is there a current signed work contract for all types of employees
+    isThereCurrentContract: field({ type: Boolean }),
+
+    // Does the company have a job description
+    doesHaveJobDescription: field({ type: Boolean }),
+
+    // Does the company have a training and development policiy
+    doesHaveTraining: field({ type: Boolean }),
+
+    // is there a procedure related to employee performance
+    doesHaveEmployeeRelatedProcedure: field({ type: Boolean }),
+
+    // Does the company have time-keeping management
+    doesHaveTimeKeeping: field({ type: Boolean }),
+
+    // Are there any policies that relate to performance and employee
+    // conduct practices
+    doesHavePerformancePolicy: field({ type: Boolean }),
+
+    // Does the organization have process or framework to support the
+    // active engagement
+    doesHaveProcessToSupport: field({ type: Boolean }),
+
+    // Are employees made aware of their rights
+    employeesAwareOfRights: field({ type: Boolean }),
+
+    // Does the organization have a system in place to ensure safe work
+    // procedures
+    doesHaveSystemToEnsureSafeWork: field({ type: Boolean }),
+
+    // Are there any policies and procedures related to employee selection
+    doesHaveEmployeeSelectionProcedure: field({ type: Boolean }),
+
+    // Does the company have a procedure related to employee labor contract
+    // termination
+    doesHaveEmployeeLaborProcedure: field({ type: Boolean }),
+
+    // Does the company have employee grievance/complaint and fair
+    // treatment policy
+    doesHaveGrievancePolicy: field({ type: Boolean }),
+
+    // Are there processes and procedures in place to ensure that your policies
+    // or codes of conduct are effectively implemented throughout your company
+    proccessToEnsurePolicesCompany: field({ type: Boolean }),
+
+    // Are there processes and procedures in place to ensure that your policies
+    // or codes of conduct are effectively implemented throughout supply chain
+    proccessToEnsurePolicesSupplyChain: field({ type: Boolean }),
+
+    // Has your company been subject to any external investigation
+    hasBeenSubjectToInvestigation: field({ type: Boolean }),
+
+    // Does your company have a documented policy in place to prevent
+    // corruption
+    doesHaveCorruptionPolicy: field({ type: Boolean }),
+
+    // If yes to above question who is responsible person/function for the
+    // compliance/anti-corruption program
+    whoIsResponsibleForCorruptionPolicy: field({ type: Boolean }),
+  },
+  { _id: false },
+);
+
 const AuditReplyRecommendSchema = mongoose.Schema({
   auditId: field({ type: String }),
   supplierId: field({ type: String }),
@@ -139,6 +235,7 @@ const AuditReplyRecommendSchema = mongoose.Schema({
   coreHseqInfo: CoreHseqInfoSchema,
   hrInfo: HrInfoSchema,
   businessInfo: BusinessInfoSchema,
+  evidenceInfo: EvidenceInfoSchema,
 });
 
 class AuditResponse {
@@ -199,6 +296,15 @@ class AuditResponse {
   static saveBasicInfo(args) {
     return this.saveSection({ ...args, name: 'basicInfo' }, ({ doc, selector }) => {
       this.update(selector, { $set: { basicInfo: doc } });
+    });
+  }
+
+  /*
+   * Save evidence info
+   */
+  static saveEvidenceInfo(args) {
+    return this.saveSection({ ...args, name: 'evidenceInfo' }, ({ doc, selector }) => {
+      this.update(selector, { $set: { evidenceInfo: doc } });
     });
   }
 
