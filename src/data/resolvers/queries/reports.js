@@ -1,4 +1,4 @@
-import { Companies } from '../../../db/models';
+import { Companies, Tenders } from '../../../db/models';
 
 const updateFilter = (filter, additionalFilter) => ({ ...filter, ...additionalFilter });
 
@@ -17,15 +17,21 @@ const reportsSuppliersQuery = {
         : filter;
     }
 
-    if (statuses && statuses.length > 0) {
-      filter = updateFilter(filter, {
-        'investigations.status': { $in: statuses },
-      });
-    }
+    // if (statuses && statuses.length > 0) {
+    //   filter = updateFilter(filter, {
+    //     'investigations.status': { $in: statuses },
+    //   });
+    // }
 
-    // console.log(await Companies.find({}));
+    // console.log(await (Companies.find({}).count()));
     // console.log('filter: ', filter);
     return Companies.find(filter);
+  },
+
+  reportsTenders(root, { type, publishDate, closeDate }) {
+    const filter = {};
+
+    return Tenders.find(filter);
   },
 };
 

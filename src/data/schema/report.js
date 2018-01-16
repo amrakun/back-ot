@@ -47,6 +47,11 @@ export const types = `
     totalNumberOfMongolianEmployees: Int!
     totalNumberOfUmnugoviEmployees: Int!
   }
+
+  enum ReportsTendersType {
+    rfq
+    eoi
+  }
 `;
 
 export const queries = `
@@ -56,4 +61,10 @@ export const queries = `
     sectCodes: [String!],
     statuses: [ReportsSuppliersFilterStatus!],
   ): [ReportsSupplier]
+
+  reportsTenders(
+    type: ReportsTendersType,
+    publishDate: Date,
+    closeDate: Date,
+  ): [Tender]
 `;
