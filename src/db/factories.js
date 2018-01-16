@@ -10,6 +10,8 @@ import {
   Feedbacks,
   FeedbackResponses,
   Qualifications,
+  Audits,
+  AuditResponses,
 } from './models';
 
 /*
@@ -379,4 +381,56 @@ export const qualificationFactory = async (params = {}) => {
   });
 
   return save(qualification);
+};
+
+export const auditFactory = async (params = {}) => {
+  const audit = new Audits({
+    date: params.publishDate || new Date(),
+    supplierIds: params.supplierIds || ['id1', 'id2'],
+  });
+
+  return save(audit);
+};
+
+export const auditResponseFactory = async (params = {}) => {
+  if (!params.auditId) {
+    const audit = await auditFactory();
+    params.auditId = audit._id;
+  }
+
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
+  const auditResponse = new AuditResponses({
+    auditId: params.auditId,
+    supplierId: params.supplierId,
+    coreHseqInfo: params.coreHseqInfo || {},
+  });
+
+  return save(auditResponse);
+};
+
+const replyRecommendDoc = {
+  supplierComment: 'supplierComment',
+  supplierAnswer: false,
+
+  auditorComment: 'auditorComment',
+  auditorRecommendation: 'auditorRecommendation',
+  auditorScore: true,
+};
+
+export const auditResponseDocs = {
+  coreHseqInfo: () => ({
+    doesHaveHealthSafety: { ...replyRecommendDoc },
+    doesHaveDocumentedPolicy: { ...replyRecommendDoc },
+    doesPerformPreemployment: { ...replyRecommendDoc },
+    doWorkProceduresConform: { ...replyRecommendDoc },
+    doesHaveTrackingSystem: { ...replyRecommendDoc },
+    doesHaveValidIndustry: { ...replyRecommendDoc },
+    doesHaveFormalProcessForReporting: { ...replyRecommendDoc },
+    doesHaveLiabilityInsurance: { ...replyRecommendDoc },
+    doesHaveFormalProcessForHealth: { ...replyRecommendDoc },
+  }),
 };

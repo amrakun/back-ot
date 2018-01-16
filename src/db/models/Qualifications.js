@@ -80,6 +80,6 @@ class Qualification {
 
 QualificationSchema.loadClass(Qualification);
 
-const Qualifications = mongoose.model('validations', QualificationSchema);
+const Qualifications = mongoose.model('qualifications', QualificationSchema);
 
 export default Qualifications;
