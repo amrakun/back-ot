@@ -1,59 +1,17 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 import { graphql } from 'graphql';
+import faker from 'faker';
 import { connect, disconnect } from '../db/connection';
 import schema from '../data';
 import { Companies } from '../db/models';
 import { supplierFactory } from '../db/factories';
 
+beforeAll(() => connect());
+afterAll(() => disconnect());
+
 describe('reportsQueries', () => {
-  beforeAll(() => connect());
-  afterAll(() => disconnect());
-
-  let _suppliers = [];
-
-  beforeEach(async () => {
-    _suppliers.push(
-      await supplierFactory({
-        isRegisteredOnSup: null,
-        enName: null,
-        mnName: null,
-        isPrequalified: null,
-        difotScores: null,
-        isProductsInfoValidated: null,
-        address: null,
-        address2: null,
-        address3: null,
-        townOrCity: null,
-        province: null,
-        zipCode: null,
-        country: null,
-        registeredInCountry: null,
-        registeredInAimag: null,
-        registeredInSum: null,
-        isChinese: null,
-        registrationNumber: null,
-        certificateOfRegistration: null,
-        website: null,
-        email: null,
-        phone: null,
-        foreignOwnershipPercentage: null,
-        totalNumberOfEmployees: null,
-        totalNumberOfMongolianEmployees: null,
-        totalNumberOfUmnugoviEmployees: null,
-      }),
-    );
-
-    _suppliers.push(await supplierFactory({}));
-    _suppliers.push(await supplierFactory({ mnName: ' ' }));
-  });
-
-  afterEach(async () => {
-    await Companies.remove({});
-  });
-
-  test('reportsSuppliers', async () => {
-    const query = `
+  let _query = `
       query reportsSuppliers(
                           $dateInterval: ReportsSuppliersFilterDateInterval,
                           $affiliation:  ReportsSuppliersFilterAffiliation,
@@ -98,9 +56,50 @@ describe('reportsQueries', () => {
       }
     `;
 
+  afterEach(async () => {
+    await Companies.remove({});
+  });
+
+  test('reportsSuppliers', async () => {
+    const suppliers = [];
+
+    suppliers.push(
+      await supplierFactory({
+        isRegisteredOnSup: null,
+        enName: null,
+        mnName: null,
+        isPrequalified: null,
+        difotScores: null,
+        isProductsInfoValidated: null,
+        address: null,
+        address2: null,
+        address3: null,
+        townOrCity: null,
+        province: null,
+        zipCode: null,
+        country: null,
+        registeredInCountry: null,
+        registeredInAimag: null,
+        registeredInSum: null,
+        isChinese: null,
+        registrationNumber: null,
+        certificateOfRegistration: null,
+        website: null,
+        email: null,
+        phone: null,
+        foreignOwnershipPercentage: null,
+        totalNumberOfEmployees: null,
+        totalNumberOfMongolianEmployees: null,
+        totalNumberOfUmnugoviEmployees: null,
+      }),
+    );
+
+    suppliers.push(await supplierFactory({}));
+    suppliers.push(await supplierFactory({}));
+
     const params = {};
 
-    const result = await graphql(schema, query, {}, {}, params);
+    const result = await graphql(schema, _query, {}, {}, params);
 
     // console.log('result: ', result.data.reportsSuppliers[0]);
     expect(result).toBeDefined();
@@ -108,7 +107,7 @@ describe('reportsQueries', () => {
 
     for (let i = 0, data = result.data.reportsSuppliers; i < data.length; i++) {
       const row = data[i],
-        supplier = _suppliers[i];
+        supplier = suppliers[i];
       expect(row._id).toEqual(supplier._id);
       expect(row.isRegisteredOnSup).toBe(row.isRegisteredOnSup || false);
       expect(row.enName).toBe(supplier.basicInfo.enName || '');
@@ -142,5 +141,166 @@ describe('reportsQueries', () => {
         supplier.basicInfo.totalNumberOfUmnugoviEmployees || 0,
       );
     }
+  });
+
+  test('reportsSuppliers filters', async () => {
+    let params = {
+      dateInterval: {},
+      affiliation: {},
+      sectCodes: [],
+      statuses: [],
+    };
+
+    let result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    params = {
+      dateInterval: {
+        startDate: null,
+        endDate: null,
+      },
+      affiliation: {
+        country: null,
+        province: null,
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    params = {
+      dateInterval: {
+        startDate: new Date(2014, 0, 1),
+        endDate: null,
+      },
+      affiliation: {
+        country: faker.random.word(),
+        province: null,
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    params = {
+      dateInterval: {
+        startDate: null,
+        endDate: new Date(2014, 0, 1),
+      },
+      affiliation: {
+        country: null,
+        province: faker.random.word(),
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    const suppliers = [
+      await supplierFactory({
+        country: 'Mongolia',
+        province: 'Umnugovi',
+        investigations: [
+          { name: 'Name', date: '2010.01.01', status: 'preQualified', statusDate: '2011.01.01' },
+        ],
+      }),
+      await supplierFactory({
+        country: 'Mongolia',
+      }),
+      await supplierFactory({
+        country: 'China',
+        investigations: [
+          { name: 'Name', date: '2010.01.01', status: 'preQualified', statusDate: '2011.01.01' },
+        ],
+      }),
+      await supplierFactory({
+        country: null,
+        province: 'Umnugovi',
+        investigations: [
+          { name: 'Name', date: '2010.01.01', status: 'preQualified', statusDate: '2011.01.01' },
+        ],
+      }),
+      await supplierFactory({
+        country: 'Mongolia',
+        province: 'Umnugovi',
+      }),
+    ];
+
+    params = {
+      dateInterval: {},
+      affiliation: {
+        country: 'Mongolia',
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    expect(result.data.reportsSuppliers.length).toBe(3);
+
+    params = {
+      dateInterval: {},
+      affiliation: {
+        province: 'Umnugovi',
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    expect(result.data.reportsSuppliers.length).toBe(3);
+
+    params = {
+      dateInterval: {},
+      affiliation: {
+        country: 'Mongolia',
+        province: 'Umnugovi',
+      },
+      sectCodes: [],
+      statuses: [],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    expect(result.data.reportsSuppliers.length).toBe(2);
+
+    params = {
+      dateInterval: {},
+      affiliation: {},
+      sectCodes: [],
+      statuses: ['preQualified'],
+    };
+
+    result = await graphql(schema, _query, {}, {}, params);
+
+    expect(result).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    expect(result.data.reportsSuppliers.length).toBe(3);
   });
 });

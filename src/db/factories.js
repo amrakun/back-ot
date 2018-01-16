@@ -62,7 +62,7 @@ export const companyFactory = (params = {}) => {
 };
 
 export const supplierFactory = (params = {}) => {
-  const company = new Companies({
+  const data = {
     basicInfo: {
       enName: params.enName !== undefined ? params.enName : faker.random.word(),
       mnName: params.enName !== undefined ? params.mnName : faker.random.word(),
@@ -109,6 +109,10 @@ export const supplierFactory = (params = {}) => {
           : faker.random.number(),
     },
 
+    investigations: params.investigations
+      ? params.investigations
+      : [{ name: 'Name', date: '2010.01.01', status: 'Status', statusDate: '2011.01.01' }],
+
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
     isProductsInfoValidated: params.isProductsInfoValidated || false,
@@ -119,8 +123,10 @@ export const supplierFactory = (params = {}) => {
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
     dueDiligences: params.dueDiligences || [],
-  });
+  };
 
+  // console.log('data: ', data)
+  const company = new Companies(data);
   return save(company);
 };
 
