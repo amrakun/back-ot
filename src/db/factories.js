@@ -412,25 +412,50 @@ export const auditResponseFactory = async (params = {}) => {
   return save(auditResponse);
 };
 
-const replyRecommendDoc = {
-  supplierComment: 'supplierComment',
-  supplierAnswer: false,
+// audit response docs ====================
+const generateSection = fields => {
+  const value = {};
 
-  auditorComment: 'auditorComment',
-  auditorRecommendation: 'auditorRecommendation',
-  auditorScore: true,
+  for (let field of fields) {
+    value[field] = {
+      supplierComment: 'supplierComment',
+      supplierAnswer: false,
+
+      auditorComment: 'auditorComment',
+      auditorRecommendation: 'auditorRecommendation',
+      auditorScore: true,
+    };
+  }
+
+  return value;
 };
 
 export const auditResponseDocs = {
-  coreHseqInfo: () => ({
-    doesHaveHealthSafety: { ...replyRecommendDoc },
-    doesHaveDocumentedPolicy: { ...replyRecommendDoc },
-    doesPerformPreemployment: { ...replyRecommendDoc },
-    doWorkProceduresConform: { ...replyRecommendDoc },
-    doesHaveTrackingSystem: { ...replyRecommendDoc },
-    doesHaveValidIndustry: { ...replyRecommendDoc },
-    doesHaveFormalProcessForReporting: { ...replyRecommendDoc },
-    doesHaveLiabilityInsurance: { ...replyRecommendDoc },
-    doesHaveFormalProcessForHealth: { ...replyRecommendDoc },
-  }),
+  coreHseqInfo: () =>
+    generateSection([
+      'doesHaveHealthSafety',
+      'doesHaveDocumentedPolicy',
+      'doesPerformPreemployment',
+      'doWorkProceduresConform',
+      'doesHaveTrackingSystem',
+      'doesHaveValidIndustry',
+      'doesHaveFormalProcessForReporting',
+      'doesHaveLiabilityInsurance',
+      'doesHaveFormalProcessForHealth',
+    ]),
+
+  hrInfo: () =>
+    generateSection([
+      'workContractManagement',
+      'jobDescriptionProcedure',
+      'trainingDevelopment',
+      'employeePerformanceManagement',
+      'timeKeepingManagement',
+      'managementOfPractises',
+      'managementOfWorkforce',
+      'employeeAwareness',
+      'employeeSelection',
+      'employeeExitManagement',
+      'grievanceAndFairTreatment',
+    ]),
 };

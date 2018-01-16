@@ -128,4 +128,8 @@ describe('Audit response db', () => {
   test('Core HSEQ info', async () => {
     await checkCommonReplyRecommentSection('coreHseqInfo');
   });
+
+  test('Human resource management info', async () => {
+    await checkCommonReplyRecommentSection('hrInfo');
+  });
 });

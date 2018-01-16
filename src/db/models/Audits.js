@@ -51,7 +51,7 @@ const ResponseSchema = mongoose.Schema(
 );
 
 // core hseq
-const CoreHseqInfoInfoSchema = mongoose.Schema(
+const CoreHseqInfoSchema = mongoose.Schema(
   {
     // Does the organization have a health safety & environment management system
     doesHaveHealthSafety: ResponseSchema,
@@ -86,12 +86,31 @@ const CoreHseqInfoInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
+// human resource management
+const HrInfoSchema = mongoose.Schema(
+  {
+    workContractManagement: ResponseSchema,
+    jobDescriptionProcedure: ResponseSchema,
+    trainingDevelopment: ResponseSchema,
+    employeePerformanceManagement: ResponseSchema,
+    timeKeepingManagement: ResponseSchema,
+    managementOfPractises: ResponseSchema,
+    managementOfWorkforce: ResponseSchema,
+    employeeAwareness: ResponseSchema,
+    employeeSelection: ResponseSchema,
+    employeeExitManagement: ResponseSchema,
+    grievanceAndFairTreatment: ResponseSchema,
+  },
+  { _id: false },
+);
+
 const AuditResponseSchema = mongoose.Schema({
   auditId: field({ type: String }),
   supplierId: field({ type: String }),
 
   basicInfo: BasicInfoSchema,
-  coreHseqInfo: CoreHseqInfoInfoSchema,
+  coreHseqInfo: CoreHseqInfoSchema,
+  hrInfo: HrInfoSchema,
 });
 
 class AuditResponse {
