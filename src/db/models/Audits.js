@@ -38,7 +38,7 @@ const BasicInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
-const ResponseSchema = mongoose.Schema(
+const ReplyRecommendSchema = mongoose.Schema(
   {
     supplierComment: field({ type: String }),
     supplierAnswer: field({ type: Boolean }),
@@ -54,34 +54,34 @@ const ResponseSchema = mongoose.Schema(
 const CoreHseqInfoSchema = mongoose.Schema(
   {
     // Does the organization have a health safety & environment management system
-    doesHaveHealthSafety: ResponseSchema,
+    doesHaveHealthSafety: ReplyRecommendSchema,
 
     // Does the organization have a documented drug and alcohol policy
-    doesHaveDocumentedPolicy: ResponseSchema,
+    doesHaveDocumentedPolicy: ReplyRecommendSchema,
 
     // Does the organization perform pre employment
-    doesPerformPreemployment: ResponseSchema,
+    doesPerformPreemployment: ReplyRecommendSchema,
 
     // Do the organizations work procedures conform to local statutory
-    doWorkProceduresConform: ResponseSchema,
+    doWorkProceduresConform: ReplyRecommendSchema,
 
     // Does the organization have a system or process for tracking
-    doesHaveTrackingSystem: ResponseSchema,
+    doesHaveTrackingSystem: ReplyRecommendSchema,
 
     // Does the organization have valid industry
-    doesHaveValidIndustry: ResponseSchema,
+    doesHaveValidIndustry: ReplyRecommendSchema,
 
     // Does the organization have formal process for reporting and investigating
     // incidents
-    doesHaveFormalProcessForReporting: ResponseSchema,
+    doesHaveFormalProcessForReporting: ReplyRecommendSchema,
 
     // Does the organization have liability insurance which meets OT's
     // minimum requirements
-    doesHaveLiabilityInsurance: ResponseSchema,
+    doesHaveLiabilityInsurance: ReplyRecommendSchema,
 
     // Does the organization have formal process for health safetiy
     // incidents
-    doesHaveFormalProcessForHealth: ResponseSchema,
+    doesHaveFormalProcessForHealth: ReplyRecommendSchema,
   },
   { _id: false },
 );
@@ -89,28 +89,56 @@ const CoreHseqInfoSchema = mongoose.Schema(
 // human resource management
 const HrInfoSchema = mongoose.Schema(
   {
-    workContractManagement: ResponseSchema,
-    jobDescriptionProcedure: ResponseSchema,
-    trainingDevelopment: ResponseSchema,
-    employeePerformanceManagement: ResponseSchema,
-    timeKeepingManagement: ResponseSchema,
-    managementOfPractises: ResponseSchema,
-    managementOfWorkforce: ResponseSchema,
-    employeeAwareness: ResponseSchema,
-    employeeSelection: ResponseSchema,
-    employeeExitManagement: ResponseSchema,
-    grievanceAndFairTreatment: ResponseSchema,
+    workContractManagement: ReplyRecommendSchema,
+    jobDescriptionProcedure: ReplyRecommendSchema,
+    trainingDevelopment: ReplyRecommendSchema,
+    employeePerformanceManagement: ReplyRecommendSchema,
+    timeKeepingManagement: ReplyRecommendSchema,
+    managementOfPractises: ReplyRecommendSchema,
+    managementOfWorkforce: ReplyRecommendSchema,
+    employeeAwareness: ReplyRecommendSchema,
+    employeeSelection: ReplyRecommendSchema,
+    employeeExitManagement: ReplyRecommendSchema,
+    grievanceAndFairTreatment: ReplyRecommendSchema,
   },
   { _id: false },
 );
 
-const AuditResponseSchema = mongoose.Schema({
+// business integrity info
+const BusinessInfoSchema = mongoose.Schema(
+  {
+    // Does your company have in place a policy statement
+    doesHavePolicyStatement: ReplyRecommendSchema,
+
+    // Are these and procedures in place to ensure that your policies or codes
+    // of conduct are effectively implemented throught your company
+    ensureThroughoutCompany: ReplyRecommendSchema,
+
+    // Are these and procedures in place to ensure that your policies or codes
+    // of conduct are effectively implemented throught your supply chain
+    ensureThroughoutSupplyChain: ReplyRecommendSchema,
+
+    // Have your company been subject to any external investigation
+    haveBeenSubjectToInvestigation: ReplyRecommendSchema,
+
+    // Does your company have a documented policy in place to prevent corruption
+    doesHaveDocumentedPolicy: ReplyRecommendSchema,
+
+    // If yes to above question who is responsible person/function for the
+    // compliance/anti-corruption program
+    whoIsResponsibleForPolicy: ReplyRecommendSchema,
+  },
+  { _id: false },
+);
+
+const AuditReplyRecommendSchema = mongoose.Schema({
   auditId: field({ type: String }),
   supplierId: field({ type: String }),
 
   basicInfo: BasicInfoSchema,
   coreHseqInfo: CoreHseqInfoSchema,
   hrInfo: HrInfoSchema,
+  businessInfo: BusinessInfoSchema,
 });
 
 class AuditResponse {
@@ -175,8 +203,8 @@ class AuditResponse {
   }
 }
 
-AuditResponseSchema.loadClass(AuditResponse);
+AuditReplyRecommendSchema.loadClass(AuditResponse);
 
-const AuditResponses = mongoose.model('audit_responses', AuditResponseSchema);
+const AuditResponses = mongoose.model('audit_responses', AuditReplyRecommendSchema);
 
 export { Audits, AuditResponses };

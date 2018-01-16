@@ -458,4 +458,14 @@ export const auditResponseDocs = {
       'employeeExitManagement',
       'grievanceAndFairTreatment',
     ]),
+
+  businessInfo: () =>
+    generateSection([
+      'doesHavePolicyStatement',
+      'ensureThroughoutCompany',
+      'ensureThroughoutSupplyChain',
+      'haveBeenSubjectToInvestigation',
+      'doesHaveDocumentedPolicy',
+      'whoIsResponsibleForPolicy',
+    ]),
 };

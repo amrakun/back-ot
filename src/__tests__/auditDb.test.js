@@ -132,4 +132,8 @@ describe('Audit response db', () => {
   test('Human resource management info', async () => {
     await checkCommonReplyRecommentSection('hrInfo');
   });
+
+  test('Business integrity info', async () => {
+    await checkCommonReplyRecommentSection('businessInfo');
+  });
 });
