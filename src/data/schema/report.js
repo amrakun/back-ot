@@ -6,7 +6,7 @@ export const types = `
 
   input ReportsSuppliersFilterAffiliation {
     country: String
-    aimag: String
+    province: String
   }
 
   enum ReportsSuppliersFilterStatus {
@@ -14,11 +14,38 @@ export const types = `
     validate
   }
 
+  type ReportsSuppliersDifotScore {
+    date: Date,
+    amount: Int
+  }
+
   type ReportsSupplier {
     _id: String!
-    isParentExistingSup: Boolean
+    isRegisteredOnSup: Boolean!
     enName: String!
-    mnName: String
+    mnName: String!
+    isPrequalified: Boolean!
+    difotScores: [ReportsSuppliersDifotScore!]!
+    isProductsInfoValidated: Boolean!
+    address: String!
+    address2: String!
+    address3: String!
+    townOrCity: String!
+    country: String!
+    province: String!
+    registeredInCountry: String!
+    registeredInAimag: String!
+    registeredInSum: String!
+    isChinese: Boolean!
+    registrationNumber: Int!
+    certificateOfRegistration: Boolean!
+    website: String!
+    email: String!
+    phone: String!
+    foreignOwnershipPercentage: String!
+    totalNumberOfEmployees: Int!
+    totalNumberOfMongolianEmployees: Int!
+    totalNumberOfUmnugoviEmployees: Int!
   }
 `;
 
