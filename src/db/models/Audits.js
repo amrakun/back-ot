@@ -143,8 +143,8 @@ const AuditReplyRecommendSchema = mongoose.Schema({
 
 class AuditResponse {
   /**
-   * Update common sections that supplier reply then auditor recomment shaped sections
-   * like coreHseqInfo
+   * Create or update sections that supplier reply then auditor recomment
+   * shaped sections like coreHseqInfo
    *
    * @param {String } auditId - Audit id
    * @param {String } supplierId - Supplier id
@@ -166,12 +166,8 @@ class AuditResponse {
    *
    * @return Created or updated response object
    */
-  static async updateReplyRecommentSection({ auditId, supplierId, name, doc }) {
-    const selector = { auditId, supplierId };
-    const previousEntry = await this.findOne(selector);
-
-    // update previous entry if exists
-    if (previousEntry) {
+  static saveReplyRecommentSection(args) {
+    return this.saveSection(args, async ({ name, doc, selector }) => {
       // Generating update query to only peace of information in given
       // section
       const updateQuery = {};
@@ -194,6 +190,29 @@ class AuditResponse {
 
       // do not override whole section values
       await this.update(selector, { $set: updateQuery });
+    });
+  }
+
+  /*
+   * Save basic info
+   */
+  static saveBasicInfo(args) {
+    return this.saveSection({ ...args, name: 'basicInfo' }, ({ doc, selector }) => {
+      this.update(selector, { $set: { basicInfo: doc } });
+    });
+  }
+
+  /*
+   * Common helper that checks previous entry
+   */
+  static async saveSection(args, updater) {
+    const { auditId, supplierId, name, doc } = args;
+    const selector = { auditId, supplierId };
+    const previousEntry = await this.findOne(selector);
+
+    // update previous entry if exists
+    if (previousEntry) {
+      await updater({ ...args, selector });
 
       // return updated
       return this.findOne({ _id: previousEntry._id });

@@ -63,7 +63,7 @@ describe('Audit response db', () => {
 
     expect(await AuditResponses.find().count()).toBe(1);
 
-    const updatedResponse = await AuditResponses.updateReplyRecommentSection({
+    const updatedResponse = await AuditResponses.saveReplyRecommentSection({
       auditId: _audit._id,
       supplierId: _company._id,
       name: 'coreHseqInfo',
@@ -113,7 +113,7 @@ describe('Audit response db', () => {
   const checkCommonReplyRecommentSection = async name => {
     const doc = auditResponseDocs[name]();
 
-    const updatedResponse = await AuditResponses.updateReplyRecommentSection({
+    const updatedResponse = await AuditResponses.saveReplyRecommentSection({
       auditId: _audit._id,
       supplierId: _company._id,
       name,
@@ -124,6 +124,21 @@ describe('Audit response db', () => {
 
     expect(sectionValue).toEqual(doc);
   };
+
+  test('Basic info', async () => {
+    const doc = {
+      sotri: 'sotri',
+      sotie: 'sotie',
+    };
+
+    const updatedResponse = await AuditResponses.saveBasicInfo({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      doc,
+    });
+
+    expect(updatedResponse.basicInfo.toJSON()).toEqual(doc);
+  });
 
   test('Core HSEQ info', async () => {
     await checkCommonReplyRecommentSection('coreHseqInfo');
