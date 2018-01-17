@@ -9,23 +9,6 @@ const getBasicInfoAsBoolean = (obj, key) =>
   obj.basicInfo && obj.basicInfo[key] && obj.basicInfo[key] === true ? true : false;
 
 const reportsSuppliersQuery = {
-  async reportsSuppliers(root, { productCode, isPrequalified }) {
-    let filter = {};
-
-    if (productCode) {
-      filter =
-        productCode.length > 0
-          ? updateFilter(filter, { validatedProductsInfo: { $all: productCode } })
-          : filter;
-    }
-
-    if (typeof isPrequalified === 'boolean') {
-      filter = updateFilter(filter, { isPrequalified });
-    }
-
-    return Companies.find(filter);
-  },
-
   async reportsSuppliersExport(root, { productCode, isPrequalified }) {
     let filter = {};
 
@@ -97,10 +80,12 @@ const reportsSuppliersQuery = {
     return generateXlsx(workbook, 'reports_suppliers');
   },
 
-  reportsTenders(root, { type, publishDate, closeDate }) {
+  async reportsTendersExport(root, { type, publishDate, closeDate }) {
     const filter = {};
 
-    return Tenders.find(filter);
+    await Tenders.find(filter);
+
+    return 'test';
   },
 };
 
