@@ -413,61 +413,74 @@ export const auditResponseFactory = async (params = {}) => {
 };
 
 // audit response docs ====================
-const generateSection = fields => {
+const generateSection = (fields, supplier = true, buyer = true) => {
   const value = {};
 
   for (let field of fields) {
-    value[field] = {
-      supplierComment: 'supplierComment',
-      supplierAnswer: false,
+    value[field] = {};
 
-      auditorComment: 'auditorComment',
-      auditorRecommendation: 'auditorRecommendation',
-      auditorScore: true,
-    };
+    if (supplier) {
+      value[field].supplierComment = 'supplierComment';
+      value[field].supplierAnswer = false;
+    }
+
+    if (buyer) {
+      value[field].auditorComment = 'auditorComment';
+      value[field].auditorRecommendation = 'auditorRecommendation';
+      value[field].auditorScore = true;
+    }
   }
 
   return value;
 };
 
 export const auditResponseDocs = {
-  coreHseqInfo: () =>
-    generateSection([
-      'doesHaveHealthSafety',
-      'doesHaveDocumentedPolicy',
-      'doesPerformPreemployment',
-      'doWorkProceduresConform',
-      'doesHaveTrackingSystem',
-      'doesHaveValidIndustry',
-      'doesHaveFormalProcessForReporting',
-      'doesHaveLiabilityInsurance',
-      'doesHaveFormalProcessForHealth',
-    ]),
+  coreHseqInfo: (...args) =>
+    generateSection(
+      [
+        'doesHaveHealthSafety',
+        'doesHaveDocumentedPolicy',
+        'doesPerformPreemployment',
+        'doWorkProceduresConform',
+        'doesHaveTrackingSystem',
+        'doesHaveValidIndustry',
+        'doesHaveFormalProcessForReporting',
+        'doesHaveLiabilityInsurance',
+        'doesHaveFormalProcessForHealth',
+      ],
+      ...args,
+    ),
 
-  hrInfo: () =>
-    generateSection([
-      'workContractManagement',
-      'jobDescriptionProcedure',
-      'trainingDevelopment',
-      'employeePerformanceManagement',
-      'timeKeepingManagement',
-      'managementOfPractises',
-      'managementOfWorkforce',
-      'employeeAwareness',
-      'employeeSelection',
-      'employeeExitManagement',
-      'grievanceAndFairTreatment',
-    ]),
+  hrInfo: (...args) =>
+    generateSection(
+      [
+        'workContractManagement',
+        'jobDescriptionProcedure',
+        'trainingDevelopment',
+        'employeePerformanceManagement',
+        'timeKeepingManagement',
+        'managementOfPractises',
+        'managementOfWorkforce',
+        'employeeAwareness',
+        'employeeSelection',
+        'employeeExitManagement',
+        'grievanceAndFairTreatment',
+      ],
+      ...args,
+    ),
 
-  businessInfo: () =>
-    generateSection([
-      'doesHavePolicyStatement',
-      'ensureThroughoutCompany',
-      'ensureThroughoutSupplyChain',
-      'haveBeenSubjectToInvestigation',
-      'doesHaveDocumentedPolicy',
-      'whoIsResponsibleForPolicy',
-    ]),
+  businessInfo: (...args) =>
+    generateSection(
+      [
+        'doesHavePolicyStatement',
+        'ensureThroughoutCompany',
+        'ensureThroughoutSupplyChain',
+        'haveBeenSubjectToInvestigation',
+        'doesHaveDocumentedPolicy',
+        'whoIsResponsibleForPolicy',
+      ],
+      ...args,
+    ),
 
   evidenceInfo: () => ({
     doesHaveHealthSafety: true,

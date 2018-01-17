@@ -30,6 +30,8 @@ import {
   mutations as QualificationMutations,
 } from './qualification';
 
+import { types as AuditTypes, queries as AuditQueries, mutations as AuditMutations } from './audit';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -40,6 +42,7 @@ export const types = `
   ${FeedbackTypes}
   ${BlockedCompanyTypes}
   ${QualificationTypes}
+  ${AuditTypes}
 `;
 
 export const queries = `
@@ -50,6 +53,7 @@ export const queries = `
     ${FeedbackQueries}
     ${BlockedCompanyQueries}
     ${QualificationQueries}
+    ${AuditQueries}
   }
 `;
 
@@ -61,5 +65,6 @@ export const mutations = `
     ${FeedbackMutations}
     ${BlockedCompanyMutations}
     ${QualificationMutations}
+    ${AuditMutations}
   }
 `;
