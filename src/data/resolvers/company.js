@@ -1,4 +1,10 @@
-import { Tenders, TenderResponses, FeedbackResponses, BlockedCompanies } from '../../db/models';
+import {
+  Tenders,
+  TenderResponses,
+  FeedbackResponses,
+  BlockedCompanies,
+  Audits,
+} from '../../db/models';
 
 export default {
   tenders(company) {
@@ -50,5 +56,9 @@ export default {
     });
 
     return openTenders.length;
+  },
+
+  audits(company) {
+    return Audits.find({ supplierIds: { $in: [company._id] } });
   },
 };

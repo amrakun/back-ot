@@ -4,7 +4,7 @@
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, BlockedCompanies } from '../db/models';
-import { userFactory, companyFactory } from '../db/factories';
+import { userFactory, companyFactory, auditFactory } from '../db/factories';
 import queries from '../data/resolvers/queries/companies';
 
 beforeAll(() => connect());
@@ -53,6 +53,10 @@ describe('Company queries', () => {
         difotScores {
           date
           amount
+        }
+
+        audits {
+          _id
         }
       }
     }
@@ -224,11 +228,13 @@ describe('Company queries', () => {
   test('check fields', async () => {
     const validatedDate = new Date();
 
-    await companyFactory({
+    const _company = await companyFactory({
       validatedProductsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
       productsInfoLastValidatedDate: validatedDate,
     });
+
+    await auditFactory({ supplierIds: [_company._id] });
 
     const response = await graphqlRequest(query, 'companies');
 
@@ -240,5 +246,8 @@ describe('Company queries', () => {
     expect(company.validatedProductsInfo).toContain('code1');
     expect(company.validatedProductsInfo).toContain('code2');
     expect(new Date(company.productsInfoLastValidatedDate)).toEqual(validatedDate);
+
+    // audits
+    expect(company.audits.length).toBe(1);
   });
 });

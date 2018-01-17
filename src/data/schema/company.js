@@ -360,6 +360,8 @@ export const types = `
 
     isBlocked: Boolean
     openTendersCount: Int
+
+    audits: [Audit]
   }
 `;
 
