@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, Users, Audits } from '../db/models';
-import { userFactory, companyFactory, auditFactory } from '../db/factories';
+import { userFactory, companyFactory, auditFactory, auditResponseFactory } from '../db/factories';
 import queries from '../data/resolvers/queries/audits';
 
 beforeAll(() => connect());
@@ -70,6 +70,8 @@ describe('Company queries', () => {
       supplierIds: [_company._id],
     });
 
+    await auditResponseFactory({ auditId: audit._id, supplierId: _company._id });
+
     const query = `
       query auditDetail($_id: String!) {
         auditDetail(_id: $_id) {
@@ -85,6 +87,79 @@ describe('Company queries', () => {
           suppliers {
             _id
           }
+
+          responses {
+            _id
+            basicInfo {
+              sotri
+              sotie
+            }
+
+            coreHseqInfo {
+              doesHaveHealthSafety { supplierComment }
+              doesHaveDocumentedPolicy { supplierComment }
+              doesPerformPreemployment { supplierComment }
+              doWorkProceduresConform { supplierComment }
+              doesHaveTrackingSystem { supplierComment }
+              doesHaveValidIndustry { supplierComment }
+              doesHaveFormalProcessForReporting { supplierComment }
+              doesHaveLiabilityInsurance { supplierComment }
+              doesHaveFormalProcessForHealth { supplierComment }
+            }
+
+            hrInfo {
+              workContractManagement { supplierComment }
+              jobDescriptionProcedure { supplierComment }
+              trainingDevelopment { supplierComment }
+              employeePerformanceManagement { supplierComment }
+              timeKeepingManagement { supplierComment }
+              managementOfPractises { supplierComment }
+              managementOfWorkforce { supplierComment }
+              employeeAwareness { supplierComment }
+              employeeSelection { supplierComment }
+              employeeExitManagement { supplierComment }
+              grievanceAndFairTreatment { supplierComment }
+            }
+
+            businessInfo {
+              doesHavePolicyStatement { supplierComment }
+              ensureThroughoutCompany { supplierComment }
+              ensureThroughoutSupplyChain { supplierComment }
+              haveBeenSubjectToInvestigation { supplierComment }
+              doesHaveDocumentedPolicy { supplierComment }
+              whoIsResponsibleForPolicy { supplierComment }
+            }
+
+            evidenceInfo {
+              doesHaveHealthSafety
+              doesHaveDrugPolicy
+              doesPerformPreemployment
+              workProceduresConform
+              doesHaveFormalProcessForHSE
+              doesHaveSystemForTracking
+              doesHaveValidCertifications
+              doesHaveSystemForReporting
+              doesHaveLiabilityInsurance
+              doesHaveFormalProcessForHealth
+              isThereCurrentContract
+              doesHaveJobDescription
+              doesHaveTraining
+              doesHaveEmployeeRelatedProcedure
+              doesHaveTimeKeeping
+              doesHavePerformancePolicy
+              doesHaveProcessToSupport
+              employeesAwareOfRights
+              doesHaveSystemToEnsureSafeWork
+              doesHaveEmployeeSelectionProcedure
+              doesHaveEmployeeLaborProcedure
+              doesHaveGrievancePolicy
+              proccessToEnsurePolicesCompany
+              proccessToEnsurePolicesSupplyChain
+              hasBeenSubjectToInvestigation
+              doesHaveCorruptionPolicy
+              whoIsResponsibleForCorruptionPolicy
+            }
+          }
         }
       }
     `;
@@ -95,6 +170,7 @@ describe('Company queries', () => {
 
     expect(response.createdUser._id).toBe(user._id);
     expect(response.suppliers.length).toBe(1);
+    expect(response.responses.length).toBe(1);
 
     expect(response.date).toBeDefined();
   });

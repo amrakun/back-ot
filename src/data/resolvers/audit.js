@@ -1,4 +1,4 @@
-import { Users, Companies } from '../../db/models';
+import { Users, Companies, AuditResponses } from '../../db/models';
 
 export default {
   createdUser(audit) {
@@ -7,5 +7,9 @@ export default {
 
   suppliers(audit) {
     return Companies.find({ _id: { $in: audit.supplierIds } });
+  },
+
+  responses(audit) {
+    return AuditResponses.find({ auditId: audit._id });
   },
 };

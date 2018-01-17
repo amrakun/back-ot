@@ -123,6 +123,36 @@ export const types = `
     ${generateBusinessFields('Recommendation')}
   }
 
+  # types ==================
+
+  type AnswerRecommendation {
+    supplierComment: String
+    supplierAnswer: Boolean
+    auditorComment: String
+    auditorRecommendation: String
+    auditorScore: Boolean
+  }
+
+  type AuditBasicInfo {
+    ${basicInfoFields}
+  }
+
+  type AuditCoreHseqInfo {
+    ${generateCoreHseqFields('AnswerRecommendation')}
+  }
+
+  type AuditHrInfo {
+    ${generateHrFields('AnswerRecommendation')}
+  }
+
+  type AuditBusinessInfo {
+    ${generateBusinessFields('AnswerRecommendation')}
+  }
+
+  type AuditEvidenceInfo {
+    ${evidenceInfoFields}
+  }
+
   type Audit {
     _id: String!
     createdUserId: String
@@ -131,6 +161,16 @@ export const types = `
 
     createdUser: User
     suppliers: [Company]
+    responses: [AuditResponse]
+  }
+
+  type AuditResponse {
+    _id: String!
+    basicInfo: AuditBasicInfo
+    coreHseqInfo: AuditCoreHseqInfo
+    hrInfo: AuditHrInfo
+    businessInfo: AuditBusinessInfo
+    evidenceInfo: AuditEvidenceInfo
   }
 `;
 
