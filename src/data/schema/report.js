@@ -1,31 +1,11 @@
 export const types = `
-  input ReportsSuppliersFilterDateInterval {
-    startDate: Date
-    endDate: Date
-  }
-
-  input ReportsSuppliersFilterAffiliation {
-    country: String
-    province: String
-  }
-
-  enum ReportsSuppliersFilterStatus {
-    preQualified
-    validate
-  }
-
-  type ReportsSuppliersDifotScore {
-    date: Date,
-    amount: Int
-  }
-
   type ReportsSupplier {
     _id: String!
     isRegisteredOnSup: Boolean!
     enName: String!
     mnName: String!
     isPrequalified: Boolean!
-    difotScores: [ReportsSuppliersDifotScore!]!
+    averageDifotScore: Int
     isProductsInfoValidated: Boolean!
     address: String!
     address2: String!
@@ -56,11 +36,14 @@ export const types = `
 
 export const queries = `
   reportsSuppliers(
-    dateInterval: ReportsSuppliersFilterDateInterval,
-    affiliation: ReportsSuppliersFilterAffiliation,
-    sectCodes: [String!],
-    statuses: [ReportsSuppliersFilterStatus!],
+    productCode: [String],
+    isPrequalified: Boolean,
   ): [ReportsSupplier]
+
+  reportsSuppliersExport(
+    productCode: [String],
+    isPrequalified: Boolean,
+  ): String
 
   reportsTenders(
     type: ReportsTendersType,

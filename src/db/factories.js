@@ -121,7 +121,8 @@ export const supplierFactory = (params = {}) => {
     isPrequalified: params.isPrequalified || false,
 
     difotScores: params.difotScores || [],
-    averageDifotScore: params.averageDifotScore || 0,
+    averageDifotScore:
+      params.averageDifotScore !== undefined ? params.averageDifotScore : faker.random.number(),
     dueDiligences: params.dueDiligences || [],
   };
 
