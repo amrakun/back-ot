@@ -10,6 +10,8 @@ import {
   Feedbacks,
   FeedbackResponses,
   Qualifications,
+  Audits,
+  AuditResponses,
 } from './models';
 
 /*
@@ -449,4 +451,135 @@ export const qualificationFactory = async (params = {}) => {
   });
 
   return save(qualification);
+};
+
+export const auditFactory = async (params = {}) => {
+  const audit = new Audits({
+    date: params.publishDate || new Date(),
+    supplierIds: params.supplierIds || ['id1', 'id2'],
+    createdUserId: params.createdUserId,
+  });
+
+  return save(audit);
+};
+
+export const auditResponseFactory = async (params = {}) => {
+  if (!params.auditId) {
+    const audit = await auditFactory();
+    params.auditId = audit._id;
+  }
+
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
+  const auditResponse = new AuditResponses({
+    auditId: params.auditId,
+    supplierId: params.supplierId,
+    coreHseqInfo: params.coreHseqInfo || {},
+  });
+
+  return save(auditResponse);
+};
+
+// audit response docs ====================
+const generateSection = (fields, supplier = true, buyer = true) => {
+  const value = {};
+
+  for (let field of fields) {
+    value[field] = {};
+
+    if (supplier) {
+      value[field].supplierComment = 'supplierComment';
+      value[field].supplierAnswer = false;
+    }
+
+    if (buyer) {
+      value[field].auditorComment = 'auditorComment';
+      value[field].auditorRecommendation = 'auditorRecommendation';
+      value[field].auditorScore = true;
+    }
+  }
+
+  return value;
+};
+
+export const auditResponseDocs = {
+  coreHseqInfo: (...args) =>
+    generateSection(
+      [
+        'doesHaveHealthSafety',
+        'doesHaveDocumentedPolicy',
+        'doesPerformPreemployment',
+        'doWorkProceduresConform',
+        'doesHaveTrackingSystem',
+        'doesHaveValidIndustry',
+        'doesHaveFormalProcessForReporting',
+        'doesHaveLiabilityInsurance',
+        'doesHaveFormalProcessForHealth',
+      ],
+      ...args,
+    ),
+
+  hrInfo: (...args) =>
+    generateSection(
+      [
+        'workContractManagement',
+        'jobDescriptionProcedure',
+        'trainingDevelopment',
+        'employeePerformanceManagement',
+        'timeKeepingManagement',
+        'managementOfPractises',
+        'managementOfWorkforce',
+        'employeeAwareness',
+        'employeeSelection',
+        'employeeExitManagement',
+        'grievanceAndFairTreatment',
+      ],
+      ...args,
+    ),
+
+  businessInfo: (...args) =>
+    generateSection(
+      [
+        'doesHavePolicyStatement',
+        'ensureThroughoutCompany',
+        'ensureThroughoutSupplyChain',
+        'haveBeenSubjectToInvestigation',
+        'doesHaveDocumentedPolicy',
+        'whoIsResponsibleForPolicy',
+      ],
+      ...args,
+    ),
+
+  evidenceInfo: () => ({
+    doesHaveHealthSafety: true,
+    doesHaveDrugPolicy: true,
+    doesPerformPreemployment: true,
+    workProceduresConform: true,
+    doesHaveFormalProcessForHSE: true,
+    doesHaveSystemForTracking: false,
+    doesHaveValidCertifications: true,
+    doesHaveSystemForReporting: true,
+    doesHaveLiabilityInsurance: true,
+    doesHaveFormalProcessForHealth: true,
+    isThereCurrentContract: false,
+    doesHaveJobDescription: true,
+    doesHaveTraining: true,
+    doesHaveEmployeeRelatedProcedure: true,
+    doesHaveTimeKeeping: true,
+    doesHavePerformancePolicy: false,
+    doesHaveProcessToSupport: true,
+    employeesAwareOfRights: true,
+    doesHaveSystemToEnsureSafeWork: false,
+    doesHaveEmployeeSelectionProcedure: true,
+    doesHaveEmployeeLaborProcedure: true,
+    doesHaveGrievancePolicy: true,
+    proccessToEnsurePolicesCompany: true,
+    proccessToEnsurePolicesSupplyChain: true,
+    hasBeenSubjectToInvestigation: false,
+    doesHaveCorruptionPolicy: true,
+    whoIsResponsibleForCorruptionPolicy: true,
+  }),
 };

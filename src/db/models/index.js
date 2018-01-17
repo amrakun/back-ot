@@ -4,6 +4,7 @@ import { Tenders, TenderResponses } from './Tenders';
 import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
+import { Audits, AuditResponses } from './Audits';
 
 export {
   Companies,
@@ -14,4 +15,6 @@ export {
   FeedbackResponses,
   BlockedCompanies,
   Qualifications,
+  Audits,
+  AuditResponses,
 };

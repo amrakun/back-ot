@@ -30,6 +30,7 @@ import {
   mutations as QualificationMutations,
 } from './qualification';
 
+import { types as AuditTypes, queries as AuditQueries, mutations as AuditMutations } from './audit';
 import { types as ReportTypes, queries as ReportQueries } from './report';
 
 export const types = `
@@ -42,6 +43,7 @@ export const types = `
   ${FeedbackTypes}
   ${BlockedCompanyTypes}
   ${QualificationTypes}
+  ${AuditTypes}
   ${ReportTypes}
 `;
 
@@ -53,6 +55,7 @@ export const queries = `
     ${FeedbackQueries}
     ${BlockedCompanyQueries}
     ${QualificationQueries}
+    ${AuditQueries}
     ${ReportQueries}
   }
 `;
@@ -65,5 +68,6 @@ export const mutations = `
     ${FeedbackMutations}
     ${BlockedCompanyMutations}
     ${QualificationMutations}
+    ${AuditMutations}
   }
 `;
