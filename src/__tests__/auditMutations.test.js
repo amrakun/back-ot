@@ -120,6 +120,43 @@ describe('Audit mutations', () => {
     });
   });
 
+  test('Save evidence info', async () => {
+    Audits.saveEvidenceInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
+
+    const args = {
+      supplierId: _company._id,
+      auditId: _audit._id,
+      evidenceInfo: auditResponseDocs.evidenceInfo(),
+    };
+
+    const mutation = `
+      mutation auditsSupplierSaveEvidenceInfo(
+        $auditId: String,
+        $supplierId: String,
+        $evidenceInfo: AuditSupplierEvidenceInfoInput
+      ) {
+
+        auditsSupplierSaveEvidenceInfo(
+          auditId: $auditId,
+          supplierId: $supplierId,
+          evidenceInfo: $evidenceInfo
+        ) {
+          _id
+        }
+      }
+    `;
+
+    await graphqlRequest(mutation, 'auditsSaveEvidenceInfo', args, { user: _user });
+
+    expect(Audits.saveEvidenceInfo.mock.calls.length).toBe(1);
+
+    expect(Audits.saveEvidenceInfo).toBeCalledWith({
+      supplierId: args.supplierId,
+      auditId: args.auditId,
+      doc: args.evidenceInfo,
+    });
+  });
+
   const callReplyRecommendMutation = async (mutation, name, isSupplier) => {
     Audits.saveReplyRecommentSection = jest.fn(() => ({ _id: 'DFAFDA' }));
 

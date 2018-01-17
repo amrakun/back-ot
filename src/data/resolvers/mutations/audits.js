@@ -34,6 +34,12 @@ auditMutations.auditsSupplierSaveBasicInfo = (root, { auditId, supplierId, basic
   return Audits.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
 };
 
+// save evidence info
+auditMutations.auditsSupplierSaveEvidenceInfo = (root, { auditId, supplierId, evidenceInfo }) => {
+  return Audits.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
+};
+
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
+requireSupplier(auditMutations, 'auditsSupplierSaveEvidenceInfo');
 
 export default auditMutations;
