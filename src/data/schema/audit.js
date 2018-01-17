@@ -131,6 +131,8 @@ export const types = `
 export const queries = ``;
 
 export const mutations = `
+  auditsAdd(date: Date!, supplierIds: [String]!): Audit
+
   auditsSupplierSaveBasicInfo(
     auditId: String,
     supplierId: String,

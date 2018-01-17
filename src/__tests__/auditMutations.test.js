@@ -40,10 +40,11 @@ describe('Audit mutations', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
     const mutations = [
       'auditsSupplierSaveBasicInfo',
+      'auditsSupplierSaveEvidenceInfo',
       'auditsSupplierSaveCoreHseqInfo',
       'auditsSupplierSaveHrInfo',
       'auditsSupplierSaveBusinessInfo',
@@ -65,9 +66,10 @@ describe('Audit mutations', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     const mutations = [
+      'auditsAdd',
       'auditsBuyerSaveCoreHseqInfo',
       'auditsBuyerSaveHrInfo',
       'auditsBuyerSaveBusinessInfo',
@@ -78,6 +80,35 @@ describe('Audit mutations', () => {
     for (let mutation of mutations) {
       checkLogin(companyMutations[mutation], {}, { user });
     }
+  });
+
+  test('Create audit', async () => {
+    await Audits.remove({});
+
+    const args = {
+      supplierIds: [_company._id],
+      date: new Date(),
+    };
+
+    const mutation = `
+      mutation auditsAdd($supplierIds: [String]!, $date: Date!) {
+        auditsAdd(supplierIds: $supplierIds, date: $date) {
+          _id
+        }
+      }
+    `;
+
+    const user = await userFactory({ isSupplier: false });
+
+    await graphqlRequest(mutation, 'auditsAdd', args, { user });
+
+    expect(await Audits.find().count()).toBe(1);
+
+    const audit = await Audits.findOne({});
+
+    expect(audit.createdUserId).toBe(user._id);
+    expect(audit.date).toEqual(args.date);
+    expect(audit.supplierIds).toContain(_company._id);
   });
 
   test('Save basic info', async () => {

@@ -1,7 +1,22 @@
 import { Audits } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 
-const auditMutations = {};
+const auditMutations = {
+  // create new audit
+  auditsAdd(root, { date, supplierIds }, { user }) {
+    return Audits.createAudit({ date, supplierIds }, user._id);
+  },
+
+  // save basic info
+  auditsSupplierSaveBasicInfo(root, { auditId, supplierId, basicInfo }) {
+    return Audits.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
+  },
+
+  // save evidence info
+  auditsSupplierSaveEvidenceInfo(root, { auditId, supplierId, evidenceInfo }) {
+    return Audits.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
+  },
+};
 
 const sections = ['coreHseqInfo', 'hrInfo', 'businessInfo'];
 
@@ -29,16 +44,7 @@ sections.forEach(section => {
   requireBuyer(auditMutations, buyerName);
 });
 
-// save basic info
-auditMutations.auditsSupplierSaveBasicInfo = (root, { auditId, supplierId, basicInfo }) => {
-  return Audits.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
-};
-
-// save evidence info
-auditMutations.auditsSupplierSaveEvidenceInfo = (root, { auditId, supplierId, evidenceInfo }) => {
-  return Audits.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
-};
-
+requireBuyer(auditMutations, 'auditsAdd');
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSaveEvidenceInfo');
 
