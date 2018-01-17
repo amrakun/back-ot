@@ -387,6 +387,7 @@ export const auditFactory = async (params = {}) => {
   const audit = new Audits({
     date: params.publishDate || new Date(),
     supplierIds: params.supplierIds || ['id1', 'id2'],
+    createdUserId: params.createdUserId,
   });
 
   return save(audit);

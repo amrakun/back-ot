@@ -20,6 +20,7 @@ const auditMutations = {
 
 const sections = ['coreHseqInfo', 'hrInfo', 'businessInfo'];
 
+// create section mutations ===========
 sections.forEach(section => {
   // capitalize first letter
   const capsedName = section.charAt(0).toUpperCase() + section.slice(1);

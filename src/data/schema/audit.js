@@ -125,10 +125,19 @@ export const types = `
 
   type Audit {
     _id: String!
+    createdUserId: String
+    supplierIds: [String]
+    date: Date
+
+    createdUser: User
+    suppliers: [Company]
   }
 `;
 
-export const queries = ``;
+export const queries = `
+  audits: [Audit]
+  auditDetail(_id: String!): Audit
+`;
 
 export const mutations = `
   auditsAdd(date: Date!, supplierIds: [String]!): Audit
