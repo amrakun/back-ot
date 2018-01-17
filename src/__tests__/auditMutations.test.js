@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Audits, Companies } from '../db/models';
+import { Users, Audits, AuditResponses, Companies } from '../db/models';
 
 import { userFactory, companyFactory, auditFactory, auditResponseDocs } from '../db/factories';
 
@@ -112,7 +112,7 @@ describe('Audit mutations', () => {
   });
 
   test('Save basic info', async () => {
-    Audits.saveBasicInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
+    AuditResponses.saveBasicInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
 
     const args = {
       supplierId: _company._id,
@@ -142,9 +142,9 @@ describe('Audit mutations', () => {
 
     await graphqlRequest(mutation, 'auditsSaveBasicInfo', args, { user: _user });
 
-    expect(Audits.saveBasicInfo.mock.calls.length).toBe(1);
+    expect(AuditResponses.saveBasicInfo.mock.calls.length).toBe(1);
 
-    expect(Audits.saveBasicInfo).toBeCalledWith({
+    expect(AuditResponses.saveBasicInfo).toBeCalledWith({
       supplierId: args.supplierId,
       auditId: args.auditId,
       doc: args.basicInfo,
@@ -152,7 +152,7 @@ describe('Audit mutations', () => {
   });
 
   test('Save evidence info', async () => {
-    Audits.saveEvidenceInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
+    AuditResponses.saveEvidenceInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
 
     const args = {
       supplierId: _company._id,
@@ -179,9 +179,9 @@ describe('Audit mutations', () => {
 
     await graphqlRequest(mutation, 'auditsSaveEvidenceInfo', args, { user: _user });
 
-    expect(Audits.saveEvidenceInfo.mock.calls.length).toBe(1);
+    expect(AuditResponses.saveEvidenceInfo.mock.calls.length).toBe(1);
 
-    expect(Audits.saveEvidenceInfo).toBeCalledWith({
+    expect(AuditResponses.saveEvidenceInfo).toBeCalledWith({
       supplierId: args.supplierId,
       auditId: args.auditId,
       doc: args.evidenceInfo,
@@ -189,7 +189,7 @@ describe('Audit mutations', () => {
   });
 
   const callReplyRecommendMutation = async (mutation, name, isSupplier) => {
-    Audits.saveReplyRecommentSection = jest.fn(() => ({ _id: 'DFAFDA' }));
+    AuditResponses.saveReplyRecommentSection = jest.fn(() => ({ _id: 'DFAFDA' }));
 
     const context = {
       user: await userFactory({ companyId: _company._id, isSupplier }),
@@ -209,9 +209,9 @@ describe('Audit mutations', () => {
 
     await graphqlRequest(mutation, name, args, context);
 
-    expect(Audits.saveReplyRecommentSection.mock.calls.length).toBe(1);
+    expect(AuditResponses.saveReplyRecommentSection.mock.calls.length).toBe(1);
 
-    expect(Audits.saveReplyRecommentSection).toBeCalledWith({
+    expect(AuditResponses.saveReplyRecommentSection).toBeCalledWith({
       supplierId: args.supplierId,
       auditId: args.auditId,
       name,

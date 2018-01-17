@@ -1,4 +1,4 @@
-import { Audits } from '../../../db/models';
+import { Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 
 const auditMutations = {
@@ -9,12 +9,12 @@ const auditMutations = {
 
   // save basic info
   auditsSupplierSaveBasicInfo(root, { auditId, supplierId, basicInfo }) {
-    return Audits.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
+    return AuditResponses.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
   },
 
   // save evidence info
   auditsSupplierSaveEvidenceInfo(root, { auditId, supplierId, evidenceInfo }) {
-    return Audits.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
+    return AuditResponses.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
   },
 };
 
@@ -26,7 +26,7 @@ sections.forEach(section => {
   const capsedName = section.charAt(0).toUpperCase() + section.slice(1);
 
   const mutation = (root, args) => {
-    return Audits.saveReplyRecommentSection({
+    return AuditResponses.saveReplyRecommentSection({
       auditId: args.auditId,
       supplierId: args.supplierId,
       name: section,
