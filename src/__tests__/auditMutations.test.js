@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Audits, Companies } from '../db/models';
+import { Users, Audits, Companies } from '../db/models';
 
 import { userFactory, companyFactory, auditFactory, auditResponseDocs } from '../db/factories';
 
@@ -13,17 +13,20 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Audit mutations', () => {
+  let _user;
   let _company;
   let _audit;
 
   beforeEach(async () => {
     // Creating test data
     _company = await companyFactory();
+    _user = await userFactory({ companyId: _company._id, isSupplier: true });
     _audit = await auditFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
+    await Users.remove({});
     await Companies.remove({});
     await Audits.remove({});
   });
@@ -37,9 +40,10 @@ describe('Audit mutations', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     const mutations = [
+      'auditsSupplierSaveBasicInfo',
       'auditsSupplierSaveCoreHseqInfo',
       'auditsSupplierSaveHrInfo',
       'auditsSupplierSaveBusinessInfo',
@@ -74,6 +78,46 @@ describe('Audit mutations', () => {
     for (let mutation of mutations) {
       checkLogin(companyMutations[mutation], {}, { user });
     }
+  });
+
+  test('Save basic info', async () => {
+    Audits.saveBasicInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
+
+    const args = {
+      supplierId: _company._id,
+      auditId: _audit._id,
+      basicInfo: {
+        sotri: 'sotri',
+        sotie: 'sotie',
+      },
+    };
+
+    const mutation = `
+      mutation auditsSupplierSaveBasicInfo(
+        $auditId: String,
+        $supplierId: String,
+        $basicInfo: AuditSupplierBasicInfoInput
+      ) {
+
+        auditsSupplierSaveBasicInfo(
+          auditId: $auditId,
+          supplierId: $supplierId,
+          basicInfo: $basicInfo
+        ) {
+          _id
+        }
+      }
+    `;
+
+    await graphqlRequest(mutation, 'auditsSaveBasicInfo', args, { user: _user });
+
+    expect(Audits.saveBasicInfo.mock.calls.length).toBe(1);
+
+    expect(Audits.saveBasicInfo).toBeCalledWith({
+      supplierId: args.supplierId,
+      auditId: args.auditId,
+      doc: args.basicInfo,
+    });
   });
 
   const callReplyRecommendMutation = async (mutation, name, isSupplier) => {

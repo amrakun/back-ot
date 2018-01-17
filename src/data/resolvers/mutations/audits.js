@@ -29,4 +29,11 @@ sections.forEach(section => {
   requireBuyer(auditMutations, buyerName);
 });
 
+// save basic info
+auditMutations.auditsSupplierSaveBasicInfo = (root, { auditId, supplierId, basicInfo }) => {
+  return Audits.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
+};
+
+requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
+
 export default auditMutations;

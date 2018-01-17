@@ -1,3 +1,8 @@
+const basicInfoFields = `
+  sotri: String
+  sotie: String
+`;
+
 const generateCoreHseqFields = type => `
   doesHaveHealthSafety: ${type}
   doesHaveDocumentedPolicy: ${type}
@@ -45,32 +50,40 @@ export const types = `
     auditorScore: Boolean
   }
 
-  # supplier core hseq info ======================
+  # supplier ======================
+
+  # basic info
+  input AuditSupplierBasicInfoInput {
+    ${basicInfoFields}
+  }
+
+  # core hseq info
   input AuditSupplierCoreHseqInfoInput {
     ${generateCoreHseqFields('Answer')}
   }
 
-  # supplier hr info ======================
+  # hr info
   input AuditSupplierHrInfoInput {
     ${generateHrFields('Answer')}
   }
 
-  # supplier business info ======================
+  # business info
   input AuditSupplierBusinessInfoInput {
     ${generateBusinessFields('Answer')}
   }
 
-  # buyer core hseq info ======================
+  # buyer ======================
+  # core hseq info
   input AuditBuyerCoreHseqInfoInput {
     ${generateCoreHseqFields('Recommendation')}
   }
 
-  # buyer hr info ======================
+  # hr info
   input AuditBuyerHrInfoInput {
     ${generateHrFields('Recommendation')}
   }
 
-  # buyer business info ======================
+  # business info
   input AuditBuyerBusinessInfoInput {
     ${generateBusinessFields('Recommendation')}
   }
@@ -83,6 +96,12 @@ export const types = `
 export const queries = ``;
 
 export const mutations = `
+  auditsSupplierSaveBasicInfo(
+    auditId: String,
+    supplierId: String,
+    basicInfo: AuditSupplierBasicInfoInput
+  ): Audit
+
   auditsSupplierSaveCoreHseqInfo(
     auditId: String,
     supplierId: String,
