@@ -186,11 +186,15 @@ export const types = `
   type AuditResponse {
     _id: String!
     auditId: String,
+    supplierId: String,
+
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
     businessInfo: AuditBusinessInfo
     evidenceInfo: AuditEvidenceInfo
+
+    supplier: Company
   }
 `;
 

@@ -108,6 +108,11 @@ describe('Company queries', () => {
 
           responses {
             _id
+
+            supplier {
+              _id
+            }
+
             basicInfo {
               sotri
               sotie
@@ -189,6 +194,8 @@ describe('Company queries', () => {
     expect(response.createdUser._id).toBe(user._id);
     expect(response.suppliers.length).toBe(1);
     expect(response.responses.length).toBe(1);
+
+    expect(response.responses[0].supplier._id).toBeDefined();
 
     expect(response.date).toBeDefined();
   });
