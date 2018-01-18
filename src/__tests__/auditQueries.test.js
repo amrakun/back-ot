@@ -33,11 +33,11 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(2);
+    expect.assertions(3);
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['audits', 'auditDetail']) {
+    for (let query of ['audits', 'auditDetail', 'auditResponseDetail']) {
       checkLogin(queries[query], {}, { user });
     }
   });
@@ -192,9 +192,11 @@ describe('Company queries', () => {
     const response = await graphqlRequest(query, 'auditDetail', args, context);
 
     expect(response.createdUser._id).toBe(user._id);
-    expect(response.suppliers.length).toBe(1);
-    expect(response.responses.length).toBe(1);
 
+    expect(response.suppliers.length).toBe(1);
+    expect(response.suppliers[0]._id).toBeDefined();
+
+    expect(response.responses.length).toBe(1);
     expect(response.responses[0].supplier._id).toBeDefined();
 
     expect(response.date).toBeDefined();
@@ -218,5 +220,31 @@ describe('Company queries', () => {
     const response = await graphqlRequest(query, 'auditResponseByUser', args, context);
 
     expect(response.auditId).toBe(args.auditId);
+  });
+
+  test('auditResponseDetail', async () => {
+    const query = `
+      query auditResponseDetail($auditId: String!, $supplierId: String!) {
+        auditResponseDetail(auditId: $auditId, supplierId: $supplierId) {
+          _id
+          auditId
+          supplierId
+        }
+      }
+    `;
+
+    const auditResponse = await auditResponseFactory();
+
+    const args = {
+      auditId: auditResponse.auditId,
+      supplierId: auditResponse.supplierId,
+    };
+
+    const context = { user: await userFactory({ isSupplier: false }) };
+
+    const response = await graphqlRequest(query, 'auditResponseDetail', args, context);
+
+    expect(response.auditId).toBe(args.auditId);
+    expect(response.supplierId).toBe(args.supplierId);
   });
 });

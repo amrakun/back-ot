@@ -202,6 +202,8 @@ export const types = `
 export const queries = `
   audits: [Audit]
   auditDetail(_id: String!): Audit
+
+  auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
   auditResponseByUser(auditId: String!): AuditResponse
 `;
 
