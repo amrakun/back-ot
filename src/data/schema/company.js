@@ -95,7 +95,7 @@ const dateFileFields = `
 export const financialInfoFields = `
   canProvideAccountsInfo: Boolean
   reasonToCannotNotProvide: String
-  currency: String!
+  currency: String
   isUpToDateSSP: Boolean
   isUpToDateCTP: Boolean
 `;
