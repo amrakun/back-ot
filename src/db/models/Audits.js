@@ -65,6 +65,10 @@ const CoreHseqInfoSchema = mongoose.Schema(
     // Do the organizations work procedures conform to local statutory
     doWorkProceduresConform: ReplyRecommendSchema,
 
+    // Does the organisation have a formal process for HSE induction and
+    // orientation of new hire employees, contractors and sub-contractors?
+    doesHaveFormalProcess: ReplyRecommendSchema,
+
     // Does the organization have a system or process for tracking
     doesHaveTrackingSystem: ReplyRecommendSchema,
 

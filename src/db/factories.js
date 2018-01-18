@@ -443,6 +443,7 @@ export const auditResponseDocs = {
         'doesHaveDocumentedPolicy',
         'doesPerformPreemployment',
         'doWorkProceduresConform',
+        'doesHaveFormalProcess',
         'doesHaveTrackingSystem',
         'doesHaveValidIndustry',
         'doesHaveFormalProcessForReporting',

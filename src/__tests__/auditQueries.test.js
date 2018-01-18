@@ -149,7 +149,7 @@ describe('Company queries', () => {
               ensureThroughoutCompany { supplierComment }
               ensureThroughoutSupplyChain { supplierComment }
               haveBeenSubjectToInvestigation { supplierComment }
-              doesHaveDocumentedPolicy { supplierComment }
+              doesHaveDocumentedPolicyToCorruption { supplierComment }
               whoIsResponsibleForPolicy { supplierComment }
             }
 

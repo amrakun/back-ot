@@ -38,6 +38,7 @@ const generateCoreHseqFields = type => `
   doesHaveDocumentedPolicy: ${type}
   doesPerformPreemployment: ${type}
   doWorkProceduresConform: ${type}
+  doesHaveFormalProcess: ${type}
   doesHaveTrackingSystem: ${type}
   doesHaveValidIndustry: ${type}
   doesHaveFormalProcessForReporting: ${type}
