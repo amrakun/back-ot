@@ -81,11 +81,58 @@ const reportsSuppliersQuery = {
   },
 
   async reportsTendersExport(root, { type, publishDate, closeDate }) {
-    const filter = {};
+    let filter = {};
 
-    await Tenders.find(filter);
+    if (publishDate) {
+      filter = publishDate.startDate
+        ? updateFilter({ publishDate: { $gte: publishDate.startDate } })
+        : filter;
+      filter = publishDate.endDate
+        ? updateFilter({ publishDate: { $lte: publishDate.endDate } })
+        : filter;
+    }
 
-    return 'test';
+    if (closeDate) {
+      filter = closeDate.startDate
+        ? updateFilter({ closeDate: { $gte: closeDate.startDate } })
+        : filter;
+      filter = closeDate.endDate
+        ? updateFilter({ closeDate: { $lte: closeDate.endDate } })
+        : filter;
+    }
+
+    if (type) {
+      filter = updateFilter({ type });
+    }
+
+    const tenders = await Tenders.find(filter);
+
+    const { workbook, sheet } = await readTemplate('reports_tenders');
+
+    let rowIndex = 1;
+
+    for (let it of tenders) {
+      rowIndex++;
+
+      sheet.cell(rowIndex, 1).value(rowIndex);
+      sheet.cell(rowIndex, 2).value(it.number);
+      sheet.cell(rowIndex, 3).value(it.name);
+
+      let suppliers = [];
+      for (let supplier of await Companies.find({ _id: it.supplierIds }, { enName: 1 })) {
+        suppliers.push(supplier.enName);
+      }
+
+      sheet.cell(rowIndex, 4).value(suppliers.join());
+      sheet.cell(rowIndex, 5).value(it.type);
+      sheet.cell(rowIndex, 6).value(it.publishDate.toString());
+      sheet.cell(rowIndex, 7).value(it.closeDate.toString());
+      sheet.cell(rowIndex, 8).value(it.status);
+      sheet.cell(rowIndex, 9).value(it.sentRegretLetter ? 'yes' : 'no');
+    }
+
+    // Write to file.
+    return generateXlsx(workbook, 'reports_tenders');
   },
 };
 
