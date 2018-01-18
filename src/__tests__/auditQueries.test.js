@@ -42,6 +42,24 @@ describe('Company queries', () => {
     }
   });
 
+  test('Suppiler required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(1);
+
+    const user = await userFactory({ isSupplier: false });
+
+    for (let query of ['auditResponseByUser']) {
+      checkLogin(queries[query], {}, { user });
+    }
+  });
+
   test('audits', async () => {
     const query = `
       query audits {
@@ -173,5 +191,25 @@ describe('Company queries', () => {
     expect(response.responses.length).toBe(1);
 
     expect(response.date).toBeDefined();
+  });
+
+  test('audit response by user', async () => {
+    const query = `
+      query auditResponseByUser($auditId: String!) {
+        auditResponseByUser(auditId: $auditId) {
+          _id
+          auditId
+        }
+      }
+    `;
+
+    const user = await userFactory({ companyId: _company._id, isSupplier: true });
+    const auditResponse = await auditResponseFactory({ supplierId: user.companyId });
+
+    const args = { auditId: auditResponse.auditId };
+    const context = { user };
+    const response = await graphqlRequest(query, 'auditResponseByUser', args, context);
+
+    expect(response.auditId).toBe(args.auditId);
   });
 });

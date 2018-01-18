@@ -185,6 +185,7 @@ export const types = `
 
   type AuditResponse {
     _id: String!
+    auditId: String,
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
@@ -196,6 +197,7 @@ export const types = `
 export const queries = `
   audits: [Audit]
   auditDetail(_id: String!): Audit
+  auditResponseByUser(auditId: String!): AuditResponse
 `;
 
 export const mutations = `
