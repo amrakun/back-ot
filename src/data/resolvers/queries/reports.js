@@ -1,26 +1,23 @@
 import { readTemplate, generateXlsx } from '../../utils';
 import { Companies, Tenders } from '../../../db/models';
 
-const updateFilter = (filter, additionalFilter) => ({ ...filter, ...additionalFilter });
-const getBasicInfo = (obj, key) => (obj.basicInfo && obj.basicInfo[key] ? obj.basicInfo[key] : '');
-const getBasicInfoAsInt = (obj, key) =>
-  obj.basicInfo && obj.basicInfo[key] ? obj.basicInfo[key] : 0;
-const getBasicInfoAsBoolean = (obj, key) =>
-  obj.basicInfo && obj.basicInfo[key] && obj.basicInfo[key] === true ? true : false;
-
 const reportsSuppliersQuery = {
-  async reportsSuppliersExport(root, { productCode, isPrequalified }) {
-    let filter = {};
+  /**
+   * Supplier list
+   * @param {Object} args - Query params
+   * @param {String[]} args.productCodes - List of product codes that will be matched with
+   * @param {boolean} args.isPrequalified - Company isPrequalified field
+   * @return {String} file url of the generated reports_suppliers.xlsx
+   */
+  async reportsSuppliersExport(root, { productCodes, isPrequalified }) {
+    const filter = {};
 
-    if (productCode) {
-      filter =
-        productCode.length > 0
-          ? updateFilter(filter, { validatedProductsInfo: { $all: productCode } })
-          : filter;
+    if (productCodes && productCodes.length > 0) {
+      filter.validatedProductsInfo = { $all: productCodes };
     }
 
     if (typeof isPrequalified === 'boolean') {
-      filter = updateFilter(filter, { isPrequalified });
+      filter.isPrequalified = isPrequalified;
     }
 
     const suppliers = await Companies.find(filter);
@@ -32,77 +29,82 @@ const reportsSuppliersQuery = {
     for (let it of suppliers) {
       rowIndex++;
 
-      sheet.cell(rowIndex, 1).value(getBasicInfoAsBoolean(it, 'isRegisteredOnSup'));
-      sheet.cell(rowIndex, 2).value(getBasicInfo(it, 'sapNumber'));
-      sheet.cell(rowIndex, 3).value(getBasicInfo(it, 'enName'));
-      sheet.cell(rowIndex, 4).value(getBasicInfo(it, 'mnName'));
-      sheet.cell(rowIndex, 5).value(getBasicInfo(it, 'averageDifotScore'));
+      const basicInfo = it.basicInfo || {};
 
-      sheet
-        .cell(rowIndex, 6)
-        .value(getBasicInfoAsBoolean(it, 'isProductsInfoValidated') ? 'yes' : 'no');
-      sheet.cell(rowIndex, 7).value(getBasicInfo(it, 'address'));
-      sheet.cell(rowIndex, 8).value(getBasicInfo(it, 'address2'));
-      sheet.cell(rowIndex, 9).value(getBasicInfo(it, 'address3'));
-      sheet.cell(rowIndex, 10).value(getBasicInfo(it, 'townOrCity'));
+      sheet.cell(rowIndex, 1).value(basicInfo.sRegisteredOnSup || false);
+      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber || '');
+      sheet.cell(rowIndex, 3).value(basicInfo.enName || '');
+      sheet.cell(rowIndex, 4).value(basicInfo.mnName || '');
+      sheet.cell(rowIndex, 5).value(basicInfo.averageDifotScore || '');
 
-      sheet.cell(rowIndex, 11).value(getBasicInfo(it, 'country'));
-      sheet.cell(rowIndex, 12).value(getBasicInfo(it, 'province'));
+      sheet.cell(rowIndex, 6).value(basicInfo.isProductsInfoValidated ? 'yes' : 'no');
 
-      sheet.cell(rowIndex, 13).value(getBasicInfo(it, 'registeredInCountry'));
-      sheet.cell(rowIndex, 14).value(getBasicInfo(it, 'registeredInAimag'));
-      sheet.cell(rowIndex, 15).value(getBasicInfo(it, 'registeredInSum'));
+      sheet.cell(rowIndex, 7).value(basicInfo.address || '');
+      sheet.cell(rowIndex, 8).value(basicInfo.address2 || '');
+      sheet.cell(rowIndex, 9).value(basicInfo.address3 || '');
+      sheet.cell(rowIndex, 10).value(basicInfo.townOrCity || '');
 
-      sheet.cell(rowIndex, 16).value(getBasicInfoAsBoolean(it, 'isChinese'));
-      sheet.cell(rowIndex, 17).value(getBasicInfoAsInt(it, 'registrationNumber'));
+      sheet.cell(rowIndex, 11).value(basicInfo.country || '');
+      sheet.cell(rowIndex, 12).value(basicInfo.province || '');
+
+      sheet.cell(rowIndex, 13).value(basicInfo.registeredInCountry || '');
+      sheet.cell(rowIndex, 14).value(basicInfo.registeredInAimag || '');
+      sheet.cell(rowIndex, 15).value(basicInfo.registeredInSum || '');
+
+      sheet.cell(rowIndex, 16).value(basicInfo.isChinese ? 'yes' : 'no');
+      sheet.cell(rowIndex, 17).value(basicInfo.registrationNumber || 0);
 
       sheet
         .cell(rowIndex, 18)
         .value(
-          (it &&
-            it.basicInfo.certificateOfRegistration &&
-            it.basicInfo.certificateOfRegistration.name &&
-            it.basicInfo.certificateOfRegistration.url) ||
-            '',
+          (basicInfo.certificateOfRegistration && basicInfo.certificateOfRegistration.url) || '',
         );
 
-      sheet.cell(rowIndex, 19).value(getBasicInfo(it, 'website'));
-      sheet.cell(rowIndex, 20).value(it.contactInfo ? it.contactInfo.phone : '');
-      sheet.cell(rowIndex, 21).value(getBasicInfo(it, 'email'));
-      sheet.cell(rowIndex, 22).value(getBasicInfo(it, 'foreignOwnershipPercentage'));
+      sheet.cell(rowIndex, 19).value(basicInfo.website || '');
+      sheet.cell(rowIndex, 20).value((it.contactInfo && it.contactInfo.phone) || '');
+      sheet.cell(rowIndex, 21).value(basicInfo.email || '');
+      sheet.cell(rowIndex, 22).value(basicInfo.foreignOwnershipPercentage || '');
 
-      sheet.cell(rowIndex, 23).value(getBasicInfoAsInt(it, 'totalNumberOfEmployees'));
-      sheet.cell(rowIndex, 24).value(getBasicInfoAsInt(it, 'totalNumberOfMongolianEmployees'));
-      sheet.cell(rowIndex, 25).value(getBasicInfoAsInt(it, 'totalNumberOfUmnugoviEmployees'));
+      sheet.cell(rowIndex, 23).value(basicInfo.totalNumberOfEmployees || 0);
+      sheet.cell(rowIndex, 24).value(basicInfo.totalNumberOfMongolianEmployees || 0);
+      sheet.cell(rowIndex, 25).value(basicInfo.totalNumberOfUmnugoviEmployees || 0);
     }
 
     // Write to file.
     return generateXlsx(workbook, 'reports_suppliers');
   },
 
+  /**
+   * Tender list
+   * @param {Object} args - Query params
+   * @param {Object} args.publishDate - Date interval object
+   * @param {Date} args.publishDate.startDate - The startDate of publishDate
+   * @param {Date} args.publishDate.endDate - The endDate of publishDate
+   * @param {Object} args.closeDate - Date interval object
+   * @param {Date} args.closeDate.startDate - The startDate of closeDate
+   * @param {Date} args.closeDate.endDate - The endDate of closeDate
+   * @param {String} args - Query params
+   * @return {String} file url of the generated reports_tenders.xlsx
+   */
   async reportsTendersExport(root, { type, publishDate, closeDate }) {
     let filter = {};
 
     if (publishDate) {
-      filter = publishDate.startDate
-        ? updateFilter({ publishDate: { $gte: publishDate.startDate } })
-        : filter;
-      filter = publishDate.endDate
-        ? updateFilter({ publishDate: { $lte: publishDate.endDate } })
-        : filter;
+      filter.publishDate = {
+        $gte: publishDate.startDate,
+        $lte: publishDate.endDate,
+      };
     }
 
     if (closeDate) {
-      filter = closeDate.startDate
-        ? updateFilter({ closeDate: { $gte: closeDate.startDate } })
-        : filter;
-      filter = closeDate.endDate
-        ? updateFilter({ closeDate: { $lte: closeDate.endDate } })
-        : filter;
+      filter.closeDate = {
+        $gte: closeDate.startDate,
+        $lte: closeDate.endDate,
+      };
     }
 
     if (type) {
-      filter = updateFilter({ type });
+      filter.type = type;
     }
 
     const tenders = await Tenders.find(filter);
@@ -116,7 +118,7 @@ const reportsSuppliersQuery = {
 
       sheet.cell(rowIndex, 1).value(rowIndex);
       sheet.cell(rowIndex, 2).value(it.number);
-      sheet.cell(rowIndex, 3).value(it.name);
+      sheet.cell(rowIndex, 3).value(it.name || '');
 
       let suppliers = [];
       for (let supplier of await Companies.find({ _id: it.supplierIds }, { enName: 1 })) {

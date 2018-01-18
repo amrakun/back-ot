@@ -5,14 +5,14 @@ export const types = `
   }
 
   input DateInterval {
-    startDate: Date
-    endDate: Date
+    startDate: Date!
+    endDate: Date!
   }
 `;
 
 export const queries = `
   reportsSuppliersExport(
-    productCode: [String],
+    productCodes: [String],
     isPrequalified: Boolean,
   ): String
 
