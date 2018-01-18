@@ -1,5 +1,6 @@
 import { readTemplate, generateXlsx } from '../../utils';
 import { Companies, Tenders } from '../../../db/models';
+import { moduleRequireBuyer } from '../../permissions';
 
 const reportsSuppliersQuery = {
   /**
@@ -137,5 +138,7 @@ const reportsSuppliersQuery = {
     return generateXlsx(workbook, 'reports_tenders');
   },
 };
+
+moduleRequireBuyer(reportsSuppliersQuery);
 
 export default reportsSuppliersQuery;
