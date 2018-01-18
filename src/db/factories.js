@@ -414,7 +414,7 @@ export const auditResponseFactory = async (params = {}) => {
 };
 
 // audit response docs ====================
-const generateSection = (fields, supplier = true, buyer = true) => {
+const generateSection = ({ fields, supplier = true, buyer = true, answerType }) => {
   const value = {};
 
   for (let field of fields) {
@@ -422,13 +422,13 @@ const generateSection = (fields, supplier = true, buyer = true) => {
 
     if (supplier) {
       value[field].supplierComment = 'supplierComment';
-      value[field].supplierAnswer = false;
+      value[field].supplierAnswer = answerType === 'number' ? 0 : false;
     }
 
     if (buyer) {
       value[field].auditorComment = 'auditorComment';
       value[field].auditorRecommendation = 'auditorRecommendation';
-      value[field].auditorScore = true;
+      value[field].auditorScore = answerType === 'number' ? 1 : true;
     }
   }
 
@@ -436,9 +436,9 @@ const generateSection = (fields, supplier = true, buyer = true) => {
 };
 
 export const auditResponseDocs = {
-  coreHseqInfo: (...args) =>
-    generateSection(
-      [
+  coreHseqInfo: (supplier, buyer) =>
+    generateSection({
+      fields: [
         'doesHaveHealthSafety',
         'doesHaveDocumentedPolicy',
         'doesPerformPreemployment',
@@ -449,12 +449,13 @@ export const auditResponseDocs = {
         'doesHaveLiabilityInsurance',
         'doesHaveFormalProcessForHealth',
       ],
-      ...args,
-    ),
+      supplier,
+      buyer,
+    }),
 
-  hrInfo: (...args) =>
-    generateSection(
-      [
+  hrInfo: (supplier, buyer) =>
+    generateSection({
+      fields: [
         'workContractManagement',
         'jobDescriptionProcedure',
         'trainingDevelopment',
@@ -467,12 +468,14 @@ export const auditResponseDocs = {
         'employeeExitManagement',
         'grievanceAndFairTreatment',
       ],
-      ...args,
-    ),
+      supplier,
+      buyer,
+      answerType: 'number',
+    }),
 
-  businessInfo: (...args) =>
-    generateSection(
-      [
+  businessInfo: (supplier, buyer) =>
+    generateSection({
+      fields: [
         'doesHavePolicyStatement',
         'ensureThroughoutCompany',
         'ensureThroughoutSupplyChain',
@@ -480,8 +483,9 @@ export const auditResponseDocs = {
         'doesHaveDocumentedPolicy',
         'whoIsResponsibleForPolicy',
       ],
-      ...args,
-    ),
+      supplier,
+      buyer,
+    }),
 
   evidenceInfo: () => ({
     doesHaveHealthSafety: true,

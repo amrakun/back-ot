@@ -80,6 +80,17 @@ export const types = `
     auditorScore: Boolean
   }
 
+  input HrAnswer {
+    supplierComment: String
+    supplierAnswer: Int
+  }
+
+  input HrRecommendation {
+    auditorComment: String
+    auditorRecommendation: String
+    auditorScore: Int
+  }
+
   # supplier ======================
 
   # basic info
@@ -94,7 +105,7 @@ export const types = `
 
   # hr info
   input AuditSupplierHrInfoInput {
-    ${generateHrFields('Answer')}
+    ${generateHrFields('HrAnswer')}
   }
 
   # business info
@@ -115,7 +126,7 @@ export const types = `
 
   # hr info
   input AuditBuyerHrInfoInput {
-    ${generateHrFields('Recommendation')}
+    ${generateHrFields('HrRecommendation')}
   }
 
   # business info
@@ -133,6 +144,14 @@ export const types = `
     auditorScore: Boolean
   }
 
+  type HrAnswerRecommendation {
+    supplierComment: String
+    supplierAnswer: Int
+    auditorComment: String
+    auditorRecommendation: String
+    auditorScore: Int
+  }
+
   type AuditBasicInfo {
     ${basicInfoFields}
   }
@@ -142,7 +161,7 @@ export const types = `
   }
 
   type AuditHrInfo {
-    ${generateHrFields('AnswerRecommendation')}
+    ${generateHrFields('HrAnswerRecommendation')}
   }
 
   type AuditBusinessInfo {
