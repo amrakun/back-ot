@@ -480,7 +480,7 @@ export const auditResponseDocs = {
         'ensureThroughoutCompany',
         'ensureThroughoutSupplyChain',
         'haveBeenSubjectToInvestigation',
-        'doesHaveDocumentedPolicy',
+        'doesHaveDocumentedPolicyToCorruption',
         'whoIsResponsibleForPolicy',
       ],
       supplier,

@@ -135,7 +135,7 @@ const BusinessInfoSchema = mongoose.Schema(
     haveBeenSubjectToInvestigation: ReplyRecommendSchema,
 
     // Does your company have a documented policy in place to prevent corruption
-    doesHaveDocumentedPolicy: ReplyRecommendSchema,
+    doesHaveDocumentedPolicyToCorruption: ReplyRecommendSchema,
 
     // If yes to above question who is responsible person/function for the
     // compliance/anti-corruption program

@@ -64,7 +64,7 @@ const generateBusinessFields = type => `
   ensureThroughoutCompany: ${type}
   ensureThroughoutSupplyChain: ${type}
   haveBeenSubjectToInvestigation: ${type}
-  doesHaveDocumentedPolicy: ${type}
+  doesHaveDocumentedPolicyToCorruption: ${type}
   whoIsResponsibleForPolicy: ${type}
 `;
 
