@@ -65,6 +65,10 @@ const CoreHseqInfoSchema = mongoose.Schema(
     // Do the organizations work procedures conform to local statutory
     doWorkProceduresConform: ReplyRecommendSchema,
 
+    // Does the organisation have a formal process for HSE induction and
+    // orientation of new hire employees, contractors and sub-contractors?
+    doesHaveFormalProcess: ReplyRecommendSchema,
+
     // Does the organization have a system or process for tracking
     doesHaveTrackingSystem: ReplyRecommendSchema,
 
@@ -86,20 +90,33 @@ const CoreHseqInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
-// human resource management
+// human resource management =========
+
+const HrReplyRecommendSchema = mongoose.Schema(
+  {
+    supplierComment: field({ type: String }),
+    supplierAnswer: field({ type: Number }),
+
+    auditorComment: field({ type: String }),
+    auditorRecommendation: field({ type: String }),
+    auditorScore: field({ type: Number }),
+  },
+  { _id: false },
+);
+
 const HrInfoSchema = mongoose.Schema(
   {
-    workContractManagement: ReplyRecommendSchema,
-    jobDescriptionProcedure: ReplyRecommendSchema,
-    trainingDevelopment: ReplyRecommendSchema,
-    employeePerformanceManagement: ReplyRecommendSchema,
-    timeKeepingManagement: ReplyRecommendSchema,
-    managementOfPractises: ReplyRecommendSchema,
-    managementOfWorkforce: ReplyRecommendSchema,
-    employeeAwareness: ReplyRecommendSchema,
-    employeeSelection: ReplyRecommendSchema,
-    employeeExitManagement: ReplyRecommendSchema,
-    grievanceAndFairTreatment: ReplyRecommendSchema,
+    workContractManagement: HrReplyRecommendSchema,
+    jobDescriptionProcedure: HrReplyRecommendSchema,
+    trainingDevelopment: HrReplyRecommendSchema,
+    employeePerformanceManagement: HrReplyRecommendSchema,
+    timeKeepingManagement: HrReplyRecommendSchema,
+    managementOfPractises: HrReplyRecommendSchema,
+    managementOfWorkforce: HrReplyRecommendSchema,
+    employeeAwareness: HrReplyRecommendSchema,
+    employeeSelection: HrReplyRecommendSchema,
+    employeeExitManagement: HrReplyRecommendSchema,
+    grievanceAndFairTreatment: HrReplyRecommendSchema,
   },
   { _id: false },
 );
@@ -122,7 +139,7 @@ const BusinessInfoSchema = mongoose.Schema(
     haveBeenSubjectToInvestigation: ReplyRecommendSchema,
 
     // Does your company have a documented policy in place to prevent corruption
-    doesHaveDocumentedPolicy: ReplyRecommendSchema,
+    doesHaveDocumentedPolicyToCorruption: ReplyRecommendSchema,
 
     // If yes to above question who is responsible person/function for the
     // compliance/anti-corruption program

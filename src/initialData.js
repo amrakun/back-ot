@@ -14,6 +14,7 @@ export const importData = async () => {
     username: 'admin',
     password: 'admin123',
     isSupplier: false,
+    role: 'admin',
     email: 'admin@ot.mn',
   });
 

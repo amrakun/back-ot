@@ -38,6 +38,7 @@ const generateCoreHseqFields = type => `
   doesHaveDocumentedPolicy: ${type}
   doesPerformPreemployment: ${type}
   doWorkProceduresConform: ${type}
+  doesHaveFormalProcess: ${type}
   doesHaveTrackingSystem: ${type}
   doesHaveValidIndustry: ${type}
   doesHaveFormalProcessForReporting: ${type}
@@ -64,7 +65,7 @@ const generateBusinessFields = type => `
   ensureThroughoutCompany: ${type}
   ensureThroughoutSupplyChain: ${type}
   haveBeenSubjectToInvestigation: ${type}
-  doesHaveDocumentedPolicy: ${type}
+  doesHaveDocumentedPolicyToCorruption: ${type}
   whoIsResponsibleForPolicy: ${type}
 `;
 
@@ -78,6 +79,17 @@ export const types = `
     auditorComment: String
     auditorRecommendation: String
     auditorScore: Boolean
+  }
+
+  input HrAnswer {
+    supplierComment: String
+    supplierAnswer: Int
+  }
+
+  input HrRecommendation {
+    auditorComment: String
+    auditorRecommendation: String
+    auditorScore: Int
   }
 
   # supplier ======================
@@ -94,7 +106,7 @@ export const types = `
 
   # hr info
   input AuditSupplierHrInfoInput {
-    ${generateHrFields('Answer')}
+    ${generateHrFields('HrAnswer')}
   }
 
   # business info
@@ -115,7 +127,7 @@ export const types = `
 
   # hr info
   input AuditBuyerHrInfoInput {
-    ${generateHrFields('Recommendation')}
+    ${generateHrFields('HrRecommendation')}
   }
 
   # business info
@@ -133,6 +145,14 @@ export const types = `
     auditorScore: Boolean
   }
 
+  type HrAnswerRecommendation {
+    supplierComment: String
+    supplierAnswer: Int
+    auditorComment: String
+    auditorRecommendation: String
+    auditorScore: Int
+  }
+
   type AuditBasicInfo {
     ${basicInfoFields}
   }
@@ -142,7 +162,7 @@ export const types = `
   }
 
   type AuditHrInfo {
-    ${generateHrFields('AnswerRecommendation')}
+    ${generateHrFields('HrAnswerRecommendation')}
   }
 
   type AuditBusinessInfo {
@@ -166,17 +186,25 @@ export const types = `
 
   type AuditResponse {
     _id: String!
+    auditId: String,
+    supplierId: String,
+
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
     businessInfo: AuditBusinessInfo
     evidenceInfo: AuditEvidenceInfo
+
+    supplier: Company
   }
 `;
 
 export const queries = `
   audits: [Audit]
   auditDetail(_id: String!): Audit
+
+  auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
+  auditResponseByUser(auditId: String!): AuditResponse
 `;
 
 export const mutations = `

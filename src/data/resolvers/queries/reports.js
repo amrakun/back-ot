@@ -122,6 +122,7 @@ const reportsSuppliersQuery = {
       sheet.cell(rowIndex, 3).value(it.name || '');
 
       let suppliers = [];
+
       for (let supplier of await Companies.find({ _id: it.supplierIds }, { enName: 1 })) {
         suppliers.push(supplier.enName);
       }
