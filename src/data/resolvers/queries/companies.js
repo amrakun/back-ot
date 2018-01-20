@@ -17,7 +17,11 @@ const companiesFilter = async args => {
     difotScore,
   } = args;
 
-  const selector = { basicInfo: { $ne: null } };
+  const selector = {
+    // ignore incomplete suppliers
+    isSentRegistrationInfo: true,
+    isSentPrequalificationInfo: true,
+  };
 
   // main filter
   if (search) {

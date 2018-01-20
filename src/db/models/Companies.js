@@ -405,6 +405,9 @@ const CompanySchema = mongoose.Schema({
   isProductsInfoValidated: field({ type: Boolean }),
   productsInfoLastValidatedDate: field({ type: Date }),
 
+  isSentRegistrationInfo: field({ type: Boolean, default: false }),
+  isSentPrequalificationInfo: field({ type: Boolean, default: false }),
+
   // capacity building certificate information
   certificateInfo: CertificateInfoSchema,
 
@@ -590,6 +593,24 @@ class Company {
       isProductsInfoValidated,
       productsInfoLastValidatedDate: new Date(),
     });
+
+    return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * Mark as sent registration info
+   */
+  async sendRegistrationInfo() {
+    await this.update({ isSentRegistrationInfo: true });
+
+    return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * Mark as sent prequalification info
+   */
+  async sendPrequalificationInfo() {
+    await this.update({ isSentPrequalificationInfo: true });
 
     return Companies.findOne({ _id: this._id });
   }

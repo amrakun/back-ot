@@ -35,8 +35,19 @@ const companyMutations = {
 
     return company.validateProductsInfo(codes);
   },
-};
 
+  async companiesSendRegistrationInfo(root, { _id }) {
+    const company = await Companies.findOne({ _id });
+
+    return company.sendRegistrationInfo();
+  },
+
+  async companiesSendPrequalificationInfo(root, { _id }) {
+    const company = await Companies.findOne({ _id });
+
+    return company.sendPrequalificationInfo();
+  },
+};
 const sections = [
   'basic',
   'contact',
@@ -62,6 +73,9 @@ sections.forEach(section => {
 
   requireSupplier(companyMutations, name);
 });
+
+requireSupplier(companyMutations, 'companiesSendRegistrationInfo');
+requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
 
 requireBuyer(companyMutations, 'companiesAddDifotScores');
 requireBuyer(companyMutations, 'companiesAddDueDiligences');

@@ -343,6 +343,9 @@ export const types = `
     environmentalInfo: CompanyEnvironmentalInfo
     healthInfo: CompanyHealthInfo
 
+    isSentRegistrationInfo: Boolean
+    isSentPrequalificationInfo: Boolean
+
     isPrequalified: Boolean
 
     averageDifotScore: Float
@@ -402,4 +405,7 @@ export const mutations = `
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
   companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
+
+  companiesSendRegistrationInfo(_id: String!): Company
+  companiesSendPrequalificationInfo(_id: String!): Company
 `;

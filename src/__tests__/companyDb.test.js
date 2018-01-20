@@ -39,6 +39,8 @@ describe('Companies model tests', () => {
 
     expect(company).toBeDefined();
     expect(company._id).toBeDefined();
+    expect(company.isSentRegistrationInfo).toBe(false);
+    expect(company.isSentPrequalificationInfo).toBe(false);
 
     const updatedUser = await Users.findOne({ _id: user._id });
 
@@ -169,5 +171,25 @@ describe('Companies model tests', () => {
     updatedCompany = await updatedCompany.validateProductsInfo(['code10']);
 
     expect(updatedCompany.validatedProductsInfo).not.toContain('code10');
+  });
+
+  test('send registration info', async () => {
+    const company = await Companies.findOne({ _id: _company._id });
+
+    await company.sendRegistrationInfo();
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.isSentRegistrationInfo).toBe(true);
+  });
+
+  test('send prequalification info', async () => {
+    const company = await Companies.findOne({ _id: _company._id });
+
+    await company.sendPrequalificationInfo();
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.isSentPrequalificationInfo).toBe(true);
   });
 });

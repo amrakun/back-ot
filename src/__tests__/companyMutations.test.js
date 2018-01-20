@@ -32,7 +32,7 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(11);
+    expect.assertions(13);
 
     const mutations = [
       'companiesEditBasicInfo',
@@ -46,6 +46,9 @@ describe('Company mutations', () => {
       'companiesEditBusinessInfo',
       'companiesEditEnvironmentalInfo',
       'companiesEditHealthInfo',
+
+      'companiesSendRegistrationInfo',
+      'companiesSendPrequalificationInfo',
     ];
 
     const user = await userFactory();
@@ -336,5 +339,50 @@ describe('Company mutations', () => {
 
     expect(updatedSupplier.validatedProductsInfo).toContain('code1');
     expect(updatedSupplier.validatedProductsInfo).toContain('code2');
+  });
+
+  test('send registration info', async () => {
+    const mutation = `
+      mutation companiesSendRegistrationInfo($_id: String!) {
+        companiesSendRegistrationInfo(_id: $_id) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id, isSupplier: true }),
+    };
+
+    await graphqlRequest(mutation, 'companiesSendRegistrationInfo', { _id: _company._id }, context);
+
+    const updatedSupplier = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedSupplier.isSentRegistrationInfo).toBe(true);
+  });
+
+  test('send prequalification info', async () => {
+    const mutation = `
+      mutation companiesSendPrequalificationInfo($_id: String!) {
+        companiesSendPrequalificationInfo(_id: $_id) {
+          _id
+        }
+      }
+    `;
+
+    const context = {
+      user: await userFactory({ companyId: _company._id, isSupplier: true }),
+    };
+
+    await graphqlRequest(
+      mutation,
+      'companiesSendPrequalificationInfo',
+      { _id: _company._id },
+      context,
+    );
+
+    const updatedSupplier = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedSupplier.isSentPrequalificationInfo).toBe(true);
   });
 });

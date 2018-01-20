@@ -47,6 +47,9 @@ describe('Company queries', () => {
         isProductsInfoValidated
         productsInfoLastValidatedDate
 
+      isSentRegistrationInfo
+      isSentPrequalificationInfo
+
         isPrequalified
 
         averageDifotScore

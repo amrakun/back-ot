@@ -28,6 +28,14 @@ const save = async object => {
 };
 
 export const companyFactory = (params = {}) => {
+  if (typeof params.isSentRegistrationInfo === 'undefined') {
+    params.isSentRegistrationInfo = true;
+  }
+
+  if (typeof params.isSentPrequalificationInfo === 'undefined') {
+    params.isSentPrequalificationInfo = true;
+  }
+
   const company = new Companies({
     basicInfo: {
       enName: params.enName || faker.random.word(),
@@ -52,6 +60,9 @@ export const companyFactory = (params = {}) => {
     validatedProductsInfo: params.validatedProductsInfo || [],
     isProductsInfoValidated: params.isProductsInfoValidated || false,
     productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
+
+    isSentRegistrationInfo: params.isSentRegistrationInfo,
+    isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
     isPrequalified: params.isPrequalified || false,
 
