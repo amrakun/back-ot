@@ -384,6 +384,7 @@ export const queries = `
 
   companyDetail(_id: String!): Company
   companyByUser: Company
+  suppliersProfileDetail(_id: String!): String
 `;
 
 export const mutations = `

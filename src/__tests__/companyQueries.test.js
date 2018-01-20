@@ -250,4 +250,72 @@ describe('Company queries', () => {
     // audits
     expect(company.audits.length).toBe(1);
   });
+
+  test('supplierProfileDetail', async () => {
+    const validatedDate = new Date();
+
+    const _company = await companyFactory({
+      validatedProductsInfo: ['code1', 'code2'],
+      isProductsInfoValidated: true,
+      productsInfoLastValidatedDate: validatedDate,
+    });
+
+    const response = await graphqlRequest(
+      `
+      query suppliersProfileDetail($_id: String!) {
+        suppliersProfileDetail(_id: $_id)
+      }`,
+      'suppliersProfileDetail',
+      { _id: _company._id },
+    );
+
+    const { basicInfo = {}, contactInfo = {} } = _company;
+
+    // basic
+    console.log('_company');
+    console.log('  -- basic  ');
+    console.log('  enName: ', basicInfo.enName);
+    console.log('  address: ', basicInfo.address);
+    console.log('  address2: ', basicInfo.address2);
+    console.log('  address3: ', basicInfo.address3);
+
+    console.log('  townOrCity: ', basicInfo.townOrCity);
+    console.log('  province: ', basicInfo.province);
+    console.log('  zipCode: ', basicInfo.zipCode);
+    console.log('  country: ', basicInfo.country);
+
+    console.log('  registeredInCountry: ', basicInfo.country);
+    console.log('  registeredInAimag: ', basicInfo.registeredInAimag);
+    console.log('  registeredInSum: ', basicInfo.registeredInSum);
+
+    console.log('  isChinese: ', basicInfo.isChinese ? 'yes' : 'no');
+    console.log('  isSubContractor: ', basicInfo.isSubContractor ? 'yes' : 'no');
+    console.log('  corporateStructure: ', basicInfo.corporateStructure);
+
+    console.log('  registrationNumber: ', basicInfo.registrationNumber);
+    console.log(
+      '  certificateOfRegistration: ',
+      basicInfo.certificateOfRegistration ? basicInfo.certificateOfRegistration.url : '',
+    );
+    console.log('  website: ', basicInfo.website);
+    console.log('  email: ', basicInfo.email);
+    console.log('  foreignOwnershipPercentage: ', basicInfo.foreignOwnershipPercentage);
+
+    console.log('  totalNumberOfEmployees: ', basicInfo.totalNumberOfEmployees);
+    console.log('  totalNumberOfMongolianEmployees: ', basicInfo.totalNumberOfMongolianEmployees);
+    console.log('  totalNumberOfUmnugoviEmployees: ', basicInfo.totalNumberOfUmnugoviEmployees);
+
+    // contact
+    console.log('  -- contact  ');
+    console.log('  name: ', contactInfo.name);
+    console.log('  jobTitle: ', contactInfo.jobTitle);
+    console.log('  address: ', contactInfo.address);
+    console.log('  address2: ', contactInfo.address2);
+    console.log('  address3: ', contactInfo.address3);
+    console.log('  phone: ', contactInfo.phone);
+    console.log('  phone2: ', contactInfo.phone2);
+    console.log('  email: ', contactInfo.email);
+
+    expect(response).toBeDefined();
+  });
 });
