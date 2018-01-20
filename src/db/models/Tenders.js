@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
-import { field } from './utils';
+import { field, isToday } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -65,7 +64,7 @@ class Tender {
     let status = 'draft';
 
     // publish date is today
-    if (moment(doc.publishDate).diff(now, 'days') === 0) {
+    if (isToday(doc.publishDate)) {
       status = 'open';
     }
 
@@ -110,12 +109,11 @@ class Tender {
    * @return null
    */
   static async publishDrafts() {
-    const now = new Date();
     const draftTenders = await this.find({ status: 'draft' });
 
     for (let draftTender of draftTenders) {
       // publish date is today
-      if (moment(draftTender.publishDate).diff(now, 'days') === 0) {
+      if (isToday(draftTender.publishDate)) {
         // change status to open
         await this.update({ _id: draftTender._id }, { $set: { status: 'open' } });
       }
@@ -129,12 +127,11 @@ class Tender {
    * @return null
    */
   static async closeOpens() {
-    const now = new Date();
     const openTenders = await this.find({ status: 'open' });
 
     for (let openTender of openTenders) {
       // close date is today
-      if (moment(openTender.closeDate).diff(now, 'days') === 0) {
+      if (isToday(openTender.closeDate)) {
         // change status to closed
         await this.update({ _id: openTender._id }, { $set: { status: 'closed' } });
       }

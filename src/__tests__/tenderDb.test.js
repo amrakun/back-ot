@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders } from '../db/models';
 import { userFactory, tenderFactory } from '../db/factories';
@@ -51,7 +52,12 @@ describe('Tender db', () => {
 
   test('Create tender: draft status', async () => {
     delete _tender._id;
-    _tender.publishDate = new Date('2040-10-10');
+
+    const tomorrow = moment()
+      .add(1, 'day')
+      .endOf('day');
+
+    _tender.publishDate = tomorrow;
 
     const tenderObj = await Tenders.createTender(_tender, _user._id);
 
