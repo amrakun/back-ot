@@ -79,7 +79,35 @@ describe('Tender db', () => {
     expect(tenderObj).toEqual(doc);
   });
 
+  test('Update tender: with open status', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+
+    expect.assertions(1);
+
+    try {
+      await Tenders.updateTender(tender._id, {});
+    } catch (e) {
+      expect(e.message).toBe('Can not update open or closed tender');
+    }
+  });
+
   test('Delete tender', async () => {
+    await Tenders.removeTender(_tender._id);
+
+    expect(await Tenders.find({ _id: _tender._id }).count()).toBe(0);
+  });
+
+  test('Delete tender: with open status', async () => {
+    expect.assertions(2);
+
+    const tender = await tenderFactory({ status: 'open' });
+
+    try {
+      await Tenders.removeTender(tender._id);
+    } catch (e) {
+      expect(e.message).toBe('Can not delete open or closed tender');
+    }
+
     await Tenders.removeTender(_tender._id);
 
     expect(await Tenders.find({ _id: _tender._id }).count()).toBe(0);

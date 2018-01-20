@@ -78,6 +78,12 @@ class Tender {
    * @return {Promise} updated tender info
    */
   static async updateTender(_id, doc) {
+    const tender = await this.findOne({ _id });
+
+    if (tender.status !== 'draft') {
+      throw new Error('Can not update open or closed tender');
+    }
+
     await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
@@ -88,7 +94,13 @@ class Tender {
    * @param {String} _id - Tender id
    * @return {Promise} - remove method response
    */
-  static removeTender(_id) {
+  static async removeTender(_id) {
+    const tender = await this.findOne({ _id });
+
+    if (tender.status !== 'draft') {
+      throw new Error('Can not delete open or closed tender');
+    }
+
     return this.remove({ _id });
   }
 
