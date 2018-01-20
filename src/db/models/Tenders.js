@@ -246,6 +246,13 @@ class TenderResponse {
   static async createTenderResponse(doc) {
     const { tenderId, supplierId } = doc;
 
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    // can send to only open tenders
+    if (tender.status !== 'open') {
+      throw Error('This tender is not available');
+    }
+
     const previousEntry = await this.findOne({ tenderId, supplierId });
 
     // prevent duplications
