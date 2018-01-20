@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { field, isToday } from './utils';
+import { field, isReached } from './utils';
 
 // Feedback schema
 const FeedbackSchema = mongoose.Schema({
@@ -37,7 +37,7 @@ class Feedback {
 
     for (let openFeedback of openFeedbacks) {
       // close date is today
-      if (isToday(openFeedback.closeDate)) {
+      if (isReached(openFeedback.closeDate)) {
         // change status to closed
         await this.update({ _id: openFeedback._id }, { $set: { status: 'closed' } });
       }

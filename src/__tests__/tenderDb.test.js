@@ -1,9 +1,9 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders } from '../db/models';
+import dbUtils from '../db/models/utils';
 import { userFactory, tenderFactory } from '../db/factories';
 
 beforeAll(() => connect());
@@ -47,21 +47,7 @@ describe('Tender db', () => {
     expect(tenderObj).toEqual(_tender);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
-    expect(status).toEqual('open');
-  });
-
-  test('Create tender: draft status', async () => {
-    delete _tender._id;
-
-    const tomorrow = moment()
-      .add(1, 'day')
-      .endOf('day');
-
-    _tender.publishDate = tomorrow;
-
-    const tenderObj = await Tenders.createTender(_tender, _user._id);
-
-    expect(tenderObj.status).toEqual('draft');
+    expect(status).toEqual('draft');
   });
 
   test('Update tender', async () => {
@@ -125,8 +111,11 @@ describe('Tender db', () => {
   });
 
   test('Publish drafts', async () => {
-    let tender1 = await tenderFactory({ publishDate: new Date() });
-    let tender2 = await tenderFactory({ publishDate: new Date('2040-01-01') });
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2040-02-01 01:01'));
+
+    let tender1 = await tenderFactory({ publishDate: new Date('2040-02-01 01:00') });
+    let tender2 = await tenderFactory({ publishDate: new Date('2040-02-02') });
 
     await Tenders.publishDrafts();
 
@@ -138,8 +127,11 @@ describe('Tender db', () => {
   });
 
   test('Close opens', async () => {
-    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date() });
-    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2040-01-01') });
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2018/01/20 17:11'));
+
+    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:10') });
+    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:12') });
 
     await Tenders.closeOpens();
 

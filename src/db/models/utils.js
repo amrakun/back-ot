@@ -13,13 +13,20 @@ export const field = options => {
   return options;
 };
 
-/*
- * Checks that given date is today
- */
-export const isToday = date => {
-  const startOfDay = moment().startOf('day');
-  const nextDay = moment(startOfDay).add(1, 'days');
-  const mDate = moment(date);
-
-  return (mDate > startOfDay) & (mDate < nextDay);
+const getNow = () => {
+  return new Date();
 };
+
+/*
+ * Doing this to mock date time now in test
+ */
+const utils = {
+  getNow,
+};
+
+/*
+ * Checks that given date is reached
+ */
+export const isReached = date => moment(date) <= utils.getNow();
+
+export default utils;

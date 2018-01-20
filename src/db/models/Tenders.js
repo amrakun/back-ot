@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { field, isToday } from './utils';
+import { field, isReached } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -59,16 +59,12 @@ class Tender {
    * @return {Promise} newly created tender object
    */
   static createTender(doc, userId) {
-    const now = new Date();
-
-    let status = 'draft';
-
-    // publish date is today
-    if (isToday(doc.publishDate)) {
-      status = 'open';
-    }
-
-    return this.create({ ...doc, status, createdDate: now, createdUserId: userId });
+    return this.create({
+      ...doc,
+      status: 'draft',
+      createdDate: new Date(),
+      createdUserId: userId,
+    });
   }
 
   /**
@@ -124,8 +120,8 @@ class Tender {
     const draftTenders = await this.find({ status: 'draft' });
 
     for (let draftTender of draftTenders) {
-      // publish date is today
-      if (isToday(draftTender.publishDate)) {
+      // publish date is reached
+      if (isReached(draftTender.publishDate)) {
         // change status to open
         await this.update({ _id: draftTender._id }, { $set: { status: 'open' } });
       }
@@ -142,8 +138,8 @@ class Tender {
     const openTenders = await this.find({ status: 'open' });
 
     for (let openTender of openTenders) {
-      // close date is today
-      if (isToday(openTender.closeDate)) {
+      // close date is reached
+      if (isReached(openTender.closeDate)) {
         // change status to closed
         await this.update({ _id: openTender._id }, { $set: { status: 'closed' } });
       }
