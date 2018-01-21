@@ -1,7 +1,14 @@
 import { Qualifications } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
 
-const qualificationMutations = {};
+const qualificationMutations = {
+  /*
+   * Save tier type
+   */
+  qualificationsSaveTierType(root, { supplierId, tierType }) {
+    return Qualifications.saveTierType(supplierId, 'tierType', tierType);
+  },
+};
 
 const sections = ['financial', 'business', 'environmental', 'health'];
 
@@ -19,5 +26,7 @@ sections.forEach(section => {
 
   requireBuyer(qualificationMutations, name);
 });
+
+requireBuyer(qualificationMutations, 'qualificationsSaveTierType');
 
 export default qualificationMutations;

@@ -405,6 +405,8 @@ const CompanySchema = mongoose.Schema({
   isProductsInfoValidated: field({ type: Boolean }),
   productsInfoLastValidatedDate: field({ type: Date }),
 
+  tierType: field({ type: String, optional: true }),
+
   isSentRegistrationInfo: field({ type: Boolean, default: false }),
   isSentPrequalificationInfo: field({ type: Boolean, default: false }),
 

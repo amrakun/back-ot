@@ -58,6 +58,7 @@ export const types = `
     businessInfo: QualificationBusinessInfo
     environmentalInfo: QualificationEnvironmentalInfo
     healthInfo: QualificationHealthInfo
+    tierType: String
 
     company: Company
   }
@@ -86,5 +87,10 @@ export const mutations = `
   qualificationsSaveHealthInfo(
     supplierId: String!,
     healthInfo: QualificationHealthInfoInput
+  ): Qualification
+
+  qualificationsSaveTierType(
+    supplierId: String!,
+    tierType: String!
   ): Qualification
 `;
