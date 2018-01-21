@@ -243,7 +243,7 @@ describe('Company queries', () => {
       productsInfoLastValidatedDate: validatedDate,
     });
 
-    await auditFactory({ supplierIds: [_company._id] });
+    await auditFactory({ supplierIds: [_company._id], status: 'open' });
 
     const response = await graphqlRequest(query, 'companies');
 

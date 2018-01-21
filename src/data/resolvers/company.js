@@ -59,6 +59,6 @@ export default {
   },
 
   audits(company) {
-    return Audits.find({ supplierIds: { $in: [company._id] } });
+    return Audits.find({ supplierIds: { $in: [company._id] }, status: { $ne: 'draft' } });
   },
 };
