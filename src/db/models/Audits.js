@@ -3,7 +3,8 @@ import { field } from './utils';
 
 // Audit schema
 const AuditSchema = mongoose.Schema({
-  date: field({ type: Date }),
+  publishDate: field({ type: Date }),
+  closeDate: field({ type: Date }),
   supplierIds: field({ type: [String] }),
   createdUserId: field({ type: String }),
 });

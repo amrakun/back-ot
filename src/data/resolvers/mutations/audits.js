@@ -3,8 +3,8 @@ import { requireSupplier, requireBuyer } from '../../permissions';
 
 const auditMutations = {
   // create new audit
-  auditsAdd(root, { date, supplierIds }, { user }) {
-    return Audits.createAudit({ date, supplierIds }, user._id);
+  auditsAdd(root, args, { user }) {
+    return Audits.createAudit(args, user._id);
   },
 
   // save basic info

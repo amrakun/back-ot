@@ -87,13 +87,16 @@ describe('Audit mutations', () => {
 
     const args = {
       supplierIds: [_company._id],
-      date: new Date(),
+      publishDate: new Date(),
+      closeDate: new Date(),
     };
 
     const mutation = `
-      mutation auditsAdd($supplierIds: [String]!, $date: Date!) {
-        auditsAdd(supplierIds: $supplierIds, date: $date) {
+      mutation auditsAdd($supplierIds: [String]!, $publishDate: Date!, $closeDate: Date!) {
+        auditsAdd(supplierIds: $supplierIds, publishDate: $publishDate, closeDate: $closeDate) {
           _id
+          publishDate
+          closeDate
         }
       }
     `;
@@ -107,7 +110,8 @@ describe('Audit mutations', () => {
     const audit = await Audits.findOne({});
 
     expect(audit.createdUserId).toBe(user._id);
-    expect(audit.date).toEqual(args.date);
+    expect(audit.publishDate).toEqual(args.publishDate);
+    expect(audit.closeDate).toEqual(args.closeDate);
     expect(audit.supplierIds).toContain(_company._id);
   });
 

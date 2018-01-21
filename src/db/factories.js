@@ -414,7 +414,8 @@ export const qualificationFactory = async (params = {}) => {
 export const auditFactory = async (params = {}) => {
   const audit = new Audits({
     supplierIds: params.supplierIds || ['id1', 'id2'],
-    date: params.date || new Date(),
+    publishDate: params.publishDate || new Date(),
+    closeDate: params.closeDate || new Date(),
     createdUserId: params.createdUserId || '_id',
   });
 
