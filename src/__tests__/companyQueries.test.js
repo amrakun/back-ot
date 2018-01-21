@@ -256,8 +256,8 @@ describe('Company queries', () => {
 
   test('companies: tier types', async () => {
     const qry = `
-      query companies($tierTypes: String) {
-        companies(tierTypes: $tierTypes) {
+      query companies($region: String) {
+        companies(region: $region) {
           tierType
         }
       }
@@ -266,7 +266,7 @@ describe('Company queries', () => {
     await companyFactory({ tierType: 'national' });
     await companyFactory({ tierType: 'tier1' });
 
-    const response = await graphqlRequest(qry, 'companies', { tierTypes: 'national' });
+    const response = await graphqlRequest(qry, 'companies', { region: 'national' });
 
     expect(response.length).toBe(1);
   });

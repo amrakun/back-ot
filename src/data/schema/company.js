@@ -380,7 +380,7 @@ const queryParams = `
   includeBlocked: Boolean,
   isPrequalified: Boolean,
   difotScore: String,
-  tierTypes: String,
+  region: String,
   _ids: [String],
 `;
 

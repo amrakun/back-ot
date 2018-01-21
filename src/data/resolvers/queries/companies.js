@@ -15,7 +15,7 @@ const companiesFilter = async args => {
     includeBlocked,
     isPrequalified,
     difotScore,
-    tierTypes,
+    region,
   } = args;
 
   const selector = {
@@ -39,8 +39,8 @@ const companiesFilter = async args => {
   }
 
   // tier types
-  if (tierTypes) {
-    selector.tierType = { $in: tierTypes.split(',') };
+  if (region) {
+    selector.tierType = { $in: region.split(',') };
   }
 
   // difot score
