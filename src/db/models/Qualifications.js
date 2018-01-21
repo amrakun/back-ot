@@ -27,7 +27,11 @@ const QualificationSchema = mongoose.Schema({
   businessInfo: generateFields(BusinessInfoSchema),
   environmentalInfo: generateFields(EnvironmentalInfoSchema),
   healthInfo: generateFields(HealthInfoSchema),
-  tierType: field({ type: String }),
+
+  tierType: field({
+    type: String,
+    enum: ['national', 'umnugobi', 'tier1', 'tier2', 'tier3'],
+  }),
 });
 
 class Qualification {

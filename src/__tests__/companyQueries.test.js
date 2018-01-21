@@ -253,4 +253,21 @@ describe('Company queries', () => {
     // audits
     expect(company.audits.length).toBe(1);
   });
+
+  test('companies: tier types', async () => {
+    const qry = `
+      query companies($tierTypes: String) {
+        companies(tierTypes: $tierTypes) {
+          tierType
+        }
+      }
+    `;
+
+    await companyFactory({ tierType: 'national' });
+    await companyFactory({ tierType: 'tier1' });
+
+    const response = await graphqlRequest(qry, 'companies', { tierTypes: 'national' });
+
+    expect(response.length).toBe(1);
+  });
 });

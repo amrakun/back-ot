@@ -332,6 +332,8 @@ export const types = `
     shareholderInfo: CompanyShareholderInfo
     groupInfo: CompanyGroupInfo
 
+    tierType: String
+
     productsInfo: [String]
     validatedProductsInfo: [String]
     isProductsInfoValidated: Boolean
@@ -378,6 +380,7 @@ const queryParams = `
   includeBlocked: Boolean,
   isPrequalified: Boolean,
   difotScore: String,
+  tierTypes: String,
   _ids: [String],
 `;
 

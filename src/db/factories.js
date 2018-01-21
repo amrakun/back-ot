@@ -56,6 +56,8 @@ export const companyFactory = (params = {}) => {
       totalNumberOfUmnugoviEmployees: faker.random.number(),
     },
 
+    tierType: params.tierType,
+
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
     isProductsInfoValidated: params.isProductsInfoValidated || false,
