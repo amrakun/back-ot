@@ -275,11 +275,14 @@ export const companyDocs = {
 export const userFactory = (params = {}) => {
   const user = new Users({
     username: params.username || faker.internet.userName(),
+
     role: params.role || 'contributor',
-    details: {
-      fullName: params.fullName || faker.random.word(),
-      avatar: params.avatar || faker.image.imageUrl(),
-    },
+
+    firstName: params.firstName || faker.random.word(),
+    lastName: params.lastName || faker.random.word(),
+    jobTitle: params.jobTitle || faker.random.word(),
+    phone: params.phone || faker.random.number(),
+
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,

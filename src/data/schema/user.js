@@ -1,22 +1,16 @@
 export const types = `
-  input UserDetails {
-    avatar: String
-    fullName: String
-  }
-
-  type UserDetailsType {
-    avatar: String
-    fullName: String
-  }
-
   type User {
     _id: String!
     username: String
     email: String
     role: String
     isSupplier: Boolean
-    details: UserDetailsType
     companyId: String
+
+    firstName: String
+    lastName: String
+    jobTitle: String
+    phone: Float
   }
 
   type AuthPayload {
@@ -35,10 +29,11 @@ export const queries = `
 const commonParams = `
   username: String!,
   email: String!,
-  role: String!
-  details: UserDetails,
-  password: String!,
-  passwordConfirmation: String!
+  role: String!,
+  firstName: String,
+  lastName: String,
+  jobTitle: String,
+  phone: Float
 `;
 
 export const mutations = `
@@ -53,14 +48,29 @@ export const mutations = `
   login(email: String!, password: String!): AuthPayload!
   forgotPassword(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String
-  usersAdd(${commonParams}): User
-  usersEdit(_id: String!, ${commonParams}): User
+
+  usersAdd(
+    ${commonParams},
+    password: String!,
+    passwordConfirmation: String!
+  ): User
+
+  usersEdit(
+    _id: String!,
+    ${commonParams},
+    password: String,
+    passwordConfirmation: String
+  ): User
 
   usersEditProfile(
     username: String!,
-    email: String!,
-    details: UserDetails,
     password: String!
+    email: String!,
+
+    firstName: String,
+    lastName: String,
+    jobTitle: String,
+    phone: Float,
   ): User
 
   usersChangePassword(currentPassword: String!, newPassword: String!): User

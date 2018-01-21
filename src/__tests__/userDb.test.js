@@ -43,7 +43,6 @@ describe('User db utils', () => {
       ..._user,
       role: 'admin',
       email: 'test@gmail.com',
-      details: _user.details,
       password: testPassword,
     });
 
@@ -53,9 +52,11 @@ describe('User db utils', () => {
     expect(userObj.email).toBe('test@gmail.com');
     expect(userObj.role).toBe('admin');
     expect(userObj.isSupplier).toBe(false);
+    expect(userObj.firstName).toBe(_user.firstName);
+    expect(userObj.lastName).toBe(_user.lastName);
+    expect(userObj.jobTitle).toBe(_user.jobTitle);
+    expect(userObj.phone).toBe(_user.phone);
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
-    expect(userObj.details.fullName).toBe(_user.details.fullName);
-    expect(userObj.details.avatar).toBe(_user.details.avatar);
   });
 
   test('Update user: duplicated email', async () => {
@@ -87,7 +88,10 @@ describe('User db utils', () => {
       email: testEmail,
       username: updateDoc.username,
       password: testPassword,
-      details: updateDoc.details,
+      firstName: updateDoc.firstName,
+      lastName: updateDoc.lastName,
+      jobTitle: updateDoc.jobTitle,
+      phone: updateDoc.phone,
     });
 
     let userObj = await Users.findOne({ _id: _user._id });
@@ -95,15 +99,16 @@ describe('User db utils', () => {
     expect(userObj.username).toBe(updateDoc.username);
     expect(userObj.email).toBe(testEmail);
     expect(userObj.role).toBe(userObj.role);
+    expect(userObj.firstName).toBe(_user.firstName);
+    expect(userObj.lastName).toBe(_user.lastName);
+    expect(userObj.jobTitle).toBe(_user.jobTitle);
+    expect(userObj.phone).toBe(_user.phone);
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
-    expect(userObj.details.fullName).toBe(updateDoc.details.fullName);
-    expect(userObj.details.avatar).toBe(updateDoc.details.avatar);
 
     // try without password ============
     await Users.updateUser(_user._id, {
       email: testEmail,
       username: updateDoc.username,
-      details: updateDoc.details,
     });
 
     userObj = await Users.findOne({ _id: _user._id });
@@ -120,7 +125,7 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
-    expect.assertions(5);
+    expect.assertions(7);
 
     const updateDoc = await userFactory();
 
@@ -133,15 +138,20 @@ describe('User db utils', () => {
     await Users.editProfile(_user._id, {
       email: 'test@gmail.com',
       username: updateDoc.username,
-      details: updateDoc.details,
+      firstName: updateDoc.firstName,
+      lastName: updateDoc.lastName,
+      jobTitle: updateDoc.jobTitle,
+      phone: updateDoc.phone,
     });
 
     const userObj = await Users.findOne({ _id: _user._id });
 
     expect(userObj.username).toBe(updateDoc.username);
     expect(userObj.email).toBe('test@gmail.com');
-    expect(userObj.details.fullName).toBe(updateDoc.details.fullName);
-    expect(userObj.details.avatar).toBe(updateDoc.details.avatar);
+    expect(userObj.firstName).toBe(updateDoc.firstName);
+    expect(userObj.lastName).toBe(updateDoc.lastName);
+    expect(userObj.jobTitle).toBe(updateDoc.jobTitle);
+    expect(userObj.phone).toBe(updateDoc.phone);
   });
 
   test('Reset password', async () => {

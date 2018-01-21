@@ -117,13 +117,13 @@ const userMutations = {
    * @return {Promise} - Newly created user
    */
   async usersAdd(root, args) {
-    const { username, password, passwordConfirmation, email, role, details } = args;
+    const { password, passwordConfirmation } = args;
 
     if (password !== passwordConfirmation) {
       throw new Error('Incorrect password confirmation');
     }
 
-    return Users.createUser({ username, password, email, role, details });
+    return Users.createUser(args);
   },
 
   /*
@@ -132,13 +132,16 @@ const userMutations = {
    * @return {Promise} - Updated user
    */
   async usersEdit(root, args) {
-    const { _id, username, password, passwordConfirmation, email, role, details } = args;
+    const { _id, password, passwordConfirmation } = args;
 
     if (password && password !== passwordConfirmation) {
       throw new Error('Incorrect password confirmation');
     }
 
-    return Users.updateUser(_id, { username, password, email, role, details });
+    delete args._id;
+    delete args.passwordConfirmation;
+
+    return Users.updateUser(_id, args);
   },
 
   /*
@@ -146,7 +149,9 @@ const userMutations = {
    * @param {Object} args - User profile doc
    * @return {Promise} - Updated user
    */
-  async usersEditProfile(root, { username, email, password, details }, { user }) {
+  async usersEditProfile(root, args, { user }) {
+    const { password } = args;
+
     const userOnDb = await Users.findOne({ _id: user._id });
     const valid = await Users.comparePassword(password, userOnDb.password);
 
@@ -155,7 +160,7 @@ const userMutations = {
       throw new Error('Invalid password');
     }
 
-    return Users.editProfile(user._id, { username, email, details });
+    return Users.editProfile(user._id, args);
   },
 
   /*
