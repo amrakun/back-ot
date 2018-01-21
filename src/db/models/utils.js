@@ -4,9 +4,10 @@ import moment from 'moment';
  * Mongoose field options wrapper
  */
 export const field = options => {
-  const { type, optional } = options;
+  const { optional } = options;
 
-  if (type === String && !optional) {
+  if (!optional) {
+    options.required = true;
     options.validate = /\S+/;
   }
 

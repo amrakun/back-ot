@@ -94,6 +94,8 @@ describe('Tender mutations', () => {
 
     delete _tender._id;
     delete _tender.status;
+    delete _tender.createdDate;
+    delete _tender.createdUserId;
     delete _tender.sentRegretLetter;
     await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
 
@@ -124,6 +126,8 @@ describe('Tender mutations', () => {
 
     delete restParams.type;
     delete restParams.status;
+    delete restParams.createdDate;
+    delete restParams.createdUserId;
     delete restParams.sentRegretLetter;
     restParams.publishDate = new Date(restParams.publishDate);
     restParams.closeDate = new Date(restParams.closeDate);

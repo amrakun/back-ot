@@ -71,6 +71,8 @@ describe('Feedback mutations', () => {
 
     delete _feedback._id;
     delete _feedback.status;
+    delete _feedback.createdDate;
+    delete _feedback.createdUserId;
     _feedback.closeDate = new Date(_feedback.closeDate);
 
     await graphqlRequest(mutation, 'feedbacksAdd', _feedback, { user: _user });

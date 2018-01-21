@@ -287,7 +287,7 @@ describe('Company mutations', () => {
 
   test('add due diligence', async () => {
     const supplier = await companyFactory({
-      dueDiligences: [{ date: new Date(), file: { url: '/path1' } }],
+      dueDiligences: [{ date: new Date(), file: { name: 'name', url: '/path1' } }],
     });
 
     const mutation = `

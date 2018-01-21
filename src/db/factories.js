@@ -40,6 +40,8 @@ export const companyFactory = (params = {}) => {
     basicInfo: {
       enName: params.enName || faker.random.word(),
       mnName: params.mnName || faker.random.word(),
+      isRegisteredOnSup: params.isRegisteredOnSup || false,
+      isSubContractor: params.isSubContractor || false,
       sapNumber: params.sapNumber || faker.random.word(),
       email: params.email || faker.internet.email(),
       address: params.address || faker.random.word(),
@@ -296,6 +298,7 @@ export const userFactory = (params = {}) => {
 
 export const tenderFactory = async (params = {}) => {
   const requestedProduct = {
+    code: faker.random.word(),
     purchaseRequestNumber: faker.random.number(),
     shortText: faker.random.word(),
     quantity: faker.random.number(),
@@ -310,8 +313,13 @@ export const tenderFactory = async (params = {}) => {
     number: params.number || faker.random.number(),
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
+
+    createdUserId: params.createdUserId || '_id',
+    createdDate: params.createdDate || new Date(),
+
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
+
     reminderDay: params.reminderDay || faker.random.number(),
     file: params.file || { name: 'name', url: 'url' },
     supplierIds: params.supplierIds || ['id1', 'id2'],
@@ -337,8 +345,8 @@ export const tenderResponseFactory = async (params = {}) => {
   const tenderResponse = new TenderResponses({
     tenderId: params.tenderId,
     supplierId: params.supplierId,
-    respondedProducts: params.respondedProducts || {},
-    respondedDocuments: params.respondedDocuments || {},
+    respondedProducts: params.respondedProducts,
+    respondedDocuments: params.respondedDocuments,
     isNotInterested: params.isNotInterested || false,
   });
 
@@ -347,9 +355,12 @@ export const tenderResponseFactory = async (params = {}) => {
 
 export const feedbackFactory = async (params = {}) => {
   const feedback = new Feedbacks({
+    status: params.status || 'open',
     closeDate: params.closeDate || new Date(),
     supplierIds: params.supplierIds || ['id1', 'id2'],
     content: params.content || faker.random.word(),
+    createdDate: params.createdDate || new Date(),
+    createdUserId: params.createdUserId || '_id',
   });
 
   return save(feedback);
@@ -369,6 +380,7 @@ export const feedbackResponseFactory = async (params = {}) => {
   const feedbackResponse = new FeedbackResponses({
     feedbackId: params.feedbackId,
     supplierId: params.supplierId,
+    status: params.status || 'onTime',
     employmentNumberBefore: params.employmentNumberBefore || faker.random.number(),
     employmentNumberNow: params.employmentNumberNow || faker.random.number(),
     nationalSpendBefore: params.nationalSpendBefore || faker.random.number(),
@@ -401,32 +413,12 @@ export const qualificationFactory = async (params = {}) => {
 
 export const auditFactory = async (params = {}) => {
   const audit = new Audits({
-    date: params.publishDate || new Date(),
     supplierIds: params.supplierIds || ['id1', 'id2'],
-    createdUserId: params.createdUserId,
+    date: params.date || new Date(),
+    createdUserId: params.createdUserId || '_id',
   });
 
   return save(audit);
-};
-
-export const auditResponseFactory = async (params = {}) => {
-  if (!params.auditId) {
-    const audit = await auditFactory();
-    params.auditId = audit._id;
-  }
-
-  if (!params.supplierId) {
-    const supplier = await companyFactory();
-    params.supplierId = supplier._id;
-  }
-
-  const auditResponse = new AuditResponses({
-    auditId: params.auditId,
-    supplierId: params.supplierId,
-    coreHseqInfo: params.coreHseqInfo || {},
-  });
-
-  return save(auditResponse);
 };
 
 // audit response docs ====================
@@ -533,4 +525,24 @@ export const auditResponseDocs = {
     doesHaveCorruptionPolicy: true,
     whoIsResponsibleForCorruptionPolicy: true,
   }),
+};
+
+export const auditResponseFactory = async (params = {}) => {
+  if (!params.auditId) {
+    const audit = await auditFactory();
+    params.auditId = audit._id;
+  }
+
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
+  const auditResponse = new AuditResponses({
+    auditId: params.auditId,
+    supplierId: params.supplierId,
+    coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
+  });
+
+  return save(auditResponse);
 };

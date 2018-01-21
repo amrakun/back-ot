@@ -15,7 +15,7 @@ const generateFields = schema => {
   const definations = {};
 
   for (let name of names) {
-    definations[name] = field({ type: Boolean });
+    definations[name] = field({ type: Boolean, optional: true });
   }
 
   return mongoose.Schema(definations, { _id: false });
@@ -31,6 +31,7 @@ const QualificationSchema = mongoose.Schema({
   tierType: field({
     type: String,
     enum: ['national', 'umnugobi', 'tier1', 'tier2', 'tier3'],
+    optional: true,
   }),
 });
 

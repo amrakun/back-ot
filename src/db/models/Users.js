@@ -10,22 +10,23 @@ const SALT_WORK_FACTOR = 10;
 
 // User schema
 const UserSchema = mongoose.Schema({
-  companyId: field({ type: mongoose.Schema.Types.ObjectId }),
+  companyId: field({ type: mongoose.Schema.Types.ObjectId, optional: true }),
 
   username: field({ type: String }),
-  password: field({ type: String }),
+  password: field({ type: String, optional: true }),
 
-  registrationToken: field({ type: String }),
-  registrationTokenExpires: field({ type: Date }),
-  resetPasswordToken: field({ type: String }),
-  resetPasswordExpires: field({ type: Date }),
+  registrationToken: field({ type: String, optional: true }),
+  registrationTokenExpires: field({ type: Date, optional: true }),
+  resetPasswordToken: field({ type: String, optional: true }),
+  resetPasswordExpires: field({ type: Date, optional: true }),
 
   role: field({
     type: String,
     enum: [ROLES.ADMIN, ROLES.CONTRIBUTOR],
+    optional: true,
   }),
 
-  isSupplier: field({ type: Boolean }),
+  isSupplier: field({ type: Boolean, optional: true }),
 
   email: field({
     type: String,

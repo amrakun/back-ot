@@ -35,7 +35,8 @@ describe('Audit response db', () => {
   test('Create audit', async () => {
     const user = await userFactory();
     const supplierIds = ['id1', 'id2'];
-    const auditObj = await Audits.createAudit({ supplierIds }, user._id);
+
+    const auditObj = await Audits.createAudit({ date: new Date(), supplierIds }, user._id);
 
     expect(auditObj.createdUserId).toEqual(user._id);
     expect(auditObj.supplierIds).toContain('id1');

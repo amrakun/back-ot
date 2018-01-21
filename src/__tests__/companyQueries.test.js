@@ -89,6 +89,8 @@ describe('Company queries', () => {
   });
 
   test('companies', async () => {
+    const user = await userFactory();
+
     // Creating test data ==============
     await Companies.create({}); // to check empty company ignorance
 
@@ -105,11 +107,15 @@ describe('Company queries', () => {
       .endOf('day');
 
     const blockedCompany = await companyFactory({ enName: 'blocked' });
-    await BlockedCompanies.block({
-      supplierId: blockedCompany._id,
-      startDate: today,
-      endDate: tomorrow,
-    });
+
+    await BlockedCompanies.block(
+      {
+        supplierId: blockedCompany._id,
+        startDate: today,
+        endDate: tomorrow,
+      },
+      user._id,
+    );
 
     await companyFactory({ enName: 'en name', sapNumber: '1441aabb' });
 

@@ -29,6 +29,8 @@ describe('Tender db', () => {
   test('Create tender: open status', async () => {
     delete _tender._id;
     delete _tender.status;
+    delete _tender.createdDate;
+    delete _tender.createdUserId;
 
     let tenderObj = await Tenders.createTender(_tender, _user._id);
 

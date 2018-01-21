@@ -3,9 +3,9 @@ import { field } from './utils';
 
 // Audit schema
 const AuditSchema = mongoose.Schema({
-  createdUserId: field({ type: String }),
   date: field({ type: Date }),
   supplierIds: field({ type: [String] }),
+  createdUserId: field({ type: String }),
 });
 
 class Audit {
@@ -16,7 +16,10 @@ class Audit {
    * @return {Promise} newly created audit object
    */
   static createAudit(doc, userId) {
-    return this.create({ ...doc, createdUserId: userId });
+    return this.create({
+      ...doc,
+      createdUserId: userId,
+    });
   }
 }
 
@@ -43,9 +46,9 @@ const ReplyRecommendSchema = mongoose.Schema(
     supplierComment: field({ type: String }),
     supplierAnswer: field({ type: Boolean }),
 
-    auditorComment: field({ type: String }),
-    auditorRecommendation: field({ type: String }),
-    auditorScore: field({ type: Boolean }),
+    auditorComment: field({ type: String, optional: true }),
+    auditorRecommendation: field({ type: String, optional: true }),
+    auditorScore: field({ type: Boolean, optional: true }),
   },
   { _id: false },
 );
