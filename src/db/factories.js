@@ -413,6 +413,7 @@ export const qualificationFactory = async (params = {}) => {
 
 export const auditFactory = async (params = {}) => {
   const audit = new Audits({
+    status: params.status || 'draft',
     supplierIds: params.supplierIds || ['id1', 'id2'],
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
@@ -542,6 +543,7 @@ export const auditResponseFactory = async (params = {}) => {
   const auditResponse = new AuditResponses({
     auditId: params.auditId,
     supplierId: params.supplierId,
+    isSent: params.isSent || false,
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
   });
 

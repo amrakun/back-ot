@@ -4,7 +4,13 @@
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Audits, AuditResponses, Companies } from '../db/models';
 
-import { userFactory, companyFactory, auditFactory, auditResponseDocs } from '../db/factories';
+import {
+  userFactory,
+  companyFactory,
+  auditFactory,
+  auditResponseFactory,
+  auditResponseDocs,
+} from '../db/factories';
 
 import companyMutations from '../data/resolvers/mutations/audits';
 
@@ -40,7 +46,7 @@ describe('Audit mutations', () => {
       }
     };
 
-    expect.assertions(5);
+    expect.assertions(6);
 
     const mutations = [
       'auditsSupplierSaveBasicInfo',
@@ -48,6 +54,7 @@ describe('Audit mutations', () => {
       'auditsSupplierSaveCoreHseqInfo',
       'auditsSupplierSaveHrInfo',
       'auditsSupplierSaveBusinessInfo',
+      'auditsSupplierSendResponse',
     ];
 
     const user = await userFactory();
@@ -313,5 +320,27 @@ describe('Audit mutations', () => {
     );
 
     await callBusinessMutation('auditsBuyerSaveBusinessInfo', 'AuditBuyerBusinessInfoInput', false);
+  });
+
+  test('Send response', async () => {
+    await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id });
+
+    const mutation = `
+      mutation auditsSupplierSendResponse($auditId: String!, $supplierId: String!) {
+        auditsSupplierSendResponse(auditId: $auditId, supplierId: $supplierId) {
+          _id
+          isSent
+        }
+      }
+    `;
+
+    const response = await graphqlRequest(
+      mutation,
+      'auditsSupplierSendResponse',
+      { supplierId: _company._id, auditId: _audit._id },
+      { user: _user },
+    );
+
+    expect(response.isSent).toBe(true);
   });
 });

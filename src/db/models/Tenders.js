@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { field, isReached } from './utils';
+import { field, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -51,7 +51,7 @@ const TenderSchema = mongoose.Schema({
   requestedDocuments: field({ type: [String] }),
 });
 
-class Tender {
+class Tender extends StatusPublishClose {
   /**
    * Create new tender
    * @param {Object} doc - tender fields
@@ -110,42 +110,6 @@ class Tender {
     await this.update({ _id }, { $set: { status: 'awarded', winnerId: supplierId } });
 
     return this.findOne({ _id });
-  }
-
-  /*
-   * Open drafted tenders
-   * @return null
-   */
-  static async publishDrafts() {
-    const draftTenders = await this.find({ status: 'draft' });
-
-    for (let draftTender of draftTenders) {
-      // publish date is reached
-      if (isReached(draftTender.publishDate)) {
-        // change status to open
-        await this.update({ _id: draftTender._id }, { $set: { status: 'open' } });
-      }
-    }
-
-    return 'done';
-  }
-
-  /*
-   * Close open tenders if closeDate is here
-   * @return null
-   */
-  static async closeOpens() {
-    const openTenders = await this.find({ status: 'open' });
-
-    for (let openTender of openTenders) {
-      // close date is reached
-      if (isReached(openTender.closeDate)) {
-        // change status to closed
-        await this.update({ _id: openTender._id }, { $set: { status: 'closed' } });
-      }
-    }
-
-    return 'done';
   }
 
   /*

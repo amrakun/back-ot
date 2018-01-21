@@ -2,6 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
+import dbUtils from '../db/models/utils';
 import { Audits, AuditResponses, Companies } from '../db/models';
 import {
   userFactory,
@@ -45,6 +46,7 @@ describe('Audit response db', () => {
       user._id,
     );
 
+    expect(auditObj.status).toBe('draft');
     expect(auditObj.createdUserId).toEqual(user._id);
     expect(auditObj.supplierIds).toContain('id1');
     expect(auditObj.supplierIds).toContain('id2');
@@ -87,6 +89,8 @@ describe('Audit response db', () => {
         },
       },
     });
+
+    expect(updatedResponse.isSent).toBe(false);
 
     // must not created new response
     expect(await AuditResponses.find().count()).toBe(1);
@@ -170,5 +174,84 @@ describe('Audit response db', () => {
     });
 
     expect(updatedResponse.evidenceInfo.toJSON()).toEqual(doc);
+  });
+
+  test('Publish drafts', async () => {
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2040-02-01 01:01'));
+
+    let audit1 = await auditFactory({ publishDate: new Date('2040-02-01 01:00') });
+    let audit2 = await auditFactory({ publishDate: new Date('2040-02-02') });
+
+    await Audits.publishDrafts();
+
+    audit1 = await Audits.findOne({ _id: audit1._id });
+    audit2 = await Audits.findOne({ _id: audit2._id });
+
+    expect(audit1.status).toBe('open');
+    expect(audit2.status).toBe('draft');
+  });
+
+  test('Close opens', async () => {
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2018/01/20 17:11'));
+
+    let audit1 = await auditFactory({ status: 'open', closeDate: new Date('2018/01/20 17:10') });
+    let audit2 = await auditFactory({ status: 'open', closeDate: new Date('2018/01/20 17:12') });
+
+    await Audits.closeOpens();
+
+    audit1 = await Audits.findOne({ _id: audit1._id });
+    audit2 = await Audits.findOne({ _id: audit2._id });
+
+    expect(audit1.status).toBe('closed');
+    expect(audit2.status).toBe('open');
+  });
+
+  test('Send', async () => {
+    expect.assertions(4);
+
+    const audit = await auditFactory({ status: 'open' });
+
+    let auditResponse = await auditResponseFactory({
+      auditId: audit._id,
+    });
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.isSent).toBe(false);
+
+    await auditResponse.send();
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.isSent).toBe(true);
+    expect(auditResponse.status).toBe('onTime');
+
+    // try to resend
+    try {
+      await auditResponse.send();
+    } catch (e) {
+      expect(e.message).toBe('Already sent');
+    }
+  });
+
+  test('Send: late', async () => {
+    const audit = await auditFactory({ status: 'closed' });
+
+    let auditResponse = await auditResponseFactory({
+      auditId: audit._id,
+    });
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.isSent).toBe(false);
+
+    await auditResponse.send();
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.isSent).toBe(true);
+    expect(auditResponse.status).toBe('late');
   });
 });

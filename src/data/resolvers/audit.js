@@ -10,6 +10,6 @@ export default {
   },
 
   responses(audit) {
-    return AuditResponses.find({ auditId: audit._id });
+    return AuditResponses.find({ auditId: audit._id, isSent: true });
   },
 };
