@@ -40,7 +40,7 @@ const TenderSchema = mongoose.Schema({
   file: field({ type: FileSchema, optional: true }),
   reminderDay: field({ type: Number }),
   supplierIds: field({ type: [String] }),
-  requestedProducts: field({ type: [ProductSchema] }),
+  requestedProducts: field({ type: [ProductSchema], optional: true }),
 
   // Awarded response id
   winnerId: field({ type: String, optional: true }),
@@ -48,7 +48,7 @@ const TenderSchema = mongoose.Schema({
   sentRegretLetter: field({ type: Boolean, default: false }),
 
   // eoi documents
-  requestedDocuments: field({ type: [String] }),
+  requestedDocuments: field({ type: [String], optional: true }),
 });
 
 class Tender extends StatusPublishClose {
