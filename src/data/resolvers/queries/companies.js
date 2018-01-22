@@ -144,10 +144,10 @@ const companyQueries = {
     return Companies.findOne({ _id });
   },
 
-  async suppliersProfileDetail(root, { _id }) {
+  async companyDetailExport(root, { _id }) {
     const supplier = await Companies.findOne({ _id });
 
-    const { workbook } = await readTemplate('suppliers_profile_detail');
+    const { workbook } = await readTemplate('company_detail_export');
     const sheetA = workbook.sheet(0);
     const sheetB = workbook.sheet(1);
     const sheetC = workbook.sheet(2);
@@ -545,7 +545,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value('Annual Turnover');
-    for (let annualTurnover of financialInfo.annualTurnover) {
+    for (let annualTurnover of financialInfo.annualTurnover || []) {
       ++index;
       sheetB.cell(index, 2).value(annualTurnover.year);
       sheetB.cell(index, 3).value(annualTurnover.amount);
@@ -553,7 +553,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value('Annual Turnover');
-    for (let preTaxProfit of financialInfo.preTaxProfit) {
+    for (let preTaxProfit of financialInfo.preTaxProfit || []) {
       ++index;
       sheetB.cell(index, 2).value(preTaxProfit.year);
       sheetB.cell(index, 3).value(preTaxProfit.amount);
@@ -561,7 +561,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value('Total Assets');
-    for (let totalAssets of financialInfo.totalAssets) {
+    for (let totalAssets of financialInfo.totalAssets || []) {
       ++index;
       sheetB.cell(index, 2).value(totalAssets.year);
       sheetB.cell(index, 3).value(totalAssets.amount);
@@ -569,7 +569,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value('Total Current Assets');
-    for (let totalCurrentAssets of financialInfo.totalCurrentAssets) {
+    for (let totalCurrentAssets of financialInfo.totalCurrentAssets || []) {
       ++index;
       sheetB.cell(index, 2).value(totalCurrentAssets.year);
       sheetB.cell(index, 3).value(totalCurrentAssets.amount);
@@ -580,7 +580,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value("Total Shareholder's Equity");
-    for (let totalShareholderEquity of financialInfo.totalShareholderEquity) {
+    for (let totalShareholderEquity of financialInfo.totalShareholderEquity || []) {
       ++index;
       sheetB.cell(index, 2).value(totalShareholderEquity.year);
       sheetB.cell(index, 3).value(totalShareholderEquity.amount);
@@ -588,7 +588,7 @@ const companyQueries = {
 
     index = index + 3;
     sheetB.cell(index, 2).value('Financial Records');
-    for (let record of financialInfo.recordsInfo) {
+    for (let record of financialInfo.recordsInfo || []) {
       ++index;
       sheetB.cell(index, 2).value(record.date);
       sheetB.cell(index, 3).value(record.file && record.file.url ? 'yes' : 'no');
@@ -709,7 +709,7 @@ const companyQueries = {
     sheetC.cell(index, 5).value('Status');
     sheetC.cell(index, 6).value('Closure Date');
 
-    for (let investigation of businessInfo.investigations) {
+    for (let investigation of businessInfo.investigations || []) {
       ++index;
       sheetC.cell(index, 3).value(investigation.name);
       sheetC.cell(index, 4).value(investigation.date);
@@ -917,7 +917,7 @@ const companyQueries = {
     sheetE.cell(index, 3).value(healthInfo.doesHaveLicense ? 'yes' : 'no');
     sheetE.cell(index, 4).value(healthInfo.doesHaveLicenseDescription || '');
 
-    return generateXlsx(workbook, 'suppliers_profile_detail');
+    return generateXlsx(workbook, 'company_detail_export');
   },
 };
 
