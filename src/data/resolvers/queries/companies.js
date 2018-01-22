@@ -15,9 +15,14 @@ const companiesFilter = async args => {
     includeBlocked,
     isPrequalified,
     difotScore,
+    region,
   } = args;
 
-  const selector = { basicInfo: { $ne: null } };
+  const selector = {
+    // ignore incomplete suppliers
+    isSentRegistrationInfo: true,
+    isSentPrequalificationInfo: true,
+  };
 
   // main filter
   if (search) {
@@ -31,6 +36,11 @@ const companiesFilter = async args => {
   // product & services filter
   if (productCodes) {
     selector.validatedProductsInfo = { $in: productCodes.split(',') };
+  }
+
+  // tier types
+  if (region) {
+    selector.tierType = { $in: region.split(',') };
   }
 
   // difot score

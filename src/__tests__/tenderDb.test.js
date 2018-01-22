@@ -3,6 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders } from '../db/models';
+import dbUtils from '../db/models/utils';
 import { userFactory, tenderFactory } from '../db/factories';
 
 beforeAll(() => connect());
@@ -28,6 +29,8 @@ describe('Tender db', () => {
   test('Create tender: open status', async () => {
     delete _tender._id;
     delete _tender.status;
+    delete _tender.createdDate;
+    delete _tender.createdUserId;
 
     let tenderObj = await Tenders.createTender(_tender, _user._id);
 
@@ -46,16 +49,7 @@ describe('Tender db', () => {
     expect(tenderObj).toEqual(_tender);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
-    expect(status).toEqual('open');
-  });
-
-  test('Create tender: draft status', async () => {
-    delete _tender._id;
-    _tender.publishDate = new Date('2040-10-10');
-
-    const tenderObj = await Tenders.createTender(_tender, _user._id);
-
-    expect(tenderObj.status).toEqual('draft');
+    expect(status).toEqual('draft');
   });
 
   test('Update tender', async () => {
@@ -73,7 +67,35 @@ describe('Tender db', () => {
     expect(tenderObj).toEqual(doc);
   });
 
+  test('Update tender: with open status', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+
+    expect.assertions(1);
+
+    try {
+      await Tenders.updateTender(tender._id, {});
+    } catch (e) {
+      expect(e.message).toBe('Can not update open or closed tender');
+    }
+  });
+
   test('Delete tender', async () => {
+    await Tenders.removeTender(_tender._id);
+
+    expect(await Tenders.find({ _id: _tender._id }).count()).toBe(0);
+  });
+
+  test('Delete tender: with open status', async () => {
+    expect.assertions(2);
+
+    const tender = await tenderFactory({ status: 'open' });
+
+    try {
+      await Tenders.removeTender(tender._id);
+    } catch (e) {
+      expect(e.message).toBe('Can not delete open or closed tender');
+    }
+
     await Tenders.removeTender(_tender._id);
 
     expect(await Tenders.find({ _id: _tender._id }).count()).toBe(0);
@@ -91,8 +113,11 @@ describe('Tender db', () => {
   });
 
   test('Publish drafts', async () => {
-    let tender1 = await tenderFactory({ publishDate: new Date() });
-    let tender2 = await tenderFactory({ publishDate: new Date('2040-01-01') });
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2040-02-01 01:01'));
+
+    let tender1 = await tenderFactory({ publishDate: new Date('2040-02-01 01:00') });
+    let tender2 = await tenderFactory({ publishDate: new Date('2040-02-02') });
 
     await Tenders.publishDrafts();
 
@@ -104,8 +129,11 @@ describe('Tender db', () => {
   });
 
   test('Close opens', async () => {
-    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date() });
-    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2040-01-01') });
+    // mocking datetime now
+    dbUtils.getNow = jest.fn(() => new Date('2018/01/20 17:11'));
+
+    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:10') });
+    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:12') });
 
     await Tenders.closeOpens();
 

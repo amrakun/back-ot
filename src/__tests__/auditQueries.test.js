@@ -66,8 +66,10 @@ describe('Company queries', () => {
         audits {
           _id
           createdUserId
-          date
           supplierIds
+          status
+          publishDate
+          closeDate
         }
       }
     `;
@@ -88,15 +90,21 @@ describe('Company queries', () => {
       supplierIds: [_company._id],
     });
 
-    await auditResponseFactory({ auditId: audit._id, supplierId: _company._id });
+    await auditResponseFactory({
+      auditId: audit._id,
+      supplierId: _company._id,
+      isSent: true,
+    });
 
     const query = `
       query auditDetail($_id: String!) {
         auditDetail(_id: $_id) {
           _id
           createdUserId
-          date
           supplierIds
+          status
+          publishDate
+          closeDate
 
           createdUser {
             _id
@@ -108,6 +116,7 @@ describe('Company queries', () => {
 
           responses {
             _id
+            status
 
             supplier {
               _id
@@ -199,7 +208,9 @@ describe('Company queries', () => {
     expect(response.responses.length).toBe(1);
     expect(response.responses[0].supplier._id).toBeDefined();
 
-    expect(response.date).toBeDefined();
+    expect(response.status).toBeDefined();
+    expect(response.publishDate).toBeDefined();
+    expect(response.closeDate).toBeDefined();
   });
 
   test('audit response by user', async () => {

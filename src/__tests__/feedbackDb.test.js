@@ -44,6 +44,7 @@ describe('Feedback db', () => {
 
     const doc = await feedbackResponseFactory();
     delete doc._id;
+    delete doc.status;
     await FeedbackResponses.remove({});
 
     let feedbackResponseObj = await FeedbackResponses.createFeedbackResponse({ ...doc });
@@ -69,6 +70,7 @@ describe('Feedback db', () => {
   test('Create feedback response: status late', async () => {
     const doc = await feedbackResponseFactory();
     delete doc._id;
+    delete doc.status;
 
     await FeedbackResponses.remove({});
 

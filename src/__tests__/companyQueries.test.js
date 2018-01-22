@@ -47,6 +47,9 @@ describe('Company queries', () => {
         isProductsInfoValidated
         productsInfoLastValidatedDate
 
+      isSentRegistrationInfo
+      isSentPrequalificationInfo
+
         isPrequalified
 
         averageDifotScore
@@ -86,6 +89,8 @@ describe('Company queries', () => {
   });
 
   test('companies', async () => {
+    const user = await userFactory();
+
     // Creating test data ==============
     await Companies.create({}); // to check empty company ignorance
 
@@ -102,11 +107,15 @@ describe('Company queries', () => {
       .endOf('day');
 
     const blockedCompany = await companyFactory({ enName: 'blocked' });
-    await BlockedCompanies.block({
-      supplierId: blockedCompany._id,
-      startDate: today,
-      endDate: tomorrow,
-    });
+
+    await BlockedCompanies.block(
+      {
+        supplierId: blockedCompany._id,
+        startDate: today,
+        endDate: tomorrow,
+      },
+      user._id,
+    );
 
     await companyFactory({ enName: 'en name', sapNumber: '1441aabb' });
 
@@ -234,7 +243,7 @@ describe('Company queries', () => {
       productsInfoLastValidatedDate: validatedDate,
     });
 
-    await auditFactory({ supplierIds: [_company._id] });
+    await auditFactory({ supplierIds: [_company._id], status: 'open' });
 
     const response = await graphqlRequest(query, 'companies');
 
@@ -249,5 +258,22 @@ describe('Company queries', () => {
 
     // audits
     expect(company.audits.length).toBe(1);
+  });
+
+  test('companies: tier types', async () => {
+    const qry = `
+      query companies($region: String) {
+        companies(region: $region) {
+          tierType
+        }
+      }
+    `;
+
+    await companyFactory({ tierType: 'national' });
+    await companyFactory({ tierType: 'tier1' });
+
+    const response = await graphqlRequest(qry, 'companies', { region: 'national' });
+
+    expect(response.length).toBe(1);
   });
 });

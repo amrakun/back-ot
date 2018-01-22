@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
-import { field } from './utils';
+import { field, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -52,7 +51,7 @@ const TenderSchema = mongoose.Schema({
   requestedDocuments: field({ type: [String] }),
 });
 
-class Tender {
+class Tender extends StatusPublishClose {
   /**
    * Create new tender
    * @param {Object} doc - tender fields
@@ -60,16 +59,12 @@ class Tender {
    * @return {Promise} newly created tender object
    */
   static createTender(doc, userId) {
-    const now = new Date();
-
-    let status = 'draft';
-
-    // publish date is today
-    if (moment(doc.publishDate).diff(now, 'days') === 0) {
-      status = 'open';
-    }
-
-    return this.create({ ...doc, status, createdDate: now, createdUserId: userId });
+    return this.create({
+      ...doc,
+      status: 'draft',
+      createdDate: new Date(),
+      createdUserId: userId,
+    });
   }
 
   /**
@@ -79,6 +74,12 @@ class Tender {
    * @return {Promise} updated tender info
    */
   static async updateTender(_id, doc) {
+    const tender = await this.findOne({ _id });
+
+    if (tender.status !== 'draft') {
+      throw new Error('Can not update open or closed tender');
+    }
+
     await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
@@ -89,7 +90,13 @@ class Tender {
    * @param {String} _id - Tender id
    * @return {Promise} - remove method response
    */
-  static removeTender(_id) {
+  static async removeTender(_id) {
+    const tender = await this.findOne({ _id });
+
+    if (tender.status !== 'draft') {
+      throw new Error('Can not delete open or closed tender');
+    }
+
     return this.remove({ _id });
   }
 
@@ -103,44 +110,6 @@ class Tender {
     await this.update({ _id }, { $set: { status: 'awarded', winnerId: supplierId } });
 
     return this.findOne({ _id });
-  }
-
-  /*
-   * Open drafted tenders
-   * @return null
-   */
-  static async publishDrafts() {
-    const now = new Date();
-    const draftTenders = await this.find({ status: 'draft' });
-
-    for (let draftTender of draftTenders) {
-      // publish date is today
-      if (moment(draftTender.publishDate).diff(now, 'days') === 0) {
-        // change status to open
-        await this.update({ _id: draftTender._id }, { $set: { status: 'open' } });
-      }
-    }
-
-    return 'done';
-  }
-
-  /*
-   * Close open tenders if closeDate is here
-   * @return null
-   */
-  static async closeOpens() {
-    const now = new Date();
-    const openTenders = await this.find({ status: 'open' });
-
-    for (let openTender of openTenders) {
-      // close date is today
-      if (moment(openTender.closeDate).diff(now, 'days') === 0) {
-        // change status to closed
-        await this.update({ _id: openTender._id }, { $set: { status: 'closed' } });
-      }
-    }
-
-    return 'done';
   }
 
   /*
@@ -202,8 +171,8 @@ const RespondedProductSchema = mongoose.Schema(
     unitPrice: field({ type: Number }),
     totalPrice: field({ type: Number }),
     leadTime: field({ type: Number }),
-    shippingTerms: field({ type: String }),
-    comment: field({ type: String }),
+    shippingTerms: field({ type: String, optional: true }),
+    comment: field({ type: String, optional: true }),
     file: field({ type: FileSchema }),
   },
   { _id: false },
@@ -236,6 +205,13 @@ class TenderResponse {
    */
   static async createTenderResponse(doc) {
     const { tenderId, supplierId } = doc;
+
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    // can send to only open tenders
+    if (tender.status !== 'open') {
+      throw Error('This tender is not available');
+    }
 
     const previousEntry = await this.findOne({ tenderId, supplierId });
 

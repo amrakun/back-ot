@@ -41,13 +41,14 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
     const mutations = [
       'qualificationsSaveFinancialInfo',
       'qualificationsSaveBusinessInfo',
       'qualificationsSaveEnvironmentalInfo',
       'qualificationsSaveHealthInfo',
+      'qualificationsSaveTierType',
     ];
 
     const user = await userFactory({ isSupplier: true });
@@ -126,5 +127,26 @@ describe('Company mutations', () => {
       sectionName: 'healthInfo',
       schema: HealthInfoSchema,
     });
+  });
+
+  test('tier type', async () => {
+    const mutation = `
+      mutation qualificationsSaveTierType($supplierId: String!, $tierType: String! ) {
+        qualificationsSaveTierType(supplierId: $supplierId, tierType: $tierType) {
+          tierType
+        }
+      }
+    `;
+
+    const params = {
+      supplierId: [_company._id],
+      tierType: 'national',
+    };
+
+    const context = { user: _user };
+
+    const res = await graphqlRequest(mutation, 'qualificationsSaveTierType', params, context);
+
+    expect(res.tierType).toBe('national');
   });
 });

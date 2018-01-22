@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
-import { field } from './utils';
+import { field, StatusPublishClose } from './utils';
 
 // Audit schema
 const AuditSchema = mongoose.Schema({
-  createdUserId: field({ type: String }),
-  date: field({ type: Date }),
+  status: field({ type: String }),
+  publishDate: field({ type: Date }),
+  closeDate: field({ type: Date }),
   supplierIds: field({ type: [String] }),
+  createdUserId: field({ type: String }),
 });
 
-class Audit {
+class Audit extends StatusPublishClose {
   /**
    * Create new audit
    * @param {Object} doc - audit fields
@@ -16,7 +18,11 @@ class Audit {
    * @return {Promise} newly created audit object
    */
   static createAudit(doc, userId) {
-    return this.create({ ...doc, createdUserId: userId });
+    return this.create({
+      ...doc,
+      status: 'draft',
+      createdUserId: userId,
+    });
   }
 }
 
@@ -43,9 +49,9 @@ const ReplyRecommendSchema = mongoose.Schema(
     supplierComment: field({ type: String }),
     supplierAnswer: field({ type: Boolean }),
 
-    auditorComment: field({ type: String }),
-    auditorRecommendation: field({ type: String }),
-    auditorScore: field({ type: Boolean }),
+    auditorComment: field({ type: String, optional: true }),
+    auditorRecommendation: field({ type: String, optional: true }),
+    auditorScore: field({ type: Boolean, optional: true }),
   },
   { _id: false },
 );
@@ -152,107 +158,112 @@ const BusinessInfoSchema = mongoose.Schema(
 const EvidenceInfoSchema = mongoose.Schema(
   {
     // Does the organization have a health safety & environmental management
-    doesHaveHealthSafety: field({ type: Boolean }),
+    doesHaveHealthSafety: field({ type: Boolean, optional: true }),
 
     // Does the organization have a documented drug or alcohol policy
-    doesHaveDrugPolicy: field({ type: Boolean }),
+    doesHaveDrugPolicy: field({ type: Boolean, optional: true }),
 
     // Does the organization perform pre employment
-    doesPerformPreemployment: field({ type: Boolean }),
+    doesPerformPreemployment: field({ type: Boolean, optional: true }),
 
     // Do the organizations work procedures conform to local statutory
-    workProceduresConform: field({ type: Boolean }),
+    workProceduresConform: field({ type: Boolean, optional: true }),
 
     // Does the organization have a formal process for HSE
-    doesHaveFormalProcessForHSE: field({ type: Boolean }),
+    doesHaveFormalProcessForHSE: field({ type: Boolean, optional: true }),
 
     // Does the organization have a system or process for current employee
-    doesHaveSystemForTracking: field({ type: Boolean }),
+    doesHaveSystemForTracking: field({ type: Boolean, optional: true }),
 
     // Does the organization have valid industry certifictions
-    doesHaveValidCertifications: field({ type: Boolean }),
+    doesHaveValidCertifications: field({ type: Boolean, optional: true }),
 
     // Does the organization have a process for reporting
-    doesHaveSystemForReporting: field({ type: Boolean }),
+    doesHaveSystemForReporting: field({ type: Boolean, optional: true }),
 
     // Does the organization have liability insurance
-    doesHaveLiabilityInsurance: field({ type: Boolean }),
+    doesHaveLiabilityInsurance: field({ type: Boolean, optional: true }),
 
     // Does the organization have a formal process for health
-    doesHaveFormalProcessForHealth: field({ type: Boolean }),
+    doesHaveFormalProcessForHealth: field({ type: Boolean, optional: true }),
 
     // Is there a current signed work contract for all types of employees
-    isThereCurrentContract: field({ type: Boolean }),
+    isThereCurrentContract: field({ type: Boolean, optional: true }),
 
     // Does the company have a job description
-    doesHaveJobDescription: field({ type: Boolean }),
+    doesHaveJobDescription: field({ type: Boolean, optional: true }),
 
     // Does the company have a training and development policiy
-    doesHaveTraining: field({ type: Boolean }),
+    doesHaveTraining: field({ type: Boolean, optional: true }),
 
     // is there a procedure related to employee performance
-    doesHaveEmployeeRelatedProcedure: field({ type: Boolean }),
+    doesHaveEmployeeRelatedProcedure: field({ type: Boolean, optional: true }),
 
     // Does the company have time-keeping management
-    doesHaveTimeKeeping: field({ type: Boolean }),
+    doesHaveTimeKeeping: field({ type: Boolean, optional: true }),
 
     // Are there any policies that relate to performance and employee
     // conduct practices
-    doesHavePerformancePolicy: field({ type: Boolean }),
+    doesHavePerformancePolicy: field({ type: Boolean, optional: true }),
 
     // Does the organization have process or framework to support the
     // active engagement
-    doesHaveProcessToSupport: field({ type: Boolean }),
+    doesHaveProcessToSupport: field({ type: Boolean, optional: true }),
 
     // Are employees made aware of their rights
-    employeesAwareOfRights: field({ type: Boolean }),
+    employeesAwareOfRights: field({ type: Boolean, optional: true }),
 
     // Does the organization have a system in place to ensure safe work
     // procedures
-    doesHaveSystemToEnsureSafeWork: field({ type: Boolean }),
+    doesHaveSystemToEnsureSafeWork: field({ type: Boolean, optional: true }),
 
     // Are there any policies and procedures related to employee selection
-    doesHaveEmployeeSelectionProcedure: field({ type: Boolean }),
+    doesHaveEmployeeSelectionProcedure: field({ type: Boolean, optional: true }),
 
     // Does the company have a procedure related to employee labor contract
     // termination
-    doesHaveEmployeeLaborProcedure: field({ type: Boolean }),
+    doesHaveEmployeeLaborProcedure: field({ type: Boolean, optional: true }),
 
     // Does the company have employee grievance/complaint and fair
     // treatment policy
-    doesHaveGrievancePolicy: field({ type: Boolean }),
+    doesHaveGrievancePolicy: field({ type: Boolean, optional: true }),
 
     // Are there processes and procedures in place to ensure that your policies
     // or codes of conduct are effectively implemented throughout your company
-    proccessToEnsurePolicesCompany: field({ type: Boolean }),
+    proccessToEnsurePolicesCompany: field({ type: Boolean, optional: true }),
 
     // Are there processes and procedures in place to ensure that your policies
     // or codes of conduct are effectively implemented throughout supply chain
-    proccessToEnsurePolicesSupplyChain: field({ type: Boolean }),
+    proccessToEnsurePolicesSupplyChain: field({ type: Boolean, optional: true }),
 
     // Has your company been subject to any external investigation
-    hasBeenSubjectToInvestigation: field({ type: Boolean }),
+    hasBeenSubjectToInvestigation: field({ type: Boolean, optional: true }),
 
     // Does your company have a documented policy in place to prevent
     // corruption
-    doesHaveCorruptionPolicy: field({ type: Boolean }),
+    doesHaveCorruptionPolicy: field({ type: Boolean, optional: true }),
 
     // If yes to above question who is responsible person/function for the
     // compliance/anti-corruption program
-    whoIsResponsibleForCorruptionPolicy: field({ type: Boolean }),
+    whoIsResponsibleForCorruptionPolicy: field({ type: Boolean, optional: true }),
   },
   { _id: false },
 );
 
-const AuditReplyRecommendSchema = mongoose.Schema({
+const AuditResponseSchema = mongoose.Schema({
   auditId: field({ type: String }),
   supplierId: field({ type: String }),
+
+  // onTime or late
+  status: field({ type: String, optional: true }),
 
   basicInfo: BasicInfoSchema,
   coreHseqInfo: CoreHseqInfoSchema,
   hrInfo: HrInfoSchema,
   businessInfo: BusinessInfoSchema,
   evidenceInfo: EvidenceInfoSchema,
+
+  isSent: field({ type: Boolean, optional: true }),
 });
 
 class AuditResponse {
@@ -341,12 +352,35 @@ class AuditResponse {
       return this.findOne({ _id: previousEntry._id });
     }
 
-    return this.create({ auditId, supplierId, [name]: doc });
+    return this.create({ auditId, isSent: false, supplierId, [name]: doc });
+  }
+
+  /**
+   * Mark this response as sent
+   * @return - Updated response object
+   */
+  async send() {
+    if (this.isSent) {
+      throw new Error('Already sent');
+    }
+
+    let status = 'onTime';
+
+    const audit = await Audits.findOne({ _id: this.auditId });
+
+    // if closeDate is reached, mark status as late
+    if (audit.status === 'closed') {
+      status = 'late';
+    }
+
+    await this.update({ isSent: true, status });
+
+    return AuditResponses.findOne({ _id: this._id });
   }
 }
 
-AuditReplyRecommendSchema.loadClass(AuditResponse);
+AuditResponseSchema.loadClass(AuditResponse);
 
-const AuditResponses = mongoose.model('audit_responses', AuditReplyRecommendSchema);
+const AuditResponses = mongoose.model('audit_responses', AuditResponseSchema);
 
 export { Audits, AuditResponses };

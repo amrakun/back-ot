@@ -8,36 +8,37 @@ import { field } from './utils';
 
 const SALT_WORK_FACTOR = 10;
 
-// Detail schema
-const DetailSchema = mongoose.Schema(
-  {
-    avatar: field({ type: String }),
-    fullName: field({ type: String }),
-  },
-  { _id: false },
-);
-
 // User schema
 const UserSchema = mongoose.Schema({
-  companyId: field({ type: mongoose.Schema.Types.ObjectId }),
+  companyId: field({ type: mongoose.Schema.Types.ObjectId, optional: true }),
+
   username: field({ type: String }),
-  password: field({ type: String }),
-  registrationToken: field({ type: String }),
-  registrationTokenExpires: field({ type: Date }),
-  resetPasswordToken: field({ type: String }),
-  resetPasswordExpires: field({ type: Date }),
+  password: field({ type: String, optional: true }),
+
+  registrationToken: field({ type: String, optional: true }),
+  registrationTokenExpires: field({ type: Date, optional: true }),
+  resetPasswordToken: field({ type: String, optional: true }),
+  resetPasswordExpires: field({ type: Date, optional: true }),
+
   role: field({
     type: String,
     enum: [ROLES.ADMIN, ROLES.CONTRIBUTOR],
+    optional: true,
   }),
-  isSupplier: field({ type: Boolean }),
+
+  isSupplier: field({ type: Boolean, optional: true }),
+
   email: field({
     type: String,
     lowercase: true,
     unique: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
   }),
-  details: field({ type: DetailSchema }),
+
+  firstName: field({ type: String, optional: true }),
+  lastName: field({ type: String, optional: true }),
+  jobTitle: field({ type: String, optional: true }),
+  phone: field({ type: Number, optional: true }),
 });
 
 class User {
@@ -50,17 +51,18 @@ class User {
    * @param {Object} doc - user fields
    * @return {Promise} newly created user object
    */
-  static async createUser({ username, email, password, role, details }) {
+  static async createUser(doc) {
+    const { email, password } = doc;
+
     if (await this.findOne({ email })) {
       throw new Error('Duplicated email');
     }
 
     return this.create({
-      username,
-      email,
-      role,
+      ...doc,
+
       isSupplier: false,
-      details,
+
       // hash password
       password: await this.generatePassword(password),
     });
@@ -72,8 +74,8 @@ class User {
    * @param {Object} doc - user fields
    * @return {Promise} updated user info
    */
-  static async updateUser(_id, { username, email, password, role, details }) {
-    const doc = { username, email, password, role, details };
+  static async updateUser(_id, { username, email, password, role }) {
+    const doc = { username, email, password, role };
 
     if (await this.findOne({ _id: { $ne: _id }, email })) {
       throw new Error('Duplicated email');
@@ -99,8 +101,8 @@ class User {
    * @param {Object} doc - User profile information
    * @return {Promise} - Updated user
    */
-  static async editProfile(_id, { username, email, details }) {
-    await this.update({ _id }, { $set: { username, email, details } });
+  static async editProfile(_id, doc) {
+    await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
   }
@@ -242,15 +244,12 @@ class User {
    * @param {String} secret - Token secret
    * @return [String] - list of tokens
    */
-  static async createTokens(_user, secret) {
-    const user = {
-      _id: _user._id,
-      email: _user.email,
-      details: _user.details,
-      role: _user.role,
-      isSupplier: _user.isSupplier,
-      companyId: _user.companyId,
-    };
+  static async createTokens(user, secret) {
+    delete user.password;
+    delete user.registrationToken;
+    delete user.registrationTokenExpires;
+    delete user.resetPasswordToken;
+    delete user.resetPasswordExpires;
 
     const createToken = await jwt.sign({ user }, secret, { expiresIn: '20m' });
 

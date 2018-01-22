@@ -332,6 +332,8 @@ export const types = `
     shareholderInfo: CompanyShareholderInfo
     groupInfo: CompanyGroupInfo
 
+    tierType: String
+
     productsInfo: [String]
     validatedProductsInfo: [String]
     isProductsInfoValidated: Boolean
@@ -342,6 +344,9 @@ export const types = `
     businessInfo: CompanyBusinessInfo
     environmentalInfo: CompanyEnvironmentalInfo
     healthInfo: CompanyHealthInfo
+
+    isSentRegistrationInfo: Boolean
+    isSentPrequalificationInfo: Boolean
 
     isPrequalified: Boolean
 
@@ -375,6 +380,7 @@ const queryParams = `
   includeBlocked: Boolean,
   isPrequalified: Boolean,
   difotScore: String,
+  region: String,
   _ids: [String],
 `;
 
@@ -403,4 +409,7 @@ export const mutations = `
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
   companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
+
+  companiesSendRegistrationInfo(_id: String!): Company
+  companiesSendPrequalificationInfo(_id: String!): Company
 `;

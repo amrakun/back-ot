@@ -177,7 +177,9 @@ export const types = `
     _id: String!
     createdUserId: String
     supplierIds: [String]
-    date: Date
+    status: String
+    publishDate: Date
+    closeDate: Date
 
     createdUser: User
     suppliers: [Company]
@@ -186,8 +188,11 @@ export const types = `
 
   type AuditResponse {
     _id: String!
-    auditId: String,
-    supplierId: String,
+    auditId: String
+    supplierId: String
+
+    status: String
+    isSent: Boolean
 
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo
@@ -208,7 +213,7 @@ export const queries = `
 `;
 
 export const mutations = `
-  auditsAdd(date: Date!, supplierIds: [String]!): Audit
+  auditsAdd(publishDate: Date!, closeDate: Date!, supplierIds: [String]!): Audit
 
   auditsSupplierSaveBasicInfo(
     auditId: String,
@@ -239,6 +244,11 @@ export const mutations = `
     supplierId: String,
     evidenceInfo: AuditSupplierEvidenceInfoInput
   ): Audit
+
+  auditsSupplierSendResponse(
+    auditId: String,
+    supplierId: String,
+  ): AuditResponse
 
   auditsBuyerSaveCoreHseqInfo(
     auditId: String,

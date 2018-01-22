@@ -15,7 +15,7 @@ const generateFields = schema => {
   const definations = {};
 
   for (let name of names) {
-    definations[name] = field({ type: Boolean });
+    definations[name] = field({ type: Boolean, optional: true });
   }
 
   return mongoose.Schema(definations, { _id: false });
@@ -27,6 +27,12 @@ const QualificationSchema = mongoose.Schema({
   businessInfo: generateFields(BusinessInfoSchema),
   environmentalInfo: generateFields(EnvironmentalInfoSchema),
   healthInfo: generateFields(HealthInfoSchema),
+
+  tierType: field({
+    type: String,
+    enum: ['national', 'umnugobi', 'tier1', 'tier2', 'tier3'],
+    optional: true,
+  }),
 });
 
 class Qualification {
@@ -73,6 +79,18 @@ class Qualification {
 
     // update company's prequalified status
     await Companies.update({ _id: supplierId }, { $set: { isPrequalified } });
+
+    return qualification;
+  }
+
+  /*
+   * Save tier type
+   */
+  static async saveTierType(supplierId, section, value) {
+    const qualification = await this.updateSection(supplierId, section, value);
+
+    // update supplier's tier type
+    await Companies.update({ _id: supplierId }, { $set: { tierType: value } });
 
     return qualification;
   }

@@ -1,6 +1,5 @@
-import moment from 'moment';
 import mongoose from 'mongoose';
-import { field } from './utils';
+import { field, isReached } from './utils';
 
 // Feedback schema
 const FeedbackSchema = mongoose.Schema({
@@ -34,12 +33,11 @@ class Feedback {
    * @return null
    */
   static async closeOpens() {
-    const now = new Date();
     const openFeedbacks = await this.find({ status: 'open' });
 
     for (let openFeedback of openFeedbacks) {
       // close date is today
-      if (moment(openFeedback.closeDate).diff(now, 'days') === 0) {
+      if (isReached(openFeedback.closeDate)) {
         // change status to closed
         await this.update({ _id: openFeedback._id }, { $set: { status: 'closed' } });
       }

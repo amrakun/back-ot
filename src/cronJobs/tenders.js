@@ -1,9 +1,8 @@
 import schedule from 'node-schedule';
 import { Tenders } from '../db/models';
 
-// every day at 0 0
-// 0 0 * * *
-schedule.scheduleJob('*/5 * * * *', async () => {
+// every 1 minute
+schedule.scheduleJob('*/1 * * * *', async () => {
   await Tenders.publishDrafts();
   await Tenders.closeOpens();
 

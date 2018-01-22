@@ -7,7 +7,7 @@ const BlockedCompanySchema = mongoose.Schema({
   supplierId: field({ type: String }),
   startDate: field({ type: Date }),
   endDate: field({ type: Date }),
-  note: field({ type: String }),
+  note: field({ type: String, optional: true }),
 
   createdUserId: field({ type: String }),
 });

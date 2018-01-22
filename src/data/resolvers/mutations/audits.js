@@ -3,8 +3,8 @@ import { requireSupplier, requireBuyer } from '../../permissions';
 
 const auditMutations = {
   // create new audit
-  auditsAdd(root, { date, supplierIds }, { user }) {
-    return Audits.createAudit({ date, supplierIds }, user._id);
+  auditsAdd(root, args, { user }) {
+    return Audits.createAudit(args, user._id);
   },
 
   // save basic info
@@ -15,6 +15,17 @@ const auditMutations = {
   // save evidence info
   auditsSupplierSaveEvidenceInfo(root, { auditId, supplierId, evidenceInfo }) {
     return AuditResponses.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
+  },
+
+  // mark response as sent
+  async auditsSupplierSendResponse(root, { auditId, supplierId }) {
+    const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
+
+    if (response) {
+      return response.send();
+    }
+
+    return null;
   },
 };
 
@@ -48,5 +59,6 @@ sections.forEach(section => {
 requireBuyer(auditMutations, 'auditsAdd');
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSaveEvidenceInfo');
+requireSupplier(auditMutations, 'auditsSupplierSendResponse');
 
 export default auditMutations;

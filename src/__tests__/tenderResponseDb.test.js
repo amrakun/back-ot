@@ -15,7 +15,7 @@ describe('Tender response db', () => {
 
   beforeEach(async () => {
     // Creating test data
-    _tender = await tenderFactory();
+    _tender = await tenderFactory({ status: 'open' });
     _company = await companyFactory();
   });
 
@@ -78,5 +78,17 @@ describe('Tender response db', () => {
     });
 
     expect(await TenderResponses.find().count()).toBe(1);
+  });
+
+  test('Create tender response: with not open status', async () => {
+    expect.assertions(1);
+
+    const tender = await tenderFactory({ status: 'draft' });
+
+    try {
+      await TenderResponses.createTenderResponse({ tenderId: tender._id });
+    } catch (e) {
+      expect(e.message).toBe('This tender is not available');
+    }
   });
 });

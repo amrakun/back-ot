@@ -87,4 +87,14 @@ describe('Qualification db', () => {
 
     expect(updatedCompany.isPrequalified).toBe(true);
   });
+
+  test('Tier type', async () => {
+    const qualif = await Qualifications.saveTierType(_company._id, 'tierType', 'national');
+
+    expect(qualif.tierType).toBe('national');
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.tierType).toBe('national');
+  });
 });

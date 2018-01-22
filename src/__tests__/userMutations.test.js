@@ -183,46 +183,118 @@ describe('User mutations', () => {
   });
 
   test('Users add', async () => {
-    const user = { _id: 'DFAFDFDFD', role: 'admin' };
+    Users.createUser = jest.fn();
 
-    Users.createUser = jest.fn(() => ({ _id: '_id' }));
+    const mutation = `
+      mutation usersAdd(
+        $username: String!,
+        $email: String!,
+        $role: String!,
 
-    const doc = {
+        $firstName: String,
+        $lastName: String,
+        $jobTitle: String,
+        $phone: Float,
+
+        $password: String!,
+        $passwordConfirmation: String!
+      ) {
+        usersAdd(
+          username: $username,
+          email: $email,
+          role: $role,
+
+          firstName: $firstName,
+          lastName: $lastName,
+          jobTitle: $jobTitle,
+          phone: $phone,
+
+          password: $password,
+          passwordConfirmation: $passwordConfirmation
+        ) {
+          _id
+          username
+          email
+          role
+          firstName
+          lastName
+          jobTitle
+          phone
+        }
+      }
+    `;
+
+    const args = {
       username: 'username',
-      password: 'password',
       email: 'info@erxes.io',
       role: 'admin',
-      details: {},
+      firstName: '',
+      lastName: '',
+      jobTitle: '',
+      phone: 4242422,
+      password: 'password',
+      passwordConfirmation: 'password',
     };
 
-    await userMutations.usersAdd({}, { ...doc, passwordConfirmation: 'password' }, { user });
+    await graphqlRequest(mutation, 'usersAdd', args, { user: { role: 'admin' } });
 
     // create user call
-    expect(Users.createUser).toBeCalledWith(doc);
+    expect(Users.createUser).toBeCalledWith(args);
   });
 
   test('Users edit', async () => {
-    const creatingUser = { _id: 'DFAFDFDFD', role: 'admin' };
-
     Users.updateUser = jest.fn();
 
-    const userId = 'DFAFDSFSDFDSF';
-    const doc = {
+    const mutation = `
+      mutation usersEdit(
+        $_id: String!,
+        $username: String!,
+        $email: String!,
+        $role: String!,
+
+        $firstName: String,
+        $lastName: String,
+        $jobTitle: String,
+        $phone: Float,
+
+        $password: String,
+        $passwordConfirmation: String
+      ) {
+        usersEdit(
+          _id: $_id,
+          username: $username,
+          email: $email,
+          role: $role,
+
+          firstName: $firstName,
+          lastName: $lastName,
+          jobTitle: $jobTitle,
+          phone: $phone,
+
+          password: $password,
+          passwordConfirmation: $passwordConfirmation
+        ) {
+          _id
+        }
+      }
+    `;
+
+    const args = {
       username: 'username',
-      password: 'password',
       email: 'info@erxes.io',
       role: 'admin',
-      details: {},
+      firstName: '',
+      lastName: '',
+      jobTitle: '',
+      phone: 4242422,
     };
 
-    await userMutations.usersEdit(
-      {},
-      { ...doc, _id: userId, passwordConfirmation: 'password' },
-      { user: creatingUser },
-    );
+    const context = { user: { role: 'admin' } };
 
-    // update user call
-    expect(Users.updateUser).toBeCalledWith(userId, doc);
+    await graphqlRequest(mutation, 'usersEdit', { _id: user._id, ...args }, context);
+
+    // create user call
+    expect(Users.updateUser).toBeCalledWith(user._id, args);
   });
 
   test('Users edit profile: invalid password', async () => {
@@ -238,21 +310,53 @@ describe('User mutations', () => {
   });
 
   test('Users edit profile: successfull', async () => {
-    const user = await userFactory({});
-
     Users.editProfile = jest.fn();
 
-    const doc = {
+    const mutation = `
+      mutation usersEditProfile(
+        $username: String!,
+        $email: String!,
+
+        $firstName: String,
+        $lastName: String,
+        $jobTitle: String,
+        $phone: Float,
+
+        $password: String!,
+      ) {
+        usersEditProfile(
+          username: $username,
+          email: $email,
+
+          firstName: $firstName,
+          lastName: $lastName,
+          jobTitle: $jobTitle,
+          phone: $phone,
+
+          password: $password,
+        ) {
+          _id
+        }
+      }
+    `;
+
+    const args = {
       username: 'username',
       email: 'info@erxes.io',
-      details: {
-        fullName: 'fullName',
-      },
+      password: 'pass',
+      firstName: '',
+      lastName: '',
+      jobTitle: '',
+      phone: 4242422,
     };
 
-    await userMutations.usersEditProfile({}, { ...doc, password: 'pass' }, { user });
+    const _user = await userFactory();
+    const context = { user: _user };
 
-    expect(Users.editProfile).toBeCalledWith(user._id, doc);
+    await graphqlRequest(mutation, 'usersEditProfile', args, context);
+
+    // create user call
+    expect(Users.editProfile).toBeCalledWith(_user._id, args);
   });
 
   test('Users remove: successful', async () => {
