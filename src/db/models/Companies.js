@@ -175,9 +175,9 @@ const DateFileSchema = mongoose.Schema(
 export const FinancialInfoSchema = mongoose.Schema(
   {
     // Can you provide accounts for the last 3 financial year?
-    canProvideAccountsInfo: field({ type: Boolean, optional: true }),
+    canProvideAccountsInfo: field({ type: Boolean }),
 
-    reasonToCannotNotProvide: field({ type: String, optional: true }),
+    reasonToCannotNotProvide: field({ type: String }),
 
     currency: field({ type: String, optional: true }),
     annualTurnover: field({ type: [YearAmountSchema], optional: true }),
@@ -189,10 +189,10 @@ export const FinancialInfoSchema = mongoose.Schema(
     recordsInfo: field({ type: [DateFileSchema], optional: true }),
 
     // Is your company up to date with Social Security payments?
-    isUpToDateSSP: field({ type: Boolean, optional: true }),
+    isUpToDateSSP: field({ type: Boolean }),
 
     // Is your company up to date with Corporation Tax payments?
-    isUpToDateCTP: field({ type: Boolean, optional: true }),
+    isUpToDateCTP: field({ type: Boolean }),
   },
   { _id: false },
 );
@@ -212,64 +212,64 @@ export const BusinessInfoSchema = mongoose.Schema(
   {
     // Does your company meet minimum standards of fair employment
     // practice required by Mongolian labor laws and regulations
-    doesMeetMinimumStandarts: field({ type: Boolean, optional: true }),
+    doesMeetMinimumStandarts: field({ type: Boolean }),
     doesMeetMinimumStandartsFile: field({ type: FileSchema, optional: true }),
 
     // Does the Company have a job description procedure in place?
-    doesHaveJobDescription: field({ type: Boolean, optional: true }),
+    doesHaveJobDescription: field({ type: Boolean }),
     doesHaveJobDescriptionFile: field({ type: FileSchema, optional: true }),
 
     // Does the company conclude valid contracts with all employees. (include skilled/unskilled,
     // temporary and permanent, and underage workers, etc)
-    doesConcludeValidContracts: field({ type: Boolean, optional: true }),
+    doesConcludeValidContracts: field({ type: Boolean }),
 
     // Please provide the employee turnover rate within your company in the last 12 months
-    employeeTurnoverRate: field({ type: Number, optional: true }),
+    employeeTurnoverRate: field({ type: Number }),
 
     // Does the organisation have Liability insurance which meets
     // Oyu Tolgoi’s minimum requirements and valid worker compensation insurance or enrolment
     // in an applicable occupational injury/illness insurance programme?
-    doesHaveLiabilityInsurance: field({ type: Boolean, optional: true }),
+    doesHaveLiabilityInsurance: field({ type: Boolean }),
     doesHaveLiabilityInsuranceFile: field({ type: FileSchema, optional: true }),
 
     // Does your company have a documented code of ethics/conduct?
-    doesHaveCodeEthics: field({ type: Boolean, optional: true }),
+    doesHaveCodeEthics: field({ type: Boolean }),
     doesHaveCodeEthicsFile: field({ type: FileSchema, optional: true }),
 
     // Does your company have a documented Corporate Social Responsibility policy?
-    doesHaveResponsiblityPolicy: field({ type: Boolean, optional: true }),
+    doesHaveResponsiblityPolicy: field({ type: Boolean }),
     doesHaveResponsiblityPolicyFile: field({ type: FileSchema, optional: true }),
 
     // Has your company ever been convicted for a breach of any labour
     // laws in the countries you operate within the last five years?
-    hasConvictedLabourLaws: field({ type: Boolean, optional: true }),
+    hasConvictedLabourLaws: field({ type: Boolean }),
 
     // Has your company ever been convicted for a breach of any human
     // rights in the countries you operate within the last five years?
-    hasConvictedForHumanRights: field({ type: Boolean, optional: true }),
+    hasConvictedForHumanRights: field({ type: Boolean }),
 
     // Has your company ever been convicted for a breach of any business
     // integrity in the countries you operate within the last five years?
-    hasConvictedForBusinessIntegrity: field({ type: Boolean, optional: true }),
+    hasConvictedForBusinessIntegrity: field({ type: Boolean }),
 
     // If Yes, what steps have you taken to ensure this does not happen again?
     proveHasNotConvicted: field({ type: String, optional: true }),
 
     // Has your company or any of its directors been investigated or convicted of
     // any other legal infringement not described above within the last five years?
-    hasLeadersConvicted: field({ type: Boolean, optional: true }),
+    hasLeadersConvicted: field({ type: Boolean }),
 
     investigations: field({ type: [InvestigationSchema], optional: true }),
 
     // Does your company employ any politically exposed person?
     // If yes, provide list of PEP name
-    doesEmployeePoliticallyExposed: field({ type: Boolean, optional: true }),
+    doesEmployeePoliticallyExposed: field({ type: Boolean }),
 
     /// Does your company employ any politically exposed person?
     // If yes, provide list of PEP name
     pepName: field({ type: String, optional: true }),
 
-    organizationChartFile: field({ type: FileSchema, optional: true }),
+    organizationChartFile: field({ type: FileSchema }),
   },
   { _id: false },
 );
@@ -281,12 +281,12 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
     // or procedures(including air quality,
     // greenhouse gases emissions, water and contamination prevention,
     // noise and vibration, Waste Management)?
-    doesHavePlan: field({ type: Boolean, optional: true }),
+    doesHavePlan: field({ type: Boolean }),
     doesHavePlanFile: field({ type: FileSchema, optional: true }),
 
     // Has any environmental regulator inspected / investigated your
     // company within the last 5 years?
-    hasEnvironmentalRegulatorInvestigated: field({ type: Boolean, optional: true }),
+    hasEnvironmentalRegulatorInvestigated: field({ type: Boolean }),
 
     dateOfInvestigation: field({ type: String, optional: true }),
 
@@ -298,7 +298,7 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
 
     // Has your company ever been convicted for a breach of any
     // Environmental laws in the countries you operate?
-    hasConvictedForEnvironmentalLaws: field({ type: Boolean, optional: true }),
+    hasConvictedForEnvironmentalLaws: field({ type: Boolean }),
 
     // If Yes, what steps have you taken to ensure this does not happen again?
     proveHasNotConvicted: field({ type: String, optional: true }),
@@ -311,37 +311,37 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
 export const HealthInfoSchema = mongoose.Schema(
   {
     // Does the organisation have a Health Safety & Environment management system?
-    doesHaveHealthSafety: field({ type: Boolean, optional: true }),
+    doesHaveHealthSafety: field({ type: Boolean }),
     doesHaveHealthSafetyFile: field({ type: FileSchema, optional: true }),
 
     // Are HSE resources, roles, responsibilities and authority levels clearly
     // identified and defined within your Organisation?
-    areHSEResourcesClearlyIdentified: field({ type: Boolean, optional: true }),
+    areHSEResourcesClearlyIdentified: field({ type: Boolean }),
 
     // Does your company have a documented process to ensure all staff
     // receive health and safety training and induction?
-    doesHaveDocumentedProcessToEnsure: field({ type: Boolean, optional: true }),
+    doesHaveDocumentedProcessToEnsure: field({ type: Boolean }),
     doesHaveDocumentedProcessToEnsureFile: field({ type: FileSchema, optional: true }),
 
     // Are all employees under your control required to utilise appropriate
     // Personal Protective Equipment (PPE) at all times?
-    areEmployeesUnderYourControl: field({ type: Boolean, optional: true }),
+    areEmployeesUnderYourControl: field({ type: Boolean }),
 
     //  Does the company have a documented process or guidelines for
     //  risk assessment (including CRM)?
-    doesHaveDocumentForRiskAssesment: field({ type: Boolean, optional: true }),
+    doesHaveDocumentForRiskAssesment: field({ type: Boolean }),
     doesHaveDocumentForRiskAssesmentFile: field({ type: FileSchema, optional: true }),
 
     // Does the company have a documented process for incident investigation?
-    doesHaveDocumentForIncidentInvestigation: field({ type: Boolean, optional: true }),
+    doesHaveDocumentForIncidentInvestigation: field({ type: Boolean }),
     doesHaveDocumentForIncidentInvestigationFile: field({ type: FileSchema, optional: true }),
 
     // Does your company have a documented Fitness for Work (FFW) policy?
-    doesHaveDocumentedFitness: field({ type: Boolean, optional: true }),
+    doesHaveDocumentedFitness: field({ type: Boolean }),
     doesHaveDocumentedFitnessFile: field({ type: FileSchema, optional: true }),
 
     // Is your company willing comply with Oyu Tolgoi
-    isWillingToComply: field({ type: Boolean, optional: true }),
+    isWillingToComply: field({ type: Boolean }),
 
     // Has there been any industrial accident in the last 5 financial years ?
     hasIndustrialAccident: field({ type: Boolean, optional: true }),

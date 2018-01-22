@@ -60,6 +60,16 @@ describe('Qualification queries', () => {
       supplierId,
       financialInfo: {
         canProvideAccountsInfo: true,
+        reasonToCannotNotProvide: true,
+        currency: true,
+        annualTurnover: true,
+        preTaxProfit: true,
+        totalAssets: true,
+        totalCurrentAssets: true,
+        totalShareholderEquity: true,
+        recordsInfo: true,
+        isUpToDateSSP: true,
+        isUpToDateCTP: true,
       },
     });
 
