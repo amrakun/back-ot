@@ -15,7 +15,9 @@ const generateFields = schema => {
   const definations = {};
 
   for (let name of names) {
-    definations[name] = field({ type: Boolean, optional: true });
+    const options = schema.paths[name].options;
+
+    definations[name] = field({ type: Boolean, optional: options.optional || false });
   }
 
   return mongoose.Schema(definations, { _id: false });
