@@ -210,6 +210,15 @@ export const queries = `
 
   auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
   auditResponseByUser(auditId: String!): AuditResponse
+
+  auditImprovementPlan(
+    auditId: String!,
+    supplierId: String!
+    auditDate: Date!,
+    auditResult: Boolean!,
+    reassessmentDate: Date!,
+    auditorName: String!
+  ): String
 `;
 
 export const mutations = `

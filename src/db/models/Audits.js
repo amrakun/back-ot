@@ -57,41 +57,82 @@ const ReplyRecommendSchema = mongoose.Schema(
 );
 
 // core hseq
-const CoreHseqInfoSchema = mongoose.Schema(
+export const CoreHseqInfoSchema = mongoose.Schema(
   {
-    // Does the organization have a health safety & environment management system
-    doesHaveHealthSafety: ReplyRecommendSchema,
+    doesHaveHealthSafety: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: 'Does the organization have a health safety & environment management system',
+    }),
 
-    // Does the organization have a documented drug and alcohol policy
-    doesHaveDocumentedPolicy: ReplyRecommendSchema,
+    doesHaveDocumentedPolicy: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: 'Does the organization have a documented drug and alcohol policy',
+    }),
 
-    // Does the organization perform pre employment
-    doesPerformPreemployment: ReplyRecommendSchema,
+    doesPerformPreemployment: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation perform pre-employment medical screening, \
+        fitness for work evaluations, background checks and verification of \
+        competence for employees, contractors and sub-contractors`,
+    }),
 
-    // Do the organizations work procedures conform to local statutory
-    doWorkProceduresConform: ReplyRecommendSchema,
+    doWorkProceduresConform: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Do the organisations work procedures conform to local statutory, \
+        legislative or regulatory codes and standards`,
+    }),
 
-    // Does the organisation have a formal process for HSE induction and
-    // orientation of new hire employees, contractors and sub-contractors?
-    doesHaveFormalProcess: ReplyRecommendSchema,
+    doesHaveFormalProcess: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have a formal process for HSE induction \
+        and orientation of new hire employees, contractors and sub-contractors
+      `,
+    }),
 
-    // Does the organization have a system or process for tracking
-    doesHaveTrackingSystem: ReplyRecommendSchema,
+    doesHaveTrackingSystem: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have a system or process for tracking \
+        current employee, contractor and sub-contractor qualifications and \
+        competencies`,
+    }),
 
-    // Does the organization have valid industry
-    doesHaveValidIndustry: ReplyRecommendSchema,
+    doesHaveValidIndustry: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have valid industry certifications \
+        and/or licenses if required by the type of services provided`,
+    }),
 
-    // Does the organization have formal process for reporting and investigating
-    // incidents
-    doesHaveFormalProcessForReporting: ReplyRecommendSchema,
+    doesHaveFormalProcessForReporting: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have a formal process for reporting and \
+        investigating incidents (including near-hits/near misses)`,
+    }),
 
-    // Does the organization have liability insurance which meets OT's
-    // minimum requirements
-    doesHaveLiabilityInsurance: ReplyRecommendSchema,
+    doesHaveLiabilityInsurance: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have Liability insurance which meets Oyu \
+        Tolgoi’s minimum requirements and valid worker compensation insurance \
+        or enrolment in an applicable occupational injury/illness
+        insurance programme`,
+    }),
 
     // Does the organization have formal process for health safetiy
     // incidents
-    doesHaveFormalProcessForHealth: ReplyRecommendSchema,
+    doesHaveFormalProcessForHealth: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does the organisation have a formal process for Health Safety \
+        and Environmental risk management`,
+    }),
   },
   { _id: false },
 );
@@ -110,46 +151,120 @@ const HrReplyRecommendSchema = mongoose.Schema(
   { _id: false },
 );
 
-const HrInfoSchema = mongoose.Schema(
+export const HrInfoSchema = mongoose.Schema(
   {
-    workContractManagement: HrReplyRecommendSchema,
-    jobDescriptionProcedure: HrReplyRecommendSchema,
-    trainingDevelopment: HrReplyRecommendSchema,
-    employeePerformanceManagement: HrReplyRecommendSchema,
-    timeKeepingManagement: HrReplyRecommendSchema,
-    managementOfPractises: HrReplyRecommendSchema,
-    managementOfWorkforce: HrReplyRecommendSchema,
-    employeeAwareness: HrReplyRecommendSchema,
-    employeeSelection: HrReplyRecommendSchema,
-    employeeExitManagement: HrReplyRecommendSchema,
-    grievanceAndFairTreatment: HrReplyRecommendSchema,
+    workContractManagement: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Work Contract Managemen',
+    }),
+
+    jobDescriptionProcedure: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Job Description Procedure',
+    }),
+
+    trainingDevelopment: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Training and Development Policy',
+    }),
+
+    employeePerformanceManagement: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Employee Performance Management',
+    }),
+
+    timeKeepingManagement: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Time-Keeping Management',
+    }),
+
+    managementOfPractises: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Management of Practices related to conduct',
+    }),
+
+    managementOfWorkforce: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Management of workforce engagement',
+    }),
+
+    employeeAwareness: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Employee Awareness of their rights to association',
+    }),
+
+    employeeSelection: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Employee selection and recruitment process',
+    }),
+
+    employeeExitManagement: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Employee exit management',
+    }),
+
+    grievanceAndFairTreatment: field({
+      type: HrReplyRecommendSchema,
+      optional: true,
+      label: 'Grievance and Fair treatment',
+    }),
   },
   { _id: false },
 );
 
 // business integrity info
-const BusinessInfoSchema = mongoose.Schema(
+export const BusinessInfoSchema = mongoose.Schema(
   {
-    // Does your company have in place a policy statement
-    doesHavePolicyStatement: ReplyRecommendSchema,
+    doesHavePolicyStatement: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does your company have in place a policy statement or code of \
+        conduct relating to the Business Integrity and Ethics`,
+    }),
 
-    // Are these and procedures in place to ensure that your policies or codes
-    // of conduct are effectively implemented throught your company
-    ensureThroughoutCompany: ReplyRecommendSchema,
+    ensureThroughoutCompany: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Are there processes and procedures in place to ensure that your \
+        policies or codes of conduct are effectively implemented throughout your company?`,
+    }),
 
-    // Are these and procedures in place to ensure that your policies or codes
-    // of conduct are effectively implemented throught your supply chain
-    ensureThroughoutSupplyChain: ReplyRecommendSchema,
+    ensureThroughoutSupplyChain: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Are there processes and procedures in place to ensure that your \
+        policies or codes of conduct are effectively implemented throughout your Supply Chain`,
+    }),
 
-    // Have your company been subject to any external investigation
-    haveBeenSubjectToInvestigation: ReplyRecommendSchema,
+    haveBeenSubjectToInvestigation: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Has your company been subject to any external investigation \
+        regarding corruption within the past five years`,
+    }),
 
-    // Does your company have a documented policy in place to prevent corruption
-    doesHaveDocumentedPolicyToCorruption: ReplyRecommendSchema,
+    doesHaveDocumentedPolicyToCorruption: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Does your company have a documented policy in place to prevent corruption`,
+    }),
 
-    // If yes to above question who is responsible person/function for the
-    // compliance/anti-corruption program
-    whoIsResponsibleForPolicy: ReplyRecommendSchema,
+    whoIsResponsibleForPolicy: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `If yes to above question, who is responsible person/function for \
+        the compliance/anti-corruption program`,
+    }),
   },
   { _id: false },
 );
