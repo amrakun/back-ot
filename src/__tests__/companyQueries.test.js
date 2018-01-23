@@ -79,11 +79,11 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(2);
+    expect.assertions(3);
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['companies', 'companiesExport']) {
+    for (let query of ['companies', 'companiesExport', 'companyDetailExport']) {
       checkLogin(queries[query], {}, { user });
     }
   });
@@ -275,41 +275,5 @@ describe('Company queries', () => {
     const response = await graphqlRequest(qry, 'companies', { region: 'national' });
 
     expect(response.length).toBe(1);
-  });
-
-  test('companyDetailExport permissions', async () => {
-    expect.assertions(3);
-
-    const testCompany = await companyFactory({ enName: 'Test company' });
-
-    const companyDetailExport = ctx =>
-      graphqlRequest(
-        `
-        query companyDetailExport($_id: String!) {
-          companyDetailExport(_id: $_id)
-        }`,
-        'companyDetailExport',
-        { _id: testCompany._id },
-        ctx,
-      );
-
-    const assertQueryToThrowException = async (query, args, errMessage) => {
-      try {
-        await query(args);
-      } catch (errors) {
-        for (let err of errors) {
-          expect(err.message).toBe(errMessage);
-        }
-      }
-    };
-
-    const buyer = await userFactory({ isSupplier: false });
-    const supplier = await userFactory({ isSupplier: true });
-
-    assertQueryToThrowException(companyDetailExport, {}, 'Login required');
-    assertQueryToThrowException(companyDetailExport, { user: supplier }, 'Permission denied');
-
-    // successful export
-    expect(await companyDetailExport({ user: buyer })).toBeDefined(); // to be called without problems
   });
 });
