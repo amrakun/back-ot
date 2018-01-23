@@ -2,6 +2,7 @@ import { Companies, BlockedCompanies } from '../../../db/models';
 import { paginate } from './utils';
 import { readTemplate, generateXlsx } from '../../utils';
 import { requireBuyer } from '../../permissions';
+import { companyDetailExport } from './companyExports';
 
 /*
  * Filter companies
@@ -153,9 +154,15 @@ const companyQueries = {
   companyDetail(root, { _id }) {
     return Companies.findOne({ _id });
   },
+
+  async companyDetailExport(root, { _id }) {
+    const supplier = await Companies.findOne({ _id });
+    return companyDetailExport(supplier);
+  },
 };
 
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
+requireBuyer(companyQueries, 'companyDetailExport');
 
 export default companyQueries;
