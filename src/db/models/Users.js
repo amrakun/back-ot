@@ -74,8 +74,8 @@ class User {
    * @param {Object} doc - user fields
    * @return {Promise} updated user info
    */
-  static async updateUser(_id, { username, email, password, role }) {
-    const doc = { username, email, password, role };
+  static async updateUser(_id, doc) {
+    const { email, password } = doc;
 
     if (await this.findOne({ _id: { $ne: _id }, email })) {
       throw new Error('Duplicated email');
