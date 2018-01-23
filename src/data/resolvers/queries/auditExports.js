@@ -115,7 +115,7 @@ const auditResponseQueries = {
       .merged(true)
       .value('Огноо:');
 
-    return generateXlsx(workbook, 'auditor_improvement_plan');
+    return generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
   },
 };
 

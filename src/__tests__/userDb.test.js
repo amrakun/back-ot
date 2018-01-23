@@ -99,10 +99,10 @@ describe('User db utils', () => {
     expect(userObj.username).toBe(updateDoc.username);
     expect(userObj.email).toBe(testEmail);
     expect(userObj.role).toBe(userObj.role);
-    expect(userObj.firstName).toBe(_user.firstName);
-    expect(userObj.lastName).toBe(_user.lastName);
-    expect(userObj.jobTitle).toBe(_user.jobTitle);
-    expect(userObj.phone).toBe(_user.phone);
+    expect(userObj.firstName).toBe(updateDoc.firstName);
+    expect(userObj.lastName).toBe(updateDoc.lastName);
+    expect(userObj.jobTitle).toBe(updateDoc.jobTitle);
+    expect(userObj.phone).toBe(updateDoc.phone);
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
 
     // try without password ============
