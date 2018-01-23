@@ -219,6 +219,15 @@ export const queries = `
     reassessmentDate: Date!,
     auditorName: String!
   ): String
+
+  auditReport(
+    auditId: String!,
+    supplierId: String!
+    auditDate: Date!,
+    auditResult: Boolean!,
+    auditor: String!,
+    reportNo: String!
+  ): String
 `;
 
 export const mutations = `
