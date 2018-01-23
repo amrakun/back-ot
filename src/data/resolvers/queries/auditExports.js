@@ -10,12 +10,11 @@ const auditResponseQueries = {
    * @param {String} auditId - Audit id
    * @param {String} supplierId - Selected supplier id
    * @param {Date} auditDate - Audit date
-   * @param {Boolean} auditorResult - Audit result
    * @param {String} auditorName - Auditor name
    * @return {String} generated file link
    */
   async auditImprovementPlan(root, args) {
-    const { auditId, supplierId, auditDate, auditResult, reassessmentDate, auditorName } = args;
+    const { auditId, supplierId, auditDate, reassessmentDate, auditorName } = args;
 
     const company = await Companies.findOne({ _id: supplierId });
     const auditResponse = await AuditResponses.findOne({ auditId, supplierId });
@@ -33,19 +32,16 @@ const auditResponseQueries = {
       sheet.range(`${cf(`R${rowIndex}C5`)}:${cf(`R${rowIndex}C10`)}`).value(value);
     };
 
-    // Нэр
+    // Supplier name
     fillMainInfoCell(basicInfo.enName);
 
-    // Үнэлгээ хийгдсэн өдөр
+    // Audit date
     fillMainInfoCell(auditDate.toLocaleString());
 
-    // Үнэлгээний дүн
-    fillMainInfoCell(auditResult);
-
-    // Давтан үнэлгээний өдөр
+    // Planned review date
     fillMainInfoCell(reassessmentDate.toLocaleString());
 
-    // Аудиторийн нэр
+    // QUALIFICATION AUDITOR(S) NAME(S)
     fillMainInfoCell(auditorName);
 
     // fill invalid answers =======================
@@ -70,7 +66,7 @@ const auditResponseQueries = {
         const fieldOptions = paths[fieldName].options;
 
         // collect only wrong answers
-        if (!fieldValue.supplierAnswer) {
+        if (fieldValue.supplierAnswer) {
           invalidAnswers.push({
             label: fieldOptions.label.replace(/\s\s/g, ''),
             recommendation: fieldValue.supplierComment,
@@ -86,7 +82,7 @@ const auditResponseQueries = {
     rowIndex += 3;
 
     invalidAnswers.forEach(answer => {
-      // Шалгуурууд
+      // CRITERIA ( SHORT QUESTION DESCRIPTION)
       rowIndex++;
       cellPointer = `${cf(`R${rowIndex}C2`)}:${cf(`R${rowIndex}C3`)}`;
       sheet
@@ -94,7 +90,7 @@ const auditResponseQueries = {
         .merged(true)
         .value(answer.label);
 
-      // Хийгдэх ажлууд
+      // IMPROVEMENT ACTION (USE VERBS)
       cellPointer = `${cf(`R${rowIndex}C4`)}:${cf(`R${rowIndex}C7`)}`;
       sheet
         .range(cellPointer)
@@ -105,15 +101,15 @@ const auditResponseQueries = {
     rowIndex += 2;
     cellPointer = `${cf(`R${rowIndex}C2`)}:${cf(`R${rowIndex}C7`)}`;
 
-    sheet.range(cellPointer).merged(true).value(`Танилцаж, зөвшөөрсөн
-      …………………………………………( Нийлүүлэгч)`);
+    sheet.range(cellPointer).merged(true).value(`Acknowledged by
+      …………………………………………………………( Supplier )`);
 
     rowIndex += 2;
     cellPointer = `${cf(`R${rowIndex}C2`)}:${cf(`R${rowIndex}C7`)}`;
     sheet
       .range(cellPointer)
       .merged(true)
-      .value('Огноо:');
+      .value('Date:');
 
     return generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
   },
