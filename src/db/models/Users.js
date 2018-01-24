@@ -102,6 +102,8 @@ class User {
    * @return {Promise} - Updated user
    */
   static async editProfile(_id, doc) {
+    delete doc.password;
+
     await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
