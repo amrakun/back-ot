@@ -20,7 +20,7 @@ export const types = `
 `;
 
 export const queries = `
-  users(page: Int, perPage: Int): [User]
+  users(page: Int, perPage: Int, search: String): [User]
   userDetail(_id: String): User
   usersTotalCount: Int
   currentUser: User

@@ -6,12 +6,23 @@ const userQueries = {
   /**
    * Users list
    * @param {Object} args - Search params
-   * @param {Object} object3 - Graphql middleware data
-   * @param {Object} object3.user - User making this request
    * @return {Promise} sorted and filtered users objects
    */
   users(root, args) {
-    const users = paginate(Users.find({}), args);
+    const { search } = args;
+    const selector = { isSupplier: false };
+
+    if (search) {
+      selector.$or = [
+        { firstName: new RegExp(`.*${search}.*`, 'i') },
+        { lastName: new RegExp(`.*${search}.*`, 'i') },
+        { username: new RegExp(`.*${search}.*`, 'i') },
+        { email: new RegExp(`.*${search}.*`, 'i') },
+      ];
+    }
+
+    const users = paginate(Users.find(selector), args);
+
     return users.sort({ username: 1 });
   },
 
