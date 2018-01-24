@@ -12,6 +12,7 @@ import {
   Qualifications,
   Audits,
   AuditResponses,
+  BlockedCompanies,
 } from './models';
 
 /*
@@ -548,4 +549,16 @@ export const auditResponseFactory = async (params = {}) => {
   });
 
   return save(auditResponse);
+};
+
+export const blockedCompanyFactory = params => {
+  const blockedCompany = new BlockedCompanies({
+    supplierId: params.supplierId || 'DFAFSFD',
+    startDate: params.startDate || new Date(),
+    endDate: params.endDate || new Date(),
+    note: params.note || 'note',
+    createdUserId: params.createdUserId || '_id',
+  });
+
+  return save(blockedCompany);
 };

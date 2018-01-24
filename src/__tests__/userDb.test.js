@@ -2,8 +2,16 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { Users } from '../db/models';
-import { userFactory } from '../db/factories';
+import { Users, Audits, BlockedCompanies, Feedbacks, Tenders } from '../db/models';
+
+import {
+  userFactory,
+  auditFactory,
+  blockedCompanyFactory,
+  feedbackFactory,
+  tenderFactory,
+} from '../db/factories';
+
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
@@ -118,6 +126,59 @@ describe('User db utils', () => {
   });
 
   test('Remove user', async () => {
+    expect.assertions(6);
+
+    // audit usage ===================
+    await auditFactory({ createdUserId: _user._id });
+
+    try {
+      await Users.removeUser(_user._id);
+    } catch (e) {
+      expect(e.message).toBe('Unable to remove. Used in audit');
+    }
+
+    // block list usage ===================
+    await Audits.remove({});
+    await blockedCompanyFactory({ createdUserId: _user._id });
+
+    try {
+      await Users.removeUser(_user._id);
+    } catch (e) {
+      expect(e.message).toBe('Unable to remove. Used in block list');
+    }
+
+    // feedback usage ===================
+    await BlockedCompanies.remove({});
+    await feedbackFactory({ createdUserId: _user._id });
+
+    try {
+      await Users.removeUser(_user._id);
+    } catch (e) {
+      expect(e.message).toBe('Unable to remove. Used in success feedback');
+    }
+
+    // tender usage ===================
+    await Feedbacks.remove({});
+    await tenderFactory({ createdUserId: _user._id });
+
+    try {
+      await Users.removeUser(_user._id);
+    } catch (e) {
+      expect(e.message).toBe('Unable to remove. Used in tender');
+    }
+
+    // can not remove a supplier ===================
+    await Users.update({ _id: _user._id }, { $set: { isSupplier: true } });
+
+    try {
+      await Users.removeUser(_user._id);
+    } catch (e) {
+      expect(e.message).toBe('Can not remove supplier');
+    }
+
+    // successfull ==================
+    await Users.update({ _id: _user._id }, { $set: { isSupplier: false } });
+    await Tenders.remove({});
     await Users.removeUser(_user._id);
 
     // ensure removed

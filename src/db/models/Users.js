@@ -5,6 +5,7 @@ import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
+import { Audits, BlockedCompanies, Feedbacks, Tenders } from './';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -114,7 +115,29 @@ class User {
    * @param {String} _id - User id
    * @return {Promise} - remove method response
    */
-  static removeUser(_id) {
+  static async removeUser(_id) {
+    const user = await this.findOne({ _id });
+
+    if (user.isSupplier) {
+      throw new Error('Can not remove supplier');
+    }
+
+    if (await Audits.findOne({ createdUserId: _id })) {
+      throw new Error('Unable to remove. Used in audit');
+    }
+
+    if (await BlockedCompanies.findOne({ createdUserId: _id })) {
+      throw new Error('Unable to remove. Used in block list');
+    }
+
+    if (await Feedbacks.findOne({ createdUserId: _id })) {
+      throw new Error('Unable to remove. Used in success feedback');
+    }
+
+    if (await Tenders.findOne({ createdUserId: _id })) {
+      throw new Error('Unable to remove. Used in tender');
+    }
+
     return Users.remove({ _id });
   }
 
