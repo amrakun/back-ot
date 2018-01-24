@@ -23,7 +23,7 @@ export const queries = `
   ): String
 
   reportsAuditExport(
-    type: ReportsTendersType,
+    type: String,
     publishDate: DateInterval,
     closeDate: DateInterval,
   ): String

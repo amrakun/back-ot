@@ -112,7 +112,7 @@ describe('report query permission checks', () => {
       const reportAuditExport = ctx =>
         graphqlRequest(
           `
-          query reportsAuditExport($type: ReportsTendersType, $publishDate: DateInterval, $closeDate: DateInterval) {
+          query reportsAuditExport($type: String, $publishDate: DateInterval, $closeDate: DateInterval) {
             reportsAuditExport(type: $type, publishDate: $publishDate, closeDate: $closeDate)
           }`,
           'reportsAuditExport',
