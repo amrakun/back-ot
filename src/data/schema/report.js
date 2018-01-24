@@ -21,4 +21,10 @@ export const queries = `
     publishDate: DateInterval,
     closeDate: DateInterval,
   ): String
+
+  reportsAuditExport(
+    type: ReportsTendersType,
+    publishDate: DateInterval,
+    closeDate: DateInterval,
+  ): String
 `;
