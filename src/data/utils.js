@@ -105,7 +105,8 @@ export const createTransporter = async () => {
  * @param {Boolean} args.templateArgs.isCustom
  * @return {Promise}
  */
-export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
+export const sendEmail = async args => {
+  const { toEmails, fromEmail, title, template, attachments = [] } = args;
   const { COMPANY_EMAIL_FROM, NODE_ENV } = process.env;
 
   // do not send email it is running in test mode
@@ -130,6 +131,7 @@ export const sendEmail = async ({ toEmails, fromEmail, title, template }) => {
       to: toEmail,
       subject: title,
       html,
+      attachments,
     };
 
     return transporter.sendMail(mailOptions, (error, info) => {

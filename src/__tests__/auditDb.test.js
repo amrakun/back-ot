@@ -254,4 +254,17 @@ describe('Audit response db', () => {
     expect(auditResponse.isSent).toBe(true);
     expect(auditResponse.status).toBe('late');
   });
+
+  test('Save email sent dates', async () => {
+    let auditResponse = await auditResponseFactory({});
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    await auditResponse.saveEmailSenDates(true, true);
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.improvementPlanSentDate).toBeDefined();
+    expect(auditResponse.reportSentDate).toBeDefined();
+  });
 });

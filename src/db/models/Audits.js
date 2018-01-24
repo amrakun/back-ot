@@ -379,7 +379,10 @@ const AuditResponseSchema = mongoose.Schema({
   evidenceInfo: EvidenceInfoSchema,
 
   improvementPlanFile: field({ type: String, optional: true }),
+  improvementPlanSentDate: field({ type: Date, optional: true }),
+
   reportFile: field({ type: String, optional: true }),
+  reportSentDate: field({ type: Date, optional: true }),
 
   isSent: field({ type: Boolean, optional: true }),
 });
@@ -492,6 +495,24 @@ class AuditResponse {
     }
 
     await this.update({ isSent: true, status });
+
+    return AuditResponses.findOne({ _id: this._id });
+  }
+
+  /**
+   * Save email sent dates for improvement plan, report
+   * @param {Boolean} improvementPlan - Is sent improvementPlan email
+   * @param {Boolean} report - Is sent report email
+   * @return - Updated response
+   */
+  async saveEmailSenDates(improvementPlan, report) {
+    if (improvementPlan) {
+      await this.update({ improvementPlanSentDate: new Date() });
+    }
+
+    if (report) {
+      await this.update({ reportSentDate: new Date() });
+    }
 
     return AuditResponses.findOne({ _id: this._id });
   }

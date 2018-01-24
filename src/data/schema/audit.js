@@ -200,8 +200,12 @@ export const types = `
     evidenceInfo: AuditEvidenceInfo
 
     isSent: Boolean
+
     improvementPlanFile: String
+    improvementPlanSentDate: Date
     reportFile: String
+    reportSentDate: Date
+
 
     supplier: Company
   }
@@ -288,4 +292,11 @@ export const mutations = `
     supplierId: String,
     businessInfo: AuditBuyerBusinessInfoInput
   ): Audit
+
+  auditsBuyerSendFiles(
+    auditId: String,
+    supplierId: String,
+    improvementPlan: Boolean,
+    report: Boolean,
+  ): AuditResponse
 `;
