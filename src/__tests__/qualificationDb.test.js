@@ -73,15 +73,9 @@ describe('Qualification db', () => {
   });
 
   test('Pre qualified status', async () => {
-    const financialDoc = generateDoc(FinancialInfoSchema, true);
-    const businessDoc = generateDoc(BusinessInfoSchema, true);
-    const environmentalDoc = generateDoc(EnvironmentalInfoSchema, true);
-    const healthDoc = generateDoc(HealthInfoSchema, true);
+    expect(_company.isPrequalified).toBe(false);
 
-    await Qualifications.updateSection(_company._id, 'financialInfo', financialDoc);
-    await Qualifications.updateSection(_company._id, 'businessInfo', businessDoc);
-    await Qualifications.updateSection(_company._id, 'environmentalInfo', environmentalDoc);
-    await Qualifications.updateSection(_company._id, 'healthInfo', healthDoc);
+    await Qualifications.prequalify(_company._id);
 
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 

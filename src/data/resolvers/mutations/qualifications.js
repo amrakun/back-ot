@@ -8,6 +8,13 @@ const qualificationMutations = {
   qualificationsSaveTierType(root, { supplierId, tierType }) {
     return Qualifications.saveTierType(supplierId, 'tierType', tierType);
   },
+
+  /*
+   * Prequalify a supplier
+   */
+  qualificationsPrequalify(root, { supplierId }) {
+    return Qualifications.prequalify(supplierId);
+  },
 };
 
 const sections = ['financial', 'business', 'environmental', 'health'];
@@ -28,5 +35,6 @@ sections.forEach(section => {
 });
 
 requireBuyer(qualificationMutations, 'qualificationsSaveTierType');
+requireBuyer(qualificationMutations, 'qualificationsPrequalify');
 
 export default qualificationMutations;

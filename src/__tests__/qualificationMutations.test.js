@@ -41,7 +41,7 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(5);
+    expect.assertions(6);
 
     const mutations = [
       'qualificationsSaveFinancialInfo',
@@ -49,6 +49,7 @@ describe('Company mutations', () => {
       'qualificationsSaveEnvironmentalInfo',
       'qualificationsSaveHealthInfo',
       'qualificationsSaveTierType',
+      'qualificationsPrequalify',
     ];
 
     const user = await userFactory({ isSupplier: true });
@@ -148,5 +149,26 @@ describe('Company mutations', () => {
     const res = await graphqlRequest(mutation, 'qualificationsSaveTierType', params, context);
 
     expect(res.tierType).toBe('national');
+  });
+
+  test('Prequalify a supplier', async () => {
+    expect(_company.isPrequalified).toBe(false);
+
+    const mutation = `
+      mutation qualificationsPrequalify($supplierId: String!) {
+        qualificationsPrequalify(supplierId: $supplierId) {
+          isPrequalified
+        }
+      }
+    `;
+
+    const response = await graphqlRequest(
+      mutation,
+      'qualificationsPrequalify',
+      { supplierId: _company._id },
+      { user: _user },
+    );
+
+    expect(response.isPrequalified).toBe(true);
   });
 });

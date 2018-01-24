@@ -54,35 +54,7 @@ class Qualification {
       await this.create({ supplierId, [section]: value });
     }
 
-    // updated object
-    const qualification = await this.findOne({ supplierId });
-
-    // check is prequalifed ==============
-    const sections = [
-      { name: 'financialInfo', schema: FinancialInfoSchema },
-      { name: 'businessInfo', schema: BusinessInfoSchema },
-      { name: 'environmentalInfo', schema: EnvironmentalInfoSchema },
-      { name: 'healthInfo', schema: HealthInfoSchema },
-    ];
-
-    let isPrequalified = true;
-
-    for (let section of sections) {
-      const names = Object.keys(section.schema.paths);
-
-      for (let name of names) {
-        const sectionValue = qualification[section.name] || {};
-
-        if (!sectionValue[name]) {
-          isPrequalified = false;
-        }
-      }
-    }
-
-    // update company's prequalified status
-    await Companies.update({ _id: supplierId }, { $set: { isPrequalified } });
-
-    return qualification;
+    return this.findOne({ supplierId });
   }
 
   /*
@@ -95,6 +67,17 @@ class Qualification {
     await Companies.update({ _id: supplierId }, { $set: { tierType: value } });
 
     return qualification;
+  }
+
+  /*
+   * Mark supplier as prequalified
+   * @return - Updated supplier
+   */
+  static async prequalify(supplierId) {
+    // update supplier's tier type
+    await Companies.update({ _id: supplierId }, { $set: { isPrequalified: true } });
+
+    return Companies.findOne({ _id: supplierId });
   }
 }
 
