@@ -31,9 +31,9 @@ describe('report query permission checks', () => {
       ctx,
     );
 
-  const assertQueryToThrowException = async (query, args, errMessage) => {
+  const assertQueryToThrowException = async (query, ctx, errMessage) => {
     try {
-      await query(args);
+      await query(ctx);
     } catch (errors) {
       for (let err of errors) {
         expect(err.message).toBe(errMessage);
