@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Companies, Users, Audits } from '../db/models';
+import { Companies, Users, Audits, AuditResponses } from '../db/models';
 import { userFactory, companyFactory, auditFactory, auditResponseFactory } from '../db/factories';
 import queries from '../data/resolvers/queries/audits';
 
@@ -262,5 +262,24 @@ describe('Company queries', () => {
 
     expect(response.auditId).toBe(args.auditId);
     expect(response.supplierId).toBe(args.supplierId);
+  });
+
+  test('audit responses', async () => {
+    await AuditResponses.remove({});
+
+    const query = `
+      query auditResponses {
+        auditResponses {
+          _id
+          auditId
+        }
+      }
+    `;
+
+    await auditResponseFactory({});
+
+    const response = await graphqlRequest(query, 'auditResponses');
+
+    expect(response.length).toBe(1);
   });
 });

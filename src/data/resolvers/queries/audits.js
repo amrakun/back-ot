@@ -17,6 +17,13 @@ const auditQueries = {
   },
 
   /**
+   * Audit responses
+   */
+  auditResponses() {
+    return AuditResponses.find({});
+  },
+
+  /**
    * Audit response detail
    */
   auditResponseDetail(root, { auditId, supplierId }) {
@@ -33,6 +40,7 @@ const auditQueries = {
 
 requireBuyer(auditQueries, 'audits');
 requireBuyer(auditQueries, 'auditDetail');
+requireBuyer(auditQueries, 'auditResponses');
 requireBuyer(auditQueries, 'auditResponseDetail');
 
 requireSupplier(auditQueries, 'auditResponseByUser');
