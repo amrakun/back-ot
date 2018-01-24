@@ -5,6 +5,7 @@ import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
 import { Audits, AuditResponses } from './Audits';
+import Configs from './Configs';
 
 export {
   Companies,
@@ -17,4 +18,5 @@ export {
   Qualifications,
   Audits,
   AuditResponses,
+  Configs,
 };
