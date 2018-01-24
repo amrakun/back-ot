@@ -33,11 +33,11 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['audits', 'auditDetail', 'auditResponseDetail']) {
+    for (let query of ['audits', 'auditDetail', 'auditResponses', 'auditResponseDetail']) {
       checkLogin(queries[query], {}, { user });
     }
   });
