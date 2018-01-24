@@ -86,45 +86,28 @@ describe('report query permission checks', () => {
   });
 
   describe('reportsAuditExport', () => {
+    const _reportAuditExport = ctx =>
+      graphqlRequest(
+        `
+        query reportsAuditExport($type: String, $publishDate: DateInterval, $closeDate: DateInterval) {
+          reportsAuditExport(type: $type, publishDate: $publishDate, closeDate: $closeDate)
+        }`,
+        'reportsAuditExport',
+        {},
+        ctx,
+      );
+
     test('permission errors', async () => {
-      expect.assertions(3);
+      expect.assertions(2);
 
-      const companyA = await companyFactory({
-        enName: 'Company name',
-      });
-      const companyB = await companyFactory({
-        enName: 'Company name B',
-      });
-      await auditFactory({
-        supplierIds: [companyA._id, companyB._id],
-      });
+      assertQueryToThrowException(_reportAuditExport, {}, 'Login required');
+      assertQueryToThrowException(_reportAuditExport, { user: _supplier }, 'Permission denied');
+    });
 
-      const companyC = await companyFactory({
-        enName: 'Company name C',
-      });
-      const companyD = await companyFactory({
-        enName: 'Company name D',
-      });
-      await auditFactory({
-        supplierIds: [companyC._id, companyD._id],
-      });
+    test('succesfull access', async () => {
+      expect.assertions(1);
 
-      const reportAuditExport = ctx =>
-        graphqlRequest(
-          `
-          query reportsAuditExport($type: String, $publishDate: DateInterval, $closeDate: DateInterval) {
-            reportsAuditExport(type: $type, publishDate: $publishDate, closeDate: $closeDate)
-          }`,
-          'reportsAuditExport',
-          {},
-          ctx,
-        );
-
-      const response = await reportAuditExport({ user: _buyer });
-
-      expect(response.errors).toBeUndefined();
-      assertQueryToThrowException(reportAuditExport, {}, 'Login required');
-      assertQueryToThrowException(reportAuditExport, { user: _supplier }, 'Permission denied');
+      expect(await _reportAuditExport({ user: _buyer })).toBeDefined(); // to be called without problems
     });
   });
 });
