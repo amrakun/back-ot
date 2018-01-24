@@ -1,5 +1,5 @@
 import { readTemplate, generateXlsx } from '../../utils';
-import { Companies, Tenders } from '../../../db/models';
+import { Companies, Tenders, Audits } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
 
 const reportsSuppliersQuery = {
@@ -137,6 +137,66 @@ const reportsSuppliersQuery = {
 
     // Write to file.
     return generateXlsx(workbook, 'reports_tenders');
+  },
+
+  /**
+   * Supplier audit list
+   * @param {Object} args - Query params
+   * @param {Object} args.publishDate - Date interval object
+   * @param {Date} args.publishDate.startDate - The startDate of publishDate
+   * @param {Date} args.publishDate.endDate - The endDate of publishDate
+   * @param {Object} args.closeDate - Date interval object
+   * @param {Date} args.closeDate.startDate - The startDate of closeDate
+   * @param {Date} args.closeDate.endDate - The endDate of closeDate
+   * @param {String} args - Query params
+   * @return {String} file url of the generated reports_audit_export.xlsx
+   */
+  async reportsAuditExport(root, { publishDate, closeDate }) {
+    const { workbook, sheet } = await readTemplate('reports_audit_export');
+
+    let filter = {};
+
+    if (publishDate) {
+      filter.publishDate = {
+        $gte: publishDate.startDate,
+        $lte: publishDate.endDate,
+      };
+    }
+
+    if (closeDate) {
+      filter.closeDate = {
+        $gte: closeDate.startDate,
+        $lte: closeDate.endDate,
+      };
+    }
+
+    const audits = await Audits.find(filter, {
+      supplierIds: 1,
+      publishDate: 1,
+      closeDate: 1,
+      status: 1,
+    });
+
+    let index = 4,
+      rowNo = 0;
+
+    for (let audit of audits) {
+      const suppliers = await Companies.find({ _id: audit.supplierIds });
+
+      for (let company of suppliers) {
+        sheet.cell(index, 1).value(++rowNo);
+        sheet.cell(index, 2).value(company.basicInfo.enName || '');
+        sheet.cell(index, 3).value('desktop');
+        sheet
+          .cell(index, 4)
+          .value((audit.publishDate && audit.publishDate.toLocaleDateString()) || '');
+        sheet.cell(index, 5).value((audit.closeDate && audit.closeDate.toLocaleDateString()) || '');
+
+        index++;
+      }
+    }
+
+    return generateXlsx(workbook, 'reports_audit_export');
   },
 };
 
