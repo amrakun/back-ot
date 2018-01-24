@@ -243,6 +243,8 @@ describe('Company queries', () => {
 
           improvementPlanFile
           reportFile
+
+          isQualified
         }
       }
     `;

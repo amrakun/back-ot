@@ -132,6 +132,10 @@ describe('Audit response db', () => {
       doc,
     });
 
+    const updatedSupplier = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedSupplier.isQualified).not.toBe(true);
+
     const sectionValue = JSON.parse(JSON.stringify(updatedResponse[name]));
 
     expect(sectionValue).toEqual(doc);
@@ -158,6 +162,10 @@ describe('Audit response db', () => {
 
   test('Human resource management info', async () => {
     await checkCommonReplyRecommentSection('hrInfo');
+  });
+
+  test('Business integrity info', async () => {
+    await checkCommonReplyRecommentSection('businessInfo');
   });
 
   test('Business integrity info', async () => {
@@ -266,5 +274,38 @@ describe('Audit response db', () => {
 
     expect(auditResponse.improvementPlanSentDate).toBeDefined();
     expect(auditResponse.reportSentDate).toBeDefined();
+  });
+
+  test('Qualified status', async () => {
+    await AuditResponses.saveReplyRecommentSection({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      name: 'coreHseqInfo',
+      doc: auditResponseDocs.coreHseqInfo(),
+    });
+
+    await AuditResponses.saveReplyRecommentSection({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      name: 'businessInfo',
+      doc: auditResponseDocs.businessInfo(),
+    });
+
+    await AuditResponses.saveReplyRecommentSection({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      name: 'hrInfo',
+      doc: auditResponseDocs.hrInfo(),
+    });
+
+    const supplier = await Companies.findOne({ _id: _company._id });
+
+    const response = await AuditResponses.findOne({
+      auditId: _audit._id,
+      supplierId: _company._id,
+    });
+
+    expect(supplier.isQualified).toBe(true);
+    expect(response.isQualified).toBe(true);
   });
 });

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { field, StatusPublishClose } from './utils';
+import { Companies } from './';
 
 // Audit schema
 const AuditSchema = mongoose.Schema({
@@ -385,6 +386,7 @@ const AuditResponseSchema = mongoose.Schema({
   reportSentDate: field({ type: Date, optional: true }),
 
   isSent: field({ type: Boolean, optional: true }),
+  isQualified: field({ type: Boolean, optional: true }),
 });
 
 class AuditResponse {
@@ -469,8 +471,46 @@ class AuditResponse {
     if (previousEntry) {
       await updater({ ...args, selector });
 
-      // return updated
-      return this.findOne({ _id: previousEntry._id });
+      // updated object
+      const response = await this.findOne({ _id: previousEntry._id });
+
+      // check is qualifed ==============
+      // All those section's auditorScore field values must be True or greater
+      // than 0
+      const sections = [
+        { name: 'coreHseqInfo', schema: CoreHseqInfoSchema },
+        { name: 'businessInfo', schema: BusinessInfoSchema },
+        { name: 'hrInfo', schema: HrInfoSchema },
+      ];
+
+      let isQualified = true;
+
+      for (let section of sections) {
+        const sectionValue = response[section.name];
+        const names = Object.keys(section.schema.paths);
+
+        // if section value is empty then ignore rest checks
+        if (!sectionValue) {
+          isQualified = false;
+          break;
+        }
+
+        for (let name of names) {
+          const fieldValue = sectionValue[name] || {};
+
+          if (!fieldValue.auditorScore) {
+            isQualified = false;
+          }
+        }
+      }
+
+      // update supplier's qualified status
+      await Companies.update({ _id: supplierId }, { $set: { isQualified } });
+
+      // update response's qualified status
+      await this.update(selector, { $set: { isQualified } });
+
+      return response;
     }
 
     return this.create({ auditId, isSent: false, supplierId, [name]: doc });

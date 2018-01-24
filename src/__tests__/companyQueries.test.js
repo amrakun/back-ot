@@ -47,10 +47,11 @@ describe('Company queries', () => {
         isProductsInfoValidated
         productsInfoLastValidatedDate
 
-      isSentRegistrationInfo
-      isSentPrequalificationInfo
+        isSentRegistrationInfo
+        isSentPrequalificationInfo
 
         isPrequalified
+        isQualified
 
         averageDifotScore
         difotScores {
@@ -232,6 +233,24 @@ describe('Company queries', () => {
 
     expect(response.length).toBe(1);
     expect(response[0].isPrequalified).toBe(true);
+  });
+
+  test('companies: isQualified', async () => {
+    const qry = `
+      query companies($isQualified: Boolean) {
+        companies(isQualified: $isQualified) {
+          isQualified
+        }
+      }
+    `;
+
+    await companyFactory({ isQualified: true });
+    await companyFactory({ isQualified: false });
+
+    const response = await graphqlRequest(qry, 'companies', { isQualified: true });
+
+    expect(response.length).toBe(1);
+    expect(response[0].isQualified).toBe(true);
   });
 
   test('check fields', async () => {

@@ -70,6 +70,7 @@ export const companyFactory = (params = {}) => {
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
     isPrequalified: params.isPrequalified || false,
+    isQualified: params.isQualified || false,
 
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
@@ -545,6 +546,7 @@ export const auditResponseFactory = async (params = {}) => {
     auditId: params.auditId,
     supplierId: params.supplierId,
     isSent: params.isSent || false,
+    isQualified: params.isQualified || false,
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
   });
 

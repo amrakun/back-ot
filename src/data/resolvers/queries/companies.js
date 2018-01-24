@@ -15,6 +15,7 @@ const companiesFilter = async args => {
     isProductsInfoValidated,
     includeBlocked,
     isPrequalified,
+    isQualified,
     difotScore,
     region,
   } = args;
@@ -87,6 +88,11 @@ const companiesFilter = async args => {
   // by pre qualified status
   if (isPrequalified) {
     selector.isPrequalified = isPrequalified;
+  }
+
+  // by qualified status
+  if (isQualified) {
+    selector.isQualified = isQualified;
   }
 
   // remove emtpy selector

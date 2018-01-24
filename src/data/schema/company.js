@@ -349,6 +349,7 @@ export const types = `
     isSentPrequalificationInfo: Boolean
 
     isPrequalified: Boolean
+    isQualified: Boolean
 
     averageDifotScore: Float
     difotScores: [CompanyDifotScore]
@@ -379,6 +380,7 @@ const queryParams = `
   isProductsInfoValidated: Boolean,
   includeBlocked: Boolean,
   isPrequalified: Boolean,
+  isQualified: Boolean,
   difotScore: String,
   region: String,
   _ids: [String],

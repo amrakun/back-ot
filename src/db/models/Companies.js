@@ -425,6 +425,7 @@ const CompanySchema = mongoose.Schema({
   healthInfo: field({ type: HealthInfoSchema, optional: true }),
 
   isPrequalified: field({ type: Boolean, optional: true }),
+  isQualified: field({ type: Boolean, optional: true }),
 
   dueDiligences: field({ type: [DateFileSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
