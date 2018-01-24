@@ -172,7 +172,7 @@ const reportsSuppliersQuery = {
 
     const audits = await Audits.find(filter, {
       supplierIds: 1,
-      publishDateL: 1,
+      publishDate: 1,
       closeDate: 1,
       status: 1,
     });
@@ -187,8 +187,10 @@ const reportsSuppliersQuery = {
         sheet.cell(index, 1).value(++rowNo);
         sheet.cell(index, 2).value(company.basicInfo.enName || '');
         sheet.cell(index, 3).value('desktop');
-        sheet.cell(index, 4).value((audit.publishDate && audit.publishDate.toString()) || '');
-        sheet.cell(index, 5).value((audit.closeDate && audit.closeDate.toString()) || '');
+        sheet
+          .cell(index, 4)
+          .value((audit.publishDate && audit.publishDate.toLocaleDateString()) || '');
+        sheet.cell(index, 5).value((audit.closeDate && audit.closeDate.toLocaleDateString()) || '');
 
         index++;
       }
