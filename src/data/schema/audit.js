@@ -192,13 +192,16 @@ export const types = `
     supplierId: String
 
     status: String
-    isSent: Boolean
 
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
     businessInfo: AuditBusinessInfo
     evidenceInfo: AuditEvidenceInfo
+
+    isSent: Boolean
+    improvementPlanFile: String
+    reportFile: String
 
     supplier: Company
   }

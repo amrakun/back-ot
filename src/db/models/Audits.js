@@ -378,6 +378,9 @@ const AuditResponseSchema = mongoose.Schema({
   businessInfo: BusinessInfoSchema,
   evidenceInfo: EvidenceInfoSchema,
 
+  improvementPlanFile: field({ type: String, optional: true }),
+  reportFile: field({ type: String, optional: true }),
+
   isSent: field({ type: Boolean, optional: true }),
 });
 

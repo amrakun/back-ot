@@ -111,7 +111,13 @@ const auditResponseQueries = {
       .merged(true)
       .value('Date:');
 
-    return generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
+    // generate file
+    const path = await generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
+
+    // save file url to response for later use
+    await auditResponse.update({ improvementPlanFile: path });
+
+    return path;
   },
 
   /**
@@ -277,7 +283,13 @@ const auditResponseQueries = {
 
     renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema, extraAction);
 
-    return generateXlsx(workbook, `auditor_report_${auditId}_${supplierId}`);
+    // generate file
+    const path = await generateXlsx(workbook, `auditor_report_${auditId}_${supplierId}`);
+
+    // save file url to response for later use
+    await auditResponse.update({ reportFile: path });
+
+    return path;
   },
 };
 

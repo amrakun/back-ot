@@ -240,6 +240,9 @@ describe('Company queries', () => {
           _id
           auditId
           supplierId
+
+          improvementPlanFile
+          reportFile
         }
       }
     `;
