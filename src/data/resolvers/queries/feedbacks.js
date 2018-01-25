@@ -1,5 +1,4 @@
 import { Feedbacks } from '../../../db/models';
-import { paginate } from './utils';
 
 const feedbackQueries = {
   /**
@@ -7,10 +6,8 @@ const feedbackQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered feedbacks list by given parameters
    */
-  async feedbacks(root, args) {
-    const feedbacks = await Feedbacks.find({}).sort({ createdDate: -1 });
-
-    return paginate(feedbacks, args);
+  async feedbacks() {
+    return Feedbacks.find({}).sort({ createdDate: -1 });
   },
 
   /**
