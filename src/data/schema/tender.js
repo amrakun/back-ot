@@ -121,6 +121,12 @@ export const queries = `
   tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
   tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
   tenderResponsesEoiBidderList(tenderId: String!, supplierIds: [String!]!): String
+
+  tenderCountByStatus(
+    startDate: Date!,
+    endDate: Date!
+    type: String!
+  ): JSON
 `;
 
 const commonParams = `

@@ -128,8 +128,52 @@ const tenderQueries = {
   tenderDetail(root, { _id }) {
     return Tenders.findOne({ _id });
   },
+
+  /*
+   * Tender counts by status
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @param {String} type - Eoi or rfq
+   * @return - Generated doc
+   */
+  async tenderCountByStatus(root, { startDate, endDate, type }) {
+    // find tenders
+    const tenders = await Tenders.find({
+      publishDate: { $gte: startDate, $lte: endDate },
+      type,
+    });
+
+    const results = {};
+
+    for (let tender of tenders) {
+      // 1/25/2018
+      const key = tender.publishDate.toLocaleDateString();
+
+      // if key is not exists then create
+      if (!results[key]) {
+        results[key] = { open: 0, closed: 0 };
+      }
+
+      // increment open count
+      if (tender.status === 'open') {
+        results[key].open += 1;
+      }
+
+      // increment closed count
+      if (tender.status === 'closed') {
+        results[key].closed += 1;
+      }
+    }
+
+    // {
+    // '1/25/2018': { open: 1, closed: 0 },
+    // '1/26/2018': { open: 1, closed: 1 }
+    // }
+    return results;
+  },
 };
 
 requireBuyer(tenderQueries, 'tendersExport');
+requireBuyer(tenderQueries, 'tenderCountByStatus');
 
 export default tenderQueries;

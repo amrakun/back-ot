@@ -168,6 +168,9 @@ const companyQueries = {
 
   /*
    * Companies count by tier type
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @return - Aggregated list
    */
   companiesCountByTierType(root, { startDate, endDate }) {
     return Companies.aggregate([
@@ -178,6 +181,9 @@ const companyQueries = {
 
   /*
    * Companies count by registered and prequalified status
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @return - Generated doc
    */
   async companiesCountByRegisteredVsPrequalified(root, args) {
     const { startDate, endDate, productCodes } = args;
@@ -211,6 +217,10 @@ const companyQueries = {
       }
     }
 
+    // {
+    // '1/25/2018': { registered: 1, prequalified: 0 },
+    // '1/26/2018': { registered: 1, prequalified: 1 }
+    // }
     return results;
   },
 };
@@ -218,5 +228,7 @@ const companyQueries = {
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
 requireBuyer(companyQueries, 'companyDetailExport');
+requireBuyer(companyQueries, 'companiesCountByTierType');
+requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 
 export default companyQueries;

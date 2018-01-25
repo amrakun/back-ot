@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses, Companies } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
@@ -185,5 +186,45 @@ describe('Tender queries', () => {
     );
 
     expect(response.length).toBe(2);
+  });
+
+  test('count by tender status', async () => {
+    const qry = `
+      query tenderCountByStatus(
+        $startDate: Date!,
+        $endDate: Date!
+        $type: String!,
+      ) {
+        tenderCountByStatus(
+          startDate: $startDate,
+          endDate: $endDate,
+          type: $type
+        )
+      }
+    `;
+
+    const t1Date = new Date();
+    const t2Date = moment()
+      .add(1, 'day')
+      .endOf('day')
+      .toDate(); // 1 days later
+
+    await tenderFactory({ publishDate: t1Date, type: 'rfq', status: 'open' });
+    await tenderFactory({ publishDate: t2Date, type: 'rfq', status: 'closed' });
+
+    const startDate = moment()
+      .add(-1, 'day')
+      .endOf('day'); // 1 day ago
+
+    const endDate = moment()
+      .add(2, 'day')
+      .endOf('day'); // 2 days later
+
+    const args = { startDate, endDate, type: 'rfq' };
+
+    const response = await graphqlRequest(qry, 'tenderCountByStatus', args);
+
+    expect(response[t1Date.toLocaleDateString()]).toEqual({ open: 1, closed: 0 });
+    expect(response[t2Date.toLocaleDateString()]).toEqual({ closed: 1, open: 0 });
   });
 });
