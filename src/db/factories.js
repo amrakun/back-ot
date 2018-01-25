@@ -281,7 +281,13 @@ export const companyDocs = {
   }),
 };
 
-export const userFactory = (params = {}) => {
+export const userFactory = async (params = {}) => {
+  if (params.isSupplier && !params.companyId) {
+    const company = await companyFactory();
+
+    params.companyId = company._id;
+  }
+
   const user = new Users({
     username: params.username || faker.internet.userName(),
 
@@ -295,7 +301,7 @@ export const userFactory = (params = {}) => {
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
-    companyId: params.companyId || 'DFADFDSFSAFD',
+    companyId: params.companyId,
   });
 
   return save(user);
@@ -312,6 +318,16 @@ export const tenderFactory = async (params = {}) => {
     manufacturerPartNumber: faker.random.number(),
   };
 
+  if (!params.createdUserId) {
+    const user = await userFactory({ isSupplier: true });
+    params.createdUserId = user._id;
+  }
+
+  if (!params.supplierIds) {
+    const supplier = await companyFactory();
+    params.supplierIds = [supplier._id];
+  }
+
   const tender = new Tenders({
     type: params.type || 'rfq',
     status: params.status || 'draft',
@@ -319,7 +335,7 @@ export const tenderFactory = async (params = {}) => {
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
 
-    createdUserId: params.createdUserId || '_id',
+    createdUserId: params.createdUserId,
     createdDate: params.createdDate || new Date(),
 
     publishDate: params.publishDate || new Date(),
@@ -327,7 +343,7 @@ export const tenderFactory = async (params = {}) => {
 
     reminderDay: params.reminderDay || faker.random.number(),
     file: params.file || { name: 'name', url: 'url' },
-    supplierIds: params.supplierIds || ['id1', 'id2'],
+    supplierIds: params.supplierIds,
     requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocuments || ['Document1'],
     sentRegretLetter: params.sentRegretLetter || false,
@@ -359,13 +375,23 @@ export const tenderResponseFactory = async (params = {}) => {
 };
 
 export const feedbackFactory = async (params = {}) => {
+  if (!params.createdUserId) {
+    const user = await userFactory();
+    params.createdUserId = user._id;
+  }
+
+  if (!params.supplierIds) {
+    const supplier = await companyFactory();
+    params.supplierIds = [supplier._id];
+  }
+
   const feedback = new Feedbacks({
     status: params.status || 'open',
     closeDate: params.closeDate || new Date(),
-    supplierIds: params.supplierIds || ['id1', 'id2'],
+    supplierIds: params.supplierIds,
     content: params.content || faker.random.word(),
     createdDate: params.createdDate || new Date(),
-    createdUserId: params.createdUserId || '_id',
+    createdUserId: params.createdUserId,
   });
 
   return save(feedback);
@@ -417,12 +443,22 @@ export const qualificationFactory = async (params = {}) => {
 };
 
 export const auditFactory = async (params = {}) => {
+  if (!params.createdUserId) {
+    const user = await userFactory();
+    params.createdUserId = user._id;
+  }
+
+  if (!params.supplierIds) {
+    const supplier = await companyFactory();
+    params.supplierIds = [supplier._id];
+  }
+
   const audit = new Audits({
     status: params.status || 'draft',
-    supplierIds: params.supplierIds || ['id1', 'id2'],
+    supplierIds: params.supplierIds,
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
-    createdUserId: params.createdUserId || '_id',
+    createdUserId: params.createdUserId,
   });
 
   return save(audit);
