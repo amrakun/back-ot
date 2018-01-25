@@ -73,7 +73,7 @@ const tenderFilter = async (args, user = {}) => {
     delete query.$or;
   }
 
-  return Tenders.find(query).sort({ createdDate: -1 });
+  return query;
 };
 
 const tenderQueries = {
@@ -83,9 +83,9 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tenders(root, args, { user }) {
-    const tenders = await tenderFilter(args, user);
+    const query = await tenderFilter(args, user);
 
-    return paginate(tenders, args);
+    return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
 
   /**
@@ -94,7 +94,8 @@ const tenderQueries = {
    * @return {String} - file url
    */
   async tendersExport(root, args, { user }) {
-    const tenders = await tenderFilter(args, user);
+    const query = await tenderFilter(args, user);
+    const tenders = await Tenders.find(query).sort({ createdDate: -1 });
 
     // read template
     const { workbook, sheet } = await readTemplate('tenders');

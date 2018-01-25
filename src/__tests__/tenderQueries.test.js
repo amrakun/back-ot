@@ -22,7 +22,9 @@ describe('Tender queries', () => {
     $status: String,
     $search: String,
     $supplierId: String,
-    $ignoreSubmitted: Boolean
+    $ignoreSubmitted: Boolean,
+    $perPage: Int,
+    $page: Int,
   `;
 
   const commonValues = `
@@ -30,7 +32,9 @@ describe('Tender queries', () => {
     status: $status,
     search: $search,
     supplierId: $supplierId,
-    ignoreSubmitted: $ignoreSubmitted
+    ignoreSubmitted: $ignoreSubmitted,
+    perPage: $perPage,
+    page: $page,
   `;
 
   const query = `
@@ -149,8 +153,14 @@ describe('Tender queries', () => {
     response = await graphqlRequest(query, 'tenders', { search: 'test' }, { user });
     expect(response.length).toBe(1);
 
-    // number ===============
-    response = await graphqlRequest(query, 'tenders', { search: '1' }, { user });
+    // number & pager ===============
+    response = await graphqlRequest(
+      query,
+      'tenders',
+      { search: '1', perPage: 10, page: 1 },
+      { user },
+    );
+
     expect(response.length).toBe(2);
   });
 
