@@ -171,6 +171,20 @@ const tenderQueries = {
     // }
     return results;
   },
+
+  /*
+   * Tender counts by type
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @param {String} type - Eoi or rfq
+   * @return - Total count
+   */
+  tendersTotalCount(root, { startDate, endDate, type }) {
+    return Tenders.find({
+      publishDate: { $gte: startDate, $lte: endDate },
+      type,
+    }).count();
+  },
 };
 
 requireBuyer(tenderQueries, 'tendersExport');

@@ -227,4 +227,47 @@ describe('Tender queries', () => {
     expect(response[t1Date.toLocaleDateString()]).toEqual({ open: 1, closed: 0 });
     expect(response[t2Date.toLocaleDateString()]).toEqual({ closed: 1, open: 0 });
   });
+
+  test('total tenders count', async () => {
+    const qry = `
+      query tendersTotalCount(
+        $startDate: Date!,
+        $endDate: Date!
+        $type: String!,
+      ) {
+        tendersTotalCount(
+          startDate: $startDate,
+          endDate: $endDate,
+          type: $type
+        )
+      }
+    `;
+
+    await tenderFactory({
+      publishDate: new Date(),
+      type: 'rfq',
+    });
+
+    await tenderFactory({
+      publishDate: moment()
+        .add(1, 'day')
+        .endOf('day')
+        .toDate(), // 1 days later,
+      type: 'eoi',
+    });
+
+    const startDate = moment()
+      .add(-1, 'day')
+      .endOf('day'); // 1 day ago
+
+    const endDate = moment()
+      .add(2, 'day')
+      .endOf('day'); // 2 days later
+
+    const args = { startDate, endDate, type: 'rfq' };
+
+    const response = await graphqlRequest(qry, 'tendersTotalCount', args);
+
+    expect(response).toBe(1);
+  });
 });

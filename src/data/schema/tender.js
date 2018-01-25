@@ -127,6 +127,12 @@ export const queries = `
     endDate: Date!
     type: String!
   ): JSON
+
+  tendersTotalCount(
+    startDate: Date!,
+    endDate: Date!
+    type: String!
+  ): Float
 `;
 
 const commonParams = `
