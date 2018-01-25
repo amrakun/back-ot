@@ -183,6 +183,6 @@ class Config {
 
 ConfigSchema.loadClass(Config);
 
-const Configs = mongoose.model('config', ConfigSchema);
+const Configs = mongoose.model('configs', ConfigSchema);
 
 export default Configs;

@@ -9,6 +9,7 @@ import qualifications from './qualifications';
 import audits from './audits';
 import auditExports from './auditExports';
 import reports from './reports';
+import configs from './configs';
 
 export default {
   ...users,
@@ -22,4 +23,5 @@ export default {
   ...audits,
   ...auditExports,
   ...reports,
+  ...configs,
 };

@@ -53,14 +53,14 @@ export const types = `
     successFeedbackTemplate: String
     auditTemplate: String
 
-    prequalificationDow: JSON,
-    specificPrequalificationDows: JSON,
+    prequalificationDow: JSON
+    specificPrequalificationDows: JSON
 
-    auditDow: JSON,
-    specificAuditDows: JSON,
+    auditDow: JSON
+    specificAuditDows: JSON
 
-    improvementPlanDow: JSON,
-    specificImprovementPlanDows: JSON,
+    improvementPlanDow: JSON
+    specificImprovementPlanDows: JSON
   }
 `;
 
@@ -80,4 +80,5 @@ export const mutations = `
 `;
 
 export const queries = `
+  config: Config
 `;

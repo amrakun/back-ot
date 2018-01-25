@@ -13,6 +13,7 @@ import {
   Audits,
   AuditResponses,
   BlockedCompanies,
+  Configs,
 } from './models';
 
 /*
@@ -636,4 +637,12 @@ export const configDocs = {
       },
     ],
   },
+};
+
+export const configFactory = params => {
+  const config = new Configs({
+    name: params.name || faker.random.word(),
+  });
+
+  return save(config);
 };
