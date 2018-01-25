@@ -583,18 +583,11 @@ export const configDocs = {
       amount: 2,
     },
 
-    specifics: [
-      {
-        supplierId: '_id1',
-        duration: 'month',
-        amount: 2,
-      },
-      {
-        supplierId: '_id2',
-        duration: 'day',
-        amount: 2,
-      },
-    ],
+    specific: {
+      supplierIds: ['_id1', '_id2'],
+      duration: 'month',
+      amount: 2,
+    },
   },
 
   audit: {
@@ -603,18 +596,11 @@ export const configDocs = {
       amount: 2,
     },
 
-    specifics: [
-      {
-        supplierId: '_id1',
-        duration: 'month',
-        amount: 2,
-      },
-      {
-        supplierId: '_id2',
-        duration: 'day',
-        amount: 2,
-      },
-    ],
+    specific: {
+      supplierIds: ['_id1', '_id2'],
+      duration: 'month',
+      amount: 2,
+    },
   },
 
   improvementPlan: {
@@ -624,20 +610,12 @@ export const configDocs = {
       amount: 2,
     },
 
-    specifics: [
-      {
-        supplierId: '_id1',
-        tierType: 'national',
-        duration: 'month',
-        amount: 2,
-      },
-      {
-        supplierId: '_id2',
-        tierType: 'national',
-        duration: 'day',
-        amount: 2,
-      },
-    ],
+    specific: {
+      supplierIds: ['_id1', '_id2'],
+      tierType: 'national',
+      duration: 'month',
+      amount: 2,
+    },
   },
 };
 

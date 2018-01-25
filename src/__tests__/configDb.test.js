@@ -48,11 +48,7 @@ describe('Config db', () => {
     const config = await Configs.savePrequalificationDow(doc);
 
     expect(config.prequalificationDow.toJSON()).toEqual(doc.common);
-
-    const [specific1, specific2] = config.specificPrequalificationDows;
-
-    expect(specific1.toJSON()).toEqual(doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(doc.specifics[1]);
+    expect(config.specificPrequalificationDow.toJSON()).toEqual(doc.specific);
   });
 
   test('Save audit duration of warranty', async () => {
@@ -61,11 +57,7 @@ describe('Config db', () => {
     const config = await Configs.saveAuditDow(doc);
 
     expect(config.auditDow.toJSON()).toEqual(doc.common);
-
-    const [specific1, specific2] = config.specificAuditDows;
-
-    expect(specific1.toJSON()).toEqual(doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(doc.specifics[1]);
+    expect(config.specificAuditDow.toJSON()).toEqual(doc.specific);
   });
 
   test('Save improvementPlan duration of warranty', async () => {
@@ -74,10 +66,6 @@ describe('Config db', () => {
     const config = await Configs.saveImprovementPlanDow(doc);
 
     expect(config.improvementPlanDow.toJSON()).toEqual(doc.common);
-
-    const [specific1, specific2] = config.specificImprovementPlanDows;
-
-    expect(specific1.toJSON()).toEqual(doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(doc.specifics[1]);
+    expect(config.specificImprovementPlanDow.toJSON()).toEqual(doc.specific);
   });
 });

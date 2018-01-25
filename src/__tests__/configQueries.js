@@ -35,13 +35,13 @@ describe('Config queries', () => {
           auditTemplate
 
           prequalificationDow
-          specificPrequalificationDows
+          specificPrequalificationDow
 
           auditDow
-          specificAuditDows
+          specificAuditDow
 
           improvementPlanDow
-          specificImprovementPlanDows
+          specificImprovementPlanDow
         }
       }
     `;

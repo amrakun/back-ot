@@ -9,9 +9,9 @@ const DurationAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const SupplierDurationAmountSchema = mongoose.Schema(
+const SuppliersDurationAmountSchema = mongoose.Schema(
   {
-    supplierId: field({ type: String }),
+    supplierIds: field({ type: [String] }),
     duration: field({ type: String }),
     amount: field({ type: Number }),
   },
@@ -27,9 +27,9 @@ const TierTypeDurationAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const SupplierTierTypeDurationAmountSchema = mongoose.Schema(
+const SuppliersTierTypeDurationAmountSchema = mongoose.Schema(
   {
-    supplierId: field({ type: String }),
+    supplierIds: field({ type: [String] }),
     tierType: field({ type: String }),
     duration: field({ type: String }),
     amount: field({ type: Number }),
@@ -60,9 +60,9 @@ const ConfigSchema = mongoose.Schema({
     optional: true,
   }),
 
-  // [{ supplierId: '_id', duration: 'year', amount: 2 }, {...}]
-  specificPrequalificationDows: field({
-    type: [SupplierDurationAmountSchema],
+  // { supplierIds: ['_id1', '_id2'], duration: 'year', amount: 2 }
+  specificPrequalificationDow: field({
+    type: SuppliersDurationAmountSchema,
     optional: true,
   }),
 
@@ -73,9 +73,9 @@ const ConfigSchema = mongoose.Schema({
     optional: true,
   }),
 
-  // [{ supplierId: '_id', duration: 'year', amount: 2 }, {...}]
-  specificAuditDows: field({
-    type: [SupplierDurationAmountSchema],
+  // { supplierIds: ['_id1', '_id2'], duration: 'year', amount: 2 }
+  specificAuditDow: field({
+    type: SuppliersDurationAmountSchema,
     optional: true,
   }),
 
@@ -86,9 +86,9 @@ const ConfigSchema = mongoose.Schema({
     optional: true,
   }),
 
-  // [{ supplierId, tierType: 'national', duration: 'year', amount: 2 }, {...}]
-  specificImprovementPlanDows: field({
-    type: [SupplierTierTypeDurationAmountSchema],
+  // { supplierIds: ['_id1', '_id2'], tierType: 'national', duration: 'year', amount: 2 }
+  specificImprovementPlanDow: field({
+    type: SuppliersTierTypeDurationAmountSchema,
     optional: true,
   }),
 });
@@ -119,15 +119,15 @@ class Config {
   /*
    * Save pre qualification duration of warranty
    * @param common - {duration: 'year', amount: 2}
-   * @param specifics - [{supplierId: '_id', duration: 'month', amount: 1}, {...}]
+   * @param specific - {supplierIds: ['_id'], duration: 'month', amount: 1}
    * @return updated config
    */
-  static async savePrequalificationDow({ common, specifics }) {
+  static async savePrequalificationDow({ common, specific }) {
     const config = await this.getConfig();
 
     await config.update({
       prequalificationDow: common,
-      specificPrequalificationDows: specifics,
+      specificPrequalificationDow: specific,
     });
 
     return this.findOne({ _id: config._id });
@@ -136,15 +136,15 @@ class Config {
   /*
    * Save audit duration of warranty
    * @param common - {duration: 'year', amount: 2}
-   * @param specifics - [{supplierId: '_id', duration: 'month', amount: 1}, {...}]
+   * @param specific - {supplierIds: ['_id'], duration: 'month', amount: 1}
    * @return updated config
    */
-  static async saveAuditDow({ common, specifics }) {
+  static async saveAuditDow({ common, specific }) {
     const config = await this.getConfig();
 
     await config.update({
       auditDow: common,
-      specificAuditDows: specifics,
+      specificAuditDow: specific,
     });
 
     return this.findOne({ _id: config._id });
@@ -153,15 +153,15 @@ class Config {
   /*
    * Save improvementPlan duration of warranty
    * @param common - {duration: 'year', amount: 2}
-   * @param specifics - [{supplierId: '_id', duration: 'month', amount: 1}, {...}]
+   * @param specific - {supplierIds: ['_id1', '_id2'], duration: 'month', amount: 1}
    * @return updated config
    */
-  static async saveImprovementPlanDow({ common, specifics }) {
+  static async saveImprovementPlanDow({ common, specific }) {
     const config = await this.getConfig();
 
     await config.update({
       improvementPlanDow: common,
-      specificImprovementPlanDows: specifics,
+      specificImprovementPlanDow: specific,
     });
 
     return this.findOne({ _id: config._id });

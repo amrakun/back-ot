@@ -4,8 +4,8 @@ export const types = `
     amount: Float!
   }
 
-  input ConfigSupplierDurationAmount {
-    supplierId: String!
+  input ConfigSuppliersDurationAmount {
+    supplierIds: [String]!
     duration: String!
     amount: Float!
   }
@@ -16,8 +16,8 @@ export const types = `
     amount: Float!
   }
 
-  input ConfigSupplierTierTypeDurationAmount {
-    supplierId: String!
+  input ConfigSuppliersTierTypeDurationAmount {
+    supplierIds: [String]!
     tierType: String!
     duration: String!
     amount: Float!
@@ -25,17 +25,17 @@ export const types = `
 
   input ConfigPrequalificationDowInput {
     common: ConfigDurationAmount!
-    specifics: [ConfigSupplierDurationAmount]!
+    specific: ConfigSuppliersDurationAmount
   }
 
   input ConfigAuditDowInput {
     common: ConfigDurationAmount!
-    specifics: [ConfigSupplierDurationAmount]!
+    specific: ConfigSuppliersDurationAmount
   }
 
   input ConfigImprovementPlanDowInput {
     common: ConfigTierTypeDurationAmount!
-    specifics: [ConfigSupplierTierTypeDurationAmount]!
+    specific: ConfigSuppliersTierTypeDurationAmount
   }
 
   type Config {
@@ -54,13 +54,13 @@ export const types = `
     auditTemplate: String
 
     prequalificationDow: JSON
-    specificPrequalificationDows: JSON
+    specificPrequalificationDow: JSON
 
     auditDow: JSON
-    specificAuditDows: JSON
+    specificAuditDow: JSON
 
     improvementPlanDow: JSON
-    specificImprovementPlanDows: JSON
+    specificImprovementPlanDow: JSON
   }
 `;
 

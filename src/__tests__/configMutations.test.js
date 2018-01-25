@@ -121,7 +121,7 @@ describe('Config mutations', () => {
         configsSavePrequalificationDow(doc: $doc) {
           _id
           prequalificationDow,
-          specificPrequalificationDows,
+          specificPrequalificationDow,
         }
       }
     `;
@@ -135,11 +135,7 @@ describe('Config mutations', () => {
     const config = await Configs.getConfig();
 
     expect(config.prequalificationDow.toJSON()).toEqual(args.doc.common);
-
-    const [specific1, specific2] = config.specificPrequalificationDows;
-
-    expect(specific1.toJSON()).toEqual(args.doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(args.doc.specifics[1]);
+    expect(config.specificPrequalificationDow.toJSON()).toEqual(args.doc.specific);
   });
 
   test('Save audit duration of warranty', async () => {
@@ -148,7 +144,7 @@ describe('Config mutations', () => {
         configsSaveAuditDow(doc: $doc) {
           _id
           auditDow,
-          specificAuditDows,
+          specificAuditDow,
         }
       }
     `;
@@ -162,11 +158,7 @@ describe('Config mutations', () => {
     const config = await Configs.getConfig();
 
     expect(config.auditDow.toJSON()).toEqual(args.doc.common);
-
-    const [specific1, specific2] = config.specificAuditDows;
-
-    expect(specific1.toJSON()).toEqual(args.doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(args.doc.specifics[1]);
+    expect(config.specificAuditDow.toJSON()).toEqual(args.doc.specific);
   });
 
   test('Save improvementPlan duration of warranty', async () => {
@@ -175,7 +167,7 @@ describe('Config mutations', () => {
         configsSaveImprovementPlanDow(doc: $doc) {
           _id
           improvementPlanDow,
-          specificImprovementPlanDows,
+          specificImprovementPlanDow,
         }
       }
     `;
@@ -189,10 +181,6 @@ describe('Config mutations', () => {
     const config = await Configs.getConfig();
 
     expect(config.improvementPlanDow.toJSON()).toEqual(args.doc.common);
-
-    const [specific1, specific2] = config.specificImprovementPlanDows;
-
-    expect(specific1.toJSON()).toEqual(args.doc.specifics[0]);
-    expect(specific2.toJSON()).toEqual(args.doc.specifics[1]);
+    expect(config.specificImprovementPlanDow.toJSON()).toEqual(args.doc.specific);
   });
 });
