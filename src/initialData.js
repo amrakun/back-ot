@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import faker from 'faker';
 import { Users, Companies } from './db/models';
-import { companyFactory, tenderFactory, tenderResponseFactory } from './db/factories';
+import { userFactory, companyFactory, tenderFactory, tenderResponseFactory } from './db/factories';
 
 dotenv.config();
 
@@ -21,6 +21,18 @@ export const importData = async () => {
     role: 'admin',
     email: 'admin@ot.mn',
   });
+
+  // create some users
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false });
 
   // create suppliers =========================
   const companyFigures = [

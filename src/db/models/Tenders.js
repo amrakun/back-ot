@@ -165,25 +165,25 @@ const Tenders = mongoose.model('tenders', TenderSchema);
 // Tender responses =====================
 const RespondedProductSchema = mongoose.Schema(
   {
-    code: field({ type: String }),
-    suggestedManufacturer: field({ type: String }),
-    suggestedManufacturerPartNumber: field({ type: Number }),
-    unitPrice: field({ type: Number }),
-    totalPrice: field({ type: Number }),
-    leadTime: field({ type: Number }),
+    code: field({ type: String, optional: true }),
+    suggestedManufacturer: field({ type: String, optional: true }),
+    suggestedManufacturerPartNumber: field({ type: Number, optional: true }),
+    unitPrice: field({ type: Number, optional: true }),
+    totalPrice: field({ type: Number, optional: true }),
+    leadTime: field({ type: Number, optional: true }),
     shippingTerms: field({ type: String, optional: true }),
     comment: field({ type: String, optional: true }),
-    file: field({ type: FileSchema }),
+    file: field({ type: FileSchema, optional: true }),
   },
   { _id: false },
 );
 
 const RespondedDocumentSchema = mongoose.Schema(
   {
-    name: field({ type: String }),
-    isSubmitted: field({ type: Boolean }),
+    name: field({ type: String, optional: true }),
+    isSubmitted: field({ type: Boolean, optional: true }),
     notes: field({ type: String }),
-    file: field({ type: FileSchema }),
+    file: field({ type: FileSchema, optional: true }),
   },
   { _id: false },
 );
