@@ -309,6 +309,7 @@ describe('Company queries', () => {
     const startDate = moment()
       .add(-1, 'day')
       .endOf('day'); // 1 day ago
+
     const endDate = moment()
       .add(1, 'day')
       .endOf('day'); // tomorrow
@@ -324,5 +325,53 @@ describe('Company queries', () => {
 
     expect(item2._id).toBe('national');
     expect(item2.count).toBe(1);
+  });
+
+  test('count by registered and prequalified status', async () => {
+    const qry = `
+      query companiesCountByRegisteredVsPrequalified(
+        $startDate: Date!,
+        $endDate: Date!
+        $productCodes: String,
+      ) {
+        companiesCountByRegisteredVsPrequalified(
+          startDate: $startDate,
+          endDate: $endDate,
+          productCodes: $productCodes
+        )
+      }
+    `;
+
+    const c1Date = new Date();
+    const c2Date = moment()
+      .add(1, 'day')
+      .endOf('day')
+      .toDate(); // 1 days later
+
+    await companyFactory({
+      validatedProductsInfo: ['code1'],
+      createdDate: c1Date,
+    });
+
+    await companyFactory({
+      validatedProductsInfo: ['code2'],
+      createdDate: c2Date,
+      isPrequalified: true,
+    });
+
+    const startDate = moment()
+      .add(-1, 'day')
+      .endOf('day'); // 1 day ago
+
+    const endDate = moment()
+      .add(2, 'day')
+      .endOf('day'); // 2 days later
+
+    const args = { startDate, endDate, productCodes: 'code1,code2' };
+
+    const response = await graphqlRequest(qry, 'companiesCountByRegisteredVsPrequalified', args);
+
+    expect(response[c1Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 0 });
+    expect(response[c2Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 1 });
   });
 });

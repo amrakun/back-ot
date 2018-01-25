@@ -175,6 +175,44 @@ const companyQueries = {
       { $group: { _id: '$tierType', count: { $sum: 1 } } },
     ]);
   },
+
+  /*
+   * Companies count by registered and prequalified status
+   */
+  async companiesCountByRegisteredVsPrequalified(root, args) {
+    const { startDate, endDate, productCodes } = args;
+
+    // find companies
+    const companies = await Companies.find({
+      createdDate: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      validatedProductsInfo: { $in: productCodes.split(',') },
+    });
+
+    const results = {};
+
+    for (let company of companies) {
+      // 1/25/2018
+      const key = company.createdDate.toLocaleDateString();
+
+      // if key is not exists then create
+      if (!results[key]) {
+        results[key] = { registered: 0, prequalified: 0 };
+      }
+
+      // increment registered count
+      results[key].registered += 1;
+
+      // increment prequalified count
+      if (company.isPrequalified) {
+        results[key].prequalified += 1;
+      }
+    }
+
+    return results;
+  },
 };
 
 requireBuyer(companyQueries, 'companies');

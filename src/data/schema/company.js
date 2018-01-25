@@ -398,6 +398,12 @@ export const queries = `
     startDate: Date!,
     endDate: Date!
   ): [JSON]
+
+  companiesCountByRegisteredVsPrequalified(
+    startDate: Date!,
+    endDate: Date!
+    productCodes: String
+  ): JSON
 `;
 
 export const mutations = `
