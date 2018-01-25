@@ -94,8 +94,8 @@ export const types = `
     tenderId: String!
     supplierId: String!
     isNotInterested: Boolean
-    respondedProducts: [TenderRespondedProduct]!
-    respondedDocuments: [TenderRespondedDocument]!
+    respondedProducts: [TenderRespondedProduct]
+    respondedDocuments: [TenderRespondedDocument]
   }
 `;
 
