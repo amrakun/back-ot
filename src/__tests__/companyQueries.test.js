@@ -93,7 +93,7 @@ describe('Company queries', () => {
     const user = await userFactory();
 
     // Creating test data ==============
-    await Companies.create({}); // to check empty company ignorance
+    await Companies.createCompany(user._id); // to check empty company ignorance
 
     const company1 = await companyFactory({
       mnName: 'mn name',
@@ -294,5 +294,35 @@ describe('Company queries', () => {
     const response = await graphqlRequest(qry, 'companies', { region: 'national' });
 
     expect(response.length).toBe(1);
+  });
+
+  test('count by tier type', async () => {
+    const qry = `
+      query companiesCountByTierType($startDate: Date!, $endDate: Date!) {
+        companiesCountByTierType(startDate: $startDate, endDate: $endDate)
+      }
+    `;
+
+    await companyFactory({ tierType: 'national' });
+    await companyFactory({ tierType: 'tier1' });
+
+    const startDate = moment()
+      .add(-1, 'day')
+      .endOf('day'); // 1 day ago
+    const endDate = moment()
+      .add(1, 'day')
+      .endOf('day'); // tomorrow
+
+    const response = await graphqlRequest(qry, 'companiesCountByTierType', { startDate, endDate });
+
+    expect(response.length).toBe(2);
+
+    const [item1, item2] = response;
+
+    expect(item1._id).toBe('tier1');
+    expect(item1.count).toBe(1);
+
+    expect(item2._id).toBe('national');
+    expect(item2.count).toBe(1);
   });
 });

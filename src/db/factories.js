@@ -39,6 +39,8 @@ export const companyFactory = (params = {}) => {
   }
 
   const company = new Companies({
+    createdDate: params.createdDate || new Date(),
+
     basicInfo: {
       enName: params.enName || faker.random.word(),
       mnName: params.mnName || faker.random.word(),

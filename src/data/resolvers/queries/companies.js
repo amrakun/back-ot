@@ -169,8 +169,11 @@ const companyQueries = {
   /*
    * Companies count by tier type
    */
-  companiesCountByTierType() {
-    return Companies.aggregate([{ $group: { _id: '$tierType', count: { $sum: 1 } } }]);
+  companiesCountByTierType(root, { startDate, endDate }) {
+    return Companies.aggregate([
+      { $match: { createdDate: { $gte: startDate, $lte: endDate } } },
+      { $group: { _id: '$tierType', count: { $sum: 1 } } },
+    ]);
   },
 };
 

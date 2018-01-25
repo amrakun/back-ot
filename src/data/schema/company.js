@@ -393,7 +393,11 @@ export const queries = `
   companyDetail(_id: String!): Company
   companyByUser: Company
   companyDetailExport(_id: String!): String
-  companiesCountByTierType: [JSON]
+
+  companiesCountByTierType(
+    startDate: Date!,
+    endDate: Date!
+  ): [JSON]
 `;
 
 export const mutations = `

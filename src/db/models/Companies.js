@@ -394,6 +394,8 @@ const DateAmountSchema = mongoose.Schema(
 
 // Main schema ============
 const CompanySchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
+
   basicInfo: field({ type: BasicInfoSchema, optional: true }),
   contactInfo: field({ type: ContactInfoSchema, optional: true }),
   managementTeamInfo: field({ type: ManagementTeamInfoSchema, optional: true }),
@@ -475,7 +477,9 @@ class Company {
    * @return {Promise} Newly created company object
    */
   static async createCompany(userId) {
-    const company = await this.create({});
+    const company = await this.create({
+      createdDate: new Date(),
+    });
 
     await Users.update({ _id: userId }, { $set: { companyId: company._id } });
 
