@@ -3,6 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Configs } from '../db/models';
+import { configDocs } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -10,13 +11,7 @@ afterAll(() => disconnect());
 
 describe('Config db', () => {
   test('Save basic info', async () => {
-    const doc = {
-      logo: '/path',
-      name: 'name',
-      phone: 53535353,
-      email: 'email@gmail.com',
-      address: 'address',
-    };
+    const doc = configDocs.basicInfo;
 
     const config = await Configs.saveBasicInfo(doc);
 
@@ -48,25 +43,7 @@ describe('Config db', () => {
   });
 
   test('Save prequalification duration of warranty', async () => {
-    const doc = {
-      common: {
-        duration: 'year',
-        amount: 2,
-      },
-
-      specifics: [
-        {
-          supplierId: '_id1',
-          duration: 'month',
-          amount: 2,
-        },
-        {
-          supplierId: '_id2',
-          duration: 'day',
-          amount: 2,
-        },
-      ],
-    };
+    const doc = configDocs.prequalification;
 
     const config = await Configs.savePrequalificationDow(doc);
 
@@ -79,25 +56,7 @@ describe('Config db', () => {
   });
 
   test('Save audit duration of warranty', async () => {
-    const doc = {
-      common: {
-        duration: 'year',
-        amount: 2,
-      },
-
-      specifics: [
-        {
-          supplierId: '_id1',
-          duration: 'month',
-          amount: 2,
-        },
-        {
-          supplierId: '_id2',
-          duration: 'day',
-          amount: 2,
-        },
-      ],
-    };
+    const doc = configDocs.audit;
 
     const config = await Configs.saveAuditDow(doc);
 
@@ -110,28 +69,7 @@ describe('Config db', () => {
   });
 
   test('Save improvementPlan duration of warranty', async () => {
-    const doc = {
-      common: {
-        tierType: 'national',
-        duration: 'year',
-        amount: 2,
-      },
-
-      specifics: [
-        {
-          supplierId: '_id1',
-          tierType: 'national',
-          duration: 'month',
-          amount: 2,
-        },
-        {
-          supplierId: '_id2',
-          tierType: 'national',
-          duration: 'day',
-          amount: 2,
-        },
-      ],
-    };
+    const doc = configDocs.improvementPlan;
 
     const config = await Configs.saveImprovementPlanDow(doc);
 

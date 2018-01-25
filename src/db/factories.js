@@ -564,3 +564,76 @@ export const blockedCompanyFactory = params => {
 
   return save(blockedCompany);
 };
+
+export const configDocs = {
+  basicInfo: {
+    logo: '/path',
+    name: 'name',
+    phone: 53535353,
+    email: 'email@gmail.com',
+    address: 'address',
+  },
+
+  prequalification: {
+    common: {
+      duration: 'year',
+      amount: 2,
+    },
+
+    specifics: [
+      {
+        supplierId: '_id1',
+        duration: 'month',
+        amount: 2,
+      },
+      {
+        supplierId: '_id2',
+        duration: 'day',
+        amount: 2,
+      },
+    ],
+  },
+
+  audit: {
+    common: {
+      duration: 'year',
+      amount: 2,
+    },
+
+    specifics: [
+      {
+        supplierId: '_id1',
+        duration: 'month',
+        amount: 2,
+      },
+      {
+        supplierId: '_id2',
+        duration: 'day',
+        amount: 2,
+      },
+    ],
+  },
+
+  improvementPlan: {
+    common: {
+      tierType: 'national',
+      duration: 'year',
+      amount: 2,
+    },
+
+    specifics: [
+      {
+        supplierId: '_id1',
+        tierType: 'national',
+        duration: 'month',
+        amount: 2,
+      },
+      {
+        supplierId: '_id2',
+        tierType: 'national',
+        duration: 'day',
+        amount: 2,
+      },
+    ],
+  },
+};

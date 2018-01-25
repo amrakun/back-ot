@@ -7,6 +7,7 @@ import feedbackResponses from './feedbackResponses';
 import blockedCompanies from './blockedCompanies';
 import qualifications from './qualifications';
 import audits from './audits';
+import configs from './configs';
 
 export default {
   ...companies,
@@ -18,4 +19,5 @@ export default {
   ...blockedCompanies,
   ...qualifications,
   ...audits,
+  ...configs,
 };
