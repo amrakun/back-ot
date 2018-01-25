@@ -165,6 +165,13 @@ const companyQueries = {
     const supplier = await Companies.findOne({ _id });
     return companyDetailExport(supplier);
   },
+
+  /*
+   * Companies count by tier type
+   */
+  companiesCountByTierType() {
+    return Companies.aggregate([{ $group: { _id: '$tierType', count: { $sum: 1 } } }]);
+  },
 };
 
 requireBuyer(companyQueries, 'companies');
