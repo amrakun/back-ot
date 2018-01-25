@@ -100,7 +100,7 @@ const companiesFilter = async args => {
     delete selector._id;
   }
 
-  return Companies.find(selector);
+  return selector;
 };
 
 const companyQueries = {
@@ -110,7 +110,9 @@ const companyQueries = {
    * @return {Promise} filtered companies list by given parameters
    */
   async companies(root, args) {
-    return paginate(await companiesFilter(args), args);
+    const selector = await companiesFilter(args);
+
+    return paginate(Companies.find(selector), args);
   },
 
   /**
@@ -119,7 +121,8 @@ const companyQueries = {
    * @return {String} - file url
    */
   async companiesExport(root, args) {
-    const companies = await companiesFilter(args);
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
 
     // read template
     const { workbook, sheet } = await readTemplate('suppliers');

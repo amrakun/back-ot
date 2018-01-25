@@ -19,7 +19,9 @@ describe('Company queries', () => {
     $isProductsInfoValidated: Boolean,
     $includeBlocked: Boolean,
     $isPrequalified: Boolean,
-    $_ids: [String]
+    $_ids: [String],
+    $perPage: Int,
+    $page: Int,
   `;
 
   const commonValues = `
@@ -29,7 +31,9 @@ describe('Company queries', () => {
     isProductsInfoValidated: $isProductsInfoValidated,
     includeBlocked: $includeBlocked,
     isPrequalified: $isPrequalified,
-    _ids: $_ids
+    _ids: $_ids,
+    perPage: $perPage,
+    page: $page,
   `;
 
   const query = `
@@ -176,8 +180,12 @@ describe('Company queries', () => {
 
     expect(response.length).toBe(1);
 
-    // blocked =============
-    response = await graphqlRequest(query, 'companies', { includeBlocked: false });
+    // blocked & pager =============
+    response = await graphqlRequest(query, 'companies', {
+      includeBlocked: false,
+      perPage: 10,
+      page: 1,
+    });
 
     expect(response.length).toBe(2);
   });
