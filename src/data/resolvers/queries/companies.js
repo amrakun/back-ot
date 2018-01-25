@@ -188,14 +188,19 @@ const companyQueries = {
   async companiesCountByRegisteredVsPrequalified(root, args) {
     const { startDate, endDate, productCodes } = args;
 
-    // find companies
-    const companies = await Companies.find({
+    const selector = {
       createdDate: {
         $gte: startDate,
         $lte: endDate,
       },
-      validatedProductsInfo: { $in: productCodes.split(',') },
-    });
+    };
+
+    if (productCodes) {
+      selector.validatedProductsInfo = { $in: productCodes.split(',') };
+    }
+
+    // find companies
+    const companies = await Companies.find(selector);
 
     const results = {};
 
