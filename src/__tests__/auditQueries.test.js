@@ -114,6 +114,10 @@ describe('Company queries', () => {
             _id
           }
 
+          supplierResponse {
+            status
+          }
+
           responses {
             _id
             status

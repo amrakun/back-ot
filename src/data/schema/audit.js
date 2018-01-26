@@ -183,6 +183,7 @@ export const types = `
 
     createdUser: User
     suppliers: [Company]
+    supplierResponse: AuditResponse
     responses: [AuditResponse]
   }
 

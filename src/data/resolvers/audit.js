@@ -12,4 +12,8 @@ export default {
   responses(audit) {
     return AuditResponses.find({ auditId: audit._id, isSent: true });
   },
+
+  supplierResponse(audit, args, { user }) {
+    return AuditResponses.findOne({ auditId: audit._id, supplierId: user.companyId });
+  },
 };
