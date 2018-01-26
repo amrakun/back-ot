@@ -24,10 +24,12 @@ export const companyDetailExport = async supplier => {
 
   sheetA.cell(index, 2).value('Section 1. Company Information');
   index += 2;
-  sheetA.cell(index, 2).value('Company name');
-  sheetA
-    .cell(index, 3)
-    .value(basicInfo.enName + (basicInfo.enName ? '(' + basicInfo.enName + ')' : ''));
+  sheetA.cell(index, 2).value('Company name (English)');
+  sheetA.cell(index, 3).value(basicInfo.enName);
+
+  index += 1;
+  sheetA.cell(index, 2).value('Company name (Mongolian)');
+  sheetA.cell(index, 3).value(basicInfo.mnName);
 
   index += 2;
   sheetA.cell(index, 2).value('Address');
@@ -37,9 +39,11 @@ export const companyDetailExport = async supplier => {
   sheetA.cell(index, 3).value(basicInfo.address || '');
 
   index += 1;
+  sheetA.cell(index, 2).value('Address Line 2');
   sheetA.cell(index, 3).value(basicInfo.address2 || '');
 
   index += 1;
+  sheetA.cell(index, 2).value('Address Line 3');
   sheetA.cell(index, 3).value(basicInfo.address3 || '');
 
   index += 2;
@@ -132,9 +136,11 @@ export const companyDetailExport = async supplier => {
   sheetA.cell(index, 3).value(contactInfo.address || '');
 
   index++;
+  sheetA.cell(index, 2).value('Address 2');
   sheetA.cell(index, 3).value(contactInfo.address2 || '');
 
   index++;
+  sheetA.cell(index, 2).value('Address 3');
   sheetA.cell(index, 3).value(contactInfo.address3 || '');
 
   index += 2;
@@ -176,7 +182,7 @@ export const companyDetailExport = async supplier => {
   sheetA.cell(index, 2).value('Executive Officer');
   index += 2;
 
-  sheetA.cell(index, 3).value('Name');
+  sheetA.cell(index, 2).value('Name');
   sheetA.cell(index++, 3).value(executiveOfficer.name || '');
 
   sheetA.cell(index, 2).value('Job title');
@@ -334,18 +340,20 @@ export const companyDetailExport = async supplier => {
   sheetA.cell(index, 2).value('Company role');
   sheetA.cell(index, 3).value(groupInfo.role || '');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Factory name');
-  sheetA.cell(index, 3).value('Town or City');
-  sheetA.cell(index, 4).value('Country');
-  sheetA.cell(index, 5).value('Associated Product');
+  if (groupInfo.role == 'EOM') {
+    index += 2;
+    sheetA.cell(index, 2).value('Factory name');
+    sheetA.cell(index, 3).value('Town or City');
+    sheetA.cell(index, 4).value('Country');
+    sheetA.cell(index, 5).value('Associated Product');
 
-  for (let factory of groupInfo.factories || []) {
-    ++index;
-    sheetA.cell(index, 2).value(factory.name || '');
-    sheetA.cell(index, 3).value(factory.townOrCity || '');
-    sheetA.cell(index, 4).value(factory.country || '');
-    sheetA.cell(index, 5).value(factory.productCodes || '');
+    for (let factory of groupInfo.factories || []) {
+      ++index;
+      sheetA.cell(index, 2).value(factory.name || '');
+      sheetA.cell(index, 3).value(factory.townOrCity || '');
+      sheetA.cell(index, 4).value(factory.country || '');
+      sheetA.cell(index, 5).value(factory.productCodes || '');
+    }
   }
 
   index += 3;
@@ -366,7 +374,7 @@ export const companyDetailExport = async supplier => {
 
   index += 2;
   sheetA.cell(index, 2).value('Product/Service code');
-  sheetA.cell(index, 3).value(groupInfo.products);
+  sheetA.cell(index, 3).value((groupInfo.productsInfo || []).join());
 
   // Capacity building certificate
   index += 3;
@@ -521,7 +529,11 @@ export const companyDetailExport = async supplier => {
     );
 
   index += 3;
-  sheetC.cell(index, 2).value('Does have code ethics');
+  sheetC
+    .cell(index, 2)
+    .value(
+      'Meets minimum standards of fair employment practice required by Mongolian labor laws and regulations',
+    );
   sheetC.cell(index, 3).value(businessInfo.doesHaveResponsiblityPolicy ? 'yes' : 'no');
   sheetC
     .cell(index, 4)

@@ -200,6 +200,6 @@ const reportsSuppliersQuery = {
   },
 };
 
-moduleRequireBuyer(reportsSuppliersQuery);
+// moduleRequireBuyer(reportsSuppliersQuery);
 
 export default reportsSuppliersQuery;
