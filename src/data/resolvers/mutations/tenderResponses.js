@@ -10,6 +10,19 @@ const tenderResponseMutations = {
   tenderResponsesAdd(root, doc) {
     return TenderResponses.createTenderResponse(doc);
   },
+
+  /**
+   * Mark tender response as sent
+   */
+  async tenderResponsesSend(root, doc) {
+    const response = await TenderResponses.findOne(doc);
+
+    if (response) {
+      return response.send();
+    }
+
+    return null;
+  },
 };
 
 moduleRequireSupplier(tenderResponseMutations);

@@ -164,10 +164,10 @@ const companyQueries = {
 
       const basicInfo = company.basicInfo || {};
 
-      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
-      sheet.cell(rowIndex, 3).value(basicInfo.enName);
+      sheet.cell(rowIndex, 1).value(basicInfo.sapNumber);
+      sheet.cell(rowIndex, 2).value(basicInfo.enName);
+      sheet.cell(rowIndex, 3).value('');
       sheet.cell(rowIndex, 4).value('');
-      sheet.cell(rowIndex, 5).value('');
     }
 
     // Write to file.

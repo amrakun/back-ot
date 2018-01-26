@@ -23,7 +23,6 @@ export const importData = async () => {
   });
 
   // create some users
-  await userFactory({ isSupplier: false, email: 'supplier@ot.mn' });
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
@@ -33,6 +32,9 @@ export const importData = async () => {
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
+
+  // create supplier
+  await userFactory({ isSupplier: true, email: 'supplier@ot.mn' });
 
   // create suppliers =========================
   const companyFigures = [
@@ -109,6 +111,7 @@ export const importData = async () => {
         tenderId: tender._id,
         supplierId,
         notInterested: faker.random.boolean(),
+        isSent: true,
       });
     }
   };

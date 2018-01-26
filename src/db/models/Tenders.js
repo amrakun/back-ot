@@ -194,6 +194,8 @@ const TenderResponseSchema = mongoose.Schema({
   respondedProducts: [RespondedProductSchema],
   respondedDocuments: [RespondedDocumentSchema],
 
+  isSent: field({ type: Boolean, optional: true }),
+
   isNotInterested: field({ type: Boolean, default: false }),
 });
 
@@ -220,7 +222,24 @@ class TenderResponse {
       return previousEntry;
     }
 
-    return this.create(doc);
+    return this.create({ ...doc, isSent: false });
+  }
+
+  /**
+   * Mark this response as sent
+   * @return - Updated response object
+   */
+  async send() {
+    const tender = await Tenders.findOne({ _id: this.tenderId });
+
+    // can send to only open tenders
+    if (tender.status !== 'open') {
+      throw Error('This tender is not available');
+    }
+
+    await this.update({ isSent: true });
+
+    return TenderResponses.findOne({ _id: this._id });
   }
 }
 

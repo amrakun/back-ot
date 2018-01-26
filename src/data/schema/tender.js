@@ -93,9 +93,11 @@ export const types = `
     _id: String!
     tenderId: String!
     supplierId: String!
-    isNotInterested: Boolean
     respondedProducts: [TenderRespondedProduct]
     respondedDocuments: [TenderRespondedDocument]
+
+    isSent: Boolean
+    isNotInterested: Boolean
   }
 `;
 
@@ -164,4 +166,5 @@ export const mutations = `
   tendersSendRegretLetter(_id: String!, subject: String!, content: String!): [String]
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
+  tenderResponsesSend(tenderId: String, supplierId: String): TenderResponse
 `;

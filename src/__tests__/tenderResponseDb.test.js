@@ -3,7 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Tenders, TenderResponses, Companies } from '../db/models';
-import { tenderFactory, companyFactory } from '../db/factories';
+import { tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -71,13 +71,15 @@ describe('Tender response db', () => {
     expect(toObject(tenderResponseObj.respondedDocuments)).toEqual(respondedDocuments);
 
     // check duplications
-    await TenderResponses.createTenderResponse({
+    const response = await TenderResponses.createTenderResponse({
       tenderId: _tender._id,
       supplierId: _company._id,
       respondedProducts,
     });
 
     expect(await TenderResponses.find().count()).toBe(1);
+
+    expect(response.isSent).toBe(false);
   });
 
   test('Create tender response: with not open status', async () => {
@@ -90,5 +92,20 @@ describe('Tender response db', () => {
     } catch (e) {
       expect(e.message).toBe('This tender is not available');
     }
+  });
+
+  test('Send', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+    let tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
+
+    tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
+
+    expect(tenderResponse.isSent).toBe(false);
+
+    await tenderResponse.send();
+
+    tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
+
+    expect(tenderResponse.isSent).toBe(true);
   });
 });

@@ -6,6 +6,7 @@ import { Users, Tenders } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
 
 import tenderMutations from '../data/resolvers/mutations/tenders';
+import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 
 beforeAll(() => connect());
 
@@ -76,6 +77,26 @@ describe('Tender mutations', () => {
 
     for (let mutation of mutations) {
       checkLogin(tenderMutations[mutation], { _id: _tender.id }, { user });
+    }
+  });
+
+  test('Tenders supplier required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(1);
+
+    const mutations = ['tenderResponsesSend'];
+
+    const user = await userFactory({});
+
+    for (let mutation of mutations) {
+      checkLogin(tenderResponseMutations[mutation], { _id: _tender.id }, { user });
     }
   });
 
@@ -196,5 +217,31 @@ describe('Tender mutations', () => {
     expect(response).toContain(notAwarded1.supplierId);
     expect(response).toContain(notAwarded2.supplierId);
     expect(updatedTender.sentRegretLetter).toBe(true);
+  });
+
+  test('Send response', async () => {
+    const company = await companyFactory();
+    const tender = await tenderFactory({ status: 'open' });
+    const user = await userFactory({ isSupplier: true });
+
+    await tenderResponseFactory({ supplierId: company._id, tenderId: tender._id });
+
+    const mutation = `
+      mutation tenderResponsesSend($tenderId: String!, $supplierId: String!) {
+        tenderResponsesSend(tenderId: $tenderId, supplierId: $supplierId) {
+          _id
+          isSent
+        }
+      }
+    `;
+
+    const response = await graphqlRequest(
+      mutation,
+      'tenderResponsesSend',
+      { supplierId: company._id, tenderId: tender._id },
+      { user },
+    );
+
+    expect(response.isSent).toBe(true);
   });
 });

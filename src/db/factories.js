@@ -372,6 +372,7 @@ export const tenderResponseFactory = async (params = {}) => {
     supplierId: params.supplierId,
     respondedProducts: params.respondedProducts,
     respondedDocuments: params.respondedDocuments,
+    isSent: params.isSent || false,
     isNotInterested: params.isNotInterested || false,
   });
 
