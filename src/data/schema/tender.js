@@ -47,7 +47,7 @@ export const types = `
     type: String!
     createdDate: String
     createdUserId: String!
-    number: Float!
+    number: String!
     name: String!
     content: String!
     publishDate: Date!
@@ -136,7 +136,7 @@ export const queries = `
 `;
 
 const commonParams = `
-  number: Float!,
+  number: String!,
   name: String!,
   content: String!,
   publishDate: Date!,

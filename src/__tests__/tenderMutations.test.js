@@ -16,7 +16,7 @@ describe('Tender mutations', () => {
   let _user;
 
   const commonParams = `
-    $number: Float!,
+    $number: String!,
     $name: String!,
     $content: String!,
     $publishDate: Date!,

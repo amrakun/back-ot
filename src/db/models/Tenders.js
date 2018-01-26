@@ -32,7 +32,7 @@ const TenderSchema = mongoose.Schema({
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
 
-  number: field({ type: Number }),
+  number: field({ type: String }),
   name: field({ type: String }),
   content: field({ type: String }),
   publishDate: field({ type: Date }),
