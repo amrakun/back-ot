@@ -146,6 +146,35 @@ const companyQueries = {
   },
 
   /**
+   * Difot score list
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async companiesGenerateDifotScoreList(root, args) {
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
+
+    // read template
+    const { workbook, sheet } = await readTemplate('difot_score');
+
+    let rowIndex = 1;
+
+    for (let company of companies) {
+      rowIndex++;
+
+      const basicInfo = company.basicInfo || {};
+
+      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+      sheet.cell(rowIndex, 3).value(basicInfo.enName);
+      sheet.cell(rowIndex, 4).value('');
+      sheet.cell(rowIndex, 5).value('');
+    }
+
+    // Write to file.
+    return generateXlsx(workbook, 'difot_score');
+  },
+
+  /**
    * Get logged in user's company
    * @param {Object} args
    * @return {Promise} found company
