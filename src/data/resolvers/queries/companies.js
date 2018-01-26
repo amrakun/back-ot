@@ -235,6 +235,8 @@ const companyQueries = {
 
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
-// requireBuyer(companyQueries, 'companyDetailExport');
+requireBuyer(companyQueries, 'companyDetailExport');
+requireBuyer(companyQueries, 'companiesCountByTierType');
+requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 
 export default companyQueries;
