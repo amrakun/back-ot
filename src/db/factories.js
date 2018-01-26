@@ -332,10 +332,6 @@ export const tenderFactory = async (params = {}) => {
     params.type = 'rfq';
   }
 
-  if (params.type === 'eoi' && !params.requestedDocuments) {
-    params.requestedDocuments = ['Document1'];
-  }
-
   const tender = new Tenders({
     type: params.type,
     status: params.status || 'draft',
@@ -353,6 +349,7 @@ export const tenderFactory = async (params = {}) => {
     file: params.file || { name: 'name', url: 'url' },
     supplierIds: params.supplierIds,
     requestedProducts: params.requestedProducts || [requestedProduct],
+    requestedDocuments: params.requestedDocuments,
     sentRegretLetter: params.sentRegretLetter || false,
   });
 
