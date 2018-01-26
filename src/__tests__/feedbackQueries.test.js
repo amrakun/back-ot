@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Feedbacks } from '../db/models';
-import { feedbackFactory } from '../db/factories';
+import { feedbackFactory, feedbackResponseFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -25,6 +25,33 @@ describe('Feedback queries', () => {
     createdUserId
   `;
 
+  const feedbackResponseFields = `
+    _id
+    status
+    feedbackId
+    supplierId
+    employmentNumberBefore
+    employmentNumberNow
+    nationalSpendBefore
+    nationalSpendAfter
+    umnugobiSpendBefore
+    umnugobiSpendAfter
+    investment
+    trainings
+    corporateSocial
+    technologyImprovement
+
+    feedback {
+      status
+    }
+
+    supplier {
+      basicInfo {
+        enName
+      }
+    }
+  `;
+
   test('feedbacks', async () => {
     await feedbackFactory();
     await feedbackFactory();
@@ -39,6 +66,24 @@ describe('Feedback queries', () => {
 
     // When there is no filter, it must return all feedbacks =============
     let response = await graphqlRequest(query, 'feedbacks', {});
+
+    expect(response.length).toBe(2);
+  });
+
+  test('feedback respones', async () => {
+    await feedbackResponseFactory();
+    await feedbackResponseFactory();
+
+    const query = `
+      query feedbackResponses {
+        feedbackResponses {
+          ${feedbackResponseFields}
+        }
+      }
+    `;
+
+    // When there is no filter, it must return all feedbacks =============
+    let response = await graphqlRequest(query, 'feedbackResponses', {});
 
     expect(response.length).toBe(2);
   });

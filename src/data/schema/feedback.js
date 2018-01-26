@@ -28,12 +28,14 @@ export const types = `
     corporateSocial: String
     technologyImprovement: String
 
+    feedback: Feedback
     supplier: Company
   }
 `;
 
 export const queries = `
   feedbacks: [Feedback]
+  feedbackResponses(supplierName: String): [FeedbackResponse]
   feedbackDetail(_id: String!): Feedback
 `;
 

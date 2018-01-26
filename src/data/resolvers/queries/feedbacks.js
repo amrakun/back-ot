@@ -1,4 +1,5 @@
-import { Feedbacks } from '../../../db/models';
+import { Feedbacks, FeedbackResponses } from '../../../db/models';
+import { moduleRequireBuyer } from '../../permissions';
 
 const feedbackQueries = {
   /**
@@ -19,6 +20,17 @@ const feedbackQueries = {
   feedbackDetail(root, { _id }) {
     return Feedbacks.findOne({ _id });
   },
+
+  /**
+   * Feedback responses list
+   * @param {Object} args - Query params
+   * @return {Promise} filtered feedback responses list by given parameters
+   */
+  async feedbackResponses() {
+    return FeedbackResponses.find({});
+  },
 };
+
+moduleRequireBuyer(feedbackQueries);
 
 export default feedbackQueries;
