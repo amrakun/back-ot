@@ -23,7 +23,7 @@ export const importData = async () => {
   });
 
   // create some users
-  await userFactory({ isSupplier: false });
+  await userFactory({ isSupplier: false, email: 'supplier@ot.mn' });
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
   await userFactory({ isSupplier: false });
