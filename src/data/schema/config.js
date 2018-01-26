@@ -10,17 +10,21 @@ export const types = `
     amount: Float!
   }
 
-  input ConfigTierTypeDurationAmount {
-    tierType: String!
-    duration: String!
-    amount: Float!
+  input ConfigTierTypesDurationAmount {
+    national: ConfigDurationAmount
+    umnugobi: ConfigDurationAmount
+    tier1: ConfigDurationAmount
+    tier2: ConfigDurationAmount
+    tier3: ConfigDurationAmount
   }
 
-  input ConfigSuppliersTierTypeDurationAmount {
+  input ConfigSuppliersTierTypesDurationAmount {
     supplierIds: [String]!
-    tierType: String!
-    duration: String!
-    amount: Float!
+    national: ConfigDurationAmount
+    umnugobi: ConfigDurationAmount
+    tier1: ConfigDurationAmount
+    tier2: ConfigDurationAmount
+    tier3: ConfigDurationAmount
   }
 
   input ConfigPrequalificationDowInput {
@@ -34,8 +38,8 @@ export const types = `
   }
 
   input ConfigImprovementPlanDowInput {
-    common: ConfigTierTypeDurationAmount!
-    specific: ConfigSuppliersTierTypeDurationAmount
+    common: ConfigTierTypesDurationAmount!
+    specific: ConfigSuppliersTierTypesDurationAmount
   }
 
   type Config {

@@ -18,21 +18,25 @@ const SuppliersDurationAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const TierTypeDurationAmountSchema = mongoose.Schema(
+const TierTypesDurationAmountSchema = mongoose.Schema(
   {
-    tierType: field({ type: String }),
-    duration: field({ type: String }),
-    amount: field({ type: Number }),
+    national: field({ type: DurationAmountSchema, optional: true }),
+    umnugobi: field({ type: DurationAmountSchema, optional: true }),
+    tier1: field({ type: DurationAmountSchema, optional: true }),
+    tier2: field({ type: DurationAmountSchema, optional: true }),
+    tier3: field({ type: DurationAmountSchema, optional: true }),
   },
   { _id: false },
 );
 
-const SuppliersTierTypeDurationAmountSchema = mongoose.Schema(
+const SuppliersTierTypesDurationAmountSchema = mongoose.Schema(
   {
     supplierIds: field({ type: [String] }),
-    tierType: field({ type: String }),
-    duration: field({ type: String }),
-    amount: field({ type: Number }),
+    national: field({ type: DurationAmountSchema, optional: true }),
+    umnugobi: field({ type: DurationAmountSchema, optional: true }),
+    tier1: field({ type: DurationAmountSchema, optional: true }),
+    tier2: field({ type: DurationAmountSchema, optional: true }),
+    tier3: field({ type: DurationAmountSchema, optional: true }),
   },
   { _id: false },
 );
@@ -80,15 +84,15 @@ const ConfigSchema = mongoose.Schema({
   }),
 
   // Improvement plan duration of warranty =============
-  // { tierType: 'national', duration: 'year', amount: 2 }
+  // { national: { duration: 'year', amount: 2 }, tier1: { duration: 'month' }
   improvementPlanDow: field({
-    type: TierTypeDurationAmountSchema,
+    type: TierTypesDurationAmountSchema,
     optional: true,
   }),
 
-  // { supplierIds: ['_id1', '_id2'], tierType: 'national', duration: 'year', amount: 2 }
+  // { supplierIds: ['_id1', '_id2'], national: { duration: 'year', amount: 2 } }
   specificImprovementPlanDow: field({
-    type: SuppliersTierTypeDurationAmountSchema,
+    type: SuppliersTierTypesDurationAmountSchema,
     optional: true,
   }),
 });

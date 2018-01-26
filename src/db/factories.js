@@ -641,16 +641,50 @@ export const configDocs = {
 
   improvementPlan: {
     common: {
-      tierType: 'national',
-      duration: 'year',
-      amount: 2,
+      national: {
+        duration: 'year',
+        amount: 2,
+      },
+      umnugobi: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier1: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier2: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier3: {
+        duration: 'year',
+        amount: 2,
+      },
     },
 
     specific: {
       supplierIds: ['_id1', '_id2'],
-      tierType: 'national',
-      duration: 'month',
-      amount: 2,
+      national: {
+        duration: 'year',
+        amount: 2,
+      },
+      umnugobi: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier1: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier2: {
+        duration: 'year',
+        amount: 2,
+      },
+      tier3: {
+        duration: 'year',
+        amount: 2,
+      },
     },
   },
 };
