@@ -383,6 +383,8 @@ const queryParams = `
   isQualified: Boolean,
   difotScore: String,
   region: String,
+  sortField: String,
+  sortDirection: Int,
   _ids: [String],
 `;
 

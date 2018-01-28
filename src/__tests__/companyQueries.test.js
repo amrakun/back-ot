@@ -382,4 +382,39 @@ describe('Company queries', () => {
     expect(response[c1Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 0 });
     expect(response[c2Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 1 });
   });
+
+  test('companies: sort', async () => {
+    const qry = `
+      query companies($sortField: String, $sortDirection: Int) {
+        companies(sortField: $sortField, sortDirection: $sortDirection) {
+          basicInfo {
+            mnName
+          }
+          averageDifotScore
+        }
+      }
+    `;
+
+    await companyFactory({ mnName: 'sup1', averageDifotScore: 2 });
+    await companyFactory({ mnName: 'sup2', averageDifotScore: 27 });
+
+    // sort by average difot score 1 =====================
+    let response = await graphqlRequest(qry, 'companies', { sortField: 'averageDifotScore' });
+
+    let [sup1, sup2] = response;
+
+    expect(sup1.basicInfo.mnName).toBe('sup1');
+    expect(sup2.basicInfo.mnName).toBe('sup2');
+
+    // sort by average difot score -1 =====================
+    response = await graphqlRequest(qry, 'companies', {
+      sortField: 'averageDifotScore',
+      sortDirection: -1,
+    });
+
+    [sup2, sup1] = response;
+
+    expect(sup1.basicInfo.mnName).toBe('sup1');
+    expect(sup2.basicInfo.mnName).toBe('sup2');
+  });
 });

@@ -110,9 +110,10 @@ const companyQueries = {
    * @return {Promise} filtered companies list by given parameters
    */
   async companies(root, args) {
+    const { sortField, sortDirection } = args;
     const selector = await companiesFilter(args);
 
-    return paginate(Companies.find(selector), args);
+    return paginate(Companies.find(selector).sort({ [sortField]: sortDirection || 1 }), args);
   },
 
   /**
