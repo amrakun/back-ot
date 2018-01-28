@@ -225,6 +225,31 @@ class TenderResponse {
     return this.create({ ...doc, isSent: false });
   }
 
+  /*
+   * Update tender response if tender is available
+   * @param {Object} doc - Update doc
+   * @return - Updated tender response
+   */
+  static async updateTenderResponse(doc) {
+    const { tenderId, supplierId } = doc;
+    const selector = { tenderId, supplierId };
+    const response = await this.findOne(selector);
+
+    if (!response) {
+      throw new Error('Response not found');
+    }
+
+    const tender = await Tenders.findOne({ _id: response.tenderId });
+
+    if (tender.status !== 'open') {
+      throw Error('This tender is not available');
+    }
+
+    await this.update(selector, { $set: doc });
+
+    return this.findOne(selector);
+  }
+
   /**
    * Mark this response as sent
    * @return - Updated response object

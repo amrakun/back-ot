@@ -156,7 +156,6 @@ const commonParams = `
 
 const responseCommonParams = `
   tenderId: String!,
-  supplierId: String!,
   isNotInterested: Boolean,
   respondedProducts: [TenderRespondedProductInput]
   respondedDocuments: [TenderRespondedDocumentInput]
@@ -170,5 +169,6 @@ export const mutations = `
   tendersSendRegretLetter(_id: String!, subject: String!, content: String!): [String]
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
+  tenderResponsesEdit(${responseCommonParams}): TenderResponse
   tenderResponsesSend(tenderId: String, supplierId: String): TenderResponse
 `;

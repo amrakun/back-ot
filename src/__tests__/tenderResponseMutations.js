@@ -3,12 +3,17 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Tenders, TenderResponses, Companies } from '../db/models';
-import { userFactory, tenderFactory, companyFactory } from '../db/factories';
+import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+
 import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 
 beforeAll(() => connect());
 
 afterAll(() => disconnect());
+
+const toObject = data => {
+  return JSON.parse(JSON.stringify(data));
+};
 
 describe('Tender mutations', () => {
   let _tender;
@@ -16,7 +21,6 @@ describe('Tender mutations', () => {
 
   const commonParams = `
     $tenderId: String!,
-    $supplierId: String!,
     $isNotInterested: Boolean,
     $respondedProducts: [TenderRespondedProductInput]
     $respondedDocuments: [TenderRespondedDocumentInput]
@@ -24,7 +28,6 @@ describe('Tender mutations', () => {
 
   const commonValues = `
     tenderId: $tenderId,
-    supplierId: $supplierId,
     isNotInterested: $isNotInterested,
     respondedProducts: $respondedProducts
     respondedDocuments: $respondedDocuments
@@ -52,27 +55,27 @@ describe('Tender mutations', () => {
       }
     };
 
-    expect.assertions(1);
+    expect.assertions(2);
 
     const user = await userFactory();
 
-    // add tender
-    checkLogin(
-      tenderResponseMutations.tenderResponsesAdd,
-      {
-        tenderId: _tender._id,
-        supplierId: _company._id,
-      },
-      { user },
-    );
+    for (const mutation of ['tenderResponsesAdd', 'tenderResponsesEdit']) {
+      checkLogin(
+        tenderResponseMutations[mutation],
+        {
+          tenderId: _tender._id,
+          supplierId: _company._id,
+        },
+        { user },
+      );
+    }
   });
 
   test('Create tender response', async () => {
-    TenderResponses.createTenderResponse = jest.fn(() => ({ _id: 'DFAFDA' }));
+    const tender = await tenderFactory({ status: 'open' });
 
     const doc = {
-      tenderId: 'tenderId',
-      supplierId: 'supplierId',
+      tenderId: tender._id,
       isNotInterested: false,
       respondedProducts: [
         {
@@ -100,15 +103,99 @@ describe('Tender mutations', () => {
       mutation tenderResponsesAdd(${commonParams}) {
         tenderResponsesAdd(${commonValues}) {
           _id
+          isNotInterested
+          respondedProducts {
+            code
+            suggestedManufacturer
+            suggestedManufacturerPartNumber
+            unitPrice
+            totalPrice
+            leadTime
+            comment
+            file
+          }
+
+          respondedDocuments {
+            name
+            isSubmitted
+            notes
+            file
+          }
         }
       }
     `;
 
     const user = await userFactory({ isSupplier: true });
 
-    await graphqlRequest(mutation, 'tenderResponsesAdd', doc, { user });
+    const response = await graphqlRequest(mutation, 'tenderResponsesAdd', doc, { user });
 
-    expect(TenderResponses.createTenderResponse.mock.calls.length).toBe(1);
-    expect(TenderResponses.createTenderResponse).toBeCalledWith(doc);
+    expect(response.isNotInterested).toBe(doc.isNotInterested);
+    expect(toObject(response.respondedProducts)).toEqual(doc.respondedProducts);
+    expect(toObject(response.respondedDocuments)).toEqual(doc.respondedDocuments);
+  });
+
+  test('Update tender response', async () => {
+    const user = await userFactory({ isSupplier: true });
+    const tender = await tenderFactory({ status: 'open' });
+
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
+
+    const doc = {
+      tenderId: tender._id,
+      isNotInterested: false,
+      respondedProducts: [
+        {
+          code: 'code',
+          suggestedManufacturer: 'suggestedManufacturer',
+          suggestedManufacturerPartNumber: 1,
+          unitPrice: 1000,
+          totalPrice: 20000,
+          leadTime: 1,
+          comment: 'comment',
+          file: { name: 'name', url: 'url' },
+        },
+      ],
+      respondedDocuments: [
+        {
+          name: 'name',
+          isSubmitted: true,
+          notes: 'notes',
+          file: { name: 'name', url: 'url' },
+        },
+      ],
+    };
+
+    const updatedResponse = await graphqlRequest(
+      `
+        mutation tenderResponsesEdit(${commonParams}) {
+          tenderResponsesEdit(${commonValues}) {
+            _id
+            respondedProducts {
+              code
+              suggestedManufacturer
+              suggestedManufacturerPartNumber
+              unitPrice
+              totalPrice
+              leadTime
+              comment
+              file
+            }
+
+            respondedDocuments {
+              name
+              isSubmitted
+              notes
+              file
+            }
+          }
+        }
+      `,
+      'tenderResponsesEdit',
+      doc,
+      { user },
+    );
+
+    expect(toObject(updatedResponse.respondedProducts)).toEqual(doc.respondedProducts);
+    expect(toObject(updatedResponse.respondedDocuments)).toEqual(doc.respondedDocuments);
   });
 });

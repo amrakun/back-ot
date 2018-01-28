@@ -7,8 +7,17 @@ const tenderResponseMutations = {
    * @param {Object} doc - tender response fields
    * @return {Promise} newly created tender reponse object
    */
-  tenderResponsesAdd(root, doc) {
-    return TenderResponses.createTenderResponse(doc);
+  tenderResponsesAdd(root, doc, { user }) {
+    return TenderResponses.createTenderResponse({ ...doc, supplierId: user.companyId });
+  },
+
+  /**
+   * Update existing tender response
+   * @param {Object} doc - tender response fields
+   * @return {Promise} updated tender reponse object
+   */
+  tenderResponsesEdit(root, doc, { user }) {
+    return TenderResponses.updateTenderResponse({ ...doc, supplierId: user.companyId });
   },
 
   /**

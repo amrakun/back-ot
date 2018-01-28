@@ -9,6 +9,10 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
+const toObject = data => {
+  return JSON.parse(JSON.stringify(data));
+};
+
 describe('Tender response db', () => {
   let _tender;
   let _company;
@@ -63,10 +67,6 @@ describe('Tender response db', () => {
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
     expect(tenderResponseObj.isNotInterested).toBe(false);
 
-    const toObject = data => {
-      return JSON.parse(JSON.stringify(data));
-    };
-
     expect(toObject(tenderResponseObj.respondedProducts)).toEqual(respondedProducts);
     expect(toObject(tenderResponseObj.respondedDocuments)).toEqual(respondedDocuments);
 
@@ -107,5 +107,55 @@ describe('Tender response db', () => {
     tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
 
     expect(tenderResponse.isSent).toBe(true);
+  });
+
+  test('Edit tender response', async () => {
+    const response = await tenderResponseFactory({});
+
+    expect.assertions(3);
+
+    // tender is closed or canceled
+    try {
+      await TenderResponses.updateTenderResponse({
+        tenderId: response.tenderId,
+        supplierId: response.supplierId,
+      });
+    } catch (e) {
+      expect(e.message).toBe('This tender is not available');
+    }
+
+    // successful ==========
+    await Tenders.update({ _id: response.tenderId }, { $set: { status: 'open' } });
+
+    const doc = {
+      tenderId: response.tenderId,
+      supplierId: response.supplierId,
+      respondedProducts: [
+        {
+          code: 'code',
+          suggestedManufacturer: 'suggestedManufacturer',
+          suggestedManufacturerPartNumber: 10,
+          unitPrice: 10000,
+          totalPrice: 10000,
+          leadTime: 10,
+          comment: 'comment',
+          file: { name: 'file', url: 'url' },
+        },
+      ],
+
+      respondedDocuments: [
+        {
+          name: 'name',
+          isSubmitted: true,
+          notes: 'notes',
+          file: { name: 'file', url: 'url' },
+        },
+      ],
+    };
+
+    const updatedResponse = await TenderResponses.updateTenderResponse(doc);
+
+    expect(toObject(updatedResponse.respondedProducts)).toEqual(doc.respondedProducts);
+    expect(toObject(updatedResponse.respondedDocuments)).toEqual(doc.respondedDocuments);
   });
 });
