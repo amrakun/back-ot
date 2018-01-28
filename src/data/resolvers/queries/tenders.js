@@ -3,59 +3,40 @@ import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
 
-const submittedTenderIds = async supplierId => {
-  const submittedTenders = await TenderResponses.find({ supplierId });
-
-  return submittedTenders.map(response => response.tenderId);
-};
-
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async (args, user = {}) => {
+const tenderFilter = async (args, extraChecks) => {
   const { type, status, search } = args;
-  const query = {};
 
+  const query = { $and: [] };
+
+  // type: rfq, eoi
   if (type) {
-    query.type = type;
+    query.$and.push({ type });
   }
 
-  query.status = {};
-  query.$or = [];
-
+  // status filter
   if (status) {
-    if (status.includes('participated')) {
-      query.$or.push({ _id: { $in: await submittedTenderIds(user.companyId) } });
-    }
-
-    query.$or.push({
-      status: {
-        $in: status
-          .replace(',participated', '')
-          .replace('participated,', '')
-          .replace('participated', '')
-          .split(','),
-      },
-    });
+    query.$and.push({ status: { $in: status.split(',') } });
   }
 
   // main filter
   if (search) {
-    query.$or.push({ name: new RegExp(`.*${search}.*`, 'i') });
-
-    if (Number.isInteger(parseInt(search))) {
-      query.$or.push({ number: parseInt(search) });
-    }
+    query.$and.push({
+      $or: [
+        { name: new RegExp(`.*${search}.*`, 'i') },
+        { number: new RegExp(`.*${search}.*`, 'i') },
+      ],
+    });
   }
 
-  // remove empty status query
-  if (Object.keys(query.status).length === 0) {
-    delete query.status;
-  }
+  // do some extra checks
+  extraChecks && (await extraChecks(query));
 
-  // remove empty or query
-  if (Object.keys(query.$or).length === 0) {
-    delete query.$or;
+  // remove empty $and selector
+  if (Object.keys(query.$and).length === 0) {
+    delete query.$and;
   }
 
   return query;
@@ -67,8 +48,8 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
-  async tenders(root, args, { user }) {
-    const query = await tenderFilter(args, user);
+  async tenders(root, args) {
+    const query = await tenderFilter(args);
 
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
@@ -79,11 +60,29 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tendersSupplier(root, args, { user }) {
-    const query = await tenderFilter(args, user);
+    const { status } = args;
 
-    query.supplierIds = { $in: [user.companyId] };
+    // removing status filter to implement custom status filter
+    // below
+    delete args.status;
 
-    query.status = { $ne: 'draft' };
+    const query = await tenderFilter(args, async query => {
+      query.$and.push({ supplierIds: { $in: [user.companyId] } });
+      query.$and.push({ status: { $ne: 'draft' } });
+
+      // filter only user's responded tenders
+      if (status && status.includes('participated')) {
+        const submittedTenders = await TenderResponses.find({
+          supplierId: user.companyId,
+        });
+
+        const submittedTenderIds = submittedTenders.map(res => res.tenderId);
+
+        query.$and.push({
+          $or: [{ _id: { $in: submittedTenderIds } }, { status: { $in: status.split(',') } }],
+        });
+      }
+    });
 
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
@@ -93,8 +92,8 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async tendersExport(root, args, { user }) {
-    const query = await tenderFilter(args, user);
+  async tendersExport(root, args) {
+    const query = await tenderFilter(args);
     const tenders = await Tenders.find(query).sort({ createdDate: -1 });
 
     // read template

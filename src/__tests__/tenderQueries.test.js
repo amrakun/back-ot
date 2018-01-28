@@ -143,8 +143,8 @@ describe('Tender queries', () => {
       closeDate: new Date('2012-02-01'),
     });
 
-    await tenderFactory({ type: 'rfq', supplierIds: [supplier1._id], number: 1 });
-    await tenderFactory({ type: 'eoi', supplierIds: [supplier2._id], number: 1 });
+    await tenderFactory({ type: 'rfq', supplierIds: [supplier1._id], number: 'number' });
+    await tenderFactory({ type: 'eoi', supplierIds: [supplier2._id], number: '2' });
 
     // When there is no filter, it must return all tenders =============
     let response = await graphqlRequest(query, 'tenders', {});
@@ -176,15 +176,19 @@ describe('Tender queries', () => {
     response = await graphqlRequest(query, 'tenders', { search: 'test' }, { user });
     expect(response.length).toBe(1);
 
+    // type and number ===============
+    response = await graphqlRequest(query, 'tenders', { type: 'rfq', search: 'number' }, { user });
+    expect(response.length).toBe(1);
+
     // number & pager ===============
     response = await graphqlRequest(
       query,
       'tenders',
-      { search: '1', perPage: 10, page: 1 },
+      { search: '2', perPage: 10, page: 1 },
       { user },
     );
 
-    expect(response.length).toBe(2);
+    expect(response.length).toBe(1);
   });
 
   test('count by tender status', async () => {
@@ -337,22 +341,43 @@ describe('Tender queries', () => {
   test('tenders supplier', async () => {
     const user = await userFactory({ isSupplier: true });
 
-    await tenderFactory({ status: 'draft', supplierIds: [user.companyId] });
-    await tenderFactory({ status: 'open', supplierIds: [user.companyId] });
-
-    const response = await graphqlRequest(
-      `query tendersSupplier(${commonParams}) {
+    const supplierQuery = `
+      query tendersSupplier(${commonParams}) {
           tendersSupplier(${commonValues}) {
             _id
             isParticipated
             isSent
           }
         }
-      `,
-      'tendersSupplier',
-      {},
-      { user },
-    );
+      `;
+
+    const supplierIds = [user.companyId];
+
+    await tenderFactory({});
+    await tenderFactory({ type: 'eoi', status: 'draft', supplierIds });
+    await tenderFactory({ type: 'rfq', status: 'open', name: 'test', supplierIds });
+    const tender = await tenderFactory({ type: 'eoi', status: 'open', supplierIds });
+
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
+
+    const doQuery = (args = {}) => graphqlRequest(supplierQuery, 'tendersSupplier', args, { user });
+
+    // without any filter ==============
+    // drafts must be excluded
+    let response = await doQuery();
+
+    expect(response.length).toBe(2);
+
+    // by type ==============
+    response = await doQuery({ type: 'rfq' });
+
+    expect(response.length).toBe(1);
+
+    // by type & name ==============
+    response = await doQuery({ type: 'rfq', name: 'test' });
+
+    // by particated status and type ==============
+    response = await doQuery({ type: 'eoi', status: 'participated' });
 
     expect(response.length).toBe(1);
   });
