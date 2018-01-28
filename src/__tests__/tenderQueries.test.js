@@ -23,8 +23,6 @@ describe('Tender queries', () => {
     $type: String,
     $status: String,
     $search: String,
-    $supplierId: String,
-    $ignoreSubmitted: Boolean,
     $perPage: Int,
     $page: Int,
   `;
@@ -33,8 +31,6 @@ describe('Tender queries', () => {
     type: $type,
     status: $status,
     search: $search,
-    supplierId: $supplierId,
-    ignoreSubmitted: $ignoreSubmitted,
     perPage: $perPage,
     page: $page,
   `;
@@ -165,17 +161,6 @@ describe('Tender queries', () => {
 
     expect(response.length).toBe(1);
     expect(response[0].type).toBe('eoi');
-
-    // filter by supplier ===============
-    response = await graphqlRequest(query, 'tenders', { supplierId: supplier1._id });
-
-    expect(response.length).toBe(1);
-    expect(response[0].supplierIds).toContain(supplier1._id);
-
-    // ignore submitted ===============
-    response = await graphqlRequest(query, 'tenders', { ignoreSubmitted: true }, { user });
-
-    expect(response.length).toBe(3);
 
     // status ===============
     response = await graphqlRequest(query, 'tenders', { status: 'open' }, { user });

@@ -112,8 +112,6 @@ const tenderQueryParams = `
   type: String,
   status: String,
   search: String,
-  supplierId: String,
-  ignoreSubmitted: Boolean,
   sortField: String,
   sortDirection: Int,
 `;

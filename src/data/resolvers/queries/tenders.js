@@ -13,7 +13,7 @@ const submittedTenderIds = async supplierId => {
  * Tender list & tender export helper
  */
 const tenderFilter = async (args, user = {}) => {
-  const { type, supplierId, ignoreSubmitted, status, search } = args;
+  const { type, status, search } = args;
   const query = {};
 
   if (type) {
@@ -37,14 +37,6 @@ const tenderFilter = async (args, user = {}) => {
           .split(','),
       },
     });
-  }
-
-  if (supplierId) {
-    query.supplierIds = { $in: [supplierId] };
-  }
-
-  if (ignoreSubmitted) {
-    query._id = { $nin: await submittedTenderIds(user.companyId) };
   }
 
   // main filter
@@ -87,7 +79,9 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tendersSupplier(root, args, { user }) {
-    const query = await tenderFilter({ ...args, supplierId: user.companyId }, user);
+    const query = await tenderFilter(args, user);
+
+    query.supplierIds = { $in: [user.companyId] };
 
     query.status = { $ne: 'draft' };
 
