@@ -64,6 +64,7 @@ export const types = `
     createdUser: User
     isAwarded: Boolean
     isParticipated: Boolean
+    isSent: Boolean
     suppliers: [Company]!
     requestedCount: Int
     submittedCount: Int

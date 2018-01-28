@@ -17,6 +17,18 @@ export default {
     return count > 0;
   },
 
+  async isSent(tender, args, { user }) {
+    const supplierId = user.companyId;
+
+    const response = await TenderResponses.findOne({ tenderId: tender._id, supplierId });
+
+    if (response) {
+      return response.iSent;
+    }
+
+    return false;
+  },
+
   suppliers(tender) {
     return Companies.find({ _id: { $in: tender.supplierIds } });
   },
