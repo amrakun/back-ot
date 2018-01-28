@@ -330,4 +330,28 @@ describe('Tender queries', () => {
     expect(response.tenderId).toBe(tender._id);
     expect(response.supplierId).toBe(company._id);
   });
+
+  test('exclude not sent responses', async () => {
+    const tender = await tenderFactory({});
+
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id });
+
+    const response = await graphqlRequest(
+      `query tenderDetail($_id: String!) {
+          tenderDetail(_id: $_id) {
+            _id
+            responses {
+              supplierId
+            }
+          }
+        }
+      `,
+      'tenderDetail',
+      { _id: tender._id },
+      { user },
+    );
+
+    expect(response.responses.length).toBe(1);
+  });
 });

@@ -37,7 +37,8 @@ export const types = `
   }
 
   type TenderResponseSub {
-    supplier: Company,
+    supplierId: String
+    supplier: Company
     response: TenderResponse
   }
 

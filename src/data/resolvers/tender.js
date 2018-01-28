@@ -50,7 +50,10 @@ export default {
   },
 
   async responses(tender) {
-    const responses = await TenderResponses.find({ tenderId: tender._id });
+    const responses = await TenderResponses.find({
+      tenderId: tender._id,
+      isSent: true,
+    });
 
     return responses.map(async response => {
       const supplier = await Companies.findOne({ _id: response.supplierId });
