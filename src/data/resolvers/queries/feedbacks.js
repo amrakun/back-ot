@@ -1,5 +1,5 @@
 import { Feedbacks, FeedbackResponses } from '../../../db/models';
-import { moduleRequireBuyer } from '../../permissions';
+import { requireBuyer } from '../../permissions';
 
 const feedbackQueries = {
   /**
@@ -31,6 +31,7 @@ const feedbackQueries = {
   },
 };
 
-moduleRequireBuyer(feedbackQueries);
+requireBuyer(feedbackQueries, 'feedbacks');
+requireBuyer(feedbackQueries, 'feedbackResponses');
 
 export default feedbackQueries;

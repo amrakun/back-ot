@@ -70,7 +70,7 @@ describe('Feedback queries', () => {
     expect(response.length).toBe(2);
   });
 
-  test('feedback respones', async () => {
+  test('feedback responses', async () => {
     await feedbackResponseFactory();
     await feedbackResponseFactory();
 
