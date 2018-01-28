@@ -108,7 +108,9 @@ const tenderQueryParams = `
   status: String,
   search: String,
   supplierId: String,
-  ignoreSubmitted: Boolean
+  ignoreSubmitted: Boolean,
+  sortField: String,
+  sortDirection: Int,
 `;
 
 export const queries = `
