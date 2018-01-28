@@ -1,6 +1,7 @@
 const basicInfoFields = `
   sotri: String
   sotie: String
+  otExperience: String
 `;
 
 const evidenceInfoFields = `

@@ -145,6 +145,7 @@ describe('Audit response db', () => {
     const doc = {
       sotri: 'sotri',
       sotie: 'sotie',
+      otExperience: 'otExperience',
     };
 
     const updatedResponse = await AuditResponses.saveBasicInfo({

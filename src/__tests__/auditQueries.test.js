@@ -129,6 +129,7 @@ describe('Company queries', () => {
             basicInfo {
               sotri
               sotie
+              otExperience
             }
 
             coreHseqInfo {

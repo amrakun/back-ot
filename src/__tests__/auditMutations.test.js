@@ -132,6 +132,7 @@ describe('Audit mutations', () => {
       basicInfo: {
         sotri: 'sotri',
         sotie: 'sotie',
+        otExperience: 'otExperience',
       },
     };
 

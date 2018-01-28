@@ -41,6 +41,8 @@ const BasicInfoSchema = mongoose.Schema(
 
     // Share of OT included employment
     sotie: field({ type: String }),
+
+    otExperience: field({ type: String, optional: true }),
   },
   { _id: false },
 );
