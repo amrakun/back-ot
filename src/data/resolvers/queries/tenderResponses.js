@@ -1,8 +1,7 @@
 import { TenderResponses } from '../../../db/models';
 import { paginate } from './utils';
-import { requireSupplier } from '../../permissions';
+import { requireBuyer, requireSupplier } from '../../permissions';
 
-// TODO check permissions
 const tenderResponseQueries = {
   /**
    * TenderResponses list
@@ -31,6 +30,8 @@ const tenderResponseQueries = {
   },
 };
 
+requireBuyer(tenderResponseQueries, 'tenderResponses');
+requireBuyer(tenderResponseQueries, 'tenderResponseDetail');
 requireSupplier(tenderResponseQueries, 'tenderResponseByUser');
 
 export default tenderResponseQueries;

@@ -5,6 +5,7 @@ import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, BlockedCompanies } from '../db/models';
 import { userFactory, companyFactory, auditFactory } from '../db/factories';
+
 import queries from '../data/resolvers/queries/companies';
 
 beforeAll(() => connect());

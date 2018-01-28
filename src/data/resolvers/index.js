@@ -1,5 +1,6 @@
 import customScalars from './customScalars';
 import Tender from './tender';
+import SupplierTender from './supplierTender';
 import Company from './company';
 import Feedback from './feedback';
 import FeedbackResponse from './feedbackResponse';
@@ -15,6 +16,7 @@ export default {
   ...customScalars,
 
   Company,
+  SupplierTender,
   Tender,
   Feedback,
   FeedbackResponse,

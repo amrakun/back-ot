@@ -356,8 +356,6 @@ export const types = `
 
     dueDiligences: [CompanyDueDiligence]
 
-    tenders: [Tender]
-
     feedbacks: [Feedback]
     lastFeedback: Feedback
 

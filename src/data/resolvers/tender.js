@@ -9,26 +9,6 @@ export default {
     return tender.winnerId;
   },
 
-  async isParticipated(tender, args, { user }) {
-    const supplierId = user.companyId;
-
-    const count = await TenderResponses.count({ tenderId: tender._id, supplierId });
-
-    return count > 0;
-  },
-
-  async isSent(tender, args, { user }) {
-    const supplierId = user.companyId;
-
-    const response = await TenderResponses.findOne({ tenderId: tender._id, supplierId });
-
-    if (response) {
-      return response.iSent;
-    }
-
-    return false;
-  },
-
   suppliers(tender) {
     return Companies.find({ _id: { $in: tender.supplierIds } });
   },
@@ -49,19 +29,7 @@ export default {
     return tender.notRespondedCount();
   },
 
-  async responses(tender) {
-    const responses = await TenderResponses.find({
-      tenderId: tender._id,
-      isSent: true,
-    });
-
-    return responses.map(async response => {
-      const supplier = await Companies.findOne({ _id: response.supplierId });
-
-      return {
-        supplier,
-        response,
-      };
-    });
+  responses(tender) {
+    return TenderResponses.find({ tenderId: tender._id, isSent: true });
   },
 };

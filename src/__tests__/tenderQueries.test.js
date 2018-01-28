@@ -5,6 +5,7 @@ import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses, Companies } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+
 import tenderQueries from '../data/resolvers/queries/tenders';
 import tenderResponseQueries from '../data/resolvers/queries/tenderResponses';
 import tenderResponseExports from '../data/resolvers/queries/tenderResponseExports';
@@ -67,21 +68,35 @@ describe('Tender queries', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(10);
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['tendersExport']) {
+    const queries = [
+      'tenders',
+      'tenderDetail',
+      'tenderCountByStatus',
+      'tendersTotalCount',
+      'tendersExport',
+    ];
+
+    for (let query of queries) {
       checkLogin(tenderQueries[query], {}, { user });
     }
 
-    const qs = [
+    const responseQueries = ['tenderResponses', 'tenderResponseDetail'];
+
+    for (let query of responseQueries) {
+      checkLogin(tenderResponseQueries[query], {}, { user });
+    }
+
+    const responseExportsQueries = [
       'tenderResponsesRfqBidSummaryReport',
       'tenderResponsesEoiShortList',
       'tenderResponsesEoiBidderList',
     ];
 
-    for (let query of qs) {
+    for (let query of responseExportsQueries) {
       checkLogin(tenderResponseExports[query], {}, { user });
     }
   });
@@ -95,9 +110,13 @@ describe('Tender queries', () => {
       }
     };
 
-    expect.assertions(1);
+    expect.assertions(3);
 
     const user = await userFactory({ isSupplier: false });
+
+    for (let query of ['tendersSupplier', 'tenderDetailSupplier']) {
+      checkLogin(tenderQueries[query], {}, { user });
+    }
 
     for (let query of ['tenderResponseByUser']) {
       checkLogin(tenderResponseQueries[query], {}, { user });
@@ -177,40 +196,6 @@ describe('Tender queries', () => {
       query,
       'tenders',
       { search: '1', perPage: 10, page: 1 },
-      { user },
-    );
-
-    expect(response.length).toBe(2);
-  });
-
-  test('tenders: always hide draft tenders from supplier', async () => {
-    user = await userFactory({ isSupplier: true });
-
-    await tenderFactory({ status: 'open' });
-    await tenderFactory({ status: 'draft' });
-
-    let response = await graphqlRequest(query, 'tenders', {}, { user });
-
-    expect(response.length).toBe(1);
-  });
-
-  test('tenders: participated status', async () => {
-    user = await userFactory({ isSupplier: true });
-
-    const tender = await tenderFactory({ status: 'open' });
-
-    await tenderFactory({ status: 'closed' });
-    await tenderFactory({ status: 'open' });
-
-    await tenderResponseFactory({
-      tenderId: tender._id,
-      supplierId: user.companyId,
-    });
-
-    let response = await graphqlRequest(
-      query,
-      'tenders',
-      { status: 'open,participated' },
       { user },
     );
 
@@ -333,6 +318,7 @@ describe('Tender queries', () => {
 
   test('exclude not sent responses', async () => {
     const tender = await tenderFactory({});
+    const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id });
@@ -353,5 +339,50 @@ describe('Tender queries', () => {
     );
 
     expect(response.responses.length).toBe(1);
+  });
+
+  test('tenders supplier', async () => {
+    const user = await userFactory({ isSupplier: true });
+
+    await tenderFactory({ supplierIds: [user.companyId] });
+    await tenderFactory({ supplierIds: [user.companyId] });
+
+    const response = await graphqlRequest(
+      `query tendersSupplier(${commonParams}) {
+          tendersSupplier(${commonValues}) {
+            _id
+            isParticipated
+            isSent
+          }
+        }
+      `,
+      'tendersSupplier',
+      {},
+      { user },
+    );
+
+    expect(response.length).toBe(2);
+  });
+
+  test('tender detail supplier', async () => {
+    const user = await userFactory({ isSupplier: true });
+    const tender = await tenderFactory({ supplierIds: [user.companyId] });
+
+    const response = await graphqlRequest(
+      `query tenderDetailSupplier($_id: String!) {
+          tenderDetailSupplier(_id: $_id) {
+            _id
+            isSent
+            isParticipated
+          }
+        }
+      `,
+      'tenderDetailSupplier',
+      { _id: tender._id },
+      { user },
+    );
+
+    expect(response.isParticipated).toBe(false);
+    expect(response.isSent).toBe(false);
   });
 });

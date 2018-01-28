@@ -27,6 +27,23 @@ const respondedDocumentFields = `
   file: JSON
 `;
 
+const commonTenderFields = `
+  _id: String!
+  status: String!
+  type: String!
+  createdDate: String
+  number: String!
+  name: String!
+  content: String!
+  publishDate: Date!
+  closeDate: Date!
+  file: JSON
+  reminderDay: Float!
+  requestedProducts: [TenderRequestedProduct]!
+  requestedDocuments: [String]!
+  isAwarded: Boolean
+`;
+
 export const types = `
   type TenderRequestedProduct {
     ${requestedProductFields}
@@ -36,43 +53,27 @@ export const types = `
     ${requestedProductFields}
   }
 
-  type TenderResponseSub {
-    supplierId: String
-    supplier: Company
-    response: TenderResponse
+  type SupplierTender {
+    ${commonTenderFields}
+    isParticipated: Boolean
+    isSent: Boolean
   }
 
   type Tender {
-    _id: String!
-    status: String!
-    type: String!
-    createdDate: String
-    createdUserId: String!
-    number: String!
-    name: String!
-    content: String!
-    publishDate: Date!
-    closeDate: Date!
-    file: JSON
-    reminderDay: Float!
+    ${commonTenderFields}
     supplierIds: [String]!
-    requestedProducts: [TenderRequestedProduct]!
-    requestedDocuments: [String]!
-
+    createdUserId: String!
     winnerId: String
     sentRegretLetter: Boolean
-
-    createdUser: User
     isAwarded: Boolean
-    isParticipated: Boolean
-    isSent: Boolean
     suppliers: [Company]!
     requestedCount: Int
     submittedCount: Int
     notInterestedCount: Int
     notRespondedCount: Int
 
-    responses: [TenderResponseSub]
+    createdUser: User
+    responses: [TenderResponse]
   }
 
   type TenderRespondedProduct {
@@ -117,9 +118,11 @@ const tenderQueryParams = `
 
 export const queries = `
   tenders(${tenderQueryParams}): [Tender]
+  tendersSupplier(${tenderQueryParams}): [SupplierTender]
   tendersExport(${tenderQueryParams}): String
 
   tenderDetail(_id: String!): Tender
+  tenderDetailSupplier(_id: String!): SupplierTender
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]
   tenderResponseDetail(_id: String!): TenderResponse

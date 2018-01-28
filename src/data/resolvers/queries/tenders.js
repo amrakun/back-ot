@@ -1,9 +1,7 @@
 import { Tenders, TenderResponses } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
-import { requireBuyer } from '../../permissions';
-
-// TODO check permissions
+import { requireSupplier, requireBuyer } from '../../permissions';
 
 const submittedTenderIds = async supplierId => {
   const submittedTenders = await TenderResponses.find({ supplierId });
@@ -24,11 +22,6 @@ const tenderFilter = async (args, user = {}) => {
 
   query.status = {};
   query.$or = [];
-
-  // always hide draft tenders from supplier
-  if (user.isSupplier) {
-    query.status.$ne = 'draft';
-  }
 
   if (status) {
     if (status.includes('participated')) {
@@ -78,12 +71,23 @@ const tenderFilter = async (args, user = {}) => {
 
 const tenderQueries = {
   /**
-   * Tenders list
+   * Tenders list for buyer
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
   async tenders(root, args, { user }) {
     const query = await tenderFilter(args, user);
+
+    return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
+  },
+
+  /**
+   * Tenders list for supplier
+   * @param {Object} args - Query params
+   * @return {Promise} filtered tenders list by given parameters
+   */
+  async tendersSupplier(root, args, { user }) {
+    const query = await tenderFilter({ ...args, supplierId: user.companyId }, user);
 
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
@@ -121,13 +125,23 @@ const tenderQueries = {
   },
 
   /**
-   * Get one tender
+   * Get one tender for buyer
    * @param {Object} args
    * @param {String} args._id
    * @return {Promise} found tender
    */
   tenderDetail(root, { _id }) {
     return Tenders.findOne({ _id });
+  },
+
+  /**
+   * Get one tender for supplier
+   * @param {Object} args
+   * @param {String} args._id
+   * @return {Promise} found tender
+   */
+  tenderDetailSupplier(root, { _id }, { user }) {
+    return Tenders.findOne({ _id, supplierIds: [user.companyId] });
   },
 
   /*
@@ -188,7 +202,13 @@ const tenderQueries = {
   },
 };
 
+requireSupplier(tenderQueries, 'tendersSupplier');
+requireSupplier(tenderQueries, 'tenderDetailSupplier');
+
+requireBuyer(tenderQueries, 'tenders');
 requireBuyer(tenderQueries, 'tendersExport');
+requireBuyer(tenderQueries, 'tenderDetail');
 requireBuyer(tenderQueries, 'tenderCountByStatus');
+requireBuyer(tenderQueries, 'tendersTotalCount');
 
 export default tenderQueries;
