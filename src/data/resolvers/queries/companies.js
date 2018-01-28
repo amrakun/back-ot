@@ -137,6 +137,13 @@ const companyQueries = {
 
       sheet.cell(rowIndex, 1).value(basicInfo.enName);
       sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+      sheet.cell(rowIndex, 3).value(company.isSentRegistrationInfo);
+      sheet.cell(rowIndex, 4).value(company.isPrequalified);
+      sheet.cell(rowIndex, 5).value(company.isQualfied);
+      sheet.cell(rowIndex, 6).value(company.isProductsInfoValidated);
+      sheet.cell(rowIndex, 7).value(Boolean(company.dueDiligences));
+      sheet.cell(rowIndex, 8).value(company.averageDifotScore);
+      sheet.cell(rowIndex, 9).value(await BlockedCompanies.isBlocked(company._id));
       sheet.cell(rowIndex, 11).value(contactInfo.email);
       sheet.cell(rowIndex, 12).value(contactInfo.phone);
     }
