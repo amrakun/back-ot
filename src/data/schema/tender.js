@@ -99,6 +99,8 @@ export const types = `
     respondedProducts: [TenderRespondedProduct]
     respondedDocuments: [TenderRespondedDocument]
 
+    supplier: Company
+
     isSent: Boolean
     isNotInterested: Boolean
   }

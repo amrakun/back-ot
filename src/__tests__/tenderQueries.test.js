@@ -302,6 +302,13 @@ describe('Tender queries', () => {
             _id
             tenderId
             supplierId
+
+            supplier {
+              _id
+              basicInfo {
+                enName
+              }
+            }
           }
         }
       `,
@@ -314,6 +321,7 @@ describe('Tender queries', () => {
 
     expect(response.tenderId).toBe(tender._id);
     expect(response.supplierId).toBe(company._id);
+    expect(response.supplier._id).toBeDefined();
   });
 
   test('exclude not sent responses', async () => {
