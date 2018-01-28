@@ -1,5 +1,5 @@
 import { Users } from '../../../db/models';
-import { requireLogin } from '../../permissions';
+import { requireBuyer } from '../../permissions';
 import { paginate } from './utils';
 
 const userQueries = {
@@ -61,8 +61,8 @@ const userQueries = {
   },
 };
 
-requireLogin(userQueries, 'users');
-requireLogin(userQueries, 'userDetail');
-requireLogin(userQueries, 'usersTotalCount');
+requireBuyer(userQueries, 'users');
+requireBuyer(userQueries, 'userDetail');
+requireBuyer(userQueries, 'usersTotalCount');
 
 export default userQueries;
