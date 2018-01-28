@@ -6,6 +6,7 @@ import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses, Companies } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
 import tenderQueries from '../data/resolvers/queries/tenders';
+import tenderResponseQueries from '../data/resolvers/queries/tenderResponses';
 import tenderResponseExports from '../data/resolvers/queries/tenderResponseExports';
 
 beforeAll(() => connect());
@@ -82,6 +83,24 @@ describe('Tender queries', () => {
 
     for (let query of qs) {
       checkLogin(tenderResponseExports[query], {}, { user });
+    }
+  });
+
+  test('Supplier required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(1);
+
+    const user = await userFactory({ isSupplier: false });
+
+    for (let query of ['tenderResponseByUser']) {
+      checkLogin(tenderResponseQueries[query], {}, { user });
     }
   });
 
@@ -279,5 +298,36 @@ describe('Tender queries', () => {
     const response = await graphqlRequest(qry, 'tendersTotalCount', args);
 
     expect(response).toBe(1);
+  });
+
+  test('tender response by user', async () => {
+    const company = await companyFactory();
+    const tender = await tenderFactory();
+
+    user = await userFactory({ isSupplier: true, companyId: company._id });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: company._id,
+    });
+
+    const response = await graphqlRequest(
+      `query tenderResponseByUser($tenderId: String!) {
+          tenderResponseByUser(tenderId: $tenderId) {
+            _id
+            tenderId
+            supplierId
+          }
+        }
+      `,
+      'tenderResponseByUser',
+      {
+        tenderId: tender._id,
+      },
+      { user },
+    );
+
+    expect(response.tenderId).toBe(tender._id);
+    expect(response.supplierId).toBe(company._id);
   });
 });

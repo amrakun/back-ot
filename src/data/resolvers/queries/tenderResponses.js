@@ -1,5 +1,6 @@
 import { TenderResponses } from '../../../db/models';
 import { paginate } from './utils';
+import { requireSupplier } from '../../permissions';
 
 // TODO check permissions
 const tenderResponseQueries = {
@@ -21,6 +22,15 @@ const tenderResponseQueries = {
   tenderResponseDetail(root, { _id }) {
     return TenderResponses.findOne({ _id });
   },
+
+  /**
+   * Get response by logged in user
+   */
+  tenderResponseByUser(root, { tenderId }, { user }) {
+    return TenderResponses.findOne({ tenderId, supplierId: user.companyId });
+  },
 };
+
+requireSupplier(tenderResponseQueries, 'tenderResponseByUser');
 
 export default tenderResponseQueries;

@@ -119,6 +119,7 @@ export const queries = `
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]
   tenderResponseDetail(_id: String!): TenderResponse
+  tenderResponseByUser(tenderId: String!): TenderResponse
 
   tenderResponsesRfqBidSummaryReport(tenderId: String!, supplierIds: [String!]!): String
   tenderResponsesEoiShortList(tenderId: String!, supplierIds: [String!]!): String
