@@ -2,10 +2,6 @@ import { Companies } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 
 const companyMutations = {
-  companiesEditBasicInfo(root, { _id, basicInfo }) {
-    return Companies.updateBasicInfo(_id, basicInfo);
-  },
-
   async companiesAddDifotScores(root, { difotScores }) {
     for (let difotScore of difotScores) {
       let company = await Companies.findOne({ 'basicInfo.enName': difotScore.supplierName });
@@ -36,14 +32,14 @@ const companyMutations = {
     return company.validateProductsInfo(codes);
   },
 
-  async companiesSendRegistrationInfo(root, { _id }) {
-    const company = await Companies.findOne({ _id });
+  async companiesSendRegistrationInfo(root, args, { user }) {
+    const company = await Companies.findOne({ _id: user.companyId });
 
     return company.sendRegistrationInfo();
   },
 
-  async companiesSendPrequalificationInfo(root, { _id }) {
-    const company = await Companies.findOne({ _id });
+  async companiesSendPrequalificationInfo(root, args, { user }) {
+    const company = await Companies.findOne({ _id: user.companyId });
 
     return company.sendPrequalificationInfo();
   },

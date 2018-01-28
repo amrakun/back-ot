@@ -9,18 +9,29 @@ const auditMutations = {
   },
 
   // save basic info
-  auditsSupplierSaveBasicInfo(root, { auditId, supplierId, basicInfo }) {
-    return AuditResponses.saveBasicInfo({ auditId: auditId, supplierId, doc: basicInfo });
+  auditsSupplierSaveBasicInfo(root, { auditId, basicInfo }, { user }) {
+    return AuditResponses.saveBasicInfo({
+      auditId: auditId,
+      supplierId: user.companyId,
+      doc: basicInfo,
+    });
   },
 
   // save evidence info
-  auditsSupplierSaveEvidenceInfo(root, { auditId, supplierId, evidenceInfo }) {
-    return AuditResponses.saveEvidenceInfo({ auditId: auditId, supplierId, doc: evidenceInfo });
+  auditsSupplierSaveEvidenceInfo(root, { auditId, evidenceInfo }, { user }) {
+    return AuditResponses.saveEvidenceInfo({
+      auditId: auditId,
+      supplierId: user.companyId,
+      doc: evidenceInfo,
+    });
   },
 
   // mark response as sent
-  async auditsSupplierSendResponse(root, { auditId, supplierId }) {
-    const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
+  async auditsSupplierSendResponse(root, { auditId }, { user }) {
+    const response = await AuditResponses.findOne({
+      auditId: auditId,
+      supplierId: user.companyId,
+    });
 
     if (response) {
       return response.send();
@@ -83,7 +94,24 @@ sections.forEach(section => {
   // capitalize first letter
   const capsedName = section.charAt(0).toUpperCase() + section.slice(1);
 
-  const mutation = (root, args) => {
+  // supplier mutation ===========
+  const supplierName = `auditsSupplierSave${capsedName}`;
+
+  auditMutations[supplierName] = (root, args, { user }) => {
+    return AuditResponses.saveReplyRecommentSection({
+      auditId: args.auditId,
+      supplierId: user.companyId,
+      name: section,
+      doc: args[section],
+    });
+  };
+
+  requireSupplier(auditMutations, supplierName);
+
+  // buyer mutation ==================
+  const buyerName = `auditsBuyerSave${capsedName}`;
+
+  auditMutations[buyerName] = (root, args) => {
     return AuditResponses.saveReplyRecommentSection({
       auditId: args.auditId,
       supplierId: args.supplierId,
@@ -92,14 +120,6 @@ sections.forEach(section => {
     });
   };
 
-  // supplier mutation
-  const supplierName = `auditsSupplierSave${capsedName}`;
-  auditMutations[supplierName] = mutation;
-  requireSupplier(auditMutations, supplierName);
-
-  // buyer mutation
-  const buyerName = `auditsBuyerSave${capsedName}`;
-  auditMutations[buyerName] = mutation;
   requireBuyer(auditMutations, buyerName);
 });
 

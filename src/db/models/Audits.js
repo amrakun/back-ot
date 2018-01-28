@@ -147,9 +147,9 @@ const HrReplyRecommendSchema = mongoose.Schema(
     supplierComment: field({ type: String }),
     supplierAnswer: field({ type: Number }),
 
-    auditorComment: field({ type: String }),
-    auditorRecommendation: field({ type: String }),
-    auditorScore: field({ type: Number }),
+    auditorComment: field({ type: String, optional: true }),
+    auditorRecommendation: field({ type: String, optional: true }),
+    auditorScore: field({ type: Number, optional: true }),
   },
   { _id: false },
 );

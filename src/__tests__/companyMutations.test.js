@@ -343,8 +343,8 @@ describe('Company mutations', () => {
 
   test('send registration info', async () => {
     const mutation = `
-      mutation companiesSendRegistrationInfo($_id: String!) {
-        companiesSendRegistrationInfo(_id: $_id) {
+      mutation companiesSendRegistrationInfo {
+        companiesSendRegistrationInfo {
           _id
         }
       }
@@ -354,7 +354,7 @@ describe('Company mutations', () => {
       user: await userFactory({ companyId: _company._id, isSupplier: true }),
     };
 
-    await graphqlRequest(mutation, 'companiesSendRegistrationInfo', { _id: _company._id }, context);
+    await graphqlRequest(mutation, 'companiesSendRegistrationInfo', {}, context);
 
     const updatedSupplier = await Companies.findOne({ _id: _company._id });
 
@@ -363,8 +363,8 @@ describe('Company mutations', () => {
 
   test('send prequalification info', async () => {
     const mutation = `
-      mutation companiesSendPrequalificationInfo($_id: String!) {
-        companiesSendPrequalificationInfo(_id: $_id) {
+      mutation companiesSendPrequalificationInfo {
+        companiesSendPrequalificationInfo {
           _id
         }
       }
@@ -374,12 +374,7 @@ describe('Company mutations', () => {
       user: await userFactory({ companyId: _company._id, isSupplier: true }),
     };
 
-    await graphqlRequest(
-      mutation,
-      'companiesSendPrequalificationInfo',
-      { _id: _company._id },
-      context,
-    );
+    await graphqlRequest(mutation, 'companiesSendPrequalificationInfo', {}, context);
 
     const updatedSupplier = await Companies.findOne({ _id: _company._id });
 

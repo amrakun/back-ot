@@ -424,6 +424,6 @@ export const mutations = `
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
   companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
 
-  companiesSendRegistrationInfo(_id: String!): Company
-  companiesSendPrequalificationInfo(_id: String!): Company
+  companiesSendRegistrationInfo: Company
+  companiesSendPrequalificationInfo: Company
 `;

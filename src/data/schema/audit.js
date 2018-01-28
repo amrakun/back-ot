@@ -246,38 +246,30 @@ export const mutations = `
 
   auditsSupplierSaveBasicInfo(
     auditId: String,
-    supplierId: String,
     basicInfo: AuditSupplierBasicInfoInput
   ): Audit
 
   auditsSupplierSaveCoreHseqInfo(
     auditId: String,
-    supplierId: String,
     coreHseqInfo: AuditSupplierCoreHseqInfoInput
   ): Audit
 
   auditsSupplierSaveHrInfo(
     auditId: String,
-    supplierId: String,
     hrInfo: AuditSupplierHrInfoInput
   ): Audit
 
   auditsSupplierSaveBusinessInfo(
     auditId: String,
-    supplierId: String,
     businessInfo: AuditSupplierBusinessInfoInput
   ): Audit
 
   auditsSupplierSaveEvidenceInfo(
     auditId: String,
-    supplierId: String,
     evidenceInfo: AuditSupplierEvidenceInfoInput
   ): Audit
 
-  auditsSupplierSendResponse(
-    auditId: String,
-    supplierId: String,
-  ): AuditResponse
+  auditsSupplierSendResponse(auditId: String): AuditResponse
 
   auditsBuyerSaveCoreHseqInfo(
     auditId: String,

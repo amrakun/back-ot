@@ -139,13 +139,11 @@ describe('Audit mutations', () => {
     const mutation = `
       mutation auditsSupplierSaveBasicInfo(
         $auditId: String,
-        $supplierId: String,
         $basicInfo: AuditSupplierBasicInfoInput
       ) {
 
         auditsSupplierSaveBasicInfo(
           auditId: $auditId,
-          supplierId: $supplierId,
           basicInfo: $basicInfo
         ) {
           _id
@@ -176,13 +174,11 @@ describe('Audit mutations', () => {
     const mutation = `
       mutation auditsSupplierSaveEvidenceInfo(
         $auditId: String,
-        $supplierId: String,
         $evidenceInfo: AuditSupplierEvidenceInfoInput
       ) {
 
         auditsSupplierSaveEvidenceInfo(
           auditId: $auditId,
-          supplierId: $supplierId,
           evidenceInfo: $evidenceInfo
         ) {
           _id
@@ -202,11 +198,9 @@ describe('Audit mutations', () => {
   });
 
   const callReplyRecommendMutation = async (mutation, name, isSupplier) => {
-    AuditResponses.saveReplyRecommentSection = jest.fn(() => ({ _id: 'DFAFDA' }));
+    const user = await userFactory({ companyId: _company._id, isSupplier });
 
-    const context = {
-      user: await userFactory({ companyId: _company._id, isSupplier }),
-    };
+    const context = { user };
 
     let docGeneratorArgs = [true, false];
 
@@ -215,33 +209,58 @@ describe('Audit mutations', () => {
     }
 
     const args = {
-      supplierId: _company._id,
       auditId: _audit._id,
       [name]: auditResponseDocs[name](...docGeneratorArgs),
     };
 
+    if (!isSupplier) {
+      args.supplierId = _company._id;
+    }
+
     await graphqlRequest(mutation, name, args, context);
 
-    expect(AuditResponses.saveReplyRecommentSection.mock.calls.length).toBe(1);
-
-    expect(AuditResponses.saveReplyRecommentSection).toBeCalledWith({
-      supplierId: args.supplierId,
+    const auditResponse = await AuditResponses.findOne({
       auditId: args.auditId,
-      name,
-      doc: args[name],
+      supplierId: _company._id,
     });
+
+    for (const fieldName of Object.keys(args[name])) {
+      for (const subFieldName of Object.keys(args[name][fieldName])) {
+        const subValue = auditResponse[name][fieldName][subFieldName];
+        expect(subValue).toBe(args[name][fieldName][subFieldName]);
+      }
+    }
   };
 
   test('audits save core hseq info', async () => {
-    const callCoreHseqMutation = (name, input, isSupplier) => {
-      const mutation = `
-        mutation ${name}(
+    // supplier =======
+    await callReplyRecommendMutation(
+      `mutation auditsSupplierSaveCoreHseqInfo(
           $auditId: String,
-          $supplierId: String,
-          $coreHseqInfo: ${input}
+          $coreHseqInfo: AuditSupplierCoreHseqInfoInput
         ) {
 
-          ${name}(
+          auditsSupplierSaveCoreHseqInfo(
+            auditId: $auditId,
+            coreHseqInfo: $coreHseqInfo
+          ) {
+            _id
+          }
+        }
+      `,
+      'coreHseqInfo',
+      true,
+    );
+
+    // buyer ========
+    await callReplyRecommendMutation(
+      `mutation auditsBuyerSaveCoreHseqInfo(
+          $auditId: String,
+          $supplierId: String,
+          $coreHseqInfo: AuditBuyerCoreHseqInfoInput
+        ) {
+
+          auditsBuyerSaveCoreHseqInfo(
             auditId: $auditId,
             supplierId: $supplierId,
             coreHseqInfo: $coreHseqInfo
@@ -249,31 +268,39 @@ describe('Audit mutations', () => {
             _id
           }
         }
-      `;
-
-      return callReplyRecommendMutation(mutation, 'coreHseqInfo', isSupplier);
-    };
-
-    // supplier =======
-    await callCoreHseqMutation(
-      'auditsSupplierSaveCoreHseqInfo',
-      'AuditSupplierCoreHseqInfoInput',
-      true,
+      `,
+      'coreHseqInfo',
+      false,
     );
-
-    await callCoreHseqMutation('auditsBuyerSaveCoreHseqInfo', 'AuditBuyerCoreHseqInfoInput', false);
   });
 
   test('audits save hr info', async () => {
-    const callHrMutation = (name, input, isSupplier) => {
-      const mutation = `
-        mutation ${name}(
+    await callReplyRecommendMutation(
+      `mutation auditsSupplierSaveHrInfo(
           $auditId: String,
-          $supplierId: String,
-          $hrInfo: ${input}
+          $hrInfo: AuditSupplierHrInfoInput
         ) {
 
-          ${name}(
+          auditsSupplierSaveHrInfo(
+            auditId: $auditId,
+            hrInfo: $hrInfo
+          ) {
+            _id
+          }
+        }
+      `,
+      'hrInfo',
+      true,
+    );
+
+    await callReplyRecommendMutation(
+      `mutation auditsBuyerSaveHrInfo(
+          $auditId: String,
+          $supplierId: String,
+          $hrInfo: AuditBuyerHrInfoInput
+        ) {
+
+          auditsBuyerSaveHrInfo(
             auditId: $auditId,
             supplierId: $supplierId,
             hrInfo: $hrInfo
@@ -281,27 +308,39 @@ describe('Audit mutations', () => {
             _id
           }
         }
-      `;
-
-      return callReplyRecommendMutation(mutation, 'hrInfo', isSupplier);
-    };
-
-    // supplier =======
-    await callHrMutation('auditsSupplierSaveHrInfo', 'AuditSupplierHrInfoInput', true);
-
-    await callHrMutation('auditsBuyerSaveHrInfo', 'AuditBuyerHrInfoInput', false);
+      `,
+      'hrInfo',
+      false,
+    );
   });
 
   test('audits save business info', async () => {
-    const callBusinessMutation = (name, input, isSupplier) => {
-      const mutation = `
-        mutation ${name}(
+    await callReplyRecommendMutation(
+      `mutation auditsSupplierSaveBusinessInfo(
           $auditId: String,
-          $supplierId: String,
-          $businessInfo: ${input}
+          $businessInfo: AuditSupplierBusinessInfoInput
         ) {
 
-          ${name}(
+          auditsSupplierSaveBusinessInfo(
+            auditId: $auditId,
+            businessInfo: $businessInfo
+          ) {
+            _id
+          }
+        }
+      `,
+      'businessInfo',
+      true,
+    );
+
+    await callReplyRecommendMutation(
+      `mutation auditsBuyerSaveBusinessInfo(
+          $auditId: String,
+          $supplierId: String,
+          $businessInfo: AuditBuyerBusinessInfoInput
+        ) {
+
+          auditsBuyerSaveBusinessInfo(
             auditId: $auditId,
             supplierId: $supplierId,
             businessInfo: $businessInfo
@@ -309,27 +348,18 @@ describe('Audit mutations', () => {
             _id
           }
         }
-      `;
-
-      return callReplyRecommendMutation(mutation, 'businessInfo', isSupplier);
-    };
-
-    // supplier =======
-    await callBusinessMutation(
-      'auditsSupplierSaveBusinessInfo',
-      'AuditSupplierBusinessInfoInput',
-      true,
+      `,
+      'businessInfo',
+      false,
     );
-
-    await callBusinessMutation('auditsBuyerSaveBusinessInfo', 'AuditBuyerBusinessInfoInput', false);
   });
 
   test('Send response', async () => {
     await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id });
 
     const mutation = `
-      mutation auditsSupplierSendResponse($auditId: String!, $supplierId: String!) {
-        auditsSupplierSendResponse(auditId: $auditId, supplierId: $supplierId) {
+      mutation auditsSupplierSendResponse($auditId: String!) {
+        auditsSupplierSendResponse(auditId: $auditId) {
           _id
           isSent
         }
