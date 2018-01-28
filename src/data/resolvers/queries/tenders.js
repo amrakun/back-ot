@@ -141,7 +141,7 @@ const tenderQueries = {
    * @return {Promise} found tender
    */
   tenderDetailSupplier(root, { _id }, { user }) {
-    return Tenders.findOne({ _id, supplierIds: [user.companyId] });
+    return Tenders.findOne({ _id, supplierIds: { $in: [user.companyId] } });
   },
 
   /*

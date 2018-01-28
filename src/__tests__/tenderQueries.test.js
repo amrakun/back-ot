@@ -366,7 +366,7 @@ describe('Tender queries', () => {
 
   test('tender detail supplier', async () => {
     const user = await userFactory({ isSupplier: true });
-    const tender = await tenderFactory({ supplierIds: [user.companyId] });
+    const tender = await tenderFactory({ supplierIds: ['_id', user.companyId] });
 
     const response = await graphqlRequest(
       `query tenderDetailSupplier($_id: String!) {
