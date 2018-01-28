@@ -89,6 +89,8 @@ const tenderQueries = {
   async tendersSupplier(root, args, { user }) {
     const query = await tenderFilter({ ...args, supplierId: user.companyId }, user);
 
+    query.status = { $ne: 'draft' };
+
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
 

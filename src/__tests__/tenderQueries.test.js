@@ -352,8 +352,8 @@ describe('Tender queries', () => {
   test('tenders supplier', async () => {
     const user = await userFactory({ isSupplier: true });
 
-    await tenderFactory({ supplierIds: [user.companyId] });
-    await tenderFactory({ supplierIds: [user.companyId] });
+    await tenderFactory({ status: 'draft', supplierIds: [user.companyId] });
+    await tenderFactory({ status: 'open', supplierIds: [user.companyId] });
 
     const response = await graphqlRequest(
       `query tendersSupplier(${commonParams}) {
@@ -369,7 +369,7 @@ describe('Tender queries', () => {
       { user },
     );
 
-    expect(response.length).toBe(2);
+    expect(response.length).toBe(1);
   });
 
   test('tender detail supplier', async () => {
