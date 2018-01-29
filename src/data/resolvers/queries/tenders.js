@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Tenders, TenderResponses } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 import { paginate } from './utils';
@@ -195,6 +196,35 @@ const tenderQueries = {
       type,
     }).count();
   },
+
+  /*
+   * Count tenders's days between publish & close dates
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @param {String} type - Eoi or rfq
+   * @return - Total count
+   */
+  async tendersAverageDuration(root, { startDate, endDate, type }) {
+    const tenders = await Tenders.find({
+      publishDate: { $gte: startDate, $lte: endDate },
+      type,
+    });
+
+    // collect durations ====================
+    const durations = [];
+
+    for (const tender of tenders) {
+      const publishDate = moment(tender.publishDate);
+      const closeDate = moment(tender.closeDate);
+
+      durations.push(closeDate.diff(publishDate, 'days'));
+    }
+
+    // calculate average duration ========
+    const sum = durations.reduce((previous, current) => (current += previous));
+
+    return sum / durations.length;
+  },
 };
 
 requireSupplier(tenderQueries, 'tendersSupplier');
@@ -205,5 +235,6 @@ requireBuyer(tenderQueries, 'tendersExport');
 requireBuyer(tenderQueries, 'tenderDetail');
 requireBuyer(tenderQueries, 'tenderCountByStatus');
 requireBuyer(tenderQueries, 'tendersTotalCount');
+requireBuyer(tenderQueries, 'tendersAverageDuration');
 
 export default tenderQueries;

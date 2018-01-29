@@ -143,6 +143,12 @@ export const queries = `
     endDate: Date!
     type: String!
   ): Float
+
+  tendersAverageDuration(
+    startDate: Date!,
+    endDate: Date!
+    type: String!
+  ): Float
 `;
 
 const commonParams = `

@@ -64,7 +64,7 @@ describe('Tender queries', () => {
       }
     };
 
-    expect.assertions(10);
+    expect.assertions(11);
 
     const user = await userFactory({ isSupplier: true });
 
@@ -72,6 +72,7 @@ describe('Tender queries', () => {
       'tenders',
       'tenderDetail',
       'tenderCountByStatus',
+      'tendersAverageDuration',
       'tendersTotalCount',
       'tendersExport',
     ];
@@ -272,6 +273,82 @@ describe('Tender queries', () => {
     const response = await graphqlRequest(qry, 'tendersTotalCount', args);
 
     expect(response).toBe(1);
+  });
+
+  test('tenders average duration', async () => {
+    const qry = `
+      query tendersAverageDuration(
+        $startDate: Date!,
+        $endDate: Date!
+        $type: String!,
+      ) {
+        tendersAverageDuration(
+          startDate: $startDate,
+          endDate: $endDate,
+          type: $type
+        )
+      }
+    `;
+
+    await tenderFactory({
+      publishDate: moment(),
+      closeDate: moment()
+        .add(3, 'day')
+        .endOf('day')
+        .toDate(), // 3 days later
+      type: 'rfq',
+    });
+
+    await tenderFactory({
+      publishDate: moment()
+        .add(1, 'day')
+        .endOf('day')
+        .toDate(), // 1 days later
+      closeDate: moment()
+        .add(3, 'day')
+        .endOf('day')
+        .toDate(), // 3 days later
+      type: 'rfq',
+    });
+
+    await tenderFactory({
+      publishDate: moment()
+        .add(1, 'day')
+        .endOf('day')
+        .toDate(), // 1 days later
+      closeDate: moment()
+        .add(10, 'day')
+        .endOf('day')
+        .toDate(), // 10 days later,
+      type: 'eoi',
+    });
+
+    await tenderFactory({
+      publishDate: moment()
+        .add(3, 'day')
+        .endOf('day')
+        .toDate(), // 3 days later
+      closeDate: moment()
+        .add(20, 'day')
+        .endOf('day')
+        .toDate(), // 20 days later,
+      type: 'eoi',
+    });
+
+    const startDate = moment().add(-1, 'day');
+    const endDate = moment()
+      .add(40, 'day')
+      .endOf('day'); // 40 days later
+
+    // ================ rfq
+    let args = { startDate, endDate, type: 'rfq' };
+    let response = await graphqlRequest(qry, 'tendersAverageDuration', args);
+    expect(response).toBe(2.5);
+
+    // ================ eoi
+    args = { startDate, endDate, type: 'eoi' };
+    response = await graphqlRequest(qry, 'tendersAverageDuration', args);
+    expect(response).toBe(13);
   });
 
   test('tender response by user', async () => {
