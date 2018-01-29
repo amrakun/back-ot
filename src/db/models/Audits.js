@@ -581,12 +581,16 @@ class PhysicalAudit {
    * @param {Object} userId - Creating user
    * @return {Promise} newly created physical audit object
    */
-  static createPhysicalAudit(doc, userId) {
-    return this.create({
+  static async createPhysicalAudit(doc, userId) {
+    const audit = await this.create({
       ...doc,
       createdDate: new Date(),
       createdUserId: userId,
     });
+
+    await this.updateSupplierInfo(doc.supplierId, doc.isQualified);
+
+    return audit;
   }
 
   /**
@@ -597,7 +601,16 @@ class PhysicalAudit {
   static async updatePhysicalAudit(_id, doc) {
     await this.update({ _id }, { $set: doc });
 
+    await this.updateSupplierInfo(doc.supplierId, doc.isQualified);
+
     return this.findOne({ _id });
+  }
+
+  /*
+   * Update supplier's isQualified field
+   */
+  static updateSupplierInfo(supplierId, isQualified) {
+    return Companies.update({ _id: supplierId }, { $set: { isQualified } });
   }
 
   /**

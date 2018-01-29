@@ -40,6 +40,9 @@ describe('PhysicalAudit db', () => {
     expect(physicalAuditObj.supplierId).toEqual(doc.supplierId);
     expect(physicalAuditObj.reportFile).toEqual(doc.reportFile);
     expect(physicalAuditObj.improvementPlanFile).toEqual(doc.improvementPlanFile);
+
+    const updatedCompany = await Companies.findOne({ _id: company._id });
+    expect(updatedCompany.isQualified).toBe(true);
   });
 
   test('Update physicalAudit', async () => {
@@ -48,12 +51,15 @@ describe('PhysicalAudit db', () => {
 
     const physicalAuditObj = await PhysicalAudits.updatePhysicalAudit(
       _id,
-      { isQualified: true, reportFile: '/path' },
+      { isQualified: false, reportFile: '/path' },
       user._id,
     );
 
-    expect(physicalAuditObj.isQualified).toEqual(true);
+    expect(physicalAuditObj.isQualified).toEqual(false);
     expect(physicalAuditObj.reportFile).toEqual('/path');
+
+    const updatedCompany = await Companies.findOne({ _id: doc.supplierId });
+    expect(updatedCompany.isQualified).toBe(false);
   });
 
   test('Remove physicalAudit', async () => {
