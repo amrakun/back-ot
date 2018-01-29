@@ -43,6 +43,7 @@ describe('Tender queries', () => {
         status
         createdDate
         supplierIds
+        sourcingOfficer
       }
     }
   `;

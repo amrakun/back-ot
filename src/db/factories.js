@@ -336,6 +336,7 @@ export const tenderFactory = async (params = {}) => {
     type: params.type,
     status: params.status || 'draft',
     number: params.number || faker.random.word(),
+    sourcingOfficer: params.sourcingOfficer || faker.random.word(),
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
 

@@ -31,12 +31,13 @@ const commonTenderFields = `
   _id: String!
   status: String!
   type: String!
-  createdDate: String
+  createdDate: Date
   number: String!
   name: String!
   content: String!
   publishDate: Date!
   closeDate: Date!
+  sourcingOfficer: String
   file: JSON
   reminderDay: Float!
   requestedProducts: [TenderRequestedProduct]!
@@ -158,6 +159,7 @@ const commonParams = `
   publishDate: Date!,
   closeDate: Date!,
   file: JSON,
+  sourcingOfficer: String,
   reminderDay: Float!,
   supplierIds: [String]!,
   requestedProducts: [TenderRequestedProductInput]
