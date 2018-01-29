@@ -1,4 +1,4 @@
-import { Feedbacks, FeedbackResponses } from '../../../db/models';
+import { Companies, Feedbacks, FeedbackResponses } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
 
 const feedbackQueries = {
@@ -26,8 +26,23 @@ const feedbackQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered feedback responses list by given parameters
    */
-  async feedbackResponses() {
-    return FeedbackResponses.find({});
+  async feedbackResponses(root, { supplierName }) {
+    const query = {};
+
+    if (supplierName) {
+      const suppliers = await Companies.find({
+        $or: [
+          { 'basicInfo.mnName': new RegExp(`.*${supplierName}.*`, 'i') },
+          { 'basicInfo.enName': new RegExp(`.*${supplierName}.*`, 'i') },
+        ],
+      });
+
+      const supplierIds = suppliers.map(s => s._id);
+
+      query.supplierId = { $in: supplierIds };
+    }
+
+    return FeedbackResponses.find(query);
   },
 };
 

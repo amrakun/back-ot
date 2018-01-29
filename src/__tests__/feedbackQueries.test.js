@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Feedbacks } from '../db/models';
-import { feedbackFactory, feedbackResponseFactory } from '../db/factories';
+import { companyFactory, feedbackFactory, feedbackResponseFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -71,12 +71,14 @@ describe('Feedback queries', () => {
   });
 
   test('feedback responses', async () => {
-    await feedbackResponseFactory();
+    const supplier = await companyFactory({ enName: 'enName' });
+
+    await feedbackResponseFactory({ supplierId: supplier._id });
     await feedbackResponseFactory();
 
     const query = `
-      query feedbackResponses {
-        feedbackResponses {
+      query feedbackResponses($supplierName: String) {
+        feedbackResponses(supplierName: $supplierName) {
           ${feedbackResponseFields}
         }
       }
@@ -86,6 +88,11 @@ describe('Feedback queries', () => {
     let response = await graphqlRequest(query, 'feedbackResponses', {});
 
     expect(response.length).toBe(2);
+
+    // filter by supplier name =============
+    response = await graphqlRequest(query, 'feedbackResponses', { supplierName: 'enName' });
+
+    expect(response.length).toBe(1);
   });
 
   test('feedback detail', async () => {
