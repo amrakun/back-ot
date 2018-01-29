@@ -32,6 +32,12 @@ import {
 
 import { types as AuditTypes, queries as AuditQueries, mutations as AuditMutations } from './audit';
 
+import {
+  types as PhysicalAuditTypes,
+  queries as PhysicalAuditQueries,
+  mutations as PhysicalAuditMutations,
+} from './physicalAudit';
+
 import { types as ReportTypes, queries as ReportQueries } from './report';
 
 import {
@@ -51,6 +57,7 @@ export const types = `
   ${BlockedCompanyTypes}
   ${QualificationTypes}
   ${AuditTypes}
+  ${PhysicalAuditTypes}
   ${ReportTypes}
   ${ConfigTypes}
 `;
@@ -64,6 +71,7 @@ export const queries = `
     ${BlockedCompanyQueries}
     ${QualificationQueries}
     ${AuditQueries}
+    ${PhysicalAuditQueries}
     ${ReportQueries}
     ${ConfigQueries}
   }
@@ -78,6 +86,7 @@ export const mutations = `
     ${BlockedCompanyMutations}
     ${QualificationMutations}
     ${AuditMutations}
+    ${PhysicalAuditMutations}
     ${ConfigMutations}
   }
 `;

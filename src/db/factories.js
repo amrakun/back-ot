@@ -696,7 +696,7 @@ export const configDocs = {
   },
 };
 
-export const physicalAuditFactory = async params => {
+export const physicalAuditFactory = async (params = {}) => {
   if (!params.supplierId) {
     const company = await companyFactory();
 
