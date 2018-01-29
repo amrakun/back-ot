@@ -564,4 +564,52 @@ AuditResponseSchema.loadClass(AuditResponse);
 
 const AuditResponses = mongoose.model('audit_responses', AuditResponseSchema);
 
-export { Audits, AuditResponses };
+// Physical audit schema
+const PhysicalAuditSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
+  createdUserId: field({ type: String }),
+  isQualified: field({ type: Boolean }),
+  supplierId: field({ type: String }),
+  reportFile: field({ type: String }),
+  improvementPlanFile: field({ type: String }),
+});
+
+class PhysicalAudit {
+  /**
+   * Create new physical audit
+   * @param {Object} doc - audit fields
+   * @param {Object} userId - Creating user
+   * @return {Promise} newly created physical audit object
+   */
+  static createPhysicalAudit(doc, userId) {
+    return this.create({
+      ...doc,
+      createdDate: new Date(),
+      createdUserId: userId,
+    });
+  }
+
+  /**
+   * Update existing physical audit
+   * @param {Object} doc - audit fields
+   * @return {Promise} updated physical audit object
+   */
+  static async updatePhysicalAudit(_id, doc) {
+    await this.update({ _id }, { $set: doc });
+
+    return this.findOne({ _id });
+  }
+
+  /**
+   * Remove existing physical audit
+   */
+  static removePhysicalAudit(_id) {
+    return this.remove({ _id });
+  }
+}
+
+PhysicalAuditSchema.loadClass(PhysicalAudit);
+
+const PhysicalAudits = mongoose.model('physical_audits', PhysicalAuditSchema);
+
+export { Audits, AuditResponses, PhysicalAudits };

@@ -4,7 +4,7 @@ import { Tenders, TenderResponses } from './Tenders';
 import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
-import { Audits, AuditResponses } from './Audits';
+import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
 
 export {
@@ -18,5 +18,6 @@ export {
   Qualifications,
   Audits,
   AuditResponses,
+  PhysicalAudits,
   Configs,
 };

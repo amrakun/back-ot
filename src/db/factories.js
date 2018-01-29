@@ -12,6 +12,7 @@ import {
   Qualifications,
   Audits,
   AuditResponses,
+  PhysicalAudits,
   BlockedCompanies,
   Configs,
 } from './models';
@@ -693,6 +694,31 @@ export const configDocs = {
       },
     },
   },
+};
+
+export const physicalAuditFactory = async params => {
+  if (!params.supplierId) {
+    const company = await companyFactory();
+
+    params.supplierId = company._id;
+  }
+
+  if (!params.createdUserId) {
+    const user = await userFactory();
+
+    params.createdUserId = user._id;
+  }
+
+  const physicalAudit = new PhysicalAudits({
+    createdDate: new Date(),
+    createdUserId: params.createdUserId,
+    isQualified: params.isQualified || true,
+    supplierId: params.supplierId,
+    reportFile: params.reportFile || '/reportFile',
+    improvementPlanFile: params.improvementPlanFile || '/improvementPlanFile',
+  });
+
+  return save(physicalAudit);
 };
 
 export const configFactory = params => {
