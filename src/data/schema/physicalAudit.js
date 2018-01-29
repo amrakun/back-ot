@@ -7,10 +7,15 @@ export const types = `
     isQualified: Boolean
     reportFile: String
     improvementPlanFile: String
+
+    createdUser: User
+    supplier: Company
   }
 `;
 
 export const queries = `
+  physicalAudits: [PhysicalAudit]
+  physicalAuditDetail(_id: String!): PhysicalAudit
 `;
 
 const commonParams = `

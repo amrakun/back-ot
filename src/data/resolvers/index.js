@@ -9,6 +9,7 @@ import BlockedCompany from './blockedCompany';
 import Qualification from './qualification';
 import Audit from './audit';
 import AuditResponse from './auditResponse';
+import PhysicalAudit from './physicalAudit';
 
 import Mutation from './mutations';
 import Query from './queries';
@@ -26,6 +27,7 @@ export default {
   Qualification,
   Audit,
   AuditResponse,
+  PhysicalAudit,
 
   Mutation,
   Query,

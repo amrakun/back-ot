@@ -5,6 +5,7 @@ import tenderResponses from './tenderResponses';
 import tenderResponseExports from './tenderResponseExports';
 import feedbacks from './feedbacks';
 import blockedCompanies from './blockedCompanies';
+import physicalAudits from './physicalAudits';
 import qualifications from './qualifications';
 import audits from './audits';
 import auditExports from './auditExports';
@@ -19,6 +20,7 @@ export default {
   ...tenderResponseExports,
   ...feedbacks,
   ...blockedCompanies,
+  ...physicalAudits,
   ...qualifications,
   ...audits,
   ...auditExports,
