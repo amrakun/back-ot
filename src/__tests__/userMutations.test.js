@@ -6,6 +6,8 @@ import { ROLES } from '../data/constants';
 import { Users, Companies } from '../db/models';
 import { userFactory } from '../db/factories';
 import userMutations from '../data/resolvers/mutations/users';
+import setPermissions from '../data/setPermissions';
+import { PERMISSIONS } from '../data/constants';
 
 beforeAll(() => connect());
 
@@ -14,6 +16,10 @@ afterAll(() => disconnect());
 describe('User mutations', () => {
   const user = { _id: 'DFAFDFDFD', role: ROLES.CONTRIBUTOR };
   const _adminUser = { _id: 'fakeId', role: ROLES.ADMIN };
+
+  beforeAll(() => {
+    setPermissions();
+  });
 
   afterEach(async () => {
     // Clearing test data
@@ -197,7 +203,8 @@ describe('User mutations', () => {
         $phone: Float,
 
         $password: String!,
-        $passwordConfirmation: String!
+        $passwordConfirmation: String!,
+        $permissions: [String!]
       ) {
         usersAdd(
           username: $username,
@@ -210,7 +217,8 @@ describe('User mutations', () => {
           phone: $phone,
 
           password: $password,
-          passwordConfirmation: $passwordConfirmation
+          passwordConfirmation: $passwordConfirmation,
+          permissions: $permissions,
         ) {
           _id
           username
@@ -220,6 +228,7 @@ describe('User mutations', () => {
           lastName
           jobTitle
           phone
+          permissions
         }
       }
     `;
@@ -234,6 +243,7 @@ describe('User mutations', () => {
       phone: 4242422,
       password: 'password',
       passwordConfirmation: 'password',
+      permissions: [PERMISSIONS[Object.keys(PERMISSIONS)[0]][0]],
     };
 
     await graphqlRequest(mutation, 'usersAdd', args, { user: { role: 'admin' } });

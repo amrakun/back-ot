@@ -40,6 +40,8 @@ const UserSchema = mongoose.Schema({
   lastName: field({ type: String, optional: true }),
   jobTitle: field({ type: String, optional: true }),
   phone: field({ type: Number, optional: true }),
+
+  permissions: [field({ type: String, optional: false })],
 });
 
 class User {

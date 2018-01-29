@@ -1,4 +1,4 @@
-import { ROLES } from './constants';
+import { ROLES, PERMISSIONS } from './constants';
 
 /**
  * Wraps object property (function) with permission checkers
@@ -78,6 +78,18 @@ export const requireBuyer = (cls, methodName) =>
 
     if (user.isSupplier) {
       throw new Error('Permission denied');
+    }
+
+    let found = false;
+    for (let permission of user.permissions) {
+      if (permission === methodName) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      throw new Error('Current action is forbidden');
     }
   });
 
