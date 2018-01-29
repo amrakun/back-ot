@@ -6,20 +6,23 @@ import moment from 'moment';
 export class StatusPublishClose {
   /*
    * Open drafts
-   * @return null
+   * @return - Published item ids
    */
   static async publishDrafts() {
     const drafts = await this.find({ status: 'draft' });
+    const results = [];
 
     for (let draft of drafts) {
       // publish date is reached
       if (isReached(draft.publishDate)) {
         // change status to open
         await this.update({ _id: draft._id }, { $set: { status: 'open' } });
+
+        results.push(draft._id);
       }
     }
 
-    return 'done';
+    return results;
   }
 
   /*

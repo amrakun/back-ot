@@ -8,26 +8,8 @@ const tenderMutations = {
    * @param {Object} doc - tenders fields
    * @return {Promise} newly created tender object
    */
-  async tendersAdd(root, doc, { user }) {
-    const tender = await Tenders.createTender(doc, user._id);
-
-    // send email ==============
-    for (let supplierId of tender.supplierIds) {
-      const supplier = await Companies.findOne({ _id: supplierId });
-
-      utils.sendEmail({
-        toEmails: [supplier.basicInfo.email],
-        title: tender.name,
-        template: {
-          name: 'tender',
-          data: {
-            content: tender.content,
-          },
-        },
-      });
-    }
-
-    return tender;
+  tendersAdd(root, doc, { user }) {
+    return Tenders.createTender(doc, user._id);
   },
 
   /**
