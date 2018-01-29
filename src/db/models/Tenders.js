@@ -128,6 +128,19 @@ class Tender extends StatusPublishClose {
   }
 
   /*
+   * Mark as canceled
+   */
+  async cancel() {
+    if (this.status === 'closed') {
+      throw new Error('This tender is closed');
+    }
+
+    await this.update({ status: 'canceled' });
+
+    return Tenders.findOne({ _id: this._id });
+  }
+
+  /*
    * total suppliers count
    */
   requestedCount() {

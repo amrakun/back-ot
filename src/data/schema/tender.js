@@ -171,6 +171,7 @@ export const mutations = `
   tendersRemove(_id: String!): String
   tendersAward(_id: String!, supplierId: String!): Tender
   tendersSendRegretLetter(_id: String!, subject: String!, content: String!): [String]
+  tendersCancel(_id: String!): Tender
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
   tenderResponsesEdit(${responseCommonParams}): TenderResponse

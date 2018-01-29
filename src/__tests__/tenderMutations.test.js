@@ -219,6 +219,22 @@ describe('Tender mutations', () => {
     expect(updatedTender.sentRegretLetter).toBe(true);
   });
 
+  test('Cancel', async () => {
+    const mutation = `
+      mutation tendersCancel($_id: String!) {
+        tendersCancel(_id: $_id) {
+          status
+        }
+      }
+    `;
+
+    const args = { _id: _tender._id };
+
+    const response = await graphqlRequest(mutation, 'tendersCancel', args);
+
+    expect(response.status).toBe('canceled');
+  });
+
   test('Send response', async () => {
     const company = await companyFactory();
     const tender = await tenderFactory({ status: 'open' });

@@ -93,6 +93,21 @@ const tenderMutations = {
 
     return notAwardedResponses.map(response => response.supplierId);
   },
+
+  /**
+   * Mark tender as canceled
+   * @param {String} _id - Tender id
+   * @return {Promise} - updated tender
+   */
+  async tendersCancel(root, { _id }) {
+    const tender = await Tenders.findOne({ _id });
+
+    if (tender) {
+      return tender.cancel();
+    }
+
+    return null;
+  },
 };
 
 moduleRequireBuyer(tenderMutations);

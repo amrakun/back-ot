@@ -95,12 +95,22 @@ describe('Tender response db', () => {
   });
 
   test('Send', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'canceled' });
+
     let tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
 
     tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
 
     expect(tenderResponse.isSent).toBe(false);
+
+    try {
+      await tenderResponse.send();
+    } catch (e) {
+      expect(e.message).toBe('This tender is not available');
+    }
+
+    // successfull ======================
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'open' } });
 
     await tenderResponse.send();
 

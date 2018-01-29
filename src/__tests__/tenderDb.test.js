@@ -174,4 +174,29 @@ describe('Tender db', () => {
       expect(e.message).toBe('Already sent');
     }
   });
+
+  test('Cancel', async () => {
+    expect.assertions(2);
+
+    let tender = await tenderFactory({ status: 'closed' });
+
+    tender = await Tenders.findOne({ _id: tender._id });
+
+    try {
+      await tender.cancel();
+    } catch (e) {
+      expect(e.message).toBe('This tender is closed');
+    }
+
+    // successfull ===========================
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'open' } });
+
+    tender = await Tenders.findOne({ _id: tender._id });
+
+    await tender.cancel();
+
+    const updatedTender = await Tenders.findOne({ _id: tender._id });
+
+    expect(updatedTender.status).toBe('canceled');
+  });
 });
