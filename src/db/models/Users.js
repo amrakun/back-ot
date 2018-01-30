@@ -40,6 +40,9 @@ const UserSchema = mongoose.Schema({
   lastName: field({ type: String, optional: true }),
   jobTitle: field({ type: String, optional: true }),
   phone: field({ type: Number, optional: true }),
+
+  // temporary user to replace this user
+  delegatedUserId: field({ type: String, optional: true }),
 });
 
 class User {
@@ -374,10 +377,11 @@ class User {
    * @param {Object} args
    * @param {String} args.email - User email
    * @param {String} args.password - User password
+   * @param {String} args.loginAs - User id to login if user is delegated his account
    * @return {Object} - generated tokens
    */
-  static async login({ email, password }) {
-    const user = await Users.findOne({ email: { $regex: new RegExp(email, 'i') } });
+  static async login({ email, password, loginAs }) {
+    let user = await Users.findOne({ email: { $regex: new RegExp(email, 'i') } });
 
     if (!user) {
       // user with provided email not found
@@ -391,10 +395,28 @@ class User {
       throw new Error('Invalid login');
     }
 
+    // if user is delegated his account then ask for which account
+    // he want to use
+    if (user.delegatedUserId) {
+      if (!loginAs) {
+        return {
+          type: 'chooseLoginAs',
+          delegatedUser: await Users.findOne({ _id: user.delegatedUserId }),
+          user,
+        };
+      }
+
+      // check invalid loginAs value
+      if ([user._id, user.delegatedUserId].includes(loginAs)) {
+        user = await Users.findOne({ _id: loginAs });
+      }
+    }
+
     // create tokens
     const [token, refreshToken] = await this.createTokens(user, this.getSecret());
 
     return {
+      type: 'login',
       token,
       refreshToken,
     };
