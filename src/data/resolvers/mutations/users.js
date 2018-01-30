@@ -164,6 +164,22 @@ const userMutations = {
   },
 
   /*
+   * Give someone your account temporarily
+   * @param {String} userId - The user that will have extra account
+   * @param {String} startDate - Start date of delegate action
+   * @param {String} endDate - End date of delegate action
+   * @return {User} - Extra account received user
+   */
+  async usersDelegate(root, { userId, startDate, endDate }, { user }) {
+    return Users.delegate({
+      userId: user._id,
+      delegateUserId: userId,
+      startDate,
+      endDate,
+    });
+  },
+
+  /*
    * Remove user
    * @param {String} _id - User _id
    * @return {Promise} - Remove user response
@@ -177,6 +193,7 @@ requireAdmin(userMutations, 'usersAdd');
 requireAdmin(userMutations, 'usersEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
+requireLogin(userMutations, 'usersDelegate');
 requireAdmin(userMutations, 'usersRemove');
 
 export default userMutations;

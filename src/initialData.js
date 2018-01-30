@@ -20,6 +20,8 @@ export const importData = async () => {
     isSupplier: false,
     role: 'admin',
     email: 'admin@ot.mn',
+    firstName: faker.name.firstName(),
+    lastName: faker.name.firstName(),
   });
 
   // create some users
