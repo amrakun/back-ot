@@ -211,6 +211,7 @@ export const types = `
 
 
     supplier: Company
+    audit: Audit
   }
 `;
 

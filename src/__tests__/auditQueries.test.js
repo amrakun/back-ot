@@ -250,6 +250,10 @@ describe('Company queries', () => {
           reportFile
 
           isQualified
+
+          audit {
+            _id
+          }
         }
       }
     `;
@@ -267,6 +271,7 @@ describe('Company queries', () => {
 
     expect(response.auditId).toBe(args.auditId);
     expect(response.supplierId).toBe(args.supplierId);
+    expect(response.audit._id).toBeDefined();
   });
 
   test('audit responses', async () => {
