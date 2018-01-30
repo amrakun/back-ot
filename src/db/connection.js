@@ -4,6 +4,7 @@ import { graphql } from 'graphql';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import schema from '../data/';
+import { userFactory } from './factories';
 
 dotenv.config();
 
@@ -43,9 +44,12 @@ export function disconnect() {
   return mongoose.connection.close();
 }
 
-export const graphqlRequest = async (mutation, name, args, context = { user: { _id: '_id' } }) => {
+export const graphqlRequest = async (mutation, name, args, context) => {
+  const user = await userFactory({});
+
   const rootValue = {};
-  const response = await graphql(schema, mutation, rootValue, context, args);
+
+  const response = await graphql(schema, mutation, rootValue, context || { user }, args);
 
   if (response.errors) {
     throw response.errors;
