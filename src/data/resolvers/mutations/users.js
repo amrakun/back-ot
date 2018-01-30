@@ -170,13 +170,26 @@ const userMutations = {
    * @param {String} endDate - End date of delegate action
    * @return {User} - Extra account received user
    */
-  async usersDelegate(root, { userId, startDate, endDate }, { user }) {
-    return Users.delegate({
+  async usersDelegate(root, { userId, startDate, endDate, reason }, { user }) {
+    const receivedUser = await Users.delegate({
       userId: user._id,
       delegateUserId: userId,
       startDate,
       endDate,
     });
+
+    utils.sendEmail({
+      toEmails: [receivedUser.email],
+      title: 'Delegation',
+      template: {
+        name: 'base',
+        data: {
+          content: reason,
+        },
+      },
+    });
+
+    return receivedUser;
   },
 
   /*
