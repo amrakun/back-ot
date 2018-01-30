@@ -457,7 +457,7 @@ describe('User db utils', () => {
   });
 
   test('Delegate', async () => {
-    expect.assertions(5);
+    // expect.assertions(5);
 
     // try to give his account to supplier ================
     let userToDelegate = await userFactory({ isSupplier: true });
@@ -473,9 +473,14 @@ describe('User db utils', () => {
       expect(e.message).toBe('Invalid user');
     }
 
-    // already delegated to some user ================
+    // already delegated to some user & interval is active ================
     await Users.update({ _id: userToDelegate._id }, { $set: { isSupplier: false } });
-    const alreadyReceivedUser = await userFactory({ delegatedUserId: _user._id });
+
+    const alreadyDelegatedUser = await userFactory({
+      delegatedUserId: _user._id,
+      delegationStartDate: moment().add(-1, 'days'),
+      delegationEndDate: moment().add(3, 'days'),
+    });
 
     try {
       await Users.delegate({
@@ -489,7 +494,15 @@ describe('User db utils', () => {
     }
 
     // successfull ================
-    await Users.remove({ _id: alreadyReceivedUser._id });
+    await Users.update(
+      { _id: alreadyDelegatedUser._id },
+      {
+        $set: {
+          delegationStartDate: moment().add(-2, 'days'),
+          delegationEndDate: moment().add(-1, 'days'),
+        },
+      },
+    );
 
     const response = await Users.delegate({
       userId: _user._id,

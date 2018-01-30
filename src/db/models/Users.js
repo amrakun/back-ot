@@ -452,7 +452,17 @@ class User {
       throw new Error('Invalid user');
     }
 
-    if (await Users.findOne({ delegatedUserId: userId })) {
+    const now = new Date();
+
+    // if this use gave his account to someone and inverval is active
+    // then it is not possible to delegate again
+    const previousActiveDelegation = await Users.findOne({
+      delegatedUserId: userId,
+      delegationStartDate: { $lte: now },
+      delegationEndDate: { $gte: now },
+    });
+
+    if (previousActiveDelegation) {
       throw new Error('Already delegated');
     }
 
