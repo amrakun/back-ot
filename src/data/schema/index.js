@@ -46,6 +46,8 @@ import {
   mutations as ConfigMutations,
 } from './config';
 
+import { types as PermissionTypes, queries as PermissionQueries } from './permission';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -60,6 +62,7 @@ export const types = `
   ${PhysicalAuditTypes}
   ${ReportTypes}
   ${ConfigTypes}
+  ${PermissionTypes}
 `;
 
 export const queries = `
@@ -74,6 +77,7 @@ export const queries = `
     ${PhysicalAuditQueries}
     ${ReportQueries}
     ${ConfigQueries}
+    ${PermissionQueries}
   }
 `;
 

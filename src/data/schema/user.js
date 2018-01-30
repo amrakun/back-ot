@@ -11,6 +11,7 @@ export const types = `
     lastName: String
     jobTitle: String
     phone: Float
+    permissions: [String!]
   }
 
   type AuthPayload {
@@ -33,7 +34,8 @@ const commonParams = `
   firstName: String,
   lastName: String,
   jobTitle: String,
-  phone: Float
+  phone: Float,
+  permissions: [String!]
 `;
 
 export const mutations = `
@@ -52,14 +54,14 @@ export const mutations = `
   usersAdd(
     ${commonParams},
     password: String!,
-    passwordConfirmation: String!
+    passwordConfirmation: String!,
   ): User
 
   usersEdit(
     _id: String!,
     ${commonParams},
     password: String,
-    passwordConfirmation: String
+    passwordConfirmation: String,
   ): User
 
   usersEditProfile(

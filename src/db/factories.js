@@ -292,7 +292,7 @@ export const userFactory = async (params = {}) => {
   const user = new Users({
     username: params.username || faker.internet.userName(),
 
-    role: params.role || 'contributor',
+    role: params.role || 'admin',
 
     firstName: params.firstName || faker.random.word(),
     lastName: params.lastName || faker.random.word(),

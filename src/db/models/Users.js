@@ -41,6 +41,8 @@ const UserSchema = mongoose.Schema({
   jobTitle: field({ type: String, optional: true }),
   phone: field({ type: Number, optional: true }),
 
+  permissions: [String],
+
   // temporary user to replace this user
   delegatedUserId: field({ type: String, optional: true }),
 });

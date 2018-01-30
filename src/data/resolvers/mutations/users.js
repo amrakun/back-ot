@@ -131,7 +131,7 @@ const userMutations = {
    * @param {Object} args - User doc
    * @return {Promise} - Updated user
    */
-  async usersEdit(root, args) {
+  usersEdit(root, args) {
     const { _id, password, passwordConfirmation } = args;
 
     if (password && password !== passwordConfirmation) {

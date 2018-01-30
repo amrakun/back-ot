@@ -11,6 +11,7 @@ import audits from './audits';
 import auditExports from './auditExports';
 import reports from './reports';
 import configs from './configs';
+import permissions from './permissions';
 
 export default {
   ...users,
@@ -26,4 +27,5 @@ export default {
   ...auditExports,
   ...reports,
   ...configs,
+  ...permissions,
 };
