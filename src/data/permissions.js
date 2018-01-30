@@ -1,4 +1,4 @@
-import { ROLES, PERMISSIONS } from './constants';
+import { ROLES } from './constants';
 
 /**
  * Wraps object property (function) with permission checkers
@@ -78,6 +78,10 @@ export const requireBuyer = (cls, methodName) =>
 
     if (user.isSupplier) {
       throw new Error('Permission denied');
+    }
+
+    if (user.role == ROLES.ADMIN) {
+      return;
     }
 
     let found = false;

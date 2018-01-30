@@ -34,7 +34,8 @@ const commonParams = `
   firstName: String,
   lastName: String,
   jobTitle: String,
-  phone: Float
+  phone: Float,
+  permissions: [String!]
 `;
 
 export const mutations = `
@@ -54,7 +55,6 @@ export const mutations = `
     ${commonParams},
     password: String!,
     passwordConfirmation: String!,
-    permissions: [String!],
   ): User
 
   usersEdit(
@@ -62,7 +62,6 @@ export const mutations = `
     ${commonParams},
     password: String,
     passwordConfirmation: String,
-    permissions: [String!],
   ): User
 
   usersEditProfile(
