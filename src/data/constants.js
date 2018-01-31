@@ -37,10 +37,6 @@ export const PERMISSION_LIST = [
 
 export const PERMISSIONS = [
   {
-    name: 'Suppliers',
-    permissions: [],
-  },
-  {
     name: 'Pre-qualification',
     permissions: ['qualificationsPrequalify', 'qualificationsSaveTierType'],
   },
