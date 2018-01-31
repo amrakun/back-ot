@@ -7,7 +7,6 @@ import { ROLES } from '../data/constants';
 import { Users, Companies } from '../db/models';
 import { userFactory } from '../db/factories';
 import userMutations from '../data/resolvers/mutations/users';
-import setPermissions from '../data/setPermissions';
 import { PERMISSIONS } from '../data/constants';
 
 beforeAll(() => connect());
@@ -17,10 +16,6 @@ afterAll(() => disconnect());
 describe('User mutations', () => {
   const user = { _id: 'DFAFDFDFD', role: ROLES.CONTRIBUTOR };
   const _adminUser = { _id: 'fakeId', role: ROLES.ADMIN };
-
-  beforeAll(() => {
-    setPermissions();
-  });
 
   afterEach(async () => {
     // Clearing test data
@@ -204,12 +199,12 @@ describe('User mutations', () => {
     checkLogin(userMutations.usersRemove, {});
   });
 
-  test(`test if Error('Permission denied') error is working as intended`, async () => {
+  test(`test if Error('Current action is forbidden') error is working as intended`, async () => {
     const checkLogin = async fn => {
       try {
         await fn({}, {}, { user });
       } catch (e) {
-        expect(e.message).toEqual('Permission denied');
+        expect(e.message).toEqual('Current action is forbidden');
       }
     };
 
@@ -266,11 +261,11 @@ describe('User mutations', () => {
           username: $username,
           email: $email,
           role: $role,
-
           firstName: $firstName,
           lastName: $lastName,
           jobTitle: $jobTitle,
           phone: $phone,
+
 
           password: $password,
           passwordConfirmation: $passwordConfirmation,
@@ -299,7 +294,7 @@ describe('User mutations', () => {
       phone: 4242422,
       password: 'password',
       passwordConfirmation: 'password',
-      permissions: [PERMISSIONS[Object.keys(PERMISSIONS)[0]][0]],
+      permissions: [PERMISSIONS[2].permissions[0]],
     };
 
     await graphqlRequest(mutation, 'usersAdd', args, { user: { role: 'admin' } });

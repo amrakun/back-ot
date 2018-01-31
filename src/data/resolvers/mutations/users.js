@@ -1,6 +1,6 @@
 import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
-import { requireLogin, requireAdmin } from '../../permissions';
+import { requireLogin, requireBuyer } from '../../permissions';
 
 const userMutations = {
   /*
@@ -202,11 +202,11 @@ const userMutations = {
   },
 };
 
-requireAdmin(userMutations, 'usersAdd');
-requireAdmin(userMutations, 'usersEdit');
+requireBuyer(userMutations, 'usersAdd');
+requireBuyer(userMutations, 'usersEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
+requireBuyer(userMutations, 'usersRemove');
 requireLogin(userMutations, 'usersDelegate');
-requireAdmin(userMutations, 'usersRemove');
 
 export default userMutations;

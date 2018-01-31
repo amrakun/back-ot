@@ -1,4 +1,4 @@
-import { ROLES } from './constants';
+import { ROLES, PERMISSION_LIST } from './constants';
 
 /**
  * Wraps object property (function) with permission checkers
@@ -84,16 +84,11 @@ export const requireBuyer = (cls, methodName) =>
       return;
     }
 
-    let found = false;
-
-    for (let permission of user.permissions) {
-      if (permission === methodName) {
-        found = true;
-        break;
-      }
+    if (PERMISSION_LIST.indexOf(methodName) == -1) {
+      return;
     }
 
-    if (!found) {
+    if ((user.permissions || []).indexOf(methodName) == -1) {
       throw new Error('Current action is forbidden');
     }
   });
