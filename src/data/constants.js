@@ -23,6 +23,16 @@ export const PERMISSION_LIST = [
   'usersAdd',
   'usersEdit',
   'usersRemove',
+  'tenderResponsesEoiShortList',
+  'tenderResponsesEoiBidderList',
+  'feedbacksAdd',
+  'companiesGenerateDifotScoreList',
+  'companiesAddDifotScores',
+  'qualificationsPrequalify',
+  'qualificationsSaveTierType',
+  'auditsAdd',
+  'auditReport',
+  'auditsBuyerSendFiles',
 ];
 
 export const PERMISSIONS = [
@@ -32,11 +42,17 @@ export const PERMISSIONS = [
   },
   {
     name: 'Pre-qualification',
-    permissions: [],
+    permissions: ['qualificationsPrequalify', 'qualificationsSaveTierType'],
   },
   {
     name: 'Qualification',
-    permissions: ['physicalAuditsAdd', 'configsSaveImprovementPlanDow'],
+    permissions: [
+      'physicalAuditsAdd',
+      'configsSaveImprovementPlanDow',
+      'auditsAdd',
+      'auditReport',
+      'auditsBuyerSendFiles',
+    ],
   },
   {
     name: 'Validation',
@@ -44,7 +60,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Difot score',
-    permissions: [],
+    permissions: ['companiesGenerateDifotScoreList', 'companiesAddDifotScores'],
   },
   {
     name: 'Due diligence',
@@ -56,7 +72,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Success feedback',
-    permissions: ['tenderResponses'],
+    permissions: ['tenderResponses', 'feedbacksAdd'],
   },
   {
     name: 'RFQ/EOI responses',
@@ -68,7 +84,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'EOI responses',
-    permissions: [],
+    permissions: ['tenderResponsesEoiShortList', 'tenderResponsesEoiBidderList'],
   },
   {
     name: 'Report',
