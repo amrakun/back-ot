@@ -164,6 +164,35 @@ const userMutations = {
   },
 
   /*
+   * Give someone your account temporarily
+   * @param {String} userId - The user that will have extra account
+   * @param {String} startDate - Start date of delegate action
+   * @param {String} endDate - End date of delegate action
+   * @return {User} - Extra account received user
+   */
+  async usersDelegate(root, { userId, startDate, endDate, reason }, { user }) {
+    const receivedUser = await Users.delegate({
+      userId: user._id,
+      delegateUserId: userId,
+      startDate,
+      endDate,
+    });
+
+    utils.sendEmail({
+      toEmails: [receivedUser.email],
+      title: 'Delegation',
+      template: {
+        name: 'base',
+        data: {
+          content: reason,
+        },
+      },
+    });
+
+    return receivedUser;
+  },
+
+  /*
    * Remove user
    * @param {String} _id - User _id
    * @return {Promise} - Remove user response
@@ -178,5 +207,6 @@ requireBuyer(userMutations, 'usersEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
 requireBuyer(userMutations, 'usersRemove');
+requireLogin(userMutations, 'usersDelegate');
 
 export default userMutations;

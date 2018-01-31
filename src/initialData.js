@@ -1,3 +1,4 @@
+import moment from 'moment';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import faker from 'faker';
@@ -20,6 +21,8 @@ export const importData = async () => {
     isSupplier: false,
     role: 'admin',
     email: 'admin@ot.mn',
+    firstName: faker.name.firstName(),
+    lastName: faker.name.firstName(),
   });
 
   // create some users
@@ -99,8 +102,8 @@ export const importData = async () => {
   const createTender = async ({ publishDate, status }) => {
     const tender = await tenderFactory({
       type: faker.random.boolean() ? 'rfq' : 'eoi',
-      publishDate: new Date(publishDate),
-      closeDate: new Date('2070-01-01'),
+      publishDate: moment(publishDate),
+      closeDate: moment(publishDate).add(30, 'days'),
       status,
       supplierIds,
     });

@@ -12,11 +12,19 @@ export const types = `
     jobTitle: String
     phone: Float
     permissions: [String!]
+
+    delegatedUserId: String
+    delegationStartDate: Date
+    delegationEndDate: Date
   }
 
   type AuthPayload {
-    token: String!
-    refreshToken: String!
+    status: String
+    token: String
+    refreshToken: String
+
+    user: User
+    delegatedUser: User
   }
 `;
 
@@ -47,7 +55,7 @@ export const mutations = `
     passwordConfirmation: String!
   ): User
 
-  login(email: String!, password: String!): AuthPayload!
+  login(email: String!, password: String!, loginAs: String): AuthPayload!
   forgotPassword(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String
 
@@ -77,4 +85,11 @@ export const mutations = `
 
   usersChangePassword(currentPassword: String!, newPassword: String!): User
   usersRemove(_id: String!): String
+
+  usersDelegate(
+    userId: String!,
+    reason: String!,
+    startDate: Date!,
+    endDate: Date!
+  ): User
 `;

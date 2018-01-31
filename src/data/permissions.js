@@ -88,7 +88,7 @@ export const requireBuyer = (cls, methodName) =>
       return;
     }
 
-    if (user.permissions.indexOf(methodName) == -1) {
+    if ((user.permissions || []).indexOf(methodName) == -1) {
       throw new Error('Current action is forbidden');
     }
   });

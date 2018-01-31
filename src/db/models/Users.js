@@ -45,6 +45,8 @@ const UserSchema = mongoose.Schema({
 
   // temporary user to replace this user
   delegatedUserId: field({ type: String, optional: true }),
+  delegationStartDate: field({ type: Date, optional: true }),
+  delegationEndDate: field({ type: Date, optional: true }),
 });
 
 class User {
@@ -399,12 +401,22 @@ class User {
 
     // if user is delegated his account then ask for which account
     // he want to use
-    if (user.delegatedUserId) {
+    const now = new Date();
+    const { delegatedUserId, delegationStartDate, delegationEndDate } = user;
+
+    // checking wheter or not this delegation is active
+    if (delegatedUserId && delegationStartDate <= now && delegationEndDate >= now) {
+      const delegatedUser = await Users.findOne({ _id: user.delegatedUserId });
+
+      // remove secret infos
+      delete delegatedUser.password;
+      delete user.password;
+
       if (!loginAs) {
         return {
-          type: 'chooseLoginAs',
-          delegatedUser: await Users.findOne({ _id: user.delegatedUserId }),
+          status: 'chooseLoginAs',
           user,
+          delegatedUser,
         };
       }
 
@@ -418,10 +430,54 @@ class User {
     const [token, refreshToken] = await this.createTokens(user, this.getSecret());
 
     return {
-      type: 'login',
+      status: 'login',
       token,
       refreshToken,
+      user,
     };
+  }
+
+  /*
+   * Give someone your account temporarily
+   * @param {String} userId - The user that is doing this action
+   * @param {String} delegateUserId - The user that will have extra account
+   * @param {String} startDate - Start date of delegate action
+   * @param {String} endDate - End date of delegate action
+   * @return {User} - Extra account received user
+   */
+  static async delegate({ userId, delegateUserId, startDate, endDate }) {
+    const delegateUser = await this.findOne({ _id: delegateUserId });
+
+    if (delegateUser.isSupplier) {
+      throw new Error('Invalid user');
+    }
+
+    const now = new Date();
+
+    // if this use gave his account to someone and inverval is active
+    // then it is not possible to delegate again
+    const previousActiveDelegation = await Users.findOne({
+      delegatedUserId: userId,
+      delegationStartDate: { $lte: now },
+      delegationEndDate: { $gte: now },
+    });
+
+    if (previousActiveDelegation) {
+      throw new Error('Already delegated');
+    }
+
+    await this.update(
+      { _id: delegateUserId },
+      {
+        $set: {
+          delegatedUserId: userId,
+          delegationStartDate: startDate,
+          delegationEndDate: endDate,
+        },
+      },
+    );
+
+    return this.findOne({ _id: delegateUserId });
   }
 }
 

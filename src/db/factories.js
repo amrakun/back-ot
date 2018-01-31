@@ -294,8 +294,8 @@ export const userFactory = async (params = {}) => {
 
     role: params.role || 'admin',
 
-    firstName: params.firstName || faker.random.word(),
-    lastName: params.lastName || faker.random.word(),
+    firstName: params.firstName || faker.name.firstName(),
+    lastName: params.lastName || faker.name.firstName(),
     jobTitle: params.jobTitle || faker.random.word(),
     phone: params.phone || faker.random.number(),
 
@@ -303,6 +303,9 @@ export const userFactory = async (params = {}) => {
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
     companyId: params.companyId,
+    delegatedUserId: params.delegatedUserId,
+    delegationStartDate: params.delegationStartDate,
+    delegationEndDate: params.delegationEndDate,
   });
 
   return save(user);

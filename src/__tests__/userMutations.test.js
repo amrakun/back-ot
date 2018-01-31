@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { ROLES } from '../data/constants';
 import { Users, Companies } from '../db/models';
@@ -71,14 +72,69 @@ describe('User mutations', () => {
     expect(Companies.createCompany).toBeCalledWith('_id');
   });
 
+  const loginMutation = `
+    mutation login($email: String!, $password: String!, $loginAs: String) {
+      login(email: $email, password: $password, loginAs: $loginAs) {
+        status
+        token
+        refreshToken
+
+        delegatedUser {
+          _id
+        }
+
+        user {
+          _id
+        }
+      }
+    }
+  `;
+
   test('Login', async () => {
-    Users.login = jest.fn();
+    const user = await userFactory({});
 
-    const doc = { email: 'test@erxes.io', password: 'password' };
+    const args = {
+      email: user.email,
+      password: 'pass',
+    };
 
-    await userMutations.login({}, doc);
+    const response = await graphqlRequest(loginMutation, 'login', args);
 
-    expect(Users.login).toBeCalledWith(doc);
+    expect(response.status).toBe('login');
+    expect(response.token).toBeDefined();
+    expect(response.refreshToken).toBeDefined();
+  });
+
+  test('Login: delegation', async () => {
+    const delegatedUser = await userFactory({});
+
+    const user = await userFactory({
+      delegatedUserId: delegatedUser._id,
+      delegationStartDate: moment().add(-1, 'days'),
+      delegationEndDate: moment().add(1, 'days'),
+    });
+
+    // without loginAs ====================
+    const args = {
+      email: user.email,
+      password: 'pass',
+    };
+
+    let response = await graphqlRequest(loginMutation, 'login', args);
+
+    expect(response.status).toBe('chooseLoginAs');
+    expect(response.delegatedUser._id.toString()).toBe(delegatedUser._id);
+    expect(response.user._id.toString()).toBe(user._id);
+
+    // with loginAs ====================
+    args.loginAs = delegatedUser._id;
+
+    response = await graphqlRequest(loginMutation, 'login', args);
+
+    expect(response.status).toBe('login');
+    expect(response.token).toBeDefined();
+    expect(response.refreshToken).toBeDefined();
+    expect(response.user._id.toString()).toBe(delegatedUser._id);
   });
 
   test('Forgot password', async () => {
@@ -143,12 +199,12 @@ describe('User mutations', () => {
     checkLogin(userMutations.usersRemove, {});
   });
 
-  test(`test if Error('Permission denied') error is working as intended`, async () => {
+  test(`test if Error('Current action is forbidden') error is working as intended`, async () => {
     const checkLogin = async fn => {
       try {
         await fn({}, {}, { user });
       } catch (e) {
-        expect(e.message).toEqual('Permission denied');
+        expect(e.message).toEqual('Current action is forbidden');
       }
     };
 
@@ -372,5 +428,46 @@ describe('User mutations', () => {
 
     // ensure removed
     expect(await Users.findOne({ _id: removeUserId })).toBe(null);
+  });
+
+  test('delegate', async () => {
+    const mutation = `
+      mutation usersDelegate(
+        $userId: String!,
+        $reason: String!,
+        $startDate: Date!,
+        $endDate: Date!,
+      ) {
+        usersDelegate(
+          userId: $userId,
+          reason: $reason,
+          startDate: $startDate,
+          endDate: $endDate,
+        ) {
+          _id
+          delegatedUserId
+          delegationStartDate
+          delegationEndDate
+        }
+      }
+    `;
+
+    const userToDelegate = await userFactory({});
+
+    const args = {
+      userId: userToDelegate._id,
+      reason: 'reason',
+      startDate: new Date(),
+      endDate: new Date(),
+    };
+
+    const _user = await userFactory();
+    const context = { user: _user };
+
+    let response = await graphqlRequest(mutation, 'usersDelegate', args, context);
+
+    expect(response.delegatedUserId.toString()).toBe(_user._id);
+    expect(response.delegationStartDate).toBeDefined();
+    expect(response.delegationEndDate).toBeDefined();
   });
 });

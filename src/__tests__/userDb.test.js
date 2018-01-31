@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Audits, BlockedCompanies, Feedbacks, Tenders } from '../db/models';
 
@@ -326,6 +327,59 @@ describe('User db utils', () => {
     expect(refreshToken).toBeDefined();
   });
 
+  test('Login: delegate', async () => {
+    const delegatedUser = await userFactory({});
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          delegatedUserId: delegatedUser._id,
+          delegationStartDate: moment().add(1, 'days'),
+          delegationEndDate: moment().add(2, 'days'),
+        },
+      },
+    );
+
+    // expired internval ======================
+    let response = await Users.login({
+      email: _user.email.toUpperCase(),
+      password: 'pass',
+    });
+
+    expect(response.status).toBe('login');
+
+    // without loginAs ======================
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          delegationStartDate: moment().add(-1, 'days'),
+          delegationEndDate: moment().add(2, 'days'),
+        },
+      },
+    );
+
+    response = await Users.login({
+      email: _user.email.toUpperCase(),
+      password: 'pass',
+    });
+
+    expect(response.status).toBe('chooseLoginAs');
+    expect(response.user._id.toString()).toBe(_user._id);
+    expect(response.delegatedUser._id.toString()).toBe(delegatedUser._id);
+
+    // with loginAs ======================
+    response = await Users.login({
+      email: _user.email.toUpperCase(),
+      password: 'pass',
+      loginAs: delegatedUser._id,
+    });
+
+    expect(response.status).toBe('login');
+    expect(response.user._id.toString()).toBe(delegatedUser._id);
+  });
+
   test('Register', async () => {
     expect.assertions(8);
 
@@ -400,5 +454,65 @@ describe('User db utils', () => {
 
     expect(token).toBeDefined();
     expect(refreshToken).toBeDefined();
+  });
+
+  test('Delegate', async () => {
+    // expect.assertions(5);
+
+    // try to give his account to supplier ================
+    let userToDelegate = await userFactory({ isSupplier: true });
+
+    try {
+      await Users.delegate({
+        userId: _user._id,
+        delegateUserId: userToDelegate._id,
+        startDate: new Date(),
+        endDate: new Date(),
+      });
+    } catch (e) {
+      expect(e.message).toBe('Invalid user');
+    }
+
+    // already delegated to some user & interval is active ================
+    await Users.update({ _id: userToDelegate._id }, { $set: { isSupplier: false } });
+
+    const alreadyDelegatedUser = await userFactory({
+      delegatedUserId: _user._id,
+      delegationStartDate: moment().add(-1, 'days'),
+      delegationEndDate: moment().add(3, 'days'),
+    });
+
+    try {
+      await Users.delegate({
+        userId: _user._id,
+        delegateUserId: userToDelegate._id,
+        startDate: new Date(),
+        endDate: new Date(),
+      });
+    } catch (e) {
+      expect(e.message).toBe('Already delegated');
+    }
+
+    // successfull ================
+    await Users.update(
+      { _id: alreadyDelegatedUser._id },
+      {
+        $set: {
+          delegationStartDate: moment().add(-2, 'days'),
+          delegationEndDate: moment().add(-1, 'days'),
+        },
+      },
+    );
+
+    const response = await Users.delegate({
+      userId: _user._id,
+      delegateUserId: userToDelegate._id,
+      startDate: new Date(),
+      endDate: new Date(),
+    });
+
+    expect(response.delegatedUserId.toString()).toBe(_user._id);
+    expect(response.delegationStartDate).toBeDefined();
+    expect(response.delegationEndDate).toBeDefined();
   });
 });
