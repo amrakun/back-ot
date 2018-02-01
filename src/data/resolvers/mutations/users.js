@@ -178,6 +178,8 @@ const userMutations = {
       endDate,
     });
 
+    const { MAIN_APP_DOMAIN } = process.env;
+
     utils.sendEmail({
       toEmails: [receivedUser.email],
       title: 'Delegation',
@@ -187,6 +189,7 @@ const userMutations = {
           reason: reason,
           user,
           receivedUser,
+          MAIN_APP_DOMAIN,
         },
       },
     });
