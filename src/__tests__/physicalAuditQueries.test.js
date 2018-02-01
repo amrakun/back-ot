@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, PhysicalAudits } from '../db/models';
-import { userFactory, physicalAuditFactory } from '../db/factories';
+import { Users, Companies, PhysicalAudits } from '../db/models';
+import { userFactory, companyFactory, physicalAuditFactory } from '../db/factories';
 import queries from '../data/resolvers/queries/physicalAudits';
 
 beforeAll(() => connect());
@@ -14,6 +14,7 @@ describe('Company queries', () => {
   afterEach(async () => {
     // Clearing test data
     await PhysicalAudits.remove({});
+    await Companies.remove({});
     await Users.remove({});
   });
 
@@ -37,8 +38,8 @@ describe('Company queries', () => {
 
   test('physicalAudits', async () => {
     const query = `
-      query physicalAudits {
-        physicalAudits {
+      query physicalAudits($supplierSearch: String) {
+        physicalAudits(supplierSearch: $supplierSearch) {
           _id
           createdDate
           createdUserId
@@ -52,7 +53,12 @@ describe('Company queries', () => {
 
     await physicalAuditFactory({});
 
-    let response = await graphqlRequest(query, 'physicalAudits', {});
+    const supplier = await companyFactory({ enName: 'enNameTest' });
+
+    await physicalAuditFactory({ supplierId: supplier._id });
+
+    const args = { supplierSearch: 'enNameTest' };
+    const response = await graphqlRequest(query, 'physicalAudits', args);
 
     expect(response.length).toBe(1);
   });

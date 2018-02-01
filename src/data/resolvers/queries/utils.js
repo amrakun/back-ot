@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
+import { Companies } from '../../../db/models';
+
 export const paginate = (collection, params) => {
   const { page, perPage, sortField, sortDirection } = params || {};
 
@@ -17,4 +19,22 @@ export const paginate = (collection, params) => {
   const _limit = Number(perPage || '20');
 
   return sortedCollection.limit(_limit).skip((_page - 1) * _limit);
+};
+
+export const supplierFilter = async (query, search) => {
+  if (search) {
+    const suppliers = await Companies.find({
+      $or: [
+        { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
+        { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
+        { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
+      ],
+    });
+
+    const supplierIds = suppliers.map(s => s._id);
+
+    query.supplierId = { $in: supplierIds };
+  }
+
+  return query;
 };

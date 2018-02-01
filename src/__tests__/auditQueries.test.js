@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, Users, Audits, AuditResponses } from '../db/models';
 import { userFactory, companyFactory, auditFactory, auditResponseFactory } from '../db/factories';
@@ -21,6 +22,7 @@ describe('Company queries', () => {
     // Clearing test data
     await Companies.remove({});
     await Audits.remove({});
+    await AuditResponses.remove({});
     await Users.remove({});
   });
 
@@ -278,17 +280,61 @@ describe('Company queries', () => {
     await AuditResponses.remove({});
 
     const query = `
-      query auditResponses {
-        auditResponses {
+      query auditResponses(
+        $supplierSearch: String,
+        $publishDate: Date,
+        $closeDate: Date
+      ) {
+        auditResponses(
+          supplierSearch: $supplierSearch,
+          publishDate: $publishDate,
+          closeDate: $closeDate
+        ) {
           _id
           auditId
+
+          supplier {
+            basicInfo {
+              enName
+              sapNumber
+            }
+          }
         }
       }
     `;
 
-    await auditResponseFactory({});
+    const supplier = await companyFactory({
+      enName: 'enName',
+      sapNumber: 'number',
+    });
 
-    const response = await graphqlRequest(query, 'auditResponses');
+    const audit1 = await auditFactory({
+      publishDate: moment(),
+      closeDate: moment().add(1, 'days'),
+    });
+
+    await auditResponseFactory({ auditId: audit1._id });
+
+    const audit2 = await auditFactory({
+      publishDate: moment().add(-9, 'days'),
+      closeDate: moment().add(-10, 'days'),
+    });
+
+    await auditResponseFactory({ supplierId: supplier._id, auditId: audit2._id });
+
+    // supplier search ===================
+    let args = { supplierSearch: 'enName' };
+    let response = await graphqlRequest(query, 'auditResponses', args);
+
+    expect(response.length).toBe(1);
+
+    // dates search ===================
+    args = {
+      publishDate: moment().add(-1, 'days'),
+      closeDate: moment().add(2, 'days'),
+    };
+
+    response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);
   });

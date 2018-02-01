@@ -219,7 +219,12 @@ export const queries = `
   audits: [Audit]
   auditDetail(_id: String!): Audit
 
-  auditResponses: [AuditResponse]
+  auditResponses(
+    supplierSearch: String,
+    publishDate: Date,
+    closeDate: Date,
+  ): [AuditResponse]
+
   auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
   auditResponseByUser(auditId: String!): AuditResponse
 
