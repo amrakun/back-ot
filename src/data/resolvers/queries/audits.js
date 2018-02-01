@@ -20,8 +20,19 @@ const auditQueries = {
   /**
    * Audit responses
    */
-  async auditResponses(root, { supplierSearch }) {
+  async auditResponses(root, { supplierSearch, publishDate, closeDate }) {
     const query = await supplierFilter({}, supplierSearch);
+
+    if (publishDate && closeDate) {
+      const audits = await Audits.find({
+        publishDate: { $gte: publishDate },
+        closeDate: { $lte: closeDate },
+      });
+
+      const auditIds = audits.map(audit => audit._id);
+
+      query.auditId = { $in: auditIds };
+    }
 
     return AuditResponses.find(query);
   },

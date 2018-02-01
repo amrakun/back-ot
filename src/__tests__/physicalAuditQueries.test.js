@@ -53,11 +53,11 @@ describe('Company queries', () => {
 
     await physicalAuditFactory({});
 
-    const supplier = await companyFactory({ enName: 'enName' });
+    const supplier = await companyFactory({ enName: 'enNameTest' });
 
     await physicalAuditFactory({ supplierId: supplier._id });
 
-    const args = { supplierSearch: 'en' };
+    const args = { supplierSearch: 'enNameTest' };
     const response = await graphqlRequest(query, 'physicalAudits', args);
 
     expect(response.length).toBe(1);

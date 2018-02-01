@@ -221,6 +221,8 @@ export const queries = `
 
   auditResponses(
     supplierSearch: String,
+    publishDate: Date,
+    closeDate: Date,
   ): [AuditResponse]
 
   auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
