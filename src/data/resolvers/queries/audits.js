@@ -1,5 +1,6 @@
 import { Audits, AuditResponses } from '../../../db/models';
 import { requireBuyer, requireSupplier } from '../../permissions';
+import { supplierFilter } from './utils';
 
 const auditQueries = {
   /**
@@ -19,8 +20,10 @@ const auditQueries = {
   /**
    * Audit responses
    */
-  auditResponses() {
-    return AuditResponses.find({});
+  async auditResponses(root, { supplierSearch }) {
+    const query = await supplierFilter({}, supplierSearch);
+
+    return AuditResponses.find(query);
   },
 
   /**

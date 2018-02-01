@@ -14,7 +14,7 @@ export const types = `
 `;
 
 export const queries = `
-  physicalAudits: [PhysicalAudit]
+  physicalAudits(supplierSearch: String): [PhysicalAudit]
   physicalAuditDetail(_id: String!): PhysicalAudit
 `;
 

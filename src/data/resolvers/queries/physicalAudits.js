@@ -1,12 +1,15 @@
 import { PhysicalAudits } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
+import { supplierFilter } from './utils';
 
 const physicalAuditQueries = {
   /**
    * PhysicalAudits list
    */
-  physicalAudits() {
-    return PhysicalAudits.find({});
+  async physicalAudits(root, { supplierSearch }) {
+    const query = await supplierFilter({}, supplierSearch);
+
+    return PhysicalAudits.find(query);
   },
 
   /**

@@ -278,17 +278,31 @@ describe('Company queries', () => {
     await AuditResponses.remove({});
 
     const query = `
-      query auditResponses {
-        auditResponses {
+      query auditResponses($supplierSearch: String) {
+        auditResponses(supplierSearch: $supplierSearch) {
           _id
           auditId
+
+          supplier {
+            basicInfo {
+              enName
+              sapNumber
+            }
+          }
         }
       }
     `;
 
-    await auditResponseFactory({});
+    const supplier = await companyFactory({
+      enName: 'enName',
+      sapNumber: 'number',
+    });
 
-    const response = await graphqlRequest(query, 'auditResponses');
+    await auditResponseFactory({});
+    await auditResponseFactory({ supplierId: supplier._id });
+
+    const args = { supplierSearch: 'enName' };
+    const response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);
   });
