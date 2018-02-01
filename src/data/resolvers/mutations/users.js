@@ -182,9 +182,11 @@ const userMutations = {
       toEmails: [receivedUser.email],
       title: 'Delegation',
       template: {
-        name: 'base',
+        name: 'delegation',
         data: {
-          content: reason,
+          reason: reason,
+          user,
+          receivedUser,
         },
       },
     });
