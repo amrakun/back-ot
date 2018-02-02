@@ -1,3 +1,6 @@
+/* eslint-disable max-len */
+
+import { BlockedCompanies } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
 export const companyDetailExport = async supplier => {
@@ -787,6 +790,71 @@ export const companyDetailExport = async supplier => {
   return generateXlsx(workbook, 'company_detail_export');
 };
 
-export default {
-  companyDetailExport,
+/**
+ * Export companies list
+ * @param {Object} args - Query params
+ * @return {String} - file url
+ */
+export const companiesExport = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('suppliers');
+
+  let rowIndex = 1;
+
+  for (let company of companies) {
+    rowIndex++;
+
+    const basicInfo = company.basicInfo || {};
+    const contactInfo = company.contactInfo || {};
+
+    sheet.cell(rowIndex, 1).value(basicInfo.enName);
+    sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+    sheet.cell(rowIndex, 3).value(company.isSentRegistrationInfo);
+    sheet.cell(rowIndex, 4).value(company.isPrequalified);
+    sheet.cell(rowIndex, 5).value(company.isQualfied);
+    sheet.cell(rowIndex, 6).value(company.isProductsInfoValidated);
+    sheet.cell(rowIndex, 7).value(Boolean(company.dueDiligences));
+    sheet.cell(rowIndex, 8).value(company.averageDifotScore);
+    sheet.cell(rowIndex, 9).value(await BlockedCompanies.isBlocked(company._id));
+    sheet.cell(rowIndex, 11).value(contactInfo.email);
+    sheet.cell(rowIndex, 12).value(contactInfo.phone);
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers');
+};
+
+/**
+ * Export companies list with validated products info
+ * @param {Object} args - Query params
+ * @return {String} - file url
+ */
+export const companiesValidatedProductsInfoExport = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('suppliers_products_info');
+
+  let rowIndex = 1;
+
+  for (let company of companies) {
+    rowIndex++;
+
+    const basicInfo = company.basicInfo || {};
+    const contactInfo = company.contactInfo || {};
+
+    const total = company.productsInfo.length;
+    const validated = company.validatedProductsInfo.length;
+
+    sheet.cell(rowIndex, 1).value(basicInfo.enName);
+    sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+    sheet.cell(rowIndex, 3).value(company.tierType);
+    sheet.cell(rowIndex, 4).value(company.isProductsInfoValidated);
+    sheet.cell(rowIndex, 5).value(`Total: ${total} | Validated: ${validated}`);
+    sheet.cell(rowIndex, 6).value(company.productsInfoLastValidatedDate.toLocaleDateString());
+    sheet.cell(rowIndex, 7).value(company.isProductsInfoValidated);
+    sheet.cell(rowIndex, 9).value(contactInfo.email);
+    sheet.cell(rowIndex, 10).value(contactInfo.phone);
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers_products_info');
 };

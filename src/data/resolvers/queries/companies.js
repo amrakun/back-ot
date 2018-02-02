@@ -2,7 +2,11 @@ import { Companies, BlockedCompanies } from '../../../db/models';
 import { paginate } from './utils';
 import { readTemplate, generateXlsx } from '../../utils';
 import { requireBuyer } from '../../permissions';
-import { companyDetailExport } from './companyExports';
+import {
+  companyDetailExport,
+  companiesExport,
+  companiesValidatedProductsInfoExport,
+} from './companyExports';
 
 /*
  * Filter companies
@@ -124,32 +128,19 @@ const companyQueries = {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    // read template
-    const { workbook, sheet } = await readTemplate('suppliers');
+    return companiesExport(companies);
+  },
 
-    let rowIndex = 1;
+  /**
+   * Export companies list with validated products info
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async companiesValidatedProductsInfoExport(root, args) {
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
 
-    for (let company of companies) {
-      rowIndex++;
-
-      const basicInfo = company.basicInfo || {};
-      const contactInfo = company.contactInfo || {};
-
-      sheet.cell(rowIndex, 1).value(basicInfo.enName);
-      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
-      sheet.cell(rowIndex, 3).value(company.isSentRegistrationInfo);
-      sheet.cell(rowIndex, 4).value(company.isPrequalified);
-      sheet.cell(rowIndex, 5).value(company.isQualfied);
-      sheet.cell(rowIndex, 6).value(company.isProductsInfoValidated);
-      sheet.cell(rowIndex, 7).value(Boolean(company.dueDiligences));
-      sheet.cell(rowIndex, 8).value(company.averageDifotScore);
-      sheet.cell(rowIndex, 9).value(await BlockedCompanies.isBlocked(company._id));
-      sheet.cell(rowIndex, 11).value(contactInfo.email);
-      sheet.cell(rowIndex, 12).value(contactInfo.phone);
-    }
-
-    // Write to file.
-    return generateXlsx(workbook, 'suppliers');
+    return companiesValidatedProductsInfoExport(companies);
   },
 
   /**
@@ -272,6 +263,7 @@ const companyQueries = {
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
 requireBuyer(companyQueries, 'companyDetailExport');
+requireBuyer(companyQueries, 'companiesValidatedProductsInfoExport');
 requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 

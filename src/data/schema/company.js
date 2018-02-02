@@ -389,6 +389,7 @@ const queryParams = `
 export const queries = `
   companies(${queryParams}): [Company]
   companiesExport(${queryParams}): String
+  companiesValidatedProductsInfoExport(${queryParams}): String
   companiesGenerateDifotScoreList(${queryParams}): String
 
   companyDetail(_id: String!): Company
