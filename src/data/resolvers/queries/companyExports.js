@@ -884,3 +884,41 @@ export const companiesGenerateDifotScoreList = async companies => {
   // Write to file.
   return generateXlsx(workbook, 'difot_score');
 };
+
+/**
+ * Due diligence list
+ * @param [Object] companies - filtered companies
+ * @return {String} - file url
+ */
+export const companiesGenerateDueDiligenceList = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('suppliers_due_diligence');
+
+  let rowIndex = 1;
+
+  for (let company of companies) {
+    rowIndex++;
+
+    const basicInfo = company.basicInfo || {};
+    const contactInfo = company.contactInfo || {};
+
+    const lastDueDiligence = company.getLastDueDiligence();
+
+    sheet.cell(rowIndex, 1).value(basicInfo.enName);
+    sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
+    sheet.cell(rowIndex, 3).value(company.tierType);
+    sheet.cell(rowIndex, 4).value(company.isPrequalified);
+
+    if (lastDueDiligence) {
+      sheet.cell(rowIndex, 5).value(lastDueDiligence.file.url);
+      sheet.cell(rowIndex, 6).value(new Date(lastDueDiligence.date).toLocaleDateString());
+    }
+
+    sheet.cell(rowIndex, 7).value('');
+    sheet.cell(rowIndex, 8).value(contactInfo.email);
+    sheet.cell(rowIndex, 9).value(contactInfo.phone);
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers_due_diligence');
+};

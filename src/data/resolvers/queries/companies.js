@@ -5,6 +5,7 @@ import {
   companyDetailExport,
   companiesExport,
   companiesGenerateDifotScoreList,
+  companiesGenerateDueDiligenceList,
   companiesValidatedProductsInfoExport,
 } from './companyExports';
 
@@ -156,6 +157,18 @@ const companyQueries = {
   },
 
   /**
+   * Due diligence list
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async companiesGenerateDueDiligenceList(root, args) {
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
+
+    return companiesGenerateDueDiligenceList(companies);
+  },
+
+  /**
    * Get logged in user's company
    * @param {Object} args
    * @return {Promise} found company
@@ -249,5 +262,7 @@ requireBuyer(companyQueries, 'companyDetailExport');
 requireBuyer(companyQueries, 'companiesValidatedProductsInfoExport');
 requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
+requireBuyer(companyQueries, 'companiesGenerateDueDiligenceList');
+requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
 
 export default companyQueries;
