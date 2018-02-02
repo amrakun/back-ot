@@ -46,6 +46,38 @@ const auditQueries = {
   },
 
   /**
+   * Audit response total counts
+   */
+  async auditResponseTotalCounts() {
+    const audits = await Audits.find({});
+
+    let invited = 0;
+    let notResponded = 0;
+    let qualified = 0;
+    let sentImprovementPlan = 0;
+
+    for (const audit of audits) {
+      const supplierIds = audit.supplierIds || [];
+
+      invited += supplierIds.length;
+
+      const responses = await AuditResponses.find({ auditId: audit._id });
+
+      notResponded += supplierIds.length - responses.length;
+
+      qualified += responses.filter(r => r.isQualified).length;
+      sentImprovementPlan += responses.filter(r => r.improvementPlanSentDate).length;
+    }
+
+    return {
+      invited,
+      notResponded,
+      qualified,
+      sentImprovementPlan,
+    };
+  },
+
+  /**
    * Audit response detail
    */
   auditResponseDetail(root, { auditId, supplierId }) {

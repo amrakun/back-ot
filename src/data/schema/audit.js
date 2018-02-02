@@ -213,6 +213,13 @@ export const types = `
     supplier: Company
     audit: Audit
   }
+
+  type AuditResponseTotalCounts {
+    invited: Float
+    notResponded: Float
+    qualified: Float
+    sentImprovementPlan: Float
+  }
 `;
 
 export const queries = `
@@ -225,6 +232,8 @@ export const queries = `
     publishDate: Date,
     closeDate: Date,
   ): [AuditResponse]
+
+  auditResponseTotalCounts: AuditResponseTotalCounts
 
   auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
   auditResponseByUser(auditId: String!): AuditResponse

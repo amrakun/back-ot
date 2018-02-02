@@ -39,7 +39,15 @@ describe('Company queries', () => {
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['audits', 'auditDetail', 'auditResponses', 'auditResponseDetail']) {
+    const items = [
+      'audits',
+      'auditDetail',
+      'auditResponses',
+      'auditResponseTotalCounts',
+      'auditResponseDetail',
+    ];
+
+    for (let query of items) {
       checkLogin(queries[query], {}, { user });
     }
   });
@@ -277,8 +285,6 @@ describe('Company queries', () => {
   });
 
   test('audit responses', async () => {
-    await AuditResponses.remove({});
-
     const query = `
       query auditResponses(
         $supplierSearch: String,
@@ -347,5 +353,42 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);
+  });
+
+  test('audit totals', async () => {
+    const query = `
+      query auditResponseTotalCounts {
+        auditResponseTotalCounts {
+          invited
+          notResponded
+          qualified
+          sentImprovementPlan
+        }
+      }
+    `;
+
+    const sup1 = await companyFactory({});
+    const sup2 = await companyFactory({});
+    const audit1 = await auditFactory({ supplierIds: [sup1._id, sup2._id] });
+    await auditResponseFactory({ auditId: audit1._id, supplierId: sup1._id });
+
+    const sup3 = await companyFactory({});
+    const sup4 = await companyFactory({});
+    const audit2 = await auditFactory({ supplierIds: [sup3._id, sup4._id] });
+    await auditResponseFactory({ auditId: audit2._id, supplierId: sup4._id });
+
+    await auditResponseFactory({ isQualified: true });
+    await auditResponseFactory({ isQualified: true });
+    await auditResponseFactory({ improvementPlanSentDate: new Date() });
+
+    const response = await graphqlRequest(query, 'auditResponseTotalCounts', {});
+
+    expect(response.invited).toBe(7);
+
+    // audit1 - 1, audit2 - 1
+    expect(response.notResponded).toBe(2);
+
+    expect(response.qualified).toBe(2);
+    expect(response.sentImprovementPlan).toBe(1);
   });
 });

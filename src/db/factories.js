@@ -598,6 +598,7 @@ export const auditResponseFactory = async (params = {}) => {
     isQualified: params.isQualified || false,
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
     improvementPlanFile: params.improvementPlanFile,
+    improvementPlanSentDate: params.improvementPlanSentDate,
     reportFile: params.reportFile,
   });
 
