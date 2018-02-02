@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { Tenders, TenderResponses } from '../../../db/models';
-import { readTemplate, generateXlsx } from '../../utils';
-import { paginate } from './utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
+import { paginate } from './utils';
+import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
 
 /*
  * Tender list & tender export helper
@@ -97,27 +97,18 @@ const tenderQueries = {
     const query = await tenderFilter(args);
     const tenders = await Tenders.find(query).sort({ createdDate: -1 });
 
-    // read template
-    const { workbook, sheet } = await readTemplate('tenders');
+    return tendersExport(tenders);
+  },
 
-    let rowIndex = 1;
+  /**
+   * Generate tender materials template for supplier
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async tenderGenerateMaterialsTemplate(root, { tenderId }) {
+    const tender = await Tenders.findOne({ _id: tenderId });
 
-    for (let tender of tenders) {
-      rowIndex++;
-
-      sheet.cell(rowIndex, 1).value(tender.status);
-      sheet.cell(rowIndex, 2).value(tender.number);
-      sheet.cell(rowIndex, 3).value(tender.name);
-      sheet.cell(rowIndex, 4).value(tender.publishDate);
-      sheet.cell(rowIndex, 5).value(tender.closeDate);
-      sheet.cell(rowIndex, 6).value(tender.requestedCount());
-      sheet.cell(rowIndex, 7).value(await tender.submittedCount());
-      sheet.cell(rowIndex, 8).value(await tender.notInterestedCount());
-      sheet.cell(rowIndex, 9).value(await tender.notRespondedCount());
-    }
-
-    // Write to file.
-    return generateXlsx(workbook, 'tenders');
+    return tenderGenerateMaterialsTemplate(tender);
   },
 
   /**
@@ -229,6 +220,7 @@ const tenderQueries = {
 
 requireSupplier(tenderQueries, 'tendersSupplier');
 requireSupplier(tenderQueries, 'tenderDetailSupplier');
+requireSupplier(tenderQueries, 'tenderGenerateMaterialsTemplate');
 
 requireBuyer(tenderQueries, 'tenders');
 requireBuyer(tenderQueries, 'tendersExport');

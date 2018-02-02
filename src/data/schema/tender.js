@@ -124,6 +124,7 @@ export const queries = `
 
   tenderDetail(_id: String!): Tender
   tenderDetailSupplier(_id: String!): SupplierTender
+  tenderGenerateMaterialsTemplate(tenderId: String!): String
 
   tenderResponses(page: Int, perPage: Int): [TenderResponse]
   tenderResponseDetail(_id: String!): TenderResponse

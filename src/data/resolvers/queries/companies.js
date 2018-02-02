@@ -1,10 +1,10 @@
 import { Companies, BlockedCompanies } from '../../../db/models';
 import { paginate } from './utils';
-import { readTemplate, generateXlsx } from '../../utils';
 import { requireBuyer } from '../../permissions';
 import {
   companyDetailExport,
   companiesExport,
+  companiesGenerateDifotScoreList,
   companiesValidatedProductsInfoExport,
 } from './companyExports';
 
@@ -152,24 +152,7 @@ const companyQueries = {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    // read template
-    const { workbook, sheet } = await readTemplate('difot_score');
-
-    let rowIndex = 1;
-
-    for (let company of companies) {
-      rowIndex++;
-
-      const basicInfo = company.basicInfo || {};
-
-      sheet.cell(rowIndex, 1).value(basicInfo.sapNumber);
-      sheet.cell(rowIndex, 2).value(basicInfo.enName);
-      sheet.cell(rowIndex, 3).value('');
-      sheet.cell(rowIndex, 4).value('');
-    }
-
-    // Write to file.
-    return generateXlsx(workbook, 'difot_score');
+    return companiesGenerateDifotScoreList(companies);
   },
 
   /**

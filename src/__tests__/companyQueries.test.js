@@ -85,11 +85,18 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     const user = await userFactory({ isSupplier: true });
 
-    for (let query of ['companies', 'companiesExport', 'companyDetailExport']) {
+    const items = [
+      'companies',
+      'companiesExport',
+      'companyDetailExport',
+      'companiesValidatedProductsInfoExport',
+    ];
+
+    for (let query of items) {
       checkLogin(queries[query], {}, { user });
     }
   });

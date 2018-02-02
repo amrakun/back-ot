@@ -792,7 +792,7 @@ export const companyDetailExport = async supplier => {
 
 /**
  * Export companies list
- * @param {Object} args - Query params
+ * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
 export const companiesExport = async companies => {
@@ -826,7 +826,7 @@ export const companiesExport = async companies => {
 
 /**
  * Export companies list with validated products info
- * @param {Object} args - Query params
+ * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
 export const companiesValidatedProductsInfoExport = async companies => {
@@ -857,4 +857,30 @@ export const companiesValidatedProductsInfoExport = async companies => {
 
   // Write to file.
   return generateXlsx(workbook, 'suppliers_products_info');
+};
+
+/**
+ * Difot score list
+ * @param [Object] companies - filtered companies
+ * @return {String} - file url
+ */
+export const companiesGenerateDifotScoreList = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('difot_score');
+
+  let rowIndex = 1;
+
+  for (let company of companies) {
+    rowIndex++;
+
+    const basicInfo = company.basicInfo || {};
+
+    sheet.cell(rowIndex, 1).value(basicInfo.sapNumber);
+    sheet.cell(rowIndex, 2).value(basicInfo.enName);
+    sheet.cell(rowIndex, 3).value('');
+    sheet.cell(rowIndex, 4).value('');
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'difot_score');
 };
