@@ -321,7 +321,8 @@ export const types = `
 
   input CompanyDueDiligenceInput {
     supplierId: String!
-    file: JSON
+    file: JSON!
+    expireDate: Date!
   }
 
   type Company {

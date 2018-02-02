@@ -287,7 +287,13 @@ describe('Company mutations', () => {
 
   test('add due diligence', async () => {
     const supplier = await companyFactory({
-      dueDiligences: [{ date: new Date(), file: { name: 'name', url: '/path1' } }],
+      dueDiligences: [
+        {
+          date: new Date(),
+          file: { name: 'name', url: '/path1' },
+          expireDate: new Date(),
+        },
+      ],
     });
 
     const mutation = `
@@ -302,13 +308,24 @@ describe('Company mutations', () => {
       user: await userFactory({ companyId: _company._id }),
     };
 
-    const dueDiligences = [{ supplierId: supplier._id, file: { url: '/path2' } }];
+    const dueDiligences = [
+      {
+        supplierId: supplier._id,
+        file: { url: '/path2' },
+        expireDate: new Date(),
+      },
+    ];
 
     await graphqlRequest(mutation, 'companiesAddDueDiligences', { dueDiligences }, context);
 
     const updatedSupplier = await Companies.findOne({ _id: supplier._id });
 
     expect(updatedSupplier.dueDiligences.length).toBe(2);
+
+    const lastDueDiligence = updatedSupplier.getLastDueDiligence();
+
+    expect(lastDueDiligence.file.url).toBe('/path2');
+    expect(lastDueDiligence.expireDate).toBeDefined();
   });
 
   test('validate products info', async () => {

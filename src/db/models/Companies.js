@@ -392,6 +392,15 @@ const DateAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
+const DueDiligencSchema = mongoose.Schema(
+  {
+    date: field({ type: String }),
+    file: FileSchema,
+    expireDate: field({ type: String }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   createdDate: field({ type: Date }),
@@ -429,7 +438,7 @@ const CompanySchema = mongoose.Schema({
   isPrequalified: field({ type: Boolean, optional: true }),
   isQualified: field({ type: Boolean, optional: true }),
 
-  dueDiligences: field({ type: [DateFileSchema], optional: true }),
+  dueDiligences: field({ type: [DueDiligencSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
   averageDifotScore: field({ type: Number, optional: true }),
 });
@@ -562,10 +571,10 @@ class Company {
    * @param {String} file - File path
    * @return updated company
    */
-  async addDueDiligence(file) {
+  async addDueDiligence({ file, expireDate }) {
     const dueDiligences = this.dueDiligences || [];
 
-    dueDiligences.push({ date: new Date(), file });
+    dueDiligences.push({ date: new Date(), file, expireDate });
 
     // update field
     await this.update({ dueDiligences });

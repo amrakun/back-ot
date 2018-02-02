@@ -22,7 +22,7 @@ const companyMutations = {
       const company = await Companies.findOne({ _id: dueDiligence.supplierId });
 
       // add new due diligence report to every supplier
-      await company.addDueDiligence(dueDiligence.file);
+      await company.addDueDiligence(dueDiligence);
     }
   },
 
