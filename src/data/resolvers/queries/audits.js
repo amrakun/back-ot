@@ -20,8 +20,10 @@ const auditQueries = {
   /**
    * Audit responses
    */
-  async auditResponses(root, { supplierSearch, publishDate, closeDate }) {
-    const query = await supplierFilter({}, supplierSearch);
+  async auditResponses(root, { supplierSearch, isFileGenerated, publishDate, closeDate }) {
+    const query = {
+      $and: [await supplierFilter({}, supplierSearch)],
+    };
 
     if (publishDate && closeDate) {
       const audits = await Audits.find({
@@ -31,7 +33,13 @@ const auditQueries = {
 
       const auditIds = audits.map(audit => audit._id);
 
-      query.auditId = { $in: auditIds };
+      query.$and.push({ auditId: { $in: auditIds } });
+    }
+
+    if (isFileGenerated) {
+      query.$and.push({
+        $or: [{ improvementPlanFile: { $ne: null } }, { reportFile: { $ne: null } }],
+      });
     }
 
     return AuditResponses.find(query);

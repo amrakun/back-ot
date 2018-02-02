@@ -221,6 +221,7 @@ export const queries = `
 
   auditResponses(
     supplierSearch: String,
+    isFileGenerated: Boolean,
     publishDate: Date,
     closeDate: Date,
   ): [AuditResponse]

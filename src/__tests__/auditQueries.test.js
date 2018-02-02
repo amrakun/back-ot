@@ -282,11 +282,13 @@ describe('Company queries', () => {
     const query = `
       query auditResponses(
         $supplierSearch: String,
+        $isFileGenerated: Boolean,
         $publishDate: Date,
         $closeDate: Date
       ) {
         auditResponses(
           supplierSearch: $supplierSearch,
+          isFileGenerated: $isFileGenerated,
           publishDate: $publishDate,
           closeDate: $closeDate
         ) {
@@ -308,13 +310,15 @@ describe('Company queries', () => {
       sapNumber: 'number',
     });
 
+    // response 1 ===
     const audit1 = await auditFactory({
       publishDate: moment(),
       closeDate: moment().add(1, 'days'),
     });
 
-    await auditResponseFactory({ auditId: audit1._id });
+    await auditResponseFactory({ auditId: audit1._id, reportFile: '/path' });
 
+    // respose 2 ===
     const audit2 = await auditFactory({
       publishDate: moment().add(-9, 'days'),
       closeDate: moment().add(-10, 'days'),
@@ -334,6 +338,12 @@ describe('Company queries', () => {
       closeDate: moment().add(2, 'days'),
     };
 
+    response = await graphqlRequest(query, 'auditResponses', args);
+
+    expect(response.length).toBe(1);
+
+    // isFileGenerated search ===================
+    args = { isFileGenerated: true };
     response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);
