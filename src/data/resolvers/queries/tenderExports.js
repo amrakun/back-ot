@@ -36,7 +36,7 @@ export const tendersExport = async tenders => {
  */
 export const tenderGenerateMaterialsTemplate = async tender => {
   // read template
-  const { workbook, sheet } = await readTemplate('rfq_requested_products');
+  const { workbook, sheet } = await readTemplate('rfq_responded_products');
 
   const requestedProducts = tender.requestedProducts;
 
@@ -55,5 +55,5 @@ export const tenderGenerateMaterialsTemplate = async tender => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'rfq_requested_products');
+  return generateXlsx(workbook, 'rfq_responded_products');
 };

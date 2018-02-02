@@ -220,7 +220,6 @@ const tenderQueries = {
 
 requireSupplier(tenderQueries, 'tendersSupplier');
 requireSupplier(tenderQueries, 'tenderDetailSupplier');
-requireSupplier(tenderQueries, 'tenderGenerateMaterialsTemplate');
 
 requireBuyer(tenderQueries, 'tenders');
 requireBuyer(tenderQueries, 'tendersExport');
