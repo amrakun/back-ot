@@ -27,6 +27,7 @@ export const PERMISSION_LIST = [
   'tenderResponsesEoiBidderList',
   'feedbacksAdd',
   'companiesGenerateDifotScoreList',
+  'companiesGenerateDueDiligenceList',
   'companiesAddDifotScores',
   'qualificationsPrequalify',
   'qualificationsSaveTierType',
@@ -60,7 +61,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Due diligence',
-    permissions: ['companiesAddDueDiligences'],
+    permissions: ['companiesAddDueDiligences', 'companiesGenerateDueDiligenceList'],
   },
   {
     name: 'Blocking',
