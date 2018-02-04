@@ -481,4 +481,191 @@ describe('Tender queries', () => {
     expect(response.isParticipated).toBe(false);
     expect(response.isSent).toBe(false);
   });
+
+  test('tender responses search & sort', async () => {
+    const tender = await tenderFactory({});
+    const user = await userFactory({ isSupplier: false });
+    const supplier = await companyFactory({ enName: 'enName' });
+
+    const tr1 = await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier._id,
+      isSent: true,
+      respondedProducts: [
+        {
+          code: 'code1',
+          unitPrice: 300,
+          totalPrice: 1000,
+          leadTime: 2000,
+        },
+        {
+          code: 'code2',
+          unitPrice: 200,
+          totalPrice: 2000,
+          leadTime: 3000,
+        },
+      ],
+    });
+
+    const tr2 = await tenderResponseFactory({
+      tenderId: tender._id,
+      isSent: true,
+      respondedProducts: [
+        {
+          code: 'code1',
+          unitPrice: 200,
+          totalPrice: 100,
+          leadTime: 200,
+        },
+        {
+          code: 'code2',
+          unitPrice: 20,
+          totalPrice: 200,
+          leadTime: 300,
+        },
+      ],
+    });
+
+    const tr3 = await tenderResponseFactory({
+      tenderId: tender._id,
+      isSent: true,
+      respondedProducts: [
+        {
+          code: 'code1',
+          unitPrice: 100,
+          totalPrice: 300,
+          leadTime: 300,
+        },
+        {
+          code: 'code2',
+          unitPrice: 40,
+          totalPrice: 500,
+          leadTime: 80,
+        },
+      ],
+    });
+
+    const doQuery = (sort, betweenSearch, supplierSearch) =>
+      graphqlRequest(
+        `query tenderResponses(
+          $tenderId: String!,
+          $sort: JSON,
+          $betweenSearch: JSON,
+          $supplierSearch: String
+        ) {
+          tenderResponses(
+            tenderId: $tenderId,
+            sort: $sort,
+            betweenSearch: $betweenSearch,
+            supplierSearch: $supplierSearch
+          ) {
+            _id
+          }
+        }
+      `,
+        'tenderResponses',
+        {
+          tenderId: tender._id,
+          sort,
+          betweenSearch,
+          supplierSearch,
+        },
+        { user },
+      );
+
+    // sort by minUnitPrice =============
+    let response = await doQuery({
+      name: 'minUnitPrice',
+      productCode: 'code1',
+    });
+
+    expect(response.length).toBe(3);
+
+    let [rr1, rr2, rr3] = response;
+
+    expect(rr1._id).toBe(tr3._id);
+    expect(rr2._id).toBe(tr2._id);
+    expect(rr3._id).toBe(tr1._id);
+
+    // sort by minLeadTime =============
+    response = await doQuery({
+      name: 'minLeadTime',
+      productCode: 'code1',
+    });
+
+    [rr1, rr2, rr3] = response;
+
+    expect(rr1._id).toBe(tr2._id);
+    expect(rr2._id).toBe(tr3._id);
+    expect(rr3._id).toBe(tr1._id);
+
+    // sort by totalPrice =============
+    response = await doQuery({
+      name: 'minTotalPrice',
+      productCode: 'code2',
+    });
+
+    [rr1, rr2, rr3] = response;
+
+    expect(rr1._id).toBe(tr2._id);
+    expect(rr2._id).toBe(tr3._id);
+    expect(rr3._id).toBe(tr1._id);
+
+    // search by between totalPrice =============
+    response = await doQuery(
+      {},
+      {
+        name: 'totalPrice',
+        productCode: 'code2',
+        minValue: 200,
+        maxValue: 500,
+      },
+    );
+
+    expect(response.length).toBe(2);
+
+    // search by between unitPrice =============
+    response = await doQuery(
+      {},
+      {
+        name: 'unitPrice',
+        productCode: 'code2',
+        minValue: 0,
+        maxValue: 30,
+      },
+    );
+
+    expect(response.length).toBe(1);
+
+    // search by between leadtime =============
+    response = await doQuery(
+      {},
+      {
+        name: 'leadTime',
+        productCode: 'code2',
+        minValue: 0,
+        maxValue: 300,
+      },
+    );
+
+    expect(response.length).toBe(2);
+
+    // by supplier search =============
+    response = await doQuery({}, {}, 'enName');
+
+    expect(response.length).toBe(1);
+
+    // by invalid product code =============
+    response = await doQuery(
+      {},
+      {
+        name: 'leadTime',
+        productCode: 'code3',
+        minValue: 0,
+        maxValue: 300,
+      },
+    );
+
+    expect(response.length).toBe(0);
+  });
 });
