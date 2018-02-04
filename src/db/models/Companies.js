@@ -130,7 +130,7 @@ const GroupInfoSchema = mongoose.Schema(
     parentRegistrationNumber: field({ type: String, optional: true }),
 
     // manufacturer, distributor, stocklist
-    role: field({ type: String }),
+    role: field({ type: [String] }),
 
     // Please provide details of the factory or factories involved in the
     // manufacture of this product

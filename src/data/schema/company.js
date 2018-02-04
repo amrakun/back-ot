@@ -68,7 +68,7 @@ const groupInfoFields = `
   parentName: String
   parentAddress: String
   parentRegistrationNumber: String
-  role: String!
+  role: [String!]!
   isExclusiveDistributor: Boolean
   authorizedDistributions: [String]
   attachments: [JSON]

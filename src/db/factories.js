@@ -180,7 +180,7 @@ export const companyDocs = {
       parentName: 'parentName',
       parentAddress: 'parentAddress',
       parentRegistrationNumber: 'parentRegistrationNumber',
-      role: 'manufacturer',
+      role: ['manufacturer'],
       isExclusiveDistributor: false,
       authorizedDistributions: ['1', '2'],
       attachments: [{ name: 'name', url: '/path1' }],
