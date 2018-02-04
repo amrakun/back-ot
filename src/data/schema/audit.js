@@ -306,9 +306,9 @@ export const mutations = `
   ): Audit
 
   auditsBuyerSendFiles(
-    auditId: String,
-    supplierId: String,
-    improvementPlan: Boolean,
-    report: Boolean,
+    auditId: String!,
+    supplierId: String!,
+    improvementPlan: String,
+    report: String,
   ): AuditResponse
 `;

@@ -383,8 +383,8 @@ describe('Audit mutations', () => {
       mutation auditsBuyerSendFiles(
         $auditId: String!,
         $supplierId: String!,
-        $improvementPlan: Boolean,
-        $report: Boolean
+        $improvementPlan: String,
+        $report: String
       ) {
 
         auditsBuyerSendFiles(
@@ -407,8 +407,8 @@ describe('Audit mutations', () => {
       {
         supplierId: _company._id,
         auditId: _audit._id,
-        improvementPlan: true,
-        report: true,
+        improvementPlan: '/improvementPlanPath',
+        report: '/reportPath',
       },
       { user: user },
     );

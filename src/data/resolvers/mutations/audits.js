@@ -53,17 +53,17 @@ const auditMutations = {
     // collection attachments =========
     const attachments = [];
 
-    if (improvementPlan && response.improvementPlanFile) {
+    if (improvementPlan) {
       attachments.push({
         filename: 'improvement_plan.xlsx',
-        path: response.improvementPlanFile,
+        path: improvementPlan,
       });
     }
 
-    if (report && response.reportFile) {
+    if (report) {
       attachments.push({
         filename: 'report.xlsx',
-        path: response.reportFile,
+        path: report,
       });
     }
 
