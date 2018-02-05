@@ -15,29 +15,29 @@ const BasicInfoSchema = mongoose.Schema(
   {
     enName: field({ type: String }),
     mnName: field({ type: String, optional: true }),
-    isRegisteredOnSup: field({ type: Boolean }),
+    isRegisteredOnSup: field({ type: Boolean, optional: true }),
     sapNumber: field({ type: String, optional: true }),
-    address: field({ type: String }),
+    address: field({ type: String, optional: true }),
     address2: field({ type: String, optional: true }),
     address3: field({ type: String, optional: true }),
-    townOrCity: field({ type: String }),
-    province: field({ type: String }),
-    zipCode: field({ type: Number }),
-    country: field({ type: String }),
-    registeredInCountry: field({ type: String }),
+    townOrCity: field({ type: String, optional: true }),
+    province: field({ type: String, optional: true }),
+    zipCode: field({ type: Number, optional: true }),
+    country: field({ type: String, optional: true }),
+    registeredInCountry: field({ type: String, optional: true }),
     registeredInAimag: field({ type: String, optional: true }),
     registeredInSum: field({ type: String, optional: true }),
     isChinese: field({ type: Boolean, optional: true }),
     isSubContractor: field({ type: Boolean, optional: true }),
-    corporateStructure: field({ type: String }),
-    registrationNumber: field({ type: Number }),
-    certificateOfRegistration: FileSchema,
-    email: field({ type: String }),
+    corporateStructure: field({ type: String, optional: true }),
+    registrationNumber: field({ type: Number, optional: true }),
+    certificateOfRegistration: field({ type: FileSchema, optional: true }),
+    email: field({ type: String, optional: true }),
     website: field({ type: String, optional: true }),
-    foreignOwnershipPercentage: field({ type: String }),
-    totalNumberOfEmployees: field({ type: Number }),
-    totalNumberOfMongolianEmployees: field({ type: Number }),
-    totalNumberOfUmnugoviEmployees: field({ type: Number }),
+    foreignOwnershipPercentage: field({ type: String, optional: true }),
+    totalNumberOfEmployees: field({ type: Number, optional: true }),
+    totalNumberOfMongolianEmployees: field({ type: Number, optional: true }),
+    totalNumberOfUmnugoviEmployees: field({ type: Number, optional: true }),
   },
   { _id: false },
 );
@@ -46,14 +46,14 @@ const BasicInfoSchema = mongoose.Schema(
 const ContactInfoSchema = mongoose.Schema(
   {
     name: field({ type: String }),
-    jobTitle: field({ type: String }),
-    address: field({ type: String }),
+    jobTitle: field({ type: String, optional: true }),
+    address: field({ type: String, optional: true }),
     address2: field({ type: String, optional: true }),
     address3: field({ type: String, optional: true }),
-    townOrCity: field({ type: String }),
-    province: field({ type: String }),
+    townOrCity: field({ type: String, optional: true }),
+    province: field({ type: String, optional: true }),
     zipCode: field({ type: Number, optional: true }),
-    country: field({ type: String }),
+    country: field({ type: String, optional: true }),
     phone: field({ type: Number }),
     phone2: field({ type: Number, optional: true }),
     email: field({ type: String }),
@@ -485,9 +485,10 @@ class Company {
    * @param userId - Permforming user id
    * @return {Promise} Newly created company object
    */
-  static async createCompany(userId) {
+  static async createCompany(userId, doc = {}) {
     const company = await this.create({
       createdDate: new Date(),
+      ...doc,
     });
 
     await Users.update({ _id: userId }, { $set: { companyId: company._id } });

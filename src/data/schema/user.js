@@ -26,6 +26,11 @@ export const types = `
     user: User
     delegatedUser: User
   }
+
+  type RegisterViaBuyerPayload {
+    user: User
+    company: Company
+  }
 `;
 
 export const queries = `
@@ -48,6 +53,13 @@ const commonParams = `
 
 export const mutations = `
   register(email: String!): String!
+
+  registerViaBuyer(
+    companyName: String!,
+    contactPersonName: String!,
+    contactPersonPhone: String!,
+    contactPersonEmail: String!,
+  ): RegisterViaBuyerPayload
 
   confirmRegistration(
     token: String!,

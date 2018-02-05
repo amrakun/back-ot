@@ -5,7 +5,7 @@ import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { ROLES } from '../data/constants';
 import { Users, Companies } from '../db/models';
-import { userFactory } from '../db/factories';
+import { userFactory, companyFactory } from '../db/factories';
 import userMutations from '../data/resolvers/mutations/users';
 import { PERMISSIONS } from '../data/constants';
 
@@ -20,11 +20,30 @@ describe('User mutations', () => {
   afterEach(async () => {
     // Clearing test data
     await Users.remove({});
+    await Companies.remove({});
+  });
+
+  test('Buyer required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(4);
+
+    const mutations = ['registerViaBuyer', 'usersAdd', 'usersEdit', 'usersRemove'];
+
+    const user = await userFactory({ isSupplier: true });
+
+    for (let mutation of mutations) {
+      checkLogin(userMutations[mutation], {}, { user });
+    }
   });
 
   test('Register', async () => {
-    Users.register = jest.fn(() => ({ _id: '_id' }));
-
     const mutation = `
       mutation register($email: String!) {
         register(email: $email)
@@ -33,14 +52,12 @@ describe('User mutations', () => {
 
     await graphqlRequest(mutation, 'register', { email: 'test@erxes.io' });
 
-    // register must be called
-    expect(Users.register).toBeCalledWith('test@erxes.io');
+    const user = await Users.findOne({ email: 'test@erxes.io' });
+
+    expect(user._id).toBeDefined();
   });
 
   test('Confirm registration', async () => {
-    Users.confirmRegistration = jest.fn(() => ({ _id: '_id' }));
-    Companies.createCompany = jest.fn(() => ({ _id: '_id' }));
-
     const mutation = `
       mutation confirmRegistration(
         $token: String!,
@@ -59,17 +76,30 @@ describe('User mutations', () => {
 
     const args = {
       token: 'token',
-      password: 'password',
-      passwordConfirmation: 'password',
+      password: 'pass',
+      passwordConfirmation: 'pass',
     };
 
-    await graphqlRequest(mutation, 'confirmRegistration', args);
+    const user = await userFactory({});
 
-    // confirmRegistration must be called
-    expect(Users.confirmRegistration).toBeCalledWith(args.token, args.password);
+    // valid tokens =================
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
 
-    // create company must be called
-    expect(Companies.createCompany).toBeCalledWith('_id');
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: tomorrow,
+        },
+      },
+    );
+
+    await graphqlRequest(mutation, 'confirmRegistration', args, { user });
+
+    expect(await Companies.find({}).count()).toBe(1);
   });
 
   const loginMutation = `
@@ -469,5 +499,83 @@ describe('User mutations', () => {
     expect(response.delegatedUserId.toString()).toBe(_user._id);
     expect(response.delegationStartDate).toBeDefined();
     expect(response.delegationEndDate).toBeDefined();
+  });
+
+  test('Register via buyer', async () => {
+    const mutation = `
+      mutation registerViaBuyer(
+        $companyName: String!,
+        $contactPersonName: String!,
+        $contactPersonPhone: String!,
+        $contactPersonEmail: String!,
+      ) {
+        registerViaBuyer(
+          companyName: $companyName,
+          contactPersonName: $contactPersonName,
+          contactPersonPhone: $contactPersonPhone,
+          contactPersonEmail: $contactPersonEmail,
+        ) {
+          user {
+            _id
+          }
+
+          company {
+            _id
+
+            basicInfo {
+              enName
+            }
+
+            contactInfo {
+              name
+              phone
+              email
+            }
+          }
+        }
+      }
+    `;
+
+    const doc = {
+      companyName: 'company',
+      contactPersonName: 'fullName',
+      contactPersonPhone: 242424242,
+      contactPersonEmail: 'test@gmail.com',
+    };
+
+    const doMutation = () => graphqlRequest(mutation, 'registerViaBuyer', doc);
+
+    // check user email existance ========
+    await userFactory({ email: doc.contactPersonEmail });
+
+    expect.assertions(8);
+
+    try {
+      await doMutation();
+    } catch (e) {
+      expect(e.toString()).toBe('GraphQLError: Invalid email');
+    }
+
+    // check company existance ========
+    await Users.remove({});
+    await companyFactory({ enName: doc.companyName });
+
+    try {
+      await doMutation();
+    } catch (e) {
+      expect(e.toString()).toBe('GraphQLError: Company already exists');
+    }
+
+    // successfull ==============
+    await Companies.remove({});
+    const response = await doMutation();
+
+    expect(response.user._id).toBeDefined();
+
+    expect(response.company._id).toBeDefined();
+    expect(response.company.basicInfo.enName).toBe(doc.companyName);
+    expect(response.company.contactInfo.name).toBe(doc.contactPersonName);
+    expect(response.company.contactInfo.phone).toBe(doc.contactPersonPhone);
+    expect(response.company.contactInfo.email).toBe(doc.contactPersonEmail);
   });
 });

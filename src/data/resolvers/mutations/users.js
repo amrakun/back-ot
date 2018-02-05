@@ -2,34 +2,72 @@ import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
 import { requireLogin, requireBuyer } from '../../permissions';
 
+const register = async email => {
+  const user = await Users.register(email);
+
+  // send email ==============
+  const { MAIN_APP_DOMAIN } = process.env;
+
+  const link = `${MAIN_APP_DOMAIN}/confirm-registration?token=${user.registrationToken}`;
+
+  utils.sendEmail({
+    toEmails: [email],
+    title: 'Registration',
+    template: {
+      name: 'registration',
+      data: {
+        content: link,
+      },
+    },
+  });
+
+  return { user, link };
+};
+
 const userMutations = {
   /*
    * Register
    * @param {String} email - User email
    * @return - Confirmation link
    */
-  async register(root, args) {
-    const { email } = args;
+  async register(root, { email }) {
+    const { link } = await register(email);
 
-    const user = await Users.register(email);
+    return link;
+  },
 
-    // send email ==============
-    const { MAIN_APP_DOMAIN } = process.env;
+  /*
+   * Register via buyer
+   * @param {String} companyName - Company name
+   * @param {String} contactPersonName - Contact person name
+   * @param {String} contactPersonPhone - Contact person phone
+   * @param {String} contactPersonEmail - Contact person email
+   * @return - Newly created company
+   */
+  async registerViaBuyer(root, args) {
+    const { companyName, contactPersonName, contactPersonPhone, contactPersonEmail } = args;
 
-    const link = `${MAIN_APP_DOMAIN}/confirm-registration?token=${user.registrationToken}`;
+    // check company duplication
+    if (await Companies.findOne({ 'basicInfo.enName': companyName })) {
+      throw new Error('Company already exists');
+    }
 
-    utils.sendEmail({
-      toEmails: [email],
-      title: 'Registration',
-      template: {
-        name: 'registration',
-        data: {
-          content: link,
-        },
+    const { user } = await register(contactPersonEmail);
+
+    // create company for new user
+    const company = await Companies.createCompany(user._id, {
+      basicInfo: {
+        enName: companyName,
+      },
+
+      contactInfo: {
+        name: contactPersonName,
+        phone: contactPersonPhone,
+        email: contactPersonEmail,
       },
     });
 
-    return link;
+    return { user, company };
   },
 
   /*
@@ -207,6 +245,7 @@ const userMutations = {
   },
 };
 
+requireBuyer(userMutations, 'registerViaBuyer');
 requireBuyer(userMutations, 'usersAdd');
 requireBuyer(userMutations, 'usersEdit');
 requireLogin(userMutations, 'usersChangePassword');
