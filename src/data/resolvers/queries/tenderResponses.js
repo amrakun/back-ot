@@ -9,9 +9,9 @@ const tenderResponseQueries = {
    * @return {Promise} filtered tenderResponses list by given parameters
    */
   async tenderResponses(root, args) {
-    const { sort = {}, betweenSearch = {}, supplierSearch } = args;
+    const { tenderId, sort = {}, betweenSearch = {}, supplierSearch } = args;
 
-    const query = await supplierFilter({ isSent: true }, supplierSearch);
+    const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch);
 
     const sortName = sort.name;
     const sortProductCode = sort.productCode;
