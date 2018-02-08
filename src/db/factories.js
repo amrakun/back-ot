@@ -238,6 +238,9 @@ export const companyDocs = {
     doesEmployeePoliticallyExposed: true,
     pepName: 'Lorem ipsum',
     organizationChartFile: { name: 'name', url: 'url' },
+
+    hasConvictedLabourLawsDescription: 'hasConvictedLabourLawsDescription',
+    hasConvictedForHumanRightsDescription: 'hasConvictedForHumanRightsDescription',
   }),
 
   environmental: () => ({
@@ -265,6 +268,7 @@ export const companyDocs = {
     doesHaveDocumentForIncidentInvestigationFile: { name: 'name', url: 'url' },
     doesHaveDocumentedFitness: false,
     doesHaveDocumentedFitnessFile: { name: 'name', url: 'url' },
+    areHSEResourcesClearlyIdentifiedFile: { name: 'name', url: 'url' },
     isWillingToComply: false,
     hasIndustrialAccident: false,
     tmha: 'tmha',

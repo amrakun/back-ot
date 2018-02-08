@@ -270,6 +270,9 @@ export const BusinessInfoSchema = mongoose.Schema(
     pepName: field({ type: String, optional: true }),
 
     organizationChartFile: field({ type: FileSchema }),
+
+    hasConvictedLabourLawsDescription: field({ type: String, optional: true }),
+    hasConvictedForHumanRightsDescription: field({ type: String, optional: true }),
   },
   { _id: false },
 );
@@ -317,6 +320,7 @@ export const HealthInfoSchema = mongoose.Schema(
     // Are HSE resources, roles, responsibilities and authority levels clearly
     // identified and defined within your Organisation?
     areHSEResourcesClearlyIdentified: field({ type: Boolean }),
+    areHSEResourcesClearlyIdentifiedFile: field({ type: FileSchema, optional: true }),
 
     // Does your company have a documented process to ensure all staff
     // receive health and safety training and induction?

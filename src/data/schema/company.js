@@ -136,6 +136,9 @@ export const businessInfoFields = `
   pepName: String
 
   organizationChartFile: JSON
+
+  hasConvictedLabourLawsDescription: String
+  hasConvictedForHumanRightsDescription: String
 `;
 
 // exporting to use in qualification
@@ -157,6 +160,7 @@ export const healthInfoFields = `
   doesHaveHealthSafetyFile: JSON
 
   areHSEResourcesClearlyIdentified: Boolean
+  areHSEResourcesClearlyIdentifiedFile: JSON
 
   doesHaveDocumentedProcessToEnsure: Boolean
   doesHaveDocumentedProcessToEnsureFile: JSON
