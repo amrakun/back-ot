@@ -208,14 +208,36 @@ describe('Tender queries', () => {
       }
     `;
 
+    const user = await userFactory();
     const t1Date = new Date();
     const t2Date = moment()
       .add(1, 'day')
       .endOf('day')
       .toDate(); // 1 days later
 
-    await tenderFactory({ publishDate: t1Date, type: 'rfq', status: 'open' });
-    await tenderFactory({ publishDate: t2Date, type: 'rfq', status: 'closed' });
+    // below tender must be ignored by createdUserId check ========
+    const ignoredUser = await userFactory();
+
+    await tenderFactory({
+      publishDate: t1Date,
+      type: 'rfq',
+      status: 'open',
+      createdUserId: ignoredUser._id,
+    });
+
+    await tenderFactory({
+      publishDate: t1Date,
+      type: 'rfq',
+      status: 'open',
+      createdUserId: user._id,
+    });
+
+    await tenderFactory({
+      publishDate: t2Date,
+      type: 'rfq',
+      status: 'closed',
+      createdUserId: user._id,
+    });
 
     const startDate = moment()
       .add(-1, 'day')
@@ -226,8 +248,9 @@ describe('Tender queries', () => {
       .endOf('day'); // 2 days later
 
     const args = { startDate, endDate, type: 'rfq' };
+    const context = { user };
 
-    const response = await graphqlRequest(qry, 'tenderCountByStatus', args);
+    const response = await graphqlRequest(qry, 'tenderCountByStatus', args, context);
 
     expect(response[t1Date.toLocaleDateString()]).toEqual({ open: 1, closed: 0 });
     expect(response[t2Date.toLocaleDateString()]).toEqual({ closed: 1, open: 0 });
@@ -248,9 +271,21 @@ describe('Tender queries', () => {
       }
     `;
 
+    // below tender must be ignored by createdUserId check =====
+    const ignoredUser = await userFactory();
+
     await tenderFactory({
       publishDate: new Date(),
       type: 'rfq',
+      createdUserId: ignoredUser._id,
+    });
+
+    const user = await userFactory({});
+
+    await tenderFactory({
+      publishDate: new Date(),
+      type: 'rfq',
+      createdUserId: user._id,
     });
 
     await tenderFactory({
@@ -259,6 +294,7 @@ describe('Tender queries', () => {
         .endOf('day')
         .toDate(), // 1 days later,
       type: 'eoi',
+      createdUserId: user._id,
     });
 
     const startDate = moment()
@@ -270,8 +306,9 @@ describe('Tender queries', () => {
       .endOf('day'); // 2 days later
 
     const args = { startDate, endDate, type: 'rfq' };
+    const context = { user };
 
-    const response = await graphqlRequest(qry, 'tendersTotalCount', args);
+    const response = await graphqlRequest(qry, 'tendersTotalCount', args, context);
 
     expect(response).toBe(1);
   });
@@ -291,6 +328,9 @@ describe('Tender queries', () => {
       }
     `;
 
+    // below tender must be ignored by createdUser check
+    const ignoredUser = await userFactory({});
+
     await tenderFactory({
       publishDate: moment(),
       closeDate: moment()
@@ -298,6 +338,19 @@ describe('Tender queries', () => {
         .endOf('day')
         .toDate(), // 3 days later
       type: 'rfq',
+      createdUserId: ignoredUser._id,
+    });
+
+    const user = await userFactory({});
+
+    await tenderFactory({
+      publishDate: moment(),
+      closeDate: moment()
+        .add(3, 'day')
+        .endOf('day')
+        .toDate(), // 3 days later
+      type: 'rfq',
+      createdUserId: user._id,
     });
 
     await tenderFactory({
@@ -310,6 +363,7 @@ describe('Tender queries', () => {
         .endOf('day')
         .toDate(), // 3 days later
       type: 'rfq',
+      createdUserId: user._id,
     });
 
     await tenderFactory({
@@ -322,6 +376,7 @@ describe('Tender queries', () => {
         .endOf('day')
         .toDate(), // 10 days later,
       type: 'eoi',
+      createdUserId: user._id,
     });
 
     await tenderFactory({
@@ -334,6 +389,7 @@ describe('Tender queries', () => {
         .endOf('day')
         .toDate(), // 20 days later,
       type: 'eoi',
+      createdUserId: user._id,
     });
 
     const startDate = moment().add(-1, 'day');
@@ -343,12 +399,12 @@ describe('Tender queries', () => {
 
     // ================ rfq
     let args = { startDate, endDate, type: 'rfq' };
-    let response = await graphqlRequest(qry, 'tendersAverageDuration', args);
+    let response = await graphqlRequest(qry, 'tendersAverageDuration', args, { user });
     expect(response).toBe(2.5);
 
     // ================ eoi
     args = { startDate, endDate, type: 'eoi' };
-    response = await graphqlRequest(qry, 'tendersAverageDuration', args);
+    response = await graphqlRequest(qry, 'tendersAverageDuration', args, { user });
     expect(response).toBe(13);
   });
 

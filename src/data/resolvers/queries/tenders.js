@@ -138,11 +138,12 @@ const tenderQueries = {
    * @param {String} type - Eoi or rfq
    * @return - Generated doc
    */
-  async tenderCountByStatus(root, { startDate, endDate, type }) {
+  async tenderCountByStatus(root, { startDate, endDate, type }, { user }) {
     // find tenders
     const tenders = await Tenders.find({
       publishDate: { $gte: startDate, $lte: endDate },
       type,
+      createdUserId: user._id,
     });
 
     const results = {};
@@ -181,10 +182,11 @@ const tenderQueries = {
    * @param {String} type - Eoi or rfq
    * @return - Total count
    */
-  tendersTotalCount(root, { startDate, endDate, type }) {
+  tendersTotalCount(root, { startDate, endDate, type }, { user }) {
     return Tenders.find({
       publishDate: { $gte: startDate, $lte: endDate },
       type,
+      createdUserId: user._id,
     }).count();
   },
 
@@ -195,10 +197,11 @@ const tenderQueries = {
    * @param {String} type - Eoi or rfq
    * @return - Total count
    */
-  async tendersAverageDuration(root, { startDate, endDate, type }) {
+  async tendersAverageDuration(root, { startDate, endDate, type }, { user }) {
     const tenders = await Tenders.find({
       publishDate: { $gte: startDate, $lte: endDate },
       type,
+      createdUserId: user._id,
     });
 
     // collect durations ====================
