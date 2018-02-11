@@ -48,6 +48,12 @@ import {
 
 import { types as PermissionTypes, queries as PermissionQueries } from './permission';
 
+import {
+  types as MassMailTypes,
+  queries as MassMailQueries,
+  mutations as MassMailMutations,
+} from './massMail';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -62,6 +68,7 @@ export const types = `
   ${PhysicalAuditTypes}
   ${ReportTypes}
   ${ConfigTypes}
+  ${MassMailTypes}
   ${PermissionTypes}
 `;
 
@@ -77,6 +84,7 @@ export const queries = `
     ${PhysicalAuditQueries}
     ${ReportQueries}
     ${ConfigQueries}
+    ${MassMailQueries}
     ${PermissionQueries}
   }
 `;
@@ -92,5 +100,6 @@ export const mutations = `
     ${AuditMutations}
     ${PhysicalAuditMutations}
     ${ConfigMutations}
+    ${MassMailMutations}
   }
 `;

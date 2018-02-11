@@ -11,6 +11,7 @@ import audits from './audits';
 import auditExports from './auditExports';
 import reports from './reports';
 import configs from './configs';
+import massMails from './massMails';
 import permissions from './permissions';
 
 export default {
@@ -27,5 +28,6 @@ export default {
   ...auditExports,
   ...reports,
   ...configs,
+  ...massMails,
   ...permissions,
 };

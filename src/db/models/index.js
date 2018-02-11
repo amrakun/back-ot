@@ -6,6 +6,7 @@ import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
+import MassMails from './MassMails';
 
 export {
   Companies,
@@ -20,4 +21,5 @@ export {
   AuditResponses,
   PhysicalAudits,
   Configs,
+  MassMails,
 };

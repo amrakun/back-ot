@@ -9,6 +9,7 @@ import qualifications from './qualifications';
 import audits from './audits';
 import physicalAudits from './physicalAudits';
 import configs from './configs';
+import massMails from './massMails';
 
 export default {
   ...companies,
@@ -22,4 +23,5 @@ export default {
   ...audits,
   ...physicalAudits,
   ...configs,
+  ...massMails,
 };
