@@ -2,7 +2,7 @@ import { readTemplate, generateXlsx } from '../../utils';
 import { Companies, Tenders, Audits } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
 
-const reportsSuppliersQuery = {
+const reportsQuery = {
   /**
    * Supplier list
    * @param {Object} args - Query params
@@ -27,7 +27,7 @@ const reportsSuppliersQuery = {
 
     let rowIndex = 1;
 
-    for (let it of suppliers) {
+    for (const it of suppliers) {
       rowIndex++;
 
       const basicInfo = it.basicInfo || {};
@@ -114,20 +114,17 @@ const reportsSuppliersQuery = {
 
     let rowIndex = 1;
 
-    for (let it of tenders) {
+    for (const it of tenders) {
       rowIndex++;
 
       sheet.cell(rowIndex, 1).value(rowIndex);
       sheet.cell(rowIndex, 2).value(it.number);
       sheet.cell(rowIndex, 3).value(it.name || '');
 
-      let suppliers = [];
+      const suppliers = await Companies.find({ _id: it.supplierIds }, { enName: 1 });
+      const supplierNames = suppliers.map(s => s.basicInfo && s.basicInfo.enName);
 
-      for (let supplier of await Companies.find({ _id: it.supplierIds }, { enName: 1 })) {
-        suppliers.push(supplier.enName);
-      }
-
-      sheet.cell(rowIndex, 4).value(suppliers.join());
+      sheet.cell(rowIndex, 4).value(supplierNames.join());
       sheet.cell(rowIndex, 5).value(it.type);
       sheet.cell(rowIndex, 6).value(it.publishDate.toString());
       sheet.cell(rowIndex, 7).value(it.closeDate.toString());
@@ -177,8 +174,8 @@ const reportsSuppliersQuery = {
       status: 1,
     });
 
-    let index = 4,
-      rowNo = 0;
+    let index = 4;
+    let rowNo = 0;
 
     for (let audit of audits) {
       const suppliers = await Companies.find({ _id: audit.supplierIds });
@@ -198,8 +195,75 @@ const reportsSuppliersQuery = {
 
     return generateXlsx(workbook, 'reports_audit_export');
   },
+
+  /**
+   * Supplier's shareholder owner report
+   * @return {String} file url of the generated reports_shareholder.xlsx
+   */
+  async reportsShareholder() {
+    const { workbook, sheet } = await readTemplate('reports_shareholder');
+    const suppliers = await Companies.find({});
+
+    let index = 5;
+
+    for (const supplier of suppliers) {
+      let colIndex = 0;
+
+      const fill = value => {
+        colIndex++;
+        sheet.cell(index, colIndex).value(value);
+      };
+
+      // basic info ================
+      const bi = (await supplier.basicInfo) || {};
+
+      fill(bi.enName);
+      fill(bi.website);
+      fill(bi.email);
+      fill(bi.address);
+      fill(bi.address2);
+      fill(bi.address3);
+
+      // contact info =================
+      const ci = (await supplier.contactInfo) || {};
+
+      fill(ci.name);
+      fill(ci.jobTitle);
+      fill(ci.phone);
+      fill(ci.phone2);
+      fill(ci.email);
+
+      // managment team info ===========
+      const mt = (await supplier.managementTeamInfo) || {};
+
+      const fillPerson = (doc = {}) => {
+        fill(doc.name);
+        fill(doc.jobTitle);
+        fill(doc.email);
+        fill(doc.phone);
+      };
+
+      fillPerson(mt.managingDirector);
+      fillPerson(mt.executiveOfficer);
+      fillPerson(mt.financialDirector);
+      fillPerson(mt.salesDirector);
+
+      // shareholders ===========
+      const shi = (await supplier.shareholderInfo) || { shareholders: [] };
+
+      for (const sh of shi.shareholders) {
+        fill(sh.name);
+        fill(sh.jobTitle);
+        fill(sh.percentage);
+      }
+
+      index++;
+    }
+
+    return generateXlsx(workbook, 'reports_shareholder');
+  },
 };
 
-moduleRequireBuyer(reportsSuppliersQuery);
+moduleRequireBuyer(reportsQuery);
 
-export default reportsSuppliersQuery;
+export default reportsQuery;

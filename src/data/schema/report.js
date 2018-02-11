@@ -27,4 +27,6 @@ export const queries = `
     publishDate: DateInterval,
     closeDate: DateInterval,
   ): String
+
+  reportsShareholder: String
 `;
