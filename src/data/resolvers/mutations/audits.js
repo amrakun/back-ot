@@ -41,9 +41,25 @@ const auditMutations = {
   },
 
   /**
+   * Save report files & reset dates
+   * @param {Boolean} improvementPlan - File path
+   * @param {Boolean} report - File path
+   * @return - Updated response
+   */
+  async auditsBuyerSaveFiles(root, { auditId, supplierId, improvementPlan, report }) {
+    const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
+
+    // save files
+    return response.saveFiles({
+      improvementPlanFile: improvementPlan,
+      reportFile: report,
+    });
+  },
+
+  /**
    * Send report files to supplier via email
-   * @param {Boolean} improvementPlan - Is sent improvementPlan email
-   * @param {Boolean} report - Is sent report email
+   * @param {Boolean} improvementPlan - File path
+   * @param {Boolean} report - File path
    * @return - Updated response
    */
   async auditsBuyerSendFiles(root, { auditId, supplierId, improvementPlan, report }) {
@@ -82,8 +98,11 @@ const auditMutations = {
       attachments,
     });
 
-    // save dates
-    return response.saveEmailSenDates(improvementPlan, report);
+    // save files & dates
+    return response.saveFiles({
+      improvementPlanFile: improvementPlan,
+      reportFile: report,
+    });
   },
 };
 
@@ -124,6 +143,7 @@ sections.forEach(section => {
 });
 
 requireBuyer(auditMutations, 'auditsAdd');
+requireBuyer(auditMutations, 'auditsBuyerSaveFiles');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');

@@ -305,6 +305,13 @@ export const mutations = `
     businessInfo: AuditBuyerBusinessInfoInput
   ): Audit
 
+  auditsBuyerSaveFiles(
+    auditId: String!,
+    supplierId: String!,
+    improvementPlan: String,
+    report: String,
+  ): AuditResponse
+
   auditsBuyerSendFiles(
     auditId: String!,
     supplierId: String!,

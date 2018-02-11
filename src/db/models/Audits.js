@@ -542,17 +542,36 @@ class AuditResponse {
   }
 
   /**
-   * Save email sent dates for improvement plan, report
+   * Save improvement plan, report files & reset dates
+   * @param {Boolean} improvementPlanFile - File path
+   * @param {Boolean} reportFile - File path
+   * @return - Updated response
+   */
+  async saveFiles({ improvementPlanFile, reportFile }) {
+    await this.update({
+      improvementPlanFile,
+      reportFile,
+      improvementPlanSentDate: null,
+      reportSentDate: null,
+    });
+
+    return AuditResponses.findOne({ _id: this._id });
+  }
+
+  /**
+   * Save files & email sent dates for improvement plan, report
    * @param {Boolean} improvementPlan - Is sent improvementPlan email
    * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
-  async saveEmailSenDates(improvementPlan, report) {
-    if (improvementPlan) {
+  async sendFiles({ improvementPlanFile, reportFile }) {
+    await this.saveFiles({ improvementPlanFile, reportFile });
+
+    if (improvementPlanFile) {
       await this.update({ improvementPlanSentDate: new Date() });
     }
 
-    if (report) {
+    if (reportFile) {
       await this.update({ reportSentDate: new Date() });
     }
 

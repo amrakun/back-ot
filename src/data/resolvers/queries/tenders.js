@@ -215,7 +215,7 @@ const tenderQueries = {
     }
 
     // calculate average duration ========
-    const sum = durations.reduce((previous, current) => (current += previous));
+    const sum = durations.reduce((previous, current) => (current += previous), 0);
 
     return sum / durations.length;
   },

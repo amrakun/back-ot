@@ -264,15 +264,45 @@ describe('Audit response db', () => {
     expect(auditResponse.status).toBe('late');
   });
 
-  test('Save email sent dates', async () => {
+  test('Save files', async () => {
+    let auditResponse = await auditResponseFactory({
+      improvementPlanSentDate: new Date(),
+      reportSentDate: new Date(),
+    });
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    const doc = {
+      improvementPlanFile: '/improvementPlanFile',
+      reportFile: '/reportFile',
+    };
+
+    await auditResponse.saveFiles(doc);
+
+    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
+
+    expect(auditResponse.improvementPlanFile).toBe(doc.improvementPlanFile);
+    expect(auditResponse.reportFile).toBe(doc.reportFile);
+    expect(auditResponse.improvementPlanSentDate).toBe(null);
+    expect(auditResponse.reportSentDate).toBe(null);
+  });
+
+  test('Send files', async () => {
     let auditResponse = await auditResponseFactory({});
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
-    await auditResponse.saveEmailSenDates(true, true);
+    const doc = {
+      improvementPlanFile: '/improvementPlanFile',
+      reportFile: '/reportFile',
+    };
+
+    await auditResponse.sendFiles(doc);
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
+    expect(auditResponse.improvementPlanFile).toBe(doc.improvementPlanFile);
+    expect(auditResponse.reportFile).toBe(doc.reportFile);
     expect(auditResponse.improvementPlanSentDate).toBeDefined();
     expect(auditResponse.reportSentDate).toBeDefined();
   });
