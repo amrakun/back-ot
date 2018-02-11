@@ -119,6 +119,21 @@ describe('Tender response db', () => {
     expect(tenderResponse.isSent).toBe(true);
   });
 
+  test('Send: EOI with late status', async () => {
+    const tender = await tenderFactory({ type: 'eoi', status: 'closed' });
+
+    await tenderResponseFactory({ tenderId: tender._id });
+
+    let tenderResponse = await TenderResponses.findOne({ tenderId: tender._id });
+
+    await tenderResponse.send();
+
+    tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
+
+    expect(tenderResponse.status).toBe('late');
+    expect(tenderResponse.isSent).toBe(true);
+  });
+
   test('Edit tender response', async () => {
     const response = await tenderResponseFactory({});
 

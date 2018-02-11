@@ -208,6 +208,10 @@ const TenderResponseSchema = mongoose.Schema({
   respondedProducts: [RespondedProductSchema],
   respondedDocuments: [RespondedDocumentSchema],
 
+  // when tender type is eoi, we can still receive responses after closedDate
+  // So eoi status will be late
+  status: field({ type: String, optional: true }),
+
   isSent: field({ type: Boolean, optional: true }),
 
   isNotInterested: field({ type: Boolean, default: false }),
@@ -271,9 +275,18 @@ class TenderResponse {
   async send() {
     const tender = await Tenders.findOne({ _id: this.tenderId });
 
-    // can send to only open tenders
-    if (tender.status !== 'open') {
+    if (['canceled', 'draft'].includes(tender.status)) {
       throw Error('This tender is not available');
+    }
+
+    // can send to only open rfqs
+    if (tender.type === 'rfq' && tender.status === 'closed') {
+      throw Error('This tender is not available');
+    }
+
+    // can send to even closed eois
+    if (tender.type === 'eoi') {
+      await this.update({ status: tender.status === 'closed' ? 'late' : 'onTime' });
     }
 
     await this.update({ isSent: true });

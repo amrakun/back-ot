@@ -102,6 +102,7 @@ export const types = `
 
     supplier: Company
 
+    status: String
     isSent: Boolean
     isNotInterested: Boolean
   }

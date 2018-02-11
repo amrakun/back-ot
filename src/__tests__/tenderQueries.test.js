@@ -616,6 +616,7 @@ describe('Tender queries', () => {
             supplierSearch: $supplierSearch
           ) {
             _id
+            status
           }
         }
       `,
