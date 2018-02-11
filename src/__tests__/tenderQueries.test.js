@@ -127,9 +127,16 @@ describe('Tender queries', () => {
     supplier1 = await companyFactory();
     supplier2 = await companyFactory();
 
-    user = await userFactory({ companyId: supplier1._id, isSupplier: false });
+    // below tender must be excluded by created user check
+    await tenderFactory({ type: 'rfq' });
 
-    const tender = await tenderFactory({ type: 'rfq' });
+    user = await userFactory({
+      companyId: supplier1._id,
+      role: 'contributor',
+      isSupplier: false,
+    });
+
+    const tender = await tenderFactory({ type: 'rfq', createdUserId: user._id });
 
     await tenderResponseFactory({
       tenderId: tender._id,
@@ -143,52 +150,61 @@ describe('Tender queries', () => {
       name: 'test',
       publishDate: new Date('2012-01-01'),
       closeDate: new Date('2012-02-01'),
+      createdUserId: user._id,
     });
 
-    await tenderFactory({ type: 'rfq', supplierIds: [supplier1._id], number: 'number' });
-    await tenderFactory({ type: 'eoi', supplierIds: [supplier2._id], number: '2' });
+    await tenderFactory({
+      type: 'rfq',
+      supplierIds: [supplier1._id],
+      number: 'number',
+      createdUserId: user._id,
+    });
+
+    await tenderFactory({
+      type: 'eoi',
+      supplierIds: [supplier2._id],
+      number: '2',
+      createdUserId: user._id,
+    });
+
+    const doQuery = args => graphqlRequest(query, 'tenders', args, { user });
 
     // When there is no filter, it must return all tenders =============
-    let response = await graphqlRequest(query, 'tenders', {});
+    let response = await doQuery({});
 
     expect(response.length).toBe(4);
 
     // filter by type ===============
-    response = await graphqlRequest(query, 'tenders', { type: 'rfq' });
+    response = await doQuery({ type: 'rfq' });
 
     expect(response.length).toBe(3);
     expect(response[0].type).toBe('rfq');
 
-    response = await graphqlRequest(query, 'tenders', { type: 'eoi' });
+    response = await doQuery({ type: 'eoi' });
 
     expect(response.length).toBe(1);
     expect(response[0].type).toBe('eoi');
 
     // status ===============
-    response = await graphqlRequest(query, 'tenders', { status: 'open' }, { user });
+    response = await doQuery({ status: 'open' });
     expect(response.length).toBe(1);
 
-    response = await graphqlRequest(query, 'tenders', { status: 'draft' }, { user });
+    response = await doQuery({ status: 'draft' });
     expect(response.length).toBe(3);
 
-    response = await graphqlRequest(query, 'tenders', { status: 'draft,open' }, { user });
+    response = await doQuery({ status: 'draft,open' });
     expect(response.length).toBe(4);
 
     // name ===============
-    response = await graphqlRequest(query, 'tenders', { search: 'test' }, { user });
+    response = await doQuery({ search: 'test' });
     expect(response.length).toBe(1);
 
     // type and number ===============
-    response = await graphqlRequest(query, 'tenders', { type: 'rfq', search: 'number' }, { user });
+    response = await doQuery({ type: 'rfq', search: 'number' });
     expect(response.length).toBe(1);
 
     // number & pager ===============
-    response = await graphqlRequest(
-      query,
-      'tenders',
-      { search: '2', perPage: 10, page: 1 },
-      { user },
-    );
+    response = await doQuery({ search: '2', perPage: 10, page: 1 });
 
     expect(response.length).toBe(1);
   });
@@ -208,7 +224,8 @@ describe('Tender queries', () => {
       }
     `;
 
-    const user = await userFactory();
+    const user = await userFactory({ role: 'contributor' });
+
     const t1Date = new Date();
     const t2Date = moment()
       .add(1, 'day')
@@ -272,7 +289,7 @@ describe('Tender queries', () => {
     `;
 
     // below tender must be ignored by createdUserId check =====
-    const ignoredUser = await userFactory();
+    const ignoredUser = await userFactory({ role: 'contributor' });
 
     await tenderFactory({
       publishDate: new Date(),
@@ -280,7 +297,7 @@ describe('Tender queries', () => {
       createdUserId: ignoredUser._id,
     });
 
-    const user = await userFactory({});
+    const user = await userFactory({ role: 'contributor' });
 
     await tenderFactory({
       publishDate: new Date(),
@@ -329,7 +346,7 @@ describe('Tender queries', () => {
     `;
 
     // below tender must be ignored by createdUser check
-    const ignoredUser = await userFactory({});
+    const ignoredUser = await userFactory({ role: 'contributor' });
 
     await tenderFactory({
       publishDate: moment(),
@@ -341,7 +358,7 @@ describe('Tender queries', () => {
       createdUserId: ignoredUser._id,
     });
 
-    const user = await userFactory({});
+    const user = await userFactory({ role: 'contributor' });
 
     await tenderFactory({
       publishDate: moment(),

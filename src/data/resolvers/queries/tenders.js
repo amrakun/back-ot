@@ -7,7 +7,7 @@ import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports'
 /*
  * Tender list & tender export helper
  */
-const tenderFilter = async (args, extraChecks) => {
+const tendersFilter = async (args, extraChecks) => {
   const { type, status, search } = args;
 
   const query = { $and: [] };
@@ -43,14 +43,24 @@ const tenderFilter = async (args, extraChecks) => {
   return query;
 };
 
+/*
+ * Buyer only filters
+ */
+const tendersBuyerFilter = async (args, user) =>
+  tendersFilter(args, query => {
+    if (user.role !== 'admin') {
+      query.$and.push({ createdUserId: user._id });
+    }
+  });
+
 const tenderQueries = {
   /**
    * Tenders list for buyer
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
    */
-  async tenders(root, args) {
-    const query = await tenderFilter(args);
+  async tenders(root, args, { user }) {
+    const query = await tendersBuyerFilter(args, user);
 
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
   },
@@ -67,7 +77,7 @@ const tenderQueries = {
     // below
     delete args.status;
 
-    const query = await tenderFilter(args, async query => {
+    const query = await tendersFilter(args, async query => {
       query.$and.push({ supplierIds: { $in: [user.companyId] } });
       query.$and.push({ status: { $ne: 'draft' } });
 
@@ -93,8 +103,9 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async tendersExport(root, args) {
-    const query = await tenderFilter(args);
+  async tendersExport(root, args, { user }) {
+    const query = await tendersBuyerFilter(args, user);
+
     const tenders = await Tenders.find(query).sort({ createdDate: -1 });
 
     return tendersExport(tenders);
@@ -139,12 +150,18 @@ const tenderQueries = {
    * @return - Generated doc
    */
   async tenderCountByStatus(root, { startDate, endDate, type }, { user }) {
-    // find tenders
-    const tenders = await Tenders.find({
+    // find tenders =========
+    const query = {
       publishDate: { $gte: startDate, $lte: endDate },
       type,
-      createdUserId: user._id,
-    });
+    };
+
+    // show all tenders to only admin
+    if (user.role !== 'admin') {
+      query.createdUserId = user._id;
+    }
+
+    const tenders = await Tenders.find(query);
 
     const results = {};
 
@@ -183,11 +200,17 @@ const tenderQueries = {
    * @return - Total count
    */
   tendersTotalCount(root, { startDate, endDate, type }, { user }) {
-    return Tenders.find({
+    const query = {
       publishDate: { $gte: startDate, $lte: endDate },
       type,
-      createdUserId: user._id,
-    }).count();
+    };
+
+    // show all tenders to only admin
+    if (user.role !== 'admin') {
+      query.createdUserId = user._id;
+    }
+
+    return Tenders.find(query).count();
   },
 
   /*
@@ -198,11 +221,18 @@ const tenderQueries = {
    * @return - Total count
    */
   async tendersAverageDuration(root, { startDate, endDate, type }, { user }) {
-    const tenders = await Tenders.find({
+    // find tenders =============
+    const query = {
       publishDate: { $gte: startDate, $lte: endDate },
       type,
-      createdUserId: user._id,
-    });
+    };
+
+    // show all tenders to only admin
+    if (user.role !== 'admin') {
+      query.createdUserId = user._id;
+    }
+
+    const tenders = await Tenders.find(query);
 
     // collect durations ====================
     const durations = [];
