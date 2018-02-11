@@ -67,9 +67,10 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     const mutations = [
+      'companiesUndoIsSentPrequalificationInfo',
       'companiesAddDifotScores',
       'companiesAddDueDiligences',
       'companiesValidateProductsInfo',
@@ -379,22 +380,44 @@ describe('Company mutations', () => {
   });
 
   test('send prequalification info', async () => {
-    const mutation = `
-      mutation companiesSendPrequalificationInfo {
-        companiesSendPrequalificationInfo {
-          _id
+    const response = await graphqlRequest(
+      `
+        mutation companiesSendPrequalificationInfo {
+          companiesSendPrequalificationInfo {
+            _id
+            isSentPrequalificationInfo
+          }
         }
-      }
-    `;
+      `,
+      'companiesSendPrequalificationInfo',
+      {},
+      {
+        user: await userFactory({ companyId: _company._id, isSupplier: true }),
+      },
+    );
 
-    const context = {
-      user: await userFactory({ companyId: _company._id, isSupplier: true }),
-    };
+    expect(response.isSentPrequalificationInfo).toBe(true);
+  });
 
-    await graphqlRequest(mutation, 'companiesSendPrequalificationInfo', {}, context);
+  test('undo isSentPrequalificationInfo', async () => {
+    const supplier = await companyFactory({});
 
-    const updatedSupplier = await Companies.findOne({ _id: _company._id });
+    const response = await graphqlRequest(
+      `
+        mutation companiesUndoIsSentPrequalificationInfo($supplierId: String!) {
+          companiesUndoIsSentPrequalificationInfo(supplierId: $supplierId) {
+            _id
+            isSentPrequalificationInfo
+          }
+        }
+      `,
+      'companiesUndoIsSentPrequalificationInfo',
+      { supplierId: supplier._id },
+      {
+        user: await userFactory({ companyId: _company._id, isSupplier: false }),
+      },
+    );
 
-    expect(updatedSupplier.isSentPrequalificationInfo).toBe(true);
+    expect(response.isSentPrequalificationInfo).toBe(false);
   });
 });

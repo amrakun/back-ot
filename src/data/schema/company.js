@@ -434,4 +434,5 @@ export const mutations = `
 
   companiesSendRegistrationInfo: Company
   companiesSendPrequalificationInfo: Company
+  companiesUndoIsSentPrequalificationInfo(supplierId: String!): Company
 `;

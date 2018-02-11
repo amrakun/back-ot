@@ -43,7 +43,14 @@ const companyMutations = {
 
     return company.sendPrequalificationInfo();
   },
+
+  async companiesUndoIsSentPrequalificationInfo(root, { supplierId }) {
+    await Companies.update({ _id: supplierId }, { $set: { isSentPrequalificationInfo: false } });
+
+    return Companies.findOne({ _id: supplierId });
+  },
 };
+
 const sections = [
   'basic',
   'contact',
@@ -76,5 +83,6 @@ requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
 requireBuyer(companyMutations, 'companiesAddDifotScores');
 requireBuyer(companyMutations, 'companiesAddDueDiligences');
 requireBuyer(companyMutations, 'companiesValidateProductsInfo');
+requireBuyer(companyMutations, 'companiesUndoIsSentPrequalificationInfo');
 
 export default companyMutations;

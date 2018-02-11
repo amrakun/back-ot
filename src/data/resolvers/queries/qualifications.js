@@ -1,5 +1,5 @@
 import { Qualifications } from '../../../db/models';
-import { moduleRequireBuyer } from '../../permissions';
+import { requireBuyer, requireSupplier } from '../../permissions';
 
 const qualificationQueries = {
   /**
@@ -8,8 +8,16 @@ const qualificationQueries = {
   qualificationDetail(root, { supplierId }) {
     return Qualifications.findOne({ supplierId });
   },
+
+  /**
+   * Qualification detail by logged in user
+   */
+  qualificationDetailByUser(root, args, { user }) {
+    return Qualifications.findOne({ supplierId: user.companyId });
+  },
 };
 
-moduleRequireBuyer(qualificationQueries);
+requireBuyer(qualificationQueries, 'qualificationDetail');
+requireSupplier(qualificationQueries, 'qualificationDetailByUser');
 
 export default qualificationQueries;

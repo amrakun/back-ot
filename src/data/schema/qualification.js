@@ -66,6 +66,7 @@ export const types = `
 
 export const queries = `
   qualificationDetail(supplierId: String!): Qualification
+  qualificationDetailByUser: Qualification
 `;
 
 export const mutations = `
