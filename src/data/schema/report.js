@@ -14,6 +14,7 @@ export const queries = `
   reportsSuppliersExport(
     productCodes: [String],
     isPrequalified: Boolean,
+    tierType: String,
   ): String
 
   reportsTendersExport(

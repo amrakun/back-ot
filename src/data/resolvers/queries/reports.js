@@ -8,20 +8,25 @@ const reportsQuery = {
    * @param {Object} args - Query params
    * @param {String[]} args.productCodes - List of product codes that will be matched with
    * @param {boolean} args.isPrequalified - Company isPrequalified field
+   * @param {String} args.tierType - Tier type
    * @return {String} file url of the generated reports_suppliers.xlsx
    */
-  async reportsSuppliersExport(root, { productCodes, isPrequalified }) {
-    const filter = {};
+  async reportsSuppliersExport(root, { productCodes, isPrequalified, tierType }) {
+    const query = {};
 
     if (productCodes && productCodes.length > 0) {
-      filter.validatedProductsInfo = { $all: productCodes };
+      query.validatedProductsInfo = { $all: productCodes };
     }
 
     if (typeof isPrequalified === 'boolean') {
-      filter.isPrequalified = isPrequalified;
+      query.isPrequalified = isPrequalified;
     }
 
-    const suppliers = await Companies.find(filter);
+    if (tierType) {
+      query.tierType = tierType;
+    }
+
+    const suppliers = await Companies.find(query);
 
     const { workbook, sheet } = await readTemplate('reports_suppliers');
 
