@@ -30,7 +30,7 @@ const feedbackQueries = {
   async feedbackResponses(root, { supplierName }) {
     const query = await supplierFilter({}, supplierName);
 
-    return FeedbackResponses.find(query);
+    return FeedbackResponses.find(query).sort({ createdDate: -1 });
   },
 };
 

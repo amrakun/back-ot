@@ -70,6 +70,7 @@ const FeedbackResponseSchema = mongoose.Schema({
   trainings: field({ type: String }),
   corporateSocial: field({ type: String }),
   technologyImprovement: field({ type: String }),
+  createdDate: field({ type: Date }),
 });
 
 class FeedbackResponse {
@@ -80,6 +81,8 @@ class FeedbackResponse {
    */
   static async createFeedbackResponse(doc) {
     const { feedbackId, supplierId } = doc;
+
+    doc.createdDate = new Date();
 
     // prevent duplications
     if (await this.findOne({ feedbackId, supplierId })) {

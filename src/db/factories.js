@@ -438,6 +438,8 @@ export const feedbackResponseFactory = async (params = {}) => {
     trainings: params.trainings || faker.random.word(),
     corporateSocial: params.corporateSocial || faker.random.word(),
     technologyImprovement: params.technologyImprovement || faker.random.word(),
+
+    createdDate: params.createdDate || new Date(),
   });
 
   return save(feedbackResponse);
