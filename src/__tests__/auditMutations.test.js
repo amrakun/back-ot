@@ -419,19 +419,17 @@ describe('Audit mutations', () => {
   });
 
   test('Send files', async () => {
-    await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id });
+    let response = await auditResponseFactory({});
 
     const mutation = `
       mutation auditsBuyerSendFiles(
-        $auditId: String!,
-        $supplierIds: [String]!,
+        $responseIds: [String]!,
         $improvementPlan: Boolean,
         $report: Boolean
       ) {
 
         auditsBuyerSendFiles(
-          auditId: $auditId,
-          supplierIds: $supplierIds,
+          responseIds: $responseIds,
           improvementPlan: $improvementPlan,
           report: $report
         ) {
@@ -447,15 +445,14 @@ describe('Audit mutations', () => {
       mutation,
       'auditsBuyerSendFiles',
       {
-        supplierIds: [_company._id],
-        auditId: _audit._id,
+        responseIds: [response._id],
         improvementPlan: true,
         report: true,
       },
       { user: user },
     );
 
-    const response = await AuditResponses.findOne({ auditId: _audit._id });
+    response = await AuditResponses.findOne({ _id: response._id });
 
     expect(response.improvementPlanSentDate).toBeDefined();
     expect(response.reportSentDate).toBeDefined();

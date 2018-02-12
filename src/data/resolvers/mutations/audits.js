@@ -58,15 +58,15 @@ const auditMutations = {
 
   /**
    * Send report files to supplier via email
-   * @param {[String]} supplierIds - Supplier ids
+   * @param {[String]} responseIds - Audit response ids
    * @param {Boolean} improvementPlan - File path
    * @param {Boolean} report - File path
    * @return - Updated response
    */
-  async auditsBuyerSendFiles(root, { auditId, supplierIds, improvementPlan, report }) {
-    for (const supplierId of supplierIds) {
-      const company = await Companies.findOne({ _id: supplierId });
-      const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
+  async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }) {
+    for (const responseId of responseIds) {
+      const response = await AuditResponses.findOne({ _id: responseId });
+      const company = await Companies.findOne({ _id: response.supplierId });
 
       // collection attachments =========
       const attachments = [];
