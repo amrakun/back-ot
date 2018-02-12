@@ -30,6 +30,8 @@ export const types = `
 
     feedback: Feedback
     supplier: Company
+
+    createdDate: Date
   }
 `;
 
