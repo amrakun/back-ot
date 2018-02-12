@@ -59,8 +59,8 @@ const auditMutations = {
   /**
    * Send report files to supplier via email
    * @param {[String]} responseIds - Audit response ids
-   * @param {Boolean} improvementPlan - File path
-   * @param {Boolean} report - File path
+   * @param {Boolean} improvementPlan - Is sent improvementPlan email
+   * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
   async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }) {
@@ -74,14 +74,14 @@ const auditMutations = {
       if (improvementPlan) {
         attachments.push({
           filename: 'improvement_plan.xlsx',
-          path: improvementPlan,
+          path: response.improvementPlanFile,
         });
       }
 
       if (report) {
         attachments.push({
           filename: 'report.xlsx',
-          path: report,
+          path: response.reportFile,
         });
       }
 
@@ -100,11 +100,8 @@ const auditMutations = {
         attachments,
       });
 
-      // save files & dates
-      await response.saveFiles({
-        improvementPlanFile: improvementPlan,
-        reportFile: report,
-      });
+      // save dates
+      await response.sendFiles({ improvementPlan, report });
     }
   },
 };
