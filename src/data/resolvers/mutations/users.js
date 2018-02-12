@@ -85,8 +85,10 @@ const userMutations = {
 
     const user = await Users.confirmRegistration(token, password);
 
-    // create company for new user
-    await Companies.createCompany(user._id);
+    // if user is not registered via buyer then create company for new user
+    if (!user.companyId) {
+      await Companies.createCompany(user._id);
+    }
 
     return user;
   },

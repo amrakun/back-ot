@@ -13,9 +13,14 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
-describe('User mutations', () => {
-  const user = { _id: 'DFAFDFDFD', role: ROLES.CONTRIBUTOR };
-  const _adminUser = { _id: 'fakeId', role: ROLES.ADMIN };
+describe('User mutations', async () => {
+  let user;
+  let _adminUser;
+
+  beforeEach(async () => {
+    user = await userFactory({ role: ROLES.CONTRIBUTOR });
+    _adminUser = await userFactory({ role: ROLES.ADMIN });
+  });
 
   afterEach(async () => {
     // Clearing test data
@@ -57,49 +62,74 @@ describe('User mutations', () => {
     expect(user._id).toBeDefined();
   });
 
-  test('Confirm registration', async () => {
-    const mutation = `
-      mutation confirmRegistration(
-        $token: String!,
-        $password: String!,
-        $passwordConfirmation: String!,
+  const confirmMutation = `
+    mutation confirmRegistration(
+      $token: String!,
+      $password: String!,
+      $passwordConfirmation: String!,
+    ) {
+      confirmRegistration(
+        token: $token,
+        password: $password,
+        passwordConfirmation: $passwordConfirmation
       ) {
-        confirmRegistration(
-          token: $token,
-          password: $password,
-          passwordConfirmation: $passwordConfirmation
-        ) {
-          _id
-        }
+        _id
       }
-    `;
+    }
+  `;
 
-    const args = {
-      token: 'token',
-      password: 'pass',
-      passwordConfirmation: 'pass',
-    };
+  const args = {
+    token: 'token',
+    password: 'pass',
+    passwordConfirmation: 'pass',
+  };
 
+  // valid tokens =================
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  test('Confirm registration: via supplier', async () => {
     const user = await userFactory({});
-
-    // valid tokens =================
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
 
     await Users.update(
       { _id: user._id },
       {
         $set: {
+          companyId: null,
           registrationToken: 'token',
           registrationTokenExpires: tomorrow,
         },
       },
     );
 
-    await graphqlRequest(mutation, 'confirmRegistration', args, { user });
+    await graphqlRequest(confirmMutation, 'confirmRegistration', args, { user });
 
-    expect(await Companies.find({}).count()).toBe(1);
+    const updatedUser = await Users.findOne({ _id: user._id });
+
+    expect(updatedUser.companyId).not.toBe(null);
+  });
+
+  test('Confirm registration: via buyer', async () => {
+    const user = await userFactory({});
+    const company = await companyFactory({});
+
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          companyId: company._id,
+          registrationToken: 'token',
+          registrationTokenExpires: tomorrow,
+        },
+      },
+    );
+
+    await graphqlRequest(confirmMutation, 'confirmRegistration', args, { user });
+
+    const updatedUser = await Users.findOne({ _id: user._id });
+
+    expect(updatedUser.companyId.toString()).toBe(company._id);
   });
 
   const loginMutation = `
