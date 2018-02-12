@@ -73,13 +73,13 @@ describe('Qualification db', () => {
   });
 
   test('Pre qualified status', async () => {
-    expect(_company.isPrequalified).toBe(false);
+    await Companies.update({ _id: _company._id }, { $set: { isPrequalified: true } });
 
-    await Qualifications.prequalify(_company._id);
+    await Qualifications.prequalify(_company._id, false);
 
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
-    expect(updatedCompany.isPrequalified).toBe(true);
+    expect(updatedCompany.isPrequalified).toBe(false);
   });
 
   test('Tier type', async () => {

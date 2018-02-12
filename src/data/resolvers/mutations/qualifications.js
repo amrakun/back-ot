@@ -12,8 +12,8 @@ const qualificationMutations = {
   /*
    * Prequalify a supplier
    */
-  qualificationsPrequalify(root, { supplierId }) {
-    return Qualifications.prequalify(supplierId);
+  qualificationsPrequalify(root, { supplierId, qualified }) {
+    return Qualifications.prequalify(supplierId, qualified);
   },
 };
 

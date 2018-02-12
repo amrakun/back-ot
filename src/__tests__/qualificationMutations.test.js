@@ -155,8 +155,8 @@ describe('Company mutations', () => {
     expect(_company.isPrequalified).toBe(false);
 
     const mutation = `
-      mutation qualificationsPrequalify($supplierId: String!) {
-        qualificationsPrequalify(supplierId: $supplierId) {
+      mutation qualificationsPrequalify($supplierId: String!, $qualified: Boolean) {
+        qualificationsPrequalify(supplierId: $supplierId, qualified: $qualified) {
           isPrequalified
         }
       }
@@ -165,7 +165,7 @@ describe('Company mutations', () => {
     const response = await graphqlRequest(
       mutation,
       'qualificationsPrequalify',
-      { supplierId: _company._id },
+      { supplierId: _company._id, qualified: true },
       { user: _user },
     );
 
