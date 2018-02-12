@@ -293,18 +293,16 @@ describe('Audit response db', () => {
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
     const doc = {
-      improvementPlanFile: '/improvementPlanFile',
-      reportFile: '/reportFile',
+      improvementPlan: true,
+      report: false,
     };
 
     await auditResponse.sendFiles(doc);
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
-    expect(auditResponse.improvementPlanFile).toBe(doc.improvementPlanFile);
-    expect(auditResponse.reportFile).toBe(doc.reportFile);
     expect(auditResponse.improvementPlanSentDate).toBeDefined();
-    expect(auditResponse.reportSentDate).toBeDefined();
+    expect(auditResponse.reportSentDate).not.toBeDefined();
   });
 
   test('Qualified status', async () => {

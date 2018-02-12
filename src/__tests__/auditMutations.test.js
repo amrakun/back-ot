@@ -424,19 +424,17 @@ describe('Audit mutations', () => {
     const mutation = `
       mutation auditsBuyerSendFiles(
         $auditId: String!,
-        $supplierId: String!,
-        $improvementPlan: String,
-        $report: String
+        $supplierIds: [String]!,
+        $improvementPlan: Boolean,
+        $report: Boolean
       ) {
 
         auditsBuyerSendFiles(
           auditId: $auditId,
-          supplierId: $supplierId,
+          supplierIds: $supplierIds,
           improvementPlan: $improvementPlan,
           report: $report
         ) {
-          improvementPlanFile
-          reportFile
           improvementPlanSentDate
           reportSentDate
         }
@@ -445,20 +443,20 @@ describe('Audit mutations', () => {
 
     const user = await userFactory({ isSupplier: false });
 
-    const response = await graphqlRequest(
+    await graphqlRequest(
       mutation,
       'auditsBuyerSendFiles',
       {
-        supplierId: _company._id,
+        supplierIds: [_company._id],
         auditId: _audit._id,
-        improvementPlan: '/improvementPlanPath',
-        report: '/reportPath',
+        improvementPlan: true,
+        report: true,
       },
       { user: user },
     );
 
-    expect(response.improvementPlanFile).toBe('/improvementPlanPath');
-    expect(response.reportFile).toBe('/reportPath');
+    const response = await AuditResponses.findOne({ auditId: _audit._id });
+
     expect(response.improvementPlanSentDate).toBeDefined();
     expect(response.reportSentDate).toBeDefined();
   });

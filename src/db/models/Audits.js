@@ -548,12 +548,19 @@ class AuditResponse {
    * @return - Updated response
    */
   async saveFiles({ improvementPlanFile, reportFile }) {
-    await this.update({
-      improvementPlanFile,
-      reportFile,
-      improvementPlanSentDate: null,
-      reportSentDate: null,
-    });
+    const doc = {};
+
+    if (improvementPlanFile) {
+      doc.improvementPlanFile = improvementPlanFile;
+      doc.improvementPlanSentDate = null;
+    }
+
+    if (reportFile) {
+      doc.reportFile = reportFile;
+      doc.reportSentDate = null;
+    }
+
+    await this.update(doc);
 
     return AuditResponses.findOne({ _id: this._id });
   }
@@ -564,14 +571,12 @@ class AuditResponse {
    * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
-  async sendFiles({ improvementPlanFile, reportFile }) {
-    await this.saveFiles({ improvementPlanFile, reportFile });
-
-    if (improvementPlanFile) {
+  async sendFiles({ improvementPlan, report }) {
+    if (improvementPlan) {
       await this.update({ improvementPlanSentDate: new Date() });
     }
 
-    if (reportFile) {
+    if (report) {
       await this.update({ reportSentDate: new Date() });
     }
 

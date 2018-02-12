@@ -58,51 +58,54 @@ const auditMutations = {
 
   /**
    * Send report files to supplier via email
+   * @param {[String]} supplierIds - Supplier ids
    * @param {Boolean} improvementPlan - File path
    * @param {Boolean} report - File path
    * @return - Updated response
    */
-  async auditsBuyerSendFiles(root, { auditId, supplierId, improvementPlan, report }) {
-    const company = await Companies.findOne({ _id: supplierId });
-    const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
+  async auditsBuyerSendFiles(root, { auditId, supplierIds, improvementPlan, report }) {
+    for (const supplierId of supplierIds) {
+      const company = await Companies.findOne({ _id: supplierId });
+      const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
 
-    // collection attachments =========
-    const attachments = [];
+      // collection attachments =========
+      const attachments = [];
 
-    if (improvementPlan) {
-      attachments.push({
-        filename: 'improvement_plan.xlsx',
-        path: improvementPlan,
-      });
-    }
+      if (improvementPlan) {
+        attachments.push({
+          filename: 'improvement_plan.xlsx',
+          path: improvementPlan,
+        });
+      }
 
-    if (report) {
-      attachments.push({
-        filename: 'report.xlsx',
-        path: report,
-      });
-    }
+      if (report) {
+        attachments.push({
+          filename: 'report.xlsx',
+          path: report,
+        });
+      }
 
-    const contactInfo = company.contactInfo || {};
+      const contactInfo = company.contactInfo || {};
 
-    // send email ===================
-    utils.sendEmail({
-      toEmails: [contactInfo.email],
-      title: 'Desktop audit report',
-      template: {
-        name: 'audit',
-        data: {
-          content: 'Desktop audit report',
+      // send email ===================
+      utils.sendEmail({
+        toEmails: [contactInfo.email],
+        title: 'Desktop audit report',
+        template: {
+          name: 'audit',
+          data: {
+            content: 'Desktop audit report',
+          },
         },
-      },
-      attachments,
-    });
+        attachments,
+      });
 
-    // save files & dates
-    return response.saveFiles({
-      improvementPlanFile: improvementPlan,
-      reportFile: report,
-    });
+      // save files & dates
+      await response.saveFiles({
+        improvementPlanFile: improvementPlan,
+        reportFile: report,
+      });
+    }
   },
 };
 

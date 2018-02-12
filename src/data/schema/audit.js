@@ -314,8 +314,8 @@ export const mutations = `
 
   auditsBuyerSendFiles(
     auditId: String!,
-    supplierId: String!,
-    improvementPlan: String,
-    report: String,
+    supplierIds: [String]!,
+    improvementPlan: Boolean,
+    report: Boolean,
   ): AuditResponse
 `;
