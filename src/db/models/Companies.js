@@ -330,6 +330,7 @@ export const HealthInfoSchema = mongoose.Schema(
     // Are all employees under your control required to utilise appropriate
     // Personal Protective Equipment (PPE) at all times?
     areEmployeesUnderYourControl: field({ type: Boolean }),
+    areEmployeesUnderYourControlFile: field({ type: FileSchema, optional: true }),
 
     //  Does the company have a documented process or guidelines for
     //  risk assessment (including CRM)?

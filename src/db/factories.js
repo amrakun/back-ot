@@ -262,6 +262,7 @@ export const companyDocs = {
     doesHaveDocumentedProcessToEnsure: true,
     doesHaveDocumentedProcessToEnsureFile: { name: 'name', url: 'url' },
     areEmployeesUnderYourControl: true,
+    areEmployeesUnderYourControlFile: { name: 'name', url: 'url' },
     doesHaveDocumentForRiskAssesment: true,
     doesHaveDocumentForRiskAssesmentFile: { name: 'name', url: 'url' },
     doesHaveDocumentForIncidentInvestigation: false,

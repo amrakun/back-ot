@@ -166,6 +166,7 @@ export const healthInfoFields = `
   doesHaveDocumentedProcessToEnsureFile: JSON
 
   areEmployeesUnderYourControl: Boolean
+  areEmployeesUnderYourControlFile: JSON
 
   doesHaveDocumentForRiskAssesment: Boolean
   doesHaveDocumentForRiskAssesmentFile: JSON
