@@ -4,7 +4,7 @@ import { moduleRequireBuyer } from '../../permissions';
 
 const reportsQuery = {
   /**
-   * Supplier list
+   * Supplier profile list
    * @param {Object} args - Query params
    * @param {String[]} args.productCodes - List of product codes that will be matched with
    * @param {boolean} args.isPrequalified - Company isPrequalified field
@@ -25,50 +25,63 @@ const reportsQuery = {
 
     const { workbook, sheet } = await readTemplate('reports_suppliers');
 
-    let rowIndex = 1;
+    let rowIndex = 2;
 
     for (const it of suppliers) {
       rowIndex++;
 
-      const basicInfo = it.basicInfo || {};
+      let colIndex = 0;
 
-      sheet.cell(rowIndex, 1).value(basicInfo.sRegisteredOnSup || false);
-      sheet.cell(rowIndex, 2).value(basicInfo.sapNumber || '');
-      sheet.cell(rowIndex, 3).value(basicInfo.enName || '');
-      sheet.cell(rowIndex, 4).value(basicInfo.mnName || '');
-      sheet.cell(rowIndex, 5).value(basicInfo.averageDifotScore || '');
+      const fill = value => {
+        colIndex++;
+        sheet.cell(rowIndex, colIndex).value(value);
+      };
 
-      sheet.cell(rowIndex, 6).value(basicInfo.isProductsInfoValidated ? 'yes' : 'no');
+      // basic info ==========
+      const bi = it.basicInfo || {};
 
-      sheet.cell(rowIndex, 7).value(basicInfo.address || '');
-      sheet.cell(rowIndex, 8).value(basicInfo.address2 || '');
-      sheet.cell(rowIndex, 9).value(basicInfo.address3 || '');
-      sheet.cell(rowIndex, 10).value(basicInfo.townOrCity || '');
+      fill(rowIndex - 2);
+      fill(bi.sRegisteredOnSup ? 'yes' : 'no');
+      fill(bi.sapNumber || '');
+      fill(it.tierType || '');
+      fill((it.productsInfo || []).join(','));
+      fill(bi.enName || '');
+      fill(bi.mnName || '');
+      fill(it.averageDifotScore || 0);
+      fill(it.isQualified ? 'yes' : 'no');
+      fill(it.isProductsInfoValidated ? 'yes' : 'no');
 
-      sheet.cell(rowIndex, 11).value(basicInfo.country || '');
-      sheet.cell(rowIndex, 12).value(basicInfo.province || '');
+      // contact info =========
+      const ci = it.contactInfo || {};
 
-      sheet.cell(rowIndex, 13).value(basicInfo.registeredInCountry || '');
-      sheet.cell(rowIndex, 14).value(basicInfo.registeredInAimag || '');
-      sheet.cell(rowIndex, 15).value(basicInfo.registeredInSum || '');
+      fill(ci.address || '');
+      fill(ci.address2 || '');
+      fill(ci.address3 || '');
+      fill(ci.townOrCity || '');
+      fill(`${ci.country || ''} / ${ci.province || ''}`);
+      fill(ci.zipCode);
 
-      sheet.cell(rowIndex, 16).value(basicInfo.isChinese ? 'yes' : 'no');
-      sheet.cell(rowIndex, 17).value(basicInfo.registrationNumber || 0);
+      fill(bi.registeredInCountry || '');
+      fill(bi.registeredInAimag || '');
+      fill(bi.registeredInSum || '');
+      fill(bi.isChinese ? 'yes' : 'no');
+      fill(bi.isSubContractor ? 'yes' : 'no');
+      fill(bi.corporateStructure || '');
+      fill(bi.registrationNumber || '');
+      fill((bi.certificateOfRegistration && bi.certificateOfRegistration.url) || '');
 
-      sheet
-        .cell(rowIndex, 18)
-        .value(
-          (basicInfo.certificateOfRegistration && basicInfo.certificateOfRegistration.url) || '',
-        );
+      fill(bi.website || '');
 
-      sheet.cell(rowIndex, 19).value(basicInfo.website || '');
-      sheet.cell(rowIndex, 20).value((it.contactInfo && it.contactInfo.phone) || '');
-      sheet.cell(rowIndex, 21).value(basicInfo.email || '');
-      sheet.cell(rowIndex, 22).value(basicInfo.foreignOwnershipPercentage || '');
+      // administrators
+      fill('');
 
-      sheet.cell(rowIndex, 23).value(basicInfo.totalNumberOfEmployees || 0);
-      sheet.cell(rowIndex, 24).value(basicInfo.totalNumberOfMongolianEmployees || 0);
-      sheet.cell(rowIndex, 25).value(basicInfo.totalNumberOfUmnugoviEmployees || 0);
+      fill(ci.phone || '');
+      fill(bi.email || '');
+      fill(bi.foreignOwnershipPercentage || '');
+
+      fill(bi.totalNumberOfEmployees || 0);
+      fill(bi.totalNumberOfMongolianEmployees || 0);
+      fill(bi.totalNumberOfUmnugoviEmployees || 0);
     }
 
     // Write to file.
