@@ -228,8 +228,8 @@ class TenderResponse {
 
     const tender = await Tenders.findOne({ _id: tenderId });
 
-    // can send to only open tenders
-    if (tender.status !== 'open') {
+    // can send to only open rfqs
+    if (tender.type === 'rfq' && tender.status !== 'open') {
       throw Error('This tender is not available');
     }
 
@@ -259,7 +259,7 @@ class TenderResponse {
 
     const tender = await Tenders.findOne({ _id: response.tenderId });
 
-    if (tender.status !== 'open') {
+    if (tender.type === 'rfq' && tender.status !== 'open') {
       throw Error('This tender is not available');
     }
 
