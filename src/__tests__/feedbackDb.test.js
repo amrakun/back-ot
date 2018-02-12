@@ -45,6 +45,7 @@ describe('Feedback db', () => {
     const doc = await feedbackResponseFactory();
     delete doc._id;
     delete doc.status;
+    delete doc.createdDate;
     await FeedbackResponses.remove({});
 
     let feedbackResponseObj = await FeedbackResponses.createFeedbackResponse({ ...doc });
@@ -55,6 +56,7 @@ describe('Feedback db', () => {
     delete feedbackResponseObj.__v;
     delete feedbackResponseObj._id;
     delete feedbackResponseObj.status;
+    delete feedbackResponseObj.createdDate;
 
     expect(status).toEqual('onTime');
     expect(feedbackResponseObj).toEqual(doc);
@@ -71,6 +73,7 @@ describe('Feedback db', () => {
     const doc = await feedbackResponseFactory();
     delete doc._id;
     delete doc.status;
+    delete doc.createdDate;
 
     await FeedbackResponses.remove({});
 
@@ -85,6 +88,7 @@ describe('Feedback db', () => {
     delete feedbackResponseObj.__v;
     delete feedbackResponseObj._id;
     delete feedbackResponseObj.status;
+    delete feedbackResponseObj.createdDate;
 
     expect(status).toBe('late');
     expect(feedbackResponseObj).toEqual(doc);
