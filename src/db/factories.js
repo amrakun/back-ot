@@ -46,7 +46,6 @@ export const companyFactory = (params = {}) => {
       enName: params.enName || faker.random.word(),
       mnName: params.mnName || faker.random.word(),
       isRegisteredOnSup: params.isRegisteredOnSup || false,
-      isSubContractor: params.isSubContractor || false,
       sapNumber: params.sapNumber || faker.random.word(),
       email: params.email || faker.internet.email(),
       address: params.address || faker.random.word(),
@@ -101,7 +100,6 @@ export const companyDocs = {
     registeredInAimag: 'UmnugivUpdated',
     registeredInSum: 'BayntsagaanUpdated',
     isChinese: true,
-    isSubContractor: false,
     corporateStructure: 'PartnershipUpdated',
     registrationNumber: 33483948394,
     certificateOfRegistration: { name: 'name', url: '/path' },
@@ -241,6 +239,8 @@ export const companyDocs = {
 
     hasConvictedLabourLawsDescription: 'hasConvictedLabourLawsDescription',
     hasConvictedForHumanRightsDescription: 'hasConvictedForHumanRightsDescription',
+
+    isSubContractor: false,
   }),
 
   environmental: () => ({

@@ -14,7 +14,6 @@ const basicInfoFields = `
   registeredInAimag: String
   registeredInSum: String
   isChinese: Boolean
-  isSubContractor: Boolean
   corporateStructure: String!
   registrationNumber: Float!
   certificateOfRegistration: JSON
@@ -139,6 +138,8 @@ export const businessInfoFields = `
 
   hasConvictedLabourLawsDescription: String
   hasConvictedForHumanRightsDescription: String
+
+  isSubContractor: Boolean
 `;
 
 // exporting to use in qualification

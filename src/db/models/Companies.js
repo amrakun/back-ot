@@ -28,7 +28,6 @@ const BasicInfoSchema = mongoose.Schema(
     registeredInAimag: field({ type: String, optional: true }),
     registeredInSum: field({ type: String, optional: true }),
     isChinese: field({ type: Boolean, optional: true }),
-    isSubContractor: field({ type: Boolean, optional: true }),
     corporateStructure: field({ type: String, optional: true }),
     registrationNumber: field({ type: Number, optional: true }),
     certificateOfRegistration: field({ type: FileSchema, optional: true }),
@@ -273,6 +272,8 @@ export const BusinessInfoSchema = mongoose.Schema(
 
     hasConvictedLabourLawsDescription: field({ type: String, optional: true }),
     hasConvictedForHumanRightsDescription: field({ type: String, optional: true }),
+
+    isSubContractor: field({ type: Boolean, optional: true }),
   },
   { _id: false },
 );

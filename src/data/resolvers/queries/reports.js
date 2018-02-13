@@ -45,6 +45,12 @@ const reportsQuery = {
       // basic info ==========
       const bi = it.basicInfo || {};
 
+      // contact info =========
+      const ci = it.contactInfo || {};
+
+      // business info =========
+      const businessInfo = it.businessInfo || {};
+
       fill(rowIndex - 2);
       fill(bi.sRegisteredOnSup ? 'yes' : 'no');
       fill(bi.sapNumber || '');
@@ -55,9 +61,6 @@ const reportsQuery = {
       fill(it.averageDifotScore || 0);
       fill(it.isQualified ? 'yes' : 'no');
       fill(it.isProductsInfoValidated ? 'yes' : 'no');
-
-      // contact info =========
-      const ci = it.contactInfo || {};
 
       fill(ci.address || '');
       fill(ci.address2 || '');
@@ -70,7 +73,7 @@ const reportsQuery = {
       fill(bi.registeredInAimag || '');
       fill(bi.registeredInSum || '');
       fill(bi.isChinese ? 'yes' : 'no');
-      fill(bi.isSubContractor ? 'yes' : 'no');
+      fill(businessInfo.isSubContractor ? 'yes' : 'no');
       fill(bi.corporateStructure || '');
       fill(bi.registrationNumber || '');
       fill((bi.certificateOfRegistration && bi.certificateOfRegistration.url) || '');
