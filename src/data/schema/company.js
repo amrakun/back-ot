@@ -15,11 +15,11 @@ const basicInfoFields = `
   registeredInSum: String
   isChinese: Boolean
   corporateStructure: String!
-  registrationNumber: Float!
+  registrationNumber: Float
   certificateOfRegistration: JSON
-  email: String!
+  email: String
   website: String
-  foreignOwnershipPercentage: String!
+  foreignOwnershipPercentage: String
   totalNumberOfEmployees: Int!
   totalNumberOfMongolianEmployees: Int!
   totalNumberOfUmnugoviEmployees: Int!
