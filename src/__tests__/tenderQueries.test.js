@@ -74,7 +74,7 @@ describe('Tender queries', () => {
       'tenderDetail',
       'tenderCountByStatus',
       'tendersAverageDuration',
-      'tendersTotalCount',
+      'tendersTotalCountReport',
       'tendersExport',
     ];
 
@@ -275,12 +275,12 @@ describe('Tender queries', () => {
 
   test('total tenders count', async () => {
     const qry = `
-      query tendersTotalCount(
+      query tendersTotalCountReport(
         $startDate: Date!,
         $endDate: Date!
         $type: String!,
       ) {
-        tendersTotalCount(
+        tendersTotalCountReport(
           startDate: $startDate,
           endDate: $endDate,
           type: $type
@@ -325,7 +325,7 @@ describe('Tender queries', () => {
     const args = { startDate, endDate, type: 'rfq' };
     const context = { user };
 
-    const response = await graphqlRequest(qry, 'tendersTotalCount', args, context);
+    const response = await graphqlRequest(qry, 'tendersTotalCountReport', args, context);
 
     expect(response).toBe(1);
   });

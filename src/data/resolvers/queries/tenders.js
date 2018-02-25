@@ -199,7 +199,7 @@ const tenderQueries = {
    * @param {String} type - Eoi or rfq
    * @return - Total count
    */
-  tendersTotalCount(root, { startDate, endDate, type }, { user }) {
+  tendersTotalCountReport(root, { startDate, endDate, type }, { user }) {
     const query = {
       publishDate: { $gte: startDate, $lte: endDate },
       type,
@@ -255,10 +255,10 @@ requireSupplier(tenderQueries, 'tendersSupplier');
 requireSupplier(tenderQueries, 'tenderDetailSupplier');
 
 requireBuyer(tenderQueries, 'tenders');
+requireBuyer(tenderQueries, 'tendersTotalCountReport');
 requireBuyer(tenderQueries, 'tendersExport');
 requireBuyer(tenderQueries, 'tenderDetail');
 requireBuyer(tenderQueries, 'tenderCountByStatus');
-requireBuyer(tenderQueries, 'tendersTotalCount');
 requireBuyer(tenderQueries, 'tendersAverageDuration');
 
 export default tenderQueries;

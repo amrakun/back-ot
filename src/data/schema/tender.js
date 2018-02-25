@@ -147,7 +147,7 @@ export const queries = `
     type: String!
   ): JSON
 
-  tendersTotalCount(
+  tendersTotalCountReport(
     startDate: Date!,
     endDate: Date!
     type: String!
