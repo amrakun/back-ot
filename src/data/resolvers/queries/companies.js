@@ -121,6 +121,17 @@ const companyQueries = {
   },
 
   /**
+   * Companies total count
+   * @param {Object} args - Query params
+   * @return {Promise} count
+   */
+  async companiesTotalCount(root, args) {
+    const selector = await companiesFilter(args);
+
+    return Companies.find(selector).count();
+  },
+
+  /**
    * Export companies list
    * @param {Object} args - Query params
    * @return {String} - file url

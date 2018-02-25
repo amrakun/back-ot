@@ -425,4 +425,19 @@ describe('Company queries', () => {
     expect(sup1.basicInfo.mnName).toBe('sup1');
     expect(sup2.basicInfo.mnName).toBe('sup2');
   });
+
+  test('companiesTotalCount', async () => {
+    const qry = `
+      query companiesTotalCount {
+        companiesTotalCount
+      }
+    `;
+
+    await companyFactory({});
+    await companyFactory({});
+
+    const count = await graphqlRequest(qry, 'companiesTotalCount', {});
+
+    expect(count).toBe(2);
+  });
 });

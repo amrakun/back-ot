@@ -396,6 +396,7 @@ const queryParams = `
 
 export const queries = `
   companies(${queryParams}): [Company]
+  companiesTotalCount(${queryParams}): Float
   companiesExport(${queryParams}): String
   companiesValidatedProductsInfoExport(${queryParams}): String
   companiesGenerateDifotScoreList(${queryParams}): String
