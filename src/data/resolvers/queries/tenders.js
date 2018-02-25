@@ -66,6 +66,17 @@ const tenderQueries = {
   },
 
   /**
+   * Tenders total count
+   * @param {Object} args - Query params
+   * @return {Promise} count
+   */
+  async tendersTotalCount(root, args, { user }) {
+    const query = await tendersBuyerFilter(args, user);
+
+    return Tenders.find(query).count();
+  },
+
+  /**
    * Tenders list for supplier
    * @param {Object} args - Query params
    * @return {Promise} filtered tenders list by given parameters
@@ -255,6 +266,7 @@ requireSupplier(tenderQueries, 'tendersSupplier');
 requireSupplier(tenderQueries, 'tenderDetailSupplier');
 
 requireBuyer(tenderQueries, 'tenders');
+requireBuyer(tenderQueries, 'tendersTotalCount');
 requireBuyer(tenderQueries, 'tendersTotalCountReport');
 requireBuyer(tenderQueries, 'tendersExport');
 requireBuyer(tenderQueries, 'tenderDetail');

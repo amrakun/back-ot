@@ -65,12 +65,13 @@ describe('Tender queries', () => {
       }
     };
 
-    expect.assertions(11);
+    expect.assertions(12);
 
     const user = await userFactory({ isSupplier: true });
 
     const queries = [
       'tenders',
+      'tendersTotalCount',
       'tenderDetail',
       'tenderCountByStatus',
       'tendersAverageDuration',
@@ -741,5 +742,20 @@ describe('Tender queries', () => {
     );
 
     expect(response.length).toBe(0);
+  });
+
+  test('tendersTotalCount', async () => {
+    const qry = `
+      query tendersTotalCount {
+        tendersTotalCount
+      }
+    `;
+
+    await tenderFactory({});
+    await tenderFactory({});
+
+    const count = await graphqlRequest(qry, 'tendersTotalCount', {});
+
+    expect(count).toBe(2);
   });
 });
