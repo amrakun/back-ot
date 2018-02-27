@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { SearchLogs, Tenders } from '../db/models';
-import { userFactory, tenderFactory } from '../db/factories';
+import { SearchLogs, TenderResponseLogs, Tenders, Users } from '../db/models';
+import { userFactory, tenderFactory, tenderResponseFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -37,7 +37,7 @@ describe('Log tests', () => {
     await tenderFactory({ type: 'eoi', createdUserId: 'cc' });
     await tenderFactory({ type: 'eoi', createdUserId: 'cc' });
 
-    const draftTenders = await Tenders.aggregate([
+    const eoiDraftTenders = await Tenders.aggregate([
       {
         $match: {
           type: 'eoi',
@@ -49,9 +49,7 @@ describe('Log tests', () => {
       },
       {
         $group: {
-          _id: {
-            createdUserId: '$createdUserId',
-          },
+          _id: '$createdUserId',
           count: { $sum: 1 },
         },
       },
@@ -72,9 +70,8 @@ describe('Log tests', () => {
       },
       {
         $group: {
-          _id: {
-            createdUserId: '$createdUserId',
-          },
+          _id: '$createdUserId',
+
           count: { $sum: 1 },
         },
       },
@@ -123,6 +120,64 @@ describe('Log tests', () => {
     //   }
     // ]);
 
-    console.log('eoiPublishTenders: ', eoiPublishTenders);
+    await Users.login({ email: _user.email, password: 'pass' });
+
+    const supplierLastLogin = await Users.aggregate([
+      {
+        $match: {
+          isSupplier: true,
+          lastLoginDate: {
+            $gte: todayStart,
+            $lt: todayEnd,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { username: '$username', email: '$email' },
+          lastLoginDate: { $max: '$lastLoginDate' },
+        },
+      },
+    ]);
+
+    const buyerLastLogin = await Users.aggregate([
+      {
+        $match: {
+          isSupplier: { $ne: true },
+          lastLoginDate: {
+            $gte: todayStart,
+            $lt: todayEnd,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { username: '$username', email: '$email' },
+          lastLoginDate: { $max: '$lastLoginDate' },
+        },
+      },
+    ]);
+
+    const tenderEoiA = await tenderFactory({ type: 'eoi' });
+    const tenderEoiB = await tenderFactory({ type: 'eoi' });
+    const tenderEoiC = await tenderFactory({ type: 'eoi' });
+    const tenderRfqA = await tenderFactory({ type: 'rfq' });
+    const tenderRfqB = await tenderFactory({ type: 'rfq' });
+
+    const tenderResponseA = await tenderResponseFactory({ tenderId: tenderEoiA._id });
+    const tenderResponseB = await tenderResponseFactory({ tenderId: tenderEoiB._id });
+    const tenderResponseC = await tenderResponseFactory({ tenderId: tenderEoiC._id });
+    const tenderResponseD = await tenderResponseFactory({ tenderId: tenderRfqA._id });
+    const tenderResponseE = await tenderResponseFactory({ tenderId: tenderRfqB._id });
+
+    const _user2 = await userFactory({});
+
+    await TenderResponseLogs.createLog(tenderResponseA, _user._id);
+    await TenderResponseLogs.createLog(tenderResponseB, _user._id);
+    await TenderResponseLogs.createLog(tenderResponseC, _user2._id);
+    await TenderResponseLogs.createLog(tenderResponseD, _user._id);
+    await TenderResponseLogs.createLog(tenderResponseE, _user2._id);
+
+    const tenderResponseLogs = await TenderResponseLogs.find({});
   });
 });

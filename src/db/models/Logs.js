@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
+import { Tenders } from './Tenders';
 
-// Feedback schema
+// SearchLog schema
 const SearchLogSchema = mongoose.Schema({
   createdDate: field({ type: Date }),
   userId: field({ type: String }),
@@ -38,4 +39,27 @@ SearchLogSchema.loadClass(
   },
 );
 
-export default mongoose.model('search_logs', SearchLogSchema);
+export const SearchLogs = mongoose.model('search_logs', SearchLogSchema);
+
+// TenderResponseLog schema
+const TenderResponseLogSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
+  userId: field({ type: String }),
+  tenderType: field({ type: String }),
+});
+
+TenderResponseLogSchema.loadClass(
+  class {
+    static async createLog(tenderResponse, userId) {
+      const tender = await Tenders.findOne({ _id: tenderResponse.tenderId });
+      const userSearchLog = await this.create({
+        userId,
+        tenderType: tender.type,
+        createdDate: new Date(),
+      });
+      return userSearchLog.save();
+    }
+  },
+);
+
+export const TenderResponseLogs = mongoose.model('tender_response_logs', TenderResponseLogSchema);

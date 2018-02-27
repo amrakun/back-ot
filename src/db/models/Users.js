@@ -48,7 +48,7 @@ const UserSchema = mongoose.Schema({
   delegationStartDate: field({ type: Date, optional: true }),
   delegationEndDate: field({ type: Date, optional: true }),
 
-  lastLoginDate: field({ type: Date }),
+  lastLoginDate: field({ type: Date, optional: true }),
 });
 
 class User {

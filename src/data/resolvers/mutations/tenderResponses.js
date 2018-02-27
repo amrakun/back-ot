@@ -1,4 +1,4 @@
-import { TenderResponses } from '../../../db/models';
+import { TenderResponses, TenderResponseLogs } from '../../../db/models';
 import { moduleRequireSupplier } from '../../permissions';
 
 const tenderResponseMutations = {
@@ -23,12 +23,14 @@ const tenderResponseMutations = {
   /**
    * Mark tender response as sent
    */
-  async tenderResponsesSend(root, doc) {
+  async tenderResponsesSend(root, doc, { user }) {
     const response = await TenderResponses.findOne(doc);
 
     if (response) {
       return response.send();
     }
+
+    await TenderResponseLogs.createLog(response, user._id);
 
     return null;
   },

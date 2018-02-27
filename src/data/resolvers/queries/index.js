@@ -13,6 +13,7 @@ import reports from './reports';
 import configs from './configs';
 import massMails from './massMails';
 import permissions from './permissions';
+import logs from './logs';
 
 export default {
   ...users,
@@ -30,4 +31,5 @@ export default {
   ...configs,
   ...massMails,
   ...permissions,
+  ...logs,
 };
