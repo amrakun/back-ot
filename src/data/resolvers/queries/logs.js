@@ -10,9 +10,6 @@ import {
 } from './logExports';
 
 const logQueries = {
-  /**
-   *
-   */
   async logsSupplierLoginsExport(root, { startDate, endDate }, { user }) {
     return buildSupplierLoginsLog(
       {
