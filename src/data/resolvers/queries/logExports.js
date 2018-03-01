@@ -381,5 +381,5 @@ export const buildRfqCreatedAndSentExport = async ({ startDate, endDate }, user)
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'activities_per_buyer');
+  return generateXlsx(workbook, 'rfq_created_and_sent');
 };
