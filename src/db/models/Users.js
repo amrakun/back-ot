@@ -47,6 +47,8 @@ const UserSchema = mongoose.Schema({
   delegatedUserId: field({ type: String, optional: true }),
   delegationStartDate: field({ type: Date, optional: true }),
   delegationEndDate: field({ type: Date, optional: true }),
+
+  lastLoginDate: field({ type: Date, optional: true }),
 });
 
 class User {
@@ -428,6 +430,9 @@ class User {
 
     // create tokens
     const [token, refreshToken] = await this.createTokens(user, this.getSecret());
+
+    user.lastLoginDate = new Date();
+    await user.save();
 
     return {
       status: 'login',

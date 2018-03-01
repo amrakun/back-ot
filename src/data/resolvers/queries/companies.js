@@ -1,4 +1,4 @@
-import { Companies, BlockedCompanies } from '../../../db/models';
+import { Companies, BlockedCompanies, SearchLogs } from '../../../db/models';
 import { paginate } from './utils';
 import { requireBuyer } from '../../permissions';
 import {
@@ -114,8 +114,12 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {Promise} filtered companies list by given parameters
    */
-  async companies(root, args) {
+  async companies(root, args, { user }) {
     const selector = await companiesFilter(args);
+
+    if (!user.isSupplier) {
+      SearchLogs.createLog(user._id);
+    }
 
     return paginate(Companies.find(selector), args);
   },

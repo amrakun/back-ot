@@ -54,6 +54,8 @@ import {
   mutations as MassMailMutations,
 } from './massMail';
 
+import { queries as LogQueries } from './log';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -86,6 +88,7 @@ export const queries = `
     ${ConfigQueries}
     ${MassMailQueries}
     ${PermissionQueries}
+    ${LogQueries}
   }
 `;
 
