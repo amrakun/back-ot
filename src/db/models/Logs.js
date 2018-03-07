@@ -63,3 +63,53 @@ TenderResponseLogSchema.loadClass(
 );
 
 export const TenderResponseLogs = mongoose.model('tender_response_logs', TenderResponseLogSchema);
+
+// SuppliersByProductCodeLog schema
+const SuppliersByProductCodeLogSchema = mongoose.Schema({
+  registeredDate: field({ type: Date }),
+  supplierId: field({ type: String }),
+  startDate: field({ type: Date }),
+  endDate: field({ type: Date, optional: true }),
+  createdDate: field({ type: Date }),
+  productCodes: [String],
+});
+
+SuppliersByProductCodeLogSchema.loadClass(
+  class {
+    static async createLog(supplier) {
+      // update last log for the supplier
+      const results = await this.find({ supplierId: supplier._id.toString() }).sort({
+        startDate: -1,
+      });
+
+      if (results.length > 0) {
+        const lastLog = await this.findOne({ _id: results[0]._id });
+        lastLog.endDate = new Date();
+        await lastLog.save();
+      }
+
+      // create new log
+      let productCodes = [];
+      const groupInfo = supplier.groupInfo;
+
+      for (let factory of (groupInfo || { factories: [{ productCodes: [] }] }).factories) {
+        productCodes = productCodes.concat(factory.productCodes);
+      }
+
+      let log = await this.create({
+        supplierId: supplier._id,
+        registeredDate: supplier.createdDate,
+        startDate: new Date(),
+        createdDate: new Date(),
+        productCodes,
+      });
+
+      return log;
+    }
+  },
+);
+
+export const SuppliersByProductCodeLogs = mongoose.model(
+  'suppliers_by_product_code_logs',
+  SuppliersByProductCodeLogSchema,
+);

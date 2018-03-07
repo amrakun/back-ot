@@ -1,5 +1,12 @@
 import { readTemplate, generateXlsx } from '../../utils';
-import { TenderResponseLogs, Users, Companies, SearchLogs, Tenders } from '../../../db/models';
+import {
+  TenderResponseLogs,
+  Users,
+  Companies,
+  SearchLogs,
+  Tenders,
+  SuppliersByProductCodeLogs,
+} from '../../../db/models';
 
 export const buildSupplierLoginsLog = async ({ startDate, endDate }, user) => {
   const { workbook, sheet } = await readTemplate('logs_supplier_logins');
@@ -382,4 +389,73 @@ export const buildRfqCreatedAndSentExport = async ({ startDate, endDate }, user)
 
   // Write to file.
   return generateXlsx(workbook, 'rfq_created_and_sent');
+};
+
+export const buildSuppliersByProductCodeLogsExport = async (
+  { startDate, endDate, productCodes },
+  user,
+) => {
+  const { workbook, sheet } = await readTemplate('suppliers_by_product_code_logs_export');
+
+  const items = await SuppliersByProductCodeLogs.aggregate([
+    {
+      $match: {
+        $and: [
+          { productCodes: { $in: productCodes } },
+          {
+            $or: [
+              {
+                endDate: { $exists: false },
+                startDate: { $gte: startDate, $lt: endDate },
+              },
+              {
+                $or: [
+                  { startDate: { $gte: startDate, $lt: endDate } },
+                  { 'endDate:': { $gte: startDate, $lt: endDate } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: '$supplierId',
+        maxStartDate: { $max: '$startDate' },
+      },
+    },
+  ]);
+
+  let rowIndex = 3;
+
+  sheet.cell(rowIndex++, 2).value(`Produced by: ${user.firstName} ${user.lastName}`);
+  sheet.cell(rowIndex++, 2).value(`Date and Time Run: ${new Date().toLocaleString()}`);
+  sheet.cell(rowIndex++, 2).value(`Number of records: ${items.length}`);
+  sheet
+    .cell(rowIndex++, 2)
+    .value(`Date range: ${startDate.toLocaleDateString()} :  ${endDate.toLocaleDateString()}`);
+  sheet.cell(rowIndex++, 2).value('Scheme: Supplier');
+  sheet.cell(rowIndex++, 2).value(`Product code: ${productCodes.join()}`);
+
+  rowIndex = 10;
+
+  for (let item of items) {
+    const supplier = await Companies.findOne({ _id: item._id });
+
+    sheet.cell(rowIndex, 2).value(supplier.createdDate.toLocaleDateString('mn-MN'));
+    sheet.cell(rowIndex, 3).value(supplier.createdDate.toLocaleTimeString('mn-MN'));
+    sheet
+      .cell(rowIndex, 4)
+      .value(
+        (supplier.contactInfo || { name: '' }).name
+          ? ''
+          : (supplier.basicInfo || { mnName: '' }).mnName,
+      );
+
+    rowIndex++;
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers_by_product_code_logs_export');
 };

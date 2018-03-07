@@ -7,6 +7,7 @@ import {
   buildSearchesPerBuyer,
   buildEoiCreatedAndSentExport,
   buildRfqCreatedAndSentExport,
+  buildSuppliersByProductCodeLogsExport,
 } from './logExports';
 
 const logQueries = {
@@ -75,6 +76,17 @@ const logQueries = {
       {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
+      },
+      user,
+    );
+  },
+
+  async logsSuppliersByProductCodeLogsExport(root, { startDate, endDate, productCodes }, { user }) {
+    return buildSuppliersByProductCodeLogsExport(
+      {
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        productCodes,
       },
       user,
     );

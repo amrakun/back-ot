@@ -7,7 +7,7 @@ import Qualifications from './Qualifications';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
 import MassMails from './MassMails';
-import { SearchLogs, TenderResponseLogs } from './Logs';
+import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs } from './Logs';
 
 export {
   Companies,
@@ -25,4 +25,5 @@ export {
   MassMails,
   SearchLogs,
   TenderResponseLogs,
+  SuppliersByProductCodeLogs,
 };
