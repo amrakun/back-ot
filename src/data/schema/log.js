@@ -6,4 +6,5 @@ export const queries = `
   logsSearchesPerBuyerExport(startDate: Date!, endDate: Date!): String
   logsEoiCreatedAndSentExport(startDate: Date!, endDate: Date!): String
   logsRfqCreatedAndSentExport(startDate: Date!, endDate: Date!): String
+  logsSuppliersByProductCodeLogsExport(startDate: Date!, endDate: Date!, productCodes: [String!]): String
 `;
