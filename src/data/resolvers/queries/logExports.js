@@ -411,7 +411,7 @@ export const buildSuppliersByProductCodeLogsExport = async (
               {
                 $or: [
                   { startDate: { $gte: startDate, $lt: endDate } },
-                  { 'endDate:': { $gte: startDate, $lt: endDate } },
+                  { endDate: { $gte: startDate, $lt: endDate } },
                 ],
               },
             ],
