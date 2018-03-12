@@ -1,4 +1,4 @@
-import { Qualifications } from '../../../db/models';
+import { Qualifications, Companies, SuppliersByProductCodeLogs } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
 
 const qualificationMutations = {
@@ -12,7 +12,11 @@ const qualificationMutations = {
   /*
    * Prequalify a supplier
    */
-  qualificationsPrequalify(root, { supplierId, qualified }) {
+  async qualificationsPrequalify(root, { supplierId, qualified }) {
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    await SuppliersByProductCodeLogs.createLog(supplier);
+
     return Qualifications.prequalify(supplierId, qualified);
   },
 };
