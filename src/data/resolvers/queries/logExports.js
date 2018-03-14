@@ -45,12 +45,12 @@ export const buildSupplierLoginsLog = async ({ startDate, endDate }, user) => {
     const user = await Users.findOne({ _id: item._id });
     const company = await Companies.findOne({ _id: user.companyId });
 
-    if (company && company.basic) {
-      sheet.cell(rowIndex, 2).value(company.basic.sapNumber);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 2).value(company.basicInfo.sapNumber);
     }
 
-    if (company && company.contact) {
-      sheet.cell(rowIndex, 3).value(company.contact.name);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 3).value(company.basicInfo.enName);
     }
 
     sheet.cell(rowIndex, 4).value(user.username);
@@ -138,12 +138,12 @@ export const buildSupplierLoginsByEoiSubmissions = async ({ startDate, endDate }
     const user = await Users.findOne({ _id: item.userId });
     const company = await Companies.findOne({ _id: user.companyId });
 
-    if (company && company.basic) {
-      sheet.cell(rowIndex, 2).value(company.basic.sapNumber);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 2).value(company.basicInfo.sapNumber);
     }
 
-    if (company && company.contact) {
-      sheet.cell(rowIndex, 3).value(company.contact.name);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 3).value(company.basicInfo.enName);
     }
 
     sheet.cell(rowIndex, 4).value(user.username);
@@ -184,12 +184,12 @@ export const buildSupplierLoginsByRfqSubmissions = async ({ startDate, endDate }
     const user = await Users.findOne({ _id: item.userId });
     const company = await Companies.findOne({ _id: user.companyId });
 
-    if (company && company.basic) {
-      sheet.cell(rowIndex, 2).value(company.basic.sapNumber);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 2).value(company.basicInfo.sapNumber);
     }
 
-    if (company && company.contact) {
-      sheet.cell(rowIndex, 3).value(company.contact.name);
+    if (company && company.basicInfo) {
+      sheet.cell(rowIndex, 3).value(company.basicInfo.enName);
     }
 
     sheet.cell(rowIndex, 4).value(user.username);
@@ -448,7 +448,7 @@ export const buildSuppliersByProductCodeLogsExport = async (
     sheet
       .cell(rowIndex, 4)
       .value(
-        (supplier.contactInfo || { name: '' }).name
+        (supplier.basicInfo || { enName: '' }).enName
           ? ''
           : (supplier.basicInfo || { mnName: '' }).mnName,
       );
