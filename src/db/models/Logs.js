@@ -17,6 +17,7 @@ SearchLogSchema.loadClass(
       const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
       let userSearchLog = await this.findOne({
+        userId,
         createdDate: {
           $gte: todayStart.toISOString(),
           $lt: todayEnd.toISOString(),
