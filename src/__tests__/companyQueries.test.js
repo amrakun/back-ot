@@ -336,10 +336,10 @@ describe('Company queries', () => {
 
     const [item1, item2] = response;
 
-    expect(item1._id).toBe('tier1');
+    expect(item1._id).toBe('national');
     expect(item1.count).toBe(1);
 
-    expect(item2._id).toBe('national');
+    expect(item2._id).toBe('tier1');
     expect(item2.count).toBe(1);
   });
 

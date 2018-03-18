@@ -217,6 +217,7 @@ const companyQueries = {
     return Companies.aggregate([
       { $match: { createdDate: { $gte: startDate, $lte: endDate } } },
       { $group: { _id: '$tierType', count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
     ]);
   },
 
