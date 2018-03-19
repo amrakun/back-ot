@@ -609,7 +609,13 @@ export const auditResponseFactory = async (params = {}) => {
     reportFile: params.reportFile,
   });
 
-  return save(auditResponse);
+  const savedResponse = await save(auditResponse);
+
+  if (params.status) {
+    await AuditResponses.update({ _id: savedResponse._id }, { $set: { status: params.status } });
+  }
+
+  return AuditResponses.findOne({ _id: savedResponse._id });
 };
 
 export const blockedCompanyFactory = params => {

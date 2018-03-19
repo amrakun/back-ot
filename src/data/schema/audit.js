@@ -227,10 +227,11 @@ export const queries = `
   auditDetail(_id: String!): Audit
 
   auditResponses(
-    supplierSearch: String,
-    isFileGenerated: Boolean,
-    publishDate: Date,
-    closeDate: Date,
+    supplierSearch: String
+    isFileGenerated: Boolean
+    publishDate: Date
+    closeDate: Date
+    status: String
   ): [AuditResponse]
 
   auditResponseTotalCounts: AuditResponseTotalCounts
