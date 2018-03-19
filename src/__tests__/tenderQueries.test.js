@@ -505,6 +505,19 @@ describe('Tender queries', () => {
 
     const supplierIds = [user.companyId];
 
+    // this tender must be ignored
+    const notInterestedTender = await tenderFactory({
+      type: 'eoi',
+      status: 'open',
+      supplierIds,
+    });
+
+    await tenderResponseFactory({
+      tenderId: notInterestedTender._id,
+      supplierId: user.companyId,
+      isNotInterested: true,
+    });
+
     await tenderFactory({});
     await tenderFactory({ type: 'eoi', status: 'draft', supplierIds });
     await tenderFactory({ type: 'rfq', status: 'open', name: 'test', supplierIds });
