@@ -53,6 +53,37 @@ const tendersBuyerFilter = async (args, user) =>
     }
   });
 
+/**
+ * Supplier only filters
+ */
+const tendersSupplierFilter = async (args, user) => {
+  const { status } = args;
+
+  // removing status filter to implement custom status filter
+  // below
+  delete args.status;
+
+  const query = await tendersFilter(args, async query => {
+    query.$and.push({ supplierIds: { $in: [user.companyId] } });
+    query.$and.push({ status: { $ne: 'draft' } });
+
+    // filter only user's responded tenders
+    if (status && status.includes('participated')) {
+      const submittedTenders = await TenderResponses.find({
+        supplierId: user.companyId,
+      });
+
+      const submittedTenderIds = submittedTenders.map(res => res.tenderId);
+
+      query.$and.push({
+        $or: [{ _id: { $in: submittedTenderIds } }, { status: { $in: status.split(',') } }],
+      });
+    }
+  });
+
+  return query;
+};
+
 const tenderQueries = {
   /**
    * Tenders list for buyer
@@ -66,11 +97,11 @@ const tenderQueries = {
   },
 
   /**
-   * Tenders total count
+   * Buyer tenders total count
    * @param {Object} args - Query params
    * @return {Promise} count
    */
-  async tendersTotalCount(root, args, { user }) {
+  async tendersBuyerTotalCount(root, args, { user }) {
     const query = await tendersBuyerFilter(args, user);
 
     return Tenders.find(query).count();
@@ -82,31 +113,20 @@ const tenderQueries = {
    * @return {Promise} filtered tenders list by given parameters
    */
   async tendersSupplier(root, args, { user }) {
-    const { status } = args;
-
-    // removing status filter to implement custom status filter
-    // below
-    delete args.status;
-
-    const query = await tendersFilter(args, async query => {
-      query.$and.push({ supplierIds: { $in: [user.companyId] } });
-      query.$and.push({ status: { $ne: 'draft' } });
-
-      // filter only user's responded tenders
-      if (status && status.includes('participated')) {
-        const submittedTenders = await TenderResponses.find({
-          supplierId: user.companyId,
-        });
-
-        const submittedTenderIds = submittedTenders.map(res => res.tenderId);
-
-        query.$and.push({
-          $or: [{ _id: { $in: submittedTenderIds } }, { status: { $in: status.split(',') } }],
-        });
-      }
-    });
+    const query = await tendersSupplierFilter(args, user);
 
     return paginate(Tenders.find(query).sort({ createdDate: -1 }), args);
+  },
+
+  /**
+   * Supplier tenders total count
+   * @param {Object} args - Query params
+   * @return {Promise} count
+   */
+  async tendersSupplierTotalCount(root, args, { user }) {
+    const query = await tendersSupplierFilter(args, user);
+
+    return Tenders.find(query).count();
   },
 
   /**
@@ -263,10 +283,11 @@ const tenderQueries = {
 };
 
 requireSupplier(tenderQueries, 'tendersSupplier');
+requireSupplier(tenderQueries, 'tendersSupplierTotalCount');
 requireSupplier(tenderQueries, 'tenderDetailSupplier');
 
 requireBuyer(tenderQueries, 'tenders');
-requireBuyer(tenderQueries, 'tendersTotalCount');
+requireBuyer(tenderQueries, 'tendersBuyerTotalCount');
 requireBuyer(tenderQueries, 'tendersTotalCountReport');
 requireBuyer(tenderQueries, 'tendersExport');
 requireBuyer(tenderQueries, 'tenderDetail');
