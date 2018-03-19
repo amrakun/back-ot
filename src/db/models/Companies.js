@@ -474,14 +474,14 @@ class Company {
    * Get feedbacks that this supplier can see
    */
   getFeedbacks() {
-    return Feedbacks.find({ supplierIds: { $in: [this._id] } }).sort({ createdDate: -1 });
+    return Feedbacks.find({ supplierIds: { $in: [this._id] } });
   }
 
   /*
    * Get get last feedback
    */
   async getLastFeedback() {
-    const feedbacks = await this.getFeedbacks();
+    const feedbacks = await this.getFeedbacks().sort({ createdDate: 1 });
 
     return feedbacks.pop();
   }
