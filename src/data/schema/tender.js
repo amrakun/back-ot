@@ -120,8 +120,10 @@ const tenderQueryParams = `
 
 export const queries = `
   tenders(${tenderQueryParams}): [Tender]
-  tendersTotalCount(${tenderQueryParams}): Float
+  tendersBuyerTotalCount(${tenderQueryParams}): Float
+
   tendersSupplier(${tenderQueryParams}): [SupplierTender]
+  tendersSupplierTotalCount(${tenderQueryParams}): Float
   tendersExport(${tenderQueryParams}): String
 
   tenderDetail(_id: String!): Tender
