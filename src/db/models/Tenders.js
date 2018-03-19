@@ -12,12 +12,12 @@ const FileSchema = mongoose.Schema(
 const ProductSchema = mongoose.Schema(
   {
     code: field({ type: String }),
-    purchaseRequestNumber: field({ type: Number }),
+    purchaseRequestNumber: field({ type: Number, max: 99999999 }),
     shortText: field({ type: String }),
     quantity: field({ type: Number }),
     uom: field({ type: String }),
     manufacturer: field({ type: String }),
-    manufacturerPartNumber: field({ type: Number }),
+    manufacturerPartNumber: field({ type: Number, max: 99999999 }),
   },
   { _id: false },
 );
@@ -81,7 +81,7 @@ class Tender extends StatusPublishClose {
       throw new Error('Can not update closed tender');
     }
 
-    await this.update({ _id }, { $set: doc });
+    await this.update({ _id }, { $set: doc }, { runValidators: true });
 
     return this.findOne({ _id });
   }
