@@ -66,7 +66,7 @@ const auditResponseQueries = {
         const fieldOptions = paths[fieldName].options;
 
         // collect only wrong answers
-        if (fieldValue.supplierAnswer) {
+        if (!fieldValue.supplierAnswer) {
           invalidAnswers.push({
             label: fieldOptions.label.replace(/\s\s/g, ''),
             recommendation: fieldValue.supplierComment,
@@ -75,9 +75,9 @@ const auditResponseQueries = {
       });
     };
 
+    collectInvalidAnswers('coreHseqInfo', CoreHseqInfoSchema);
     collectInvalidAnswers('hrInfo', HrInfoSchema);
     collectInvalidAnswers('businessInfo', BusinessInfoSchema);
-    collectInvalidAnswers('coreHseqInfo', CoreHseqInfoSchema);
 
     rIndex += 3;
 

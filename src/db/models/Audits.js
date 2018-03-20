@@ -159,7 +159,7 @@ export const HrInfoSchema = mongoose.Schema(
     workContractManagement: field({
       type: HrReplyRecommendSchema,
       optional: true,
-      label: 'Work Contract Managemen',
+      label: 'Work Contract Management',
     }),
 
     jobDescriptionProcedure: field({
