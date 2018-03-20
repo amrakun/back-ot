@@ -67,6 +67,17 @@ const tendersSupplierFilter = async (args, user) => {
     query.$and.push({ supplierIds: { $in: [user.companyId] } });
     query.$and.push({ status: { $ne: 'draft' } });
 
+    // ignore not interested tenders =============
+    const notInterestedTenders = await TenderResponses.find({
+      supplierId: user.companyId,
+      isNotInterested: true,
+    });
+
+    const notInterestedTenderIds = notInterestedTenders.map(res => res.tenderId);
+
+    query.$and.push({ _id: { $nin: notInterestedTenderIds } });
+    // =================== //
+
     // filter only user's responded tenders
     if (status && status.includes('participated')) {
       const submittedTenders = await TenderResponses.find({

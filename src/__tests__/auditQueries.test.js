@@ -287,16 +287,18 @@ describe('Company queries', () => {
   test('audit responses', async () => {
     const query = `
       query auditResponses(
-        $supplierSearch: String,
-        $isFileGenerated: Boolean,
-        $publishDate: Date,
+        $supplierSearch: String
+        $isFileGenerated: Boolean
+        $publishDate: Date
         $closeDate: Date
+        $status: String
       ) {
         auditResponses(
-          supplierSearch: $supplierSearch,
-          isFileGenerated: $isFileGenerated,
-          publishDate: $publishDate,
+          supplierSearch: $supplierSearch
+          isFileGenerated: $isFileGenerated
+          publishDate: $publishDate
           closeDate: $closeDate
+          status: $status
         ) {
           _id
           auditId
@@ -322,7 +324,11 @@ describe('Company queries', () => {
       closeDate: moment().add(1, 'days'),
     });
 
-    await auditResponseFactory({ auditId: audit1._id, reportFile: '/path' });
+    await auditResponseFactory({
+      auditId: audit1._id,
+      reportFile: '/path',
+      status: 'late',
+    });
 
     // respose 2 ===
     const audit2 = await auditFactory({
@@ -330,7 +336,11 @@ describe('Company queries', () => {
       closeDate: moment().add(-10, 'days'),
     });
 
-    await auditResponseFactory({ supplierId: supplier._id, auditId: audit2._id });
+    await auditResponseFactory({
+      supplierId: supplier._id,
+      auditId: audit2._id,
+      status: 'onTime',
+    });
 
     // supplier search ===================
     let args = { supplierSearch: 'enName' };
@@ -350,6 +360,12 @@ describe('Company queries', () => {
 
     // isFileGenerated search ===================
     args = { isFileGenerated: true };
+    response = await graphqlRequest(query, 'auditResponses', args);
+
+    expect(response.length).toBe(1);
+
+    // status search ===================
+    args = { status: 'onTime' };
     response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);

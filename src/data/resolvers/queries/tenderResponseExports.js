@@ -27,8 +27,8 @@ const tenderResponseQueries = {
       template: 'rfq_bid',
     });
 
-    tender.requestedProducts.forEach((product, index) => {
-      const rowIndex = 13 + index;
+    for (const [index, product] of tender.requestedProducts.entries()) {
+      const rowIndex = 12 + index;
 
       // fill requested products section
       sheet.cell(rowIndex, 2).value(product.code);
@@ -40,22 +40,24 @@ const tenderResponseQueries = {
 
       let columnIndex = 4;
 
-      responses.forEach((response, index) => {
+      for (const response of responses) {
+        const supplier = await Companies.findOne({ _id: response.supplierId });
+
         // find response by product code
-        const rp = response.respondedProducts.find(p => p.code === product.code);
+        const rp = response.respondedProducts.find(p => p.code === product.code) || {};
 
         columnIndex += 4;
 
         // title
-        sheet.cell(10, columnIndex).value(`Supplier${index + 1}`);
+        sheet.cell(10, columnIndex).value(supplier.basicInfo.enName);
 
         // fill suppliers section
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
         sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
-        sheet.cell(rowIndex, columnIndex + 2).value(rp.totalPrice);
+        sheet.cell(rowIndex, columnIndex + 2).value(product.quantity * rp.unitPrice);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.suggestedManufacturer);
-      });
-    });
+      }
+    }
 
     return generateXlsx(workbook, `rfq_bid_summary_${tender._id}`);
   },
