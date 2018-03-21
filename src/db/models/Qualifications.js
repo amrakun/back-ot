@@ -75,7 +75,10 @@ class Qualification {
    */
   static async prequalify(supplierId, status) {
     // update supplier's tier type
-    await Companies.update({ _id: supplierId }, { $set: { isPrequalified: status } });
+    await Companies.update(
+      { _id: supplierId },
+      { $set: { isPrequalified: status, prequalifiedDate: new Date() } },
+    );
 
     return Companies.findOne({ _id: supplierId });
   }

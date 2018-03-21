@@ -80,6 +80,7 @@ describe('Qualification db', () => {
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(updatedCompany.isPrequalified).toBe(false);
+    expect(updatedCompany.prequalifiedDate).toBeDefined();
   });
 
   test('Tier type', async () => {
