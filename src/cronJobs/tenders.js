@@ -1,5 +1,5 @@
 import schedule from 'node-schedule';
-import { Companies, Tenders } from '../db/models';
+import { Users, Companies, Tenders } from '../db/models';
 import utils from '../data/utils';
 
 // every 1 minute
@@ -7,7 +7,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   const publishedTenderIds = await Tenders.publishDrafts();
   const publishedTenders = await Tenders.find({ _id: { $in: publishedTenderIds } });
 
-  // send email to suppliers
+  // send published email to suppliers
   for (const tender of publishedTenders) {
     const suppliers = await Companies.find({ _id: { $in: tender.supplierIds } });
 
@@ -25,7 +25,24 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     }
   }
 
-  await Tenders.closeOpens();
+  const closedTenderIds = await Tenders.closeOpens();
+  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds } });
+
+  // send closed email to suppliers
+  for (const tender of closedTenders) {
+    const createdUser = await Users.findOne({ _id: tender.createdUserId });
+
+    utils.sendEmail({
+      toEmails: [createdUser.email],
+      title: tender.name,
+      template: {
+        name: 'tender_close',
+        data: {
+          tender,
+        },
+      },
+    });
+  }
 
   console.log('Checked tender status'); // eslint-disable-line
 });
