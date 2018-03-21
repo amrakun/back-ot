@@ -193,6 +193,9 @@ const auditResponseQueries = {
     // core hseq
     let rIndex = 77;
 
+    // main result
+    let isQualified = true;
+
     const renderSection = (sectionName, sectionTitle, schema, extraAction) => {
       rIndex += 2;
 
@@ -224,19 +227,29 @@ const auditResponseQueries = {
         // auditorRecommendation: recommendation
         // auditorScore: no
         const fieldValue = sectionValue[fieldName] || {};
-        fieldValue.supplierAnswer = fixValue(fieldValue.supplierAnswer);
-        fieldValue.auditorScore = fixValue(fieldValue.auditorScore);
+        const supplierAnswer = fixValue(fieldValue.supplierAnswer);
+        const auditorScore = fixValue(fieldValue.auditorScore);
+
+        // if auditor replied as no or gave 0 score then consider this
+        // supplier as not qualified
+        if (auditorScore === 'NO' || auditorScore === 0) {
+          isQualified = false;
+        }
 
         const fieldOptions = paths[fieldName].options;
 
         const label = fieldOptions.label.replace(/\s\s/g, '');
 
         fillRange(`R${rIndex}C2`, `R${rIndex}C5`, label);
-        fillRange(`R${rIndex}C6`, `R${rIndex}C8`, fieldValue.supplierAnswer, 'center');
-        fillRange(`R${rIndex}C9`, `R${rIndex}C10`, fieldValue.auditorScore), 'center';
+        fillRange(`R${rIndex}C6`, `R${rIndex}C8`, supplierAnswer, 'center');
+        fillRange(`R${rIndex}C9`, `R${rIndex}C10`, auditorScore), 'center';
 
         if (extraAction) {
-          extraAction(fieldValue);
+          extraAction({
+            ...fieldValue,
+            supplierAnswer,
+            auditorScore,
+          });
         }
       });
     };
@@ -244,6 +257,14 @@ const auditResponseQueries = {
     renderSection('coreHseqInfo', 'Core HSEQ Criteria', CoreHseqInfoSchema);
     renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema);
     renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema);
+
+    // Audit result: not qualified
+    if (!isQualified) {
+      fillCell(72, 6, 'Not qualified with improvement plan').style({
+        fill: 'ff0000',
+        fontColor: 'ffffff',
+      });
+    }
 
     rIndex += 2;
 
