@@ -3,6 +3,7 @@ import { Companies, AuditResponses } from '../../../db/models';
 import { CoreHseqInfoSchema, BusinessInfoSchema, HrInfoSchema } from '../../../db/models/Audits';
 import { readTemplate, generateXlsx } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
+import { fixValue } from './utils';
 
 const auditResponseQueries = {
   /**
@@ -144,13 +145,13 @@ const auditResponseQueries = {
         .range(`${cf(row)}:${cf(col)}`)
         .merged(true)
         .style({ horizontalAlignment: aligment })
-        .value(value);
+        .value(fixValue(value));
 
     const fillCell = (rIndex, colIndex, value, aligment = 'left') =>
       sheet
         .cell(rIndex, colIndex)
         .style({ horizontalAlignment: aligment })
-        .value(value);
+        .value(fixValue(value));
 
     // Supplier name
     fillRange('R19C3', 'R19C9', bi.enName, 'center');
@@ -223,15 +224,16 @@ const auditResponseQueries = {
         // auditorRecommendation: recommendation
         // auditorScore: no
         const fieldValue = sectionValue[fieldName] || {};
+        fieldValue.supplierAnswer = fixValue(fieldValue.supplierAnswer);
+        fieldValue.auditorScore = fixValue(fieldValue.auditorScore);
+
         const fieldOptions = paths[fieldName].options;
 
         const label = fieldOptions.label.replace(/\s\s/g, '');
-        const supplierAnswer = fieldValue.supplierAnswer;
-        const auditorScore = fieldValue.auditorScore;
 
         fillRange(`R${rIndex}C2`, `R${rIndex}C5`, label);
-        fillRange(`R${rIndex}C6`, `R${rIndex}C8`, supplierAnswer, 'center');
-        fillRange(`R${rIndex}C9`, `R${rIndex}C10`, auditorScore), 'center';
+        fillRange(`R${rIndex}C6`, `R${rIndex}C8`, fieldValue.supplierAnswer, 'center');
+        fillRange(`R${rIndex}C9`, `R${rIndex}C10`, fieldValue.auditorScore), 'center';
 
         if (extraAction) {
           extraAction(fieldValue);
