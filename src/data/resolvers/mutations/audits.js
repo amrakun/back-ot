@@ -33,11 +33,29 @@ const auditMutations = {
       supplierId: user.companyId,
     });
 
+    let updatedResponse;
+
     if (response) {
-      return response.send();
+      updatedResponse = await response.send();
     }
 
-    return null;
+    // send email ===================
+    const { MAIN_AUDITOR_EMAIL } = process.env;
+    const supplier = await Companies.findOne({ _id: user.companyId });
+
+    utils.sendEmail({
+      toEmails: [MAIN_AUDITOR_EMAIL],
+      title: 'New audit response notification',
+      template: {
+        name: 'audit',
+        data: {
+          content: `Supplier '${supplier.basicInfo.enName}' filled out and
+            submitted supplier qualification questionnaire (date).`,
+        },
+      },
+    });
+
+    return updatedResponse;
   },
 
   /**

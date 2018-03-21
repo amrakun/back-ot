@@ -3,6 +3,7 @@ import { Companies, AuditResponses } from '../../../db/models';
 import { CoreHseqInfoSchema, BusinessInfoSchema, HrInfoSchema } from '../../../db/models/Audits';
 import { readTemplate, generateXlsx } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
+import { fixValue } from './utils';
 
 const auditResponseQueries = {
   /**
@@ -144,13 +145,13 @@ const auditResponseQueries = {
         .range(`${cf(row)}:${cf(col)}`)
         .merged(true)
         .style({ horizontalAlignment: aligment })
-        .value(value);
+        .value(fixValue(value));
 
     const fillCell = (rIndex, colIndex, value, aligment = 'left') =>
       sheet
         .cell(rIndex, colIndex)
         .style({ horizontalAlignment: aligment })
-        .value(value);
+        .value(fixValue(value));
 
     // Supplier name
     fillRange('R19C3', 'R19C9', bi.enName, 'center');
@@ -192,6 +193,9 @@ const auditResponseQueries = {
     // core hseq
     let rIndex = 77;
 
+    // main result
+    let isQualified = true;
+
     const renderSection = (sectionName, sectionTitle, schema, extraAction) => {
       rIndex += 2;
 
@@ -223,18 +227,29 @@ const auditResponseQueries = {
         // auditorRecommendation: recommendation
         // auditorScore: no
         const fieldValue = sectionValue[fieldName] || {};
+        const supplierAnswer = fixValue(fieldValue.supplierAnswer);
+        const auditorScore = fixValue(fieldValue.auditorScore);
+
+        // if auditor replied as no or gave 0 score then consider this
+        // supplier as not qualified
+        if (auditorScore === 'NO' || auditorScore === 0) {
+          isQualified = false;
+        }
+
         const fieldOptions = paths[fieldName].options;
 
         const label = fieldOptions.label.replace(/\s\s/g, '');
-        const supplierAnswer = fieldValue.supplierAnswer;
-        const auditorScore = fieldValue.auditorScore;
 
         fillRange(`R${rIndex}C2`, `R${rIndex}C5`, label);
         fillRange(`R${rIndex}C6`, `R${rIndex}C8`, supplierAnswer, 'center');
         fillRange(`R${rIndex}C9`, `R${rIndex}C10`, auditorScore), 'center';
 
         if (extraAction) {
-          extraAction(fieldValue);
+          extraAction({
+            ...fieldValue,
+            supplierAnswer,
+            auditorScore,
+          });
         }
       });
     };
@@ -242,6 +257,14 @@ const auditResponseQueries = {
     renderSection('coreHseqInfo', 'Core HSEQ Criteria', CoreHseqInfoSchema);
     renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema);
     renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema);
+
+    // Audit result: not qualified
+    if (!isQualified) {
+      fillCell(72, 6, 'Not qualified with improvement plan').style({
+        fill: 'ff0000',
+        fontColor: 'ffffff',
+      });
+    }
 
     rIndex += 2;
 

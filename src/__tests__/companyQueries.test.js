@@ -56,6 +56,7 @@ describe('Company queries', () => {
         isSentPrequalificationInfo
 
         isPrequalified
+        prequalifiedDate
         isQualified
 
         averageDifotScore

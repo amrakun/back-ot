@@ -357,6 +357,7 @@ export const types = `
     isSentPrequalificationInfo: Boolean
 
     isPrequalified: Boolean
+    prequalifiedDate: Date
     isQualified: Boolean
 
     averageDifotScore: Float

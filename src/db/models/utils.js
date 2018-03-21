@@ -27,20 +27,23 @@ export class StatusPublishClose {
 
   /*
    * Close opens if closeDate is here
-   * @return null
+   * @return - Closed item ids
    */
   static async closeOpens() {
     const opens = await this.find({ status: 'open' });
+    const results = [];
 
     for (let open of opens) {
       // close date is reached
       if (isReached(open.closeDate)) {
         // change status to closed
         await this.update({ _id: open._id }, { $set: { status: 'closed' } });
+
+        results.push(open._id);
       }
     }
 
-    return 'done';
+    return results;
   }
 }
 
