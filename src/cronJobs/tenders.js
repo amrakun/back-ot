@@ -31,10 +31,11 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   // send closed email to suppliers
   for (const tender of closedTenders) {
     const createdUser = await Users.findOne({ _id: tender.createdUserId });
+    const type = tender.type === 'rfq' ? 'RFQ' : 'EOI';
 
     utils.sendEmail({
       toEmails: [createdUser.email],
-      title: tender.name,
+      title: `${type} close notification - ${tender.number} - ${tender.name}`,
       template: {
         name: 'tender_close',
         data: {
