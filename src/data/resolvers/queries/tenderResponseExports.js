@@ -38,7 +38,7 @@ const tenderResponseQueries = {
       sheet.cell(rowIndex, 6).value(product.manufacturer);
       sheet.cell(rowIndex, 7).value(product.manufacturerPartNumber);
 
-      let columnIndex = 4;
+      let columnIndex = 3;
 
       for (const response of responses) {
         const supplier = await Companies.findOne({ _id: response.supplierId });
@@ -46,7 +46,7 @@ const tenderResponseQueries = {
         // find response by product code
         const rp = response.respondedProducts.find(p => p.code === product.code) || {};
 
-        columnIndex += 4;
+        columnIndex += 5;
 
         // title
         sheet.cell(10, columnIndex).value(supplier.basicInfo.enName);
@@ -56,6 +56,7 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
         sheet.cell(rowIndex, columnIndex + 2).value(product.quantity * rp.unitPrice);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.suggestedManufacturer);
+        sheet.cell(rowIndex, columnIndex + 4).value(rp.shippingTerms);
       }
     }
 

@@ -99,6 +99,48 @@ export const importData = async () => {
     { publishDate: '2028-02-10', times: 1, statusDuration: 1 },
   ];
 
+  const requestedProducts = [
+    {
+      code: 'product1',
+      purchaseRequestNumber: 1,
+      shortText: 'short text 1',
+      quantity: 1,
+      uom: 'uom1',
+      manufacturer: 'manufacturer1',
+      manufacturerPartNumber: 1,
+    },
+    {
+      code: 'product2',
+      purchaseRequestNumber: 2,
+      shortText: 'short text 2',
+      quantity: 2,
+      uom: 'uom2',
+      manufacturer: 'manufacturer2',
+      manufacturerPartNumber: 2,
+    },
+  ];
+
+  const respondedProducts = [
+    {
+      code: 'product1',
+      suggestedManufacturer: 'suggestedManufacturer1',
+      suggestedManufacturerPartNumber: 2,
+      unitPrice: 100,
+      totalPrice: 100,
+      leadTime: 1,
+      shippingTerms: 'shippingTerms1',
+    },
+    {
+      code: 'product2',
+      suggestedManufacturer: 'suggestedManufacturer2',
+      suggestedManufacturerPartNumber: 2,
+      unitPrice: 200,
+      totalPrice: 200,
+      leadTime: 2,
+      shippingTerms: 'shippingTerms2',
+    },
+  ];
+
   const createTender = async ({ publishDate, status }) => {
     const tender = await tenderFactory({
       type: faker.random.boolean() ? 'rfq' : 'eoi',
@@ -106,6 +148,7 @@ export const importData = async () => {
       closeDate: moment(publishDate).add(30, 'days'),
       status,
       supplierIds,
+      requestedProducts,
     });
 
     // create responses
@@ -115,6 +158,7 @@ export const importData = async () => {
         supplierId,
         notInterested: faker.random.boolean(),
         isSent: true,
+        respondedProducts,
       });
     }
   };
