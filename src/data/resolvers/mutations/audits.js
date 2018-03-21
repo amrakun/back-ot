@@ -33,11 +33,27 @@ const auditMutations = {
       supplierId: user.companyId,
     });
 
+    let updatedResponse;
+
     if (response) {
-      return response.send();
+      updatedResponse = await response.send();
     }
 
-    return null;
+    // send email ===================
+    const { MAIN_AUDITOR_EMAIL } = process.env;
+
+    utils.sendEmail({
+      toEmails: [MAIN_AUDITOR_EMAIL],
+      title: 'New audit response',
+      template: {
+        name: 'audit',
+        data: {
+          content: 'New audit response',
+        },
+      },
+    });
+
+    return updatedResponse;
   },
 
   /**
