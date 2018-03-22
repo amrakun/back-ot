@@ -38,6 +38,7 @@ export const types = `
 export const queries = `
   feedbacks: [Feedback]
   feedbackResponses(supplierName: String): [FeedbackResponse]
+  feedbackResponsesExport: String
   feedbackDetail(_id: String!): Feedback
 `;
 
