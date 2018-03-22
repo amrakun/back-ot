@@ -1,6 +1,6 @@
 import { Companies, BlockedCompanies, SearchLogs } from '../../../db/models';
 import { paginate } from './utils';
-import { requireBuyer } from '../../permissions';
+import { requireBuyer, requireSupplier } from '../../permissions';
 import {
   companyDetailExport,
   companiesExport,
@@ -202,8 +202,21 @@ const companyQueries = {
     return Companies.findOne({ _id });
   },
 
+  /*
+   * Export supplier from buyer
+   */
   async companyDetailExport(root, { _id }) {
     const supplier = await Companies.findOne({ _id });
+
+    return companyDetailExport(supplier);
+  },
+
+  /*
+   * Export supplier from supplier
+   */
+  async companyDetailSupplierExport(root, args, { user }) {
+    const supplier = await Companies.findOne({ _id: user.companyId });
+
     return companyDetailExport(supplier);
   },
 
@@ -280,5 +293,7 @@ requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 requireBuyer(companyQueries, 'companiesGenerateDueDiligenceList');
 requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
+
+requireSupplier(companyQueries, 'companyDetailSupplierExport');
 
 export default companyQueries;
