@@ -7,6 +7,7 @@ import {
   companiesGenerateDifotScoreList,
   companiesGenerateDueDiligenceList,
   companiesValidatedProductsInfoExport,
+  companiesGeneratePrequalificationList,
 } from './companyExports';
 
 /*
@@ -184,6 +185,18 @@ const companyQueries = {
   },
 
   /**
+   * Prequalification list
+   * @param {Object} args - Query params
+   * @return {String} - file url
+   */
+  async companiesGeneratePrequalificationList(root, args) {
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
+
+    return companiesGeneratePrequalificationList(companies);
+  },
+
+  /**
    * Get logged in user's company
    * @param {Object} args
    * @return {Promise} found company
@@ -293,6 +306,7 @@ requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 requireBuyer(companyQueries, 'companiesGenerateDueDiligenceList');
 requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
+requireBuyer(companyQueries, 'companiesGeneratePrequalificationList');
 
 requireSupplier(companyQueries, 'companyDetailSupplierExport');
 

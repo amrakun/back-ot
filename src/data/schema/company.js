@@ -404,6 +404,7 @@ export const queries = `
   companiesValidatedProductsInfoExport(${queryParams}): String
   companiesGenerateDifotScoreList(${queryParams}): String
   companiesGenerateDueDiligenceList(${queryParams}): String
+  companiesGeneratePrequalificationList(${queryParams}): String
 
   companyDetail(_id: String!): Company
   companyByUser: Company
