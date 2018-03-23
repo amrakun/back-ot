@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { BlockedCompanies } from '../../../db/models';
+import { BlockedCompanies, Qualifications } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
 export const companyDetailExport = async supplier => {
@@ -921,4 +921,56 @@ export const companiesGenerateDueDiligenceList = async companies => {
 
   // Write to file.
   return generateXlsx(workbook, 'suppliers_due_diligence');
+};
+
+/**
+ * Prequalification list
+ * @param [Object] companies - filtered companies
+ * @return {String} - file url
+ */
+export const companiesGeneratePrequalificationList = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('suppliers_prequalification');
+
+  let rowIndex = 1;
+
+  /*
+   * Check per sections' all values are true
+   */
+  const isSectionPassed = sectionSchema => {
+    const section = sectionSchema.toJSON();
+    const fieldNames = Object.keys(section);
+
+    let isPassed = true;
+
+    for (const fieldName of fieldNames) {
+      if (!section[fieldName]) {
+        isPassed = false;
+        break;
+      }
+    }
+
+    return isPassed ? 'Passed' : 'Failed';
+  };
+
+  for (let company of companies) {
+    rowIndex++;
+
+    const qualification = await Qualifications.findOne({ supplierId: company._id });
+
+    if (!qualification) {
+      continue;
+    }
+
+    const basicInfo = company.basicInfo || {};
+
+    sheet.cell(rowIndex, 1).value(basicInfo.enName);
+    sheet.cell(rowIndex, 2).value(isSectionPassed(qualification.businessInfo));
+    sheet.cell(rowIndex, 3).value(isSectionPassed(qualification.healthInfo));
+    sheet.cell(rowIndex, 4).value(isSectionPassed(qualification.environmentalInfo));
+    sheet.cell(rowIndex, 5).value(isSectionPassed(qualification.financialInfo));
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers_prequalification');
 };
