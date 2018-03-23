@@ -109,13 +109,14 @@ export const types = `
 `;
 
 const tenderQueryParams = `
-  page: Int,
-  perPage: Int,
-  type: String,
-  status: String,
-  search: String,
-  sortField: String,
-  sortDirection: Int,
+  page: Int
+  perPage: Int
+  type: String
+  status: String
+  search: String
+  month: Date
+  sortField: String
+  sortDirection: Int
 `;
 
 export const queries = `
