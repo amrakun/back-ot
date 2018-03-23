@@ -398,7 +398,7 @@ const DateAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const DueDiligencSchema = mongoose.Schema(
+const DueDiligenceSchema = mongoose.Schema(
   {
     date: field({ type: String }),
     file: FileSchema,
@@ -445,7 +445,7 @@ const CompanySchema = mongoose.Schema({
   prequalifiedDate: field({ type: Date, optional: true }),
   isQualified: field({ type: Boolean, optional: true }),
 
-  dueDiligences: field({ type: [DueDiligencSchema], optional: true }),
+  dueDiligences: field({ type: [DueDiligenceSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
   averageDifotScore: field({ type: Number, optional: true }),
 });
