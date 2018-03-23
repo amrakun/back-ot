@@ -60,6 +60,18 @@ describe('Company queries', () => {
         isQualified
 
         averageDifotScore
+
+        dueDiligences {
+          date
+          expireDate
+          file
+          createdUserId
+
+          createdUser {
+            _id
+          }
+        }
+
         difotScores {
           date
           amount
