@@ -402,6 +402,7 @@ const DueDiligenceSchema = mongoose.Schema(
   {
     date: field({ type: String }),
     file: FileSchema,
+    createdUserId: field({ type: String }),
     expireDate: field({ type: String }),
   },
   { _id: false },
@@ -579,10 +580,15 @@ class Company {
    * @param {String} file - File path
    * @return updated company
    */
-  async addDueDiligence({ file, expireDate }) {
+  async addDueDiligence({ file, expireDate }, user) {
     const dueDiligences = this.dueDiligences || [];
 
-    dueDiligences.push({ date: new Date(), file, expireDate });
+    dueDiligences.push({
+      date: new Date(),
+      file,
+      expireDate,
+      createdUserId: user._id,
+    });
 
     // update field
     await this.update({ dueDiligences });

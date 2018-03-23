@@ -287,12 +287,15 @@ describe('Company mutations', () => {
   });
 
   test('add due diligence', async () => {
+    const user = await userFactory({ companyId: _company._id });
+
     const supplier = await companyFactory({
       dueDiligences: [
         {
           date: new Date(),
           file: { name: 'name', url: '/path1' },
           expireDate: new Date(),
+          createdUserId: user._id,
         },
       ],
     });
@@ -305,9 +308,7 @@ describe('Company mutations', () => {
       }
     `;
 
-    const context = {
-      user: await userFactory({ companyId: _company._id }),
-    };
+    const context = { user };
 
     const dueDiligences = [
       {
@@ -327,6 +328,7 @@ describe('Company mutations', () => {
 
     expect(lastDueDiligence.file.url).toBe('/path2');
     expect(lastDueDiligence.expireDate).toBeDefined();
+    expect(lastDueDiligence.createdUserId).toBeDefined();
   });
 
   test('validate products info', async () => {

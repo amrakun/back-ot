@@ -324,6 +324,8 @@ export const types = `
     date: Date
     expireDate: Date
     file: JSON
+    createdUserId: String
+    createdUser: User
   }
 
   input CompanyDueDiligenceInput {
