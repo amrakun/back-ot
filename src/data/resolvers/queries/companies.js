@@ -81,7 +81,7 @@ const companiesFilter = async args => {
   }
 
   // by is products info validated
-  if (isProductsInfoValidated) {
+  if (isProductsInfoValidated !== undefined) {
     selector.isProductsInfoValidated = isProductsInfoValidated;
   }
 
@@ -91,12 +91,12 @@ const companiesFilter = async args => {
   }
 
   // by pre qualified status
-  if (isPrequalified) {
+  if (isPrequalified !== undefined) {
     selector.isPrequalified = isPrequalified;
   }
 
   // by qualified status
-  if (isQualified) {
+  if (isQualified !== undefined) {
     selector.isQualified = isQualified;
   }
 

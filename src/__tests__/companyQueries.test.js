@@ -234,6 +234,41 @@ describe('Company queries', () => {
     expect(response[0].averageDifotScore).toBe(77);
   });
 
+  // test checkbox typed filters
+  const checkbox = async ({ qry, name }) => {
+    await companyFactory({ [name]: true });
+    await companyFactory({ [name]: false });
+
+    // checked ================
+    let response = await graphqlRequest(qry, 'companies', { [name]: true });
+
+    expect(response.length).toBe(1);
+    expect(response[0][name]).toBe(true);
+
+    // unchecked ================
+    response = await graphqlRequest(qry, 'companies', { [name]: false });
+
+    expect(response.length).toBe(1);
+    expect(response[0][name]).toBe(false);
+
+    // undefined ================
+    response = await graphqlRequest(qry, 'companies', {});
+
+    expect(response.length).toBe(2);
+  };
+
+  test('companies: isProductsInfoValidated', async () => {
+    const qry = `
+      query companies($isProductsInfoValidated: Boolean) {
+        companies(isProductsInfoValidated: $isProductsInfoValidated) {
+          isProductsInfoValidated
+        }
+      }
+    `;
+
+    await checkbox({ qry, name: 'isProductsInfoValidated' });
+  });
+
   test('companies: isPrequalified', async () => {
     const qry = `
       query companies($isPrequalified: Boolean) {
@@ -243,13 +278,7 @@ describe('Company queries', () => {
       }
     `;
 
-    await companyFactory({ isPrequalified: true });
-    await companyFactory({ isPrequalified: false });
-
-    const response = await graphqlRequest(qry, 'companies', { isPrequalified: true });
-
-    expect(response.length).toBe(1);
-    expect(response[0].isPrequalified).toBe(true);
+    await checkbox({ qry, name: 'isPrequalified' });
   });
 
   test('companies: isQualified', async () => {
@@ -261,13 +290,7 @@ describe('Company queries', () => {
       }
     `;
 
-    await companyFactory({ isQualified: true });
-    await companyFactory({ isQualified: false });
-
-    const response = await graphqlRequest(qry, 'companies', { isQualified: true });
-
-    expect(response.length).toBe(1);
-    expect(response[0].isQualified).toBe(true);
+    await checkbox({ qry, name: 'isQualified' });
   });
 
   test('check fields', async () => {
