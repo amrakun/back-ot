@@ -8,7 +8,7 @@ import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports'
  * Tender list & tender export helper
  */
 const tendersFilter = async (args, extraChecks) => {
-  const { type, status, search } = args;
+  const { type, status, search, month } = args;
 
   const query = { $and: [] };
 
@@ -29,6 +29,20 @@ const tendersFilter = async (args, extraChecks) => {
         { name: new RegExp(`.*${search}.*`, 'i') },
         { number: new RegExp(`.*${search}.*`, 'i') },
       ],
+    });
+  }
+
+  // month filter: month is date object
+  if (month) {
+    query.$and.push({
+      createdDate: {
+        $gt: moment(month)
+          .startOf('month')
+          .toDate(),
+        $lte: moment(month)
+          .endOf('month')
+          .toDate(),
+      },
     });
   }
 

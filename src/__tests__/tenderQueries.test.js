@@ -20,19 +20,21 @@ describe('Tender queries', () => {
   let supplier2;
 
   const commonParams = `
-    $type: String,
-    $status: String,
-    $search: String,
-    $perPage: Int,
-    $page: Int,
+    $type: String
+    $status: String
+    $search: String
+    $month: Date
+    $perPage: Int
+    $page: Int
   `;
 
   const commonValues = `
-    type: $type,
-    status: $status,
-    search: $search,
-    perPage: $perPage,
-    page: $page,
+    type: $type
+    status: $status
+    search: $search
+    month: $month
+    perPage: $perPage
+    page: $page
   `;
 
   const query = `
@@ -208,6 +210,35 @@ describe('Tender queries', () => {
     response = await doQuery({ search: '2', perPage: 10, page: 1 });
 
     expect(response.length).toBe(1);
+  });
+
+  test('tenders: month filter', async () => {
+    const user = await userFactory({ isSupplier: false });
+
+    await tenderFactory({ createdDate: new Date('2014-02-01') });
+
+    const tender1 = await tenderFactory({ createdDate: new Date('2012-02-01') });
+    const tender2 = await tenderFactory({ createdDate: new Date('2012-03-01') });
+
+    const doQuery = args => graphqlRequest(query, 'tenders', args, { user });
+
+    // case1 ==============
+    let response = await doQuery({ month: new Date('2012-02-01') });
+
+    expect(response.length).toBe(1);
+
+    let [tender] = response;
+
+    expect(tender._id).toBe(tender1._id);
+
+    // case2 ==============
+    response = await doQuery({ month: new Date('2012-03-01') });
+
+    expect(response.length).toBe(1);
+
+    [tender] = response;
+
+    expect(tender._id).toBe(tender2._id);
   });
 
   test('count by tender status', async () => {
