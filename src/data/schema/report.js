@@ -29,5 +29,5 @@ export const queries = `
     closeDate: DateInterval,
   ): String
 
-  reportsShareholder: String
+  reportsShareholder(name: String): String
 `;

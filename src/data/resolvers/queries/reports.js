@@ -221,11 +221,24 @@ const reportsQuery = {
    * Supplier's shareholder owner report
    * @return {String} file url of the generated reports_shareholder.xlsx
    */
-  async reportsShareholder() {
+  async reportsShareholder(root, { name }) {
     const { workbook, sheet } = await readTemplate('reports_shareholder');
     const suppliers = await Companies.find({});
 
     let index = 5;
+
+    // is given value includes name filter
+    const checkIncludes = field => {
+      if (!name) {
+        return true;
+      }
+
+      if (field && field.name) {
+        return field.name.includes(name);
+      }
+
+      return false;
+    };
 
     for (const supplier of suppliers) {
       let colIndex = 0;
@@ -235,9 +248,39 @@ const reportsQuery = {
         sheet.cell(index, colIndex).value(value);
       };
 
-      // basic info ================
       const bi = (await supplier.basicInfo) || {};
+      const ci = (await supplier.contactInfo) || {};
+      const mt = (await supplier.managementTeamInfo) || {};
+      const shi = (await supplier.shareholderInfo) || { shareholders: [] };
 
+      // check is valid ==============================
+      let isValid = false;
+
+      if (checkIncludes(ci)) {
+        isValid = true;
+      }
+
+      if (
+        checkIncludes(mt.managingDirector) ||
+        checkIncludes(mt.executiveOfficer) ||
+        checkIncludes(mt.financialDirector) ||
+        checkIncludes(mt.salesDirector)
+      ) {
+        isValid = true;
+      }
+
+      for (const sh of shi.shareholders) {
+        if (checkIncludes(sh)) {
+          isValid = true;
+        }
+      }
+
+      // collect only name containing suppliers
+      if (!isValid) {
+        continue;
+      }
+
+      // basic info ================
       fill(bi.enName);
       fill(bi.website);
       fill(bi.email);
@@ -246,8 +289,6 @@ const reportsQuery = {
       fill(bi.address3);
 
       // contact info =================
-      const ci = (await supplier.contactInfo) || {};
-
       fill(ci.name);
       fill(ci.jobTitle);
       fill(ci.phone);
@@ -255,8 +296,6 @@ const reportsQuery = {
       fill(ci.email);
 
       // managment team info ===========
-      const mt = (await supplier.managementTeamInfo) || {};
-
       const fillPerson = (doc = {}) => {
         fill(doc.name);
         fill(doc.jobTitle);
@@ -270,8 +309,6 @@ const reportsQuery = {
       fillPerson(mt.salesDirector);
 
       // shareholders ===========
-      const shi = (await supplier.shareholderInfo) || { shareholders: [] };
-
       for (const sh of shi.shareholders) {
         fill(sh.name);
         fill(sh.jobTitle);
