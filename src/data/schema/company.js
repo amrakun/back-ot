@@ -421,6 +421,8 @@ export const queries = `
     endDate: Date!
     productCodes: String
   ): JSON
+
+  companiesPrequalifiedStatus(${queryParams}): JSON
 `;
 
 export const mutations = `

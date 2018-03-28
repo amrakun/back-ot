@@ -453,7 +453,10 @@ export const qualificationFactory = async (params = {}) => {
 
   const qualification = new Qualifications({
     supplierId: params.supplierId,
-    financialInfo: params.financialInfo || {},
+    financialInfo: params.financialInfo,
+    businessInfo: params.businessInfo,
+    environmentalInfo: params.environmentalInfo,
+    healthInfo: params.healthInfo,
   });
 
   return save(qualification);

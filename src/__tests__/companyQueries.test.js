@@ -3,8 +3,14 @@
 
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Companies, BlockedCompanies } from '../db/models';
-import { userFactory, companyFactory, auditFactory } from '../db/factories';
+import { Companies, Qualifications, BlockedCompanies } from '../db/models';
+import { userFactory, companyFactory, auditFactory, qualificationFactory } from '../db/factories';
+import {
+  FinancialInfoSchema,
+  BusinessInfoSchema,
+  EnvironmentalInfoSchema,
+  HealthInfoSchema,
+} from '../db/models/Companies';
 
 import queries from '../data/resolvers/queries/companies';
 
@@ -87,6 +93,7 @@ describe('Company queries', () => {
   afterEach(async () => {
     // Clearing test data
     await Companies.remove({});
+    await Qualifications.remove({});
   });
 
   test('Buyer required', async () => {
@@ -98,7 +105,7 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
     const user = await userFactory({ isSupplier: true });
 
@@ -107,6 +114,7 @@ describe('Company queries', () => {
       'companiesExport',
       'companyDetailExport',
       'companiesValidatedProductsInfoExport',
+      'companiesPrequalifiedStatus',
     ];
 
     for (let query of items) {
@@ -475,5 +483,54 @@ describe('Company queries', () => {
     const count = await graphqlRequest(qry, 'companiesTotalCount', {});
 
     expect(count).toBe(2);
+  });
+
+  test('companiesPrequalifiedStatus', async () => {
+    const generateDoc = schema => {
+      const names = Object.keys(schema.paths);
+
+      const doc = {};
+
+      for (let name of names) {
+        doc[name] = true;
+      }
+
+      return doc;
+    };
+
+    const qry = `
+      query companiesPrequalifiedStatus {
+        companiesPrequalifiedStatus
+      }
+    `;
+
+    // financial info ===========
+    const financialInfo = generateDoc(FinancialInfoSchema);
+    await qualificationFactory({});
+    await qualificationFactory({ financialInfo });
+    await qualificationFactory({ financialInfo });
+    await qualificationFactory({ financialInfo });
+
+    // business info ===========
+    const businessInfo = generateDoc(BusinessInfoSchema);
+    await qualificationFactory({ businessInfo });
+    await qualificationFactory({ businessInfo });
+
+    // environmental info ===========
+    const environmentalInfo = generateDoc(EnvironmentalInfoSchema);
+    await qualificationFactory({ environmentalInfo });
+    await qualificationFactory({ environmentalInfo });
+
+    // health info ===========
+    const healthInfo = generateDoc(HealthInfoSchema);
+    await qualificationFactory({ healthInfo });
+    await qualificationFactory({ healthInfo });
+
+    const response = await graphqlRequest(qry, 'companiesPrequalifiedStatus', {});
+
+    expect(response.financialInfo).toBe(3);
+    expect(response.businessInfo).toBe(2);
+    expect(response.environmentalInfo).toBe(2);
+    expect(response.healthInfo).toBe(2);
   });
 });
