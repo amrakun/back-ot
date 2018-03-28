@@ -360,6 +360,8 @@ export const types = `
 
     isPrequalified: Boolean
     prequalifiedDate: Date
+    prequalifiedStatus: JSON
+
     isQualified: Boolean
 
     averageDifotScore: Float
