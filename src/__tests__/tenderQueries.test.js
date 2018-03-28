@@ -600,6 +600,39 @@ describe('Tender queries', () => {
     expect(response.isSent).toBe(false);
   });
 
+  test('tender responses search: not interested', async () => {
+    const tender = await tenderFactory({});
+    const user = await userFactory({ isSupplier: false });
+
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true, isNotInterested: true });
+
+    const doQuery = isNotInterested =>
+      graphqlRequest(
+        `query tenderResponses($tenderId: String!, $isNotInterested: Boolean) {
+          tenderResponses(tenderId: $tenderId, isNotInterested: $isNotInterested) {
+            _id
+          }
+        }
+      `,
+        'tenderResponses',
+        { isNotInterested, tenderId: tender._id },
+        { user },
+      );
+
+    // not interested =============
+    let response = await doQuery(true);
+    expect(response.length).toBe(1);
+
+    // interested =============
+    response = await doQuery(false);
+    expect(response.length).toBe(1);
+
+    // without filter =============
+    response = await doQuery();
+    expect(response.length).toBe(2);
+  });
+
   test('tender responses search & sort', async () => {
     const tender = await tenderFactory({});
     const user = await userFactory({ isSupplier: false });
