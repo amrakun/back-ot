@@ -7,6 +7,7 @@ export const queries = `
   logsEoiCreatedAndSentExport(startDate: Date!, endDate: Date!): String
   logsRfqCreatedAndSentExport(startDate: Date!, endDate: Date!): String
   logsSuppliersByProductCodeLogsExport(startDate: Date!, endDate: Date!, productCodes: [String!]): String
+  logsActivityLogsExport(startDate: Date!, endDate: Date!, module: String): String
 `;
 
 export const mutations = `

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 import { Tenders } from './Tenders';
-import { MODULES } from '../../data/constants';
+import { MODULES, MODULES_TO_TEXT } from '../../data/constants';
 
 // SearchLog schema
 const SearchLogSchema = mongoose.Schema({
@@ -119,15 +119,15 @@ export const SuppliersByProductCodeLogs = mongoose.model(
 const ActivityLogSchema = mongoose.Schema({
   createdDate: field({ type: Date }),
   userId: field({ type: String }),
-  module: field({ type: String, enum: MODULES.ALL }),
-  apiCall: field({ type: String }),
+  module: field({ type: String }),
+  apiCall: field({ type: String, enum: MODULES.ALL }),
 });
 
 ActivityLogSchema.loadClass(
   class {
     static write({ apiCall, userId }) {
       return this.create({
-        module: apiCall,
+        module: MODULES_TO_TEXT[apiCall],
         apiCall,
         userId,
         createdDate: new Date(),
