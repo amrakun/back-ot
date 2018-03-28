@@ -8,6 +8,7 @@ import {
   buildEoiCreatedAndSentExport,
   buildRfqCreatedAndSentExport,
   buildSuppliersByProductCodeLogsExport,
+  buildActivityLogs,
 } from './logExports';
 
 const logQueries = {
@@ -90,6 +91,10 @@ const logQueries = {
       },
       user,
     );
+  },
+
+  async logsActivityLogs() {
+    return buildActivityLogs();
   },
 };
 

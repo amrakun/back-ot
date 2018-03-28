@@ -8,3 +8,7 @@ export const queries = `
   logsRfqCreatedAndSentExport(startDate: Date!, endDate: Date!): String
   logsSuppliersByProductCodeLogsExport(startDate: Date!, endDate: Date!, productCodes: [String!]): String
 `;
+
+export const mutations = `
+  logsWrite(apiCall: String!): Boolean
+`;

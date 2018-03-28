@@ -125,9 +125,9 @@ const ActivityLogSchema = mongoose.Schema({
 
 ActivityLogSchema.loadClass(
   class {
-    static write({ module, apiCall, userId }) {
+    static write({ apiCall, userId }) {
       return this.create({
-        module,
+        module: apiCall,
         apiCall,
         userId,
         createdDate: new Date(),
