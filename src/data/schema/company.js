@@ -419,10 +419,12 @@ export const queries = `
   ): [JSON]
 
   companiesCountByRegisteredVsPrequalified(
-    startDate: Date!,
+    startDate: Date!
     endDate: Date!
     productCodes: String
   ): JSON
+
+  companiesCountByProductCode(startDate: Date, endDate: Date): JSON
 
   companiesPrequalifiedStatus(${queryParams}): JSON
 `;

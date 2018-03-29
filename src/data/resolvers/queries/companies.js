@@ -298,6 +298,61 @@ const companyQueries = {
     return results;
   },
 
+  /*
+   * Companies count by product code
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @return - Generated doc
+   */
+  async companiesCountByProductCode(root, args) {
+    const { startDate, endDate } = args;
+
+    const selector = {};
+
+    if (startDate && endDate) {
+      selector.createdDate = {
+        $gte: startDate,
+        $lte: endDate,
+      };
+    }
+
+    // find companies
+    const companies = await Companies.find(selector);
+
+    const parentLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'];
+    const results = {};
+
+    parentLetters.forEach(letter => {
+      results[letter] = { validated: 0, prequalified: 0, registered: 0 };
+    });
+
+    for (const company of companies) {
+      const productsInfo = company.productsInfo || [];
+
+      for (const letter of parentLetters) {
+        // products info must contain this letter
+        if (!productsInfo.find(p => p.startsWith(letter))) {
+          continue;
+        }
+
+        // count as registered
+        results[letter].registered++;
+
+        // count as validated
+        if (company.isProductsInfoValidated) {
+          results[letter].validated++;
+        }
+
+        // count as prequalified
+        if (company.isPrequalified) {
+          results[letter].prequalified++;
+        }
+      }
+    }
+
+    return results;
+  },
+
   /**
    * Count companies by prequalification status's tabs
    * @param {Object} args - Query params
