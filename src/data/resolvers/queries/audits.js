@@ -146,6 +146,7 @@ requireBuyer(auditQueries, 'audits');
 requireBuyer(auditQueries, 'auditDetail');
 requireBuyer(auditQueries, 'auditResponses');
 requireBuyer(auditQueries, 'auditResponseDetail');
+requireBuyer(auditQueries, 'auditResponsesQualifiedStatus');
 
 requireSupplier(auditQueries, 'auditResponseByUser');
 

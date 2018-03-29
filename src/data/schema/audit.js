@@ -202,7 +202,9 @@ export const types = `
     evidenceInfo: AuditEvidenceInfo
 
     isSent: Boolean
+
     isQualified: Boolean
+    qualifiedStatus: JSON
 
     improvementPlanFile: String
     improvementPlanSentDate: Date

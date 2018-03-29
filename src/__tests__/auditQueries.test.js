@@ -41,7 +41,7 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
     const user = await userFactory({ isSupplier: true });
 
@@ -50,6 +50,7 @@ describe('Company queries', () => {
       'auditDetail',
       'auditResponses',
       'auditResponseTotalCounts',
+      'auditResponsesQualifiedStatus',
       'auditResponseDetail',
     ];
 
@@ -443,5 +444,37 @@ describe('Company queries', () => {
     expect(response.coreHseqInfo).toBe(3);
     expect(response.businessInfo).toBe(2);
     expect(response.hrInfo).toBe(2);
+  });
+
+  test('audit response qualified status object', async () => {
+    const qry = `
+      query auditResponseByUser($auditId: String!) {
+        auditResponseByUser(auditId: $auditId) {
+          qualifiedStatus
+        }
+      }
+    `;
+
+    const user = await userFactory({ isSupplier: true });
+    const audit = await auditFactory({});
+
+    await auditResponseFactory({
+      supplierId: user.companyId,
+      auditId: audit._id,
+      coreHseqInfo: auditResponseDocs.coreHseqInfo(false, true),
+      businessInfo: auditResponseDocs.businessInfo(false, true),
+      hrInfo: auditResponseDocs.hrInfo(false, true),
+    });
+
+    const response = await graphqlRequest(
+      qry,
+      'auditResponseByUser',
+      { auditId: audit._id },
+      { user },
+    );
+
+    expect(response.qualifiedStatus.coreHseqInfo).toBe(true);
+    expect(response.qualifiedStatus.businessInfo).toBe(true);
+    expect(response.qualifiedStatus.hrInfo).toBe(true);
   });
 });
