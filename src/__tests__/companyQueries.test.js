@@ -561,4 +561,39 @@ describe('Company queries', () => {
     expect(response.prequalifiedStatus.environmentalInfo).toBe(true);
     expect(response.prequalifiedStatus.healthInfo).toBe(true);
   });
+
+  test('companiesCountByProductCode', async () => {
+    const user = await userFactory({ isSupplier: false });
+
+    const qry = `
+      query companiesCountByProductCode {
+        companiesCountByProductCode
+      }
+    `;
+
+    await companyFactory({
+      productsInfo: ['a01001', 'b01001'],
+      isProductsInfoValidated: true,
+    });
+
+    await companyFactory({
+      productsInfo: ['a01002', 'c01002'],
+      isProductsInfoValidated: true,
+      isPrequalified: true,
+    });
+
+    const response = await graphqlRequest(qry, 'companiesCountByProductCode', {}, { user });
+
+    expect(response.a.registered).toBe(2);
+    expect(response.a.validated).toBe(2);
+    expect(response.a.prequalified).toBe(1);
+
+    expect(response.b.registered).toBe(1);
+    expect(response.b.validated).toBe(1);
+    expect(response.b.prequalified).toBe(0);
+
+    expect(response.c.registered).toBe(1);
+    expect(response.c.validated).toBe(1);
+    expect(response.c.prequalified).toBe(1);
+  });
 });
