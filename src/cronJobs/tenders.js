@@ -4,6 +4,8 @@ import utils from '../data/utils';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
+  const { FROM_EMAIL_TENDER } = process.env;
+
   const publishedTenderIds = await Tenders.publishDrafts();
   const publishedTenders = await Tenders.find({ _id: { $in: publishedTenderIds } });
 
@@ -13,6 +15,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
     for (const supplier of suppliers) {
       utils.sendEmail({
+        fromEmail: FROM_EMAIL_TENDER,
         toEmails: [supplier.basicInfo.email],
         title: tender.name,
         template: {
@@ -34,6 +37,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     const type = tender.type === 'rfq' ? 'RFQ' : 'EOI';
 
     utils.sendEmail({
+      fromEmail: FROM_EMAIL_TENDER,
       toEmails: [createdUser.email],
       title: `${type} close notification - ${tender.number} - ${tender.name}`,
       template: {

@@ -360,6 +360,8 @@ export const types = `
 
     isPrequalified: Boolean
     prequalifiedDate: Date
+    prequalifiedStatus: JSON
+
     isQualified: Boolean
 
     averageDifotScore: Float
@@ -421,6 +423,8 @@ export const queries = `
     endDate: Date!
     productCodes: String
   ): JSON
+
+  companiesPrequalifiedStatus(${queryParams}): JSON
 `;
 
 export const mutations = `

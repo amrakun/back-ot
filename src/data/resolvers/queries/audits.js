@@ -2,6 +2,43 @@ import { Audits, AuditResponses } from '../../../db/models';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { supplierFilter } from './utils';
 
+/*
+ * Common audit responses filter
+ */
+const responsesFilter = async args => {
+  const { status, supplierSearch, isFileGenerated, publishDate, closeDate } = args;
+
+  const query = {
+    $and: [await supplierFilter({}, supplierSearch)],
+  };
+
+  // status filter
+  if (status) {
+    query.status = status;
+  }
+
+  // date filter
+  if (publishDate && closeDate) {
+    const audits = await Audits.find({
+      publishDate: { $gte: publishDate },
+      closeDate: { $lte: closeDate },
+    });
+
+    const auditIds = audits.map(audit => audit._id);
+
+    query.$and.push({ auditId: { $in: auditIds } });
+  }
+
+  // is file generated
+  if (isFileGenerated) {
+    query.$and.push({
+      $or: [{ improvementPlanFile: { $ne: null } }, { reportFile: { $ne: null } }],
+    });
+  }
+
+  return AuditResponses.find(query);
+};
+
 const auditQueries = {
   /**
    * Audits list
@@ -21,37 +58,41 @@ const auditQueries = {
    * Audit responses
    */
   async auditResponses(root, args) {
-    const { status, supplierSearch, isFileGenerated, publishDate, closeDate } = args;
+    return responsesFilter(args);
+  },
 
-    const query = {
-      $and: [await supplierFilter({}, supplierSearch)],
+  /**
+   * Count audit responses by qualified status's tabs
+   * @param {Object} args - Query params
+   * @return {Object} - Count map
+   */
+  async auditResponsesQualifiedStatus(root, args) {
+    const responses = await responsesFilter(args);
+
+    let coreHseqInfo = 0;
+    let businessInfo = 0;
+    let hrInfo = 0;
+
+    // Check per section's all values are true
+    const count = (name, schemaValue, count) => {
+      if (AuditResponses.isSectionPassed({ name, schemaValue })) {
+        count++;
+      }
+
+      return count;
     };
 
-    // status filter
-    if (status) {
-      query.status = status;
+    for (const response of responses) {
+      coreHseqInfo = count('coreHseqInfo', response.coreHseqInfo, coreHseqInfo);
+      businessInfo = count('businessInfo', response.businessInfo, businessInfo);
+      hrInfo = count('hrInfo', response.hrInfo, hrInfo);
     }
 
-    // date filter
-    if (publishDate && closeDate) {
-      const audits = await Audits.find({
-        publishDate: { $gte: publishDate },
-        closeDate: { $lte: closeDate },
-      });
-
-      const auditIds = audits.map(audit => audit._id);
-
-      query.$and.push({ auditId: { $in: auditIds } });
-    }
-
-    // is file generated
-    if (isFileGenerated) {
-      query.$and.push({
-        $or: [{ improvementPlanFile: { $ne: null } }, { reportFile: { $ne: null } }],
-      });
-    }
-
-    return AuditResponses.find(query);
+    return {
+      coreHseqInfo,
+      businessInfo,
+      hrInfo,
+    };
   },
 
   /**
@@ -105,6 +146,7 @@ requireBuyer(auditQueries, 'audits');
 requireBuyer(auditQueries, 'auditDetail');
 requireBuyer(auditQueries, 'auditResponses');
 requireBuyer(auditQueries, 'auditResponseDetail');
+requireBuyer(auditQueries, 'auditResponsesQualifiedStatus');
 
 requireSupplier(auditQueries, 'auditResponseByUser');
 

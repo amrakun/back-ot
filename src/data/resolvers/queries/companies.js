@@ -1,4 +1,5 @@
-import { Companies, BlockedCompanies, SearchLogs } from '../../../db/models';
+import { Companies, BlockedCompanies, Qualifications, SearchLogs } from '../../../db/models';
+
 import { paginate } from './utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import {
@@ -296,6 +297,46 @@ const companyQueries = {
     // }
     return results;
   },
+
+  /**
+   * Count companies by prequalification status's tabs
+   * @param {Object} args - Query params
+   * @return {Object} - Count map
+   */
+  async companiesPrequalifiedStatus(root, args) {
+    const selector = await companiesFilter(args);
+    const companies = await Companies.find(selector);
+
+    let financialInfo = 0;
+    let businessInfo = 0;
+    let environmentalInfo = 0;
+    let healthInfo = 0;
+
+    // Check per section's all values are true
+    const count = (section, count) => {
+      if (Qualifications.isSectionPassed(section)) {
+        count++;
+      }
+
+      return count;
+    };
+
+    for (const company of companies) {
+      const qualif = await Qualifications.findOne({ supplierId: company._id });
+
+      financialInfo = count(qualif.financialInfo, financialInfo);
+      businessInfo = count(qualif.businessInfo, businessInfo);
+      environmentalInfo = count(qualif.environmentalInfo, environmentalInfo);
+      healthInfo = count(qualif.healthInfo, healthInfo);
+    }
+
+    return {
+      financialInfo,
+      businessInfo,
+      environmentalInfo,
+      healthInfo,
+    };
+  },
 };
 
 requireBuyer(companyQueries, 'companies');
@@ -307,6 +348,7 @@ requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
 requireBuyer(companyQueries, 'companiesGenerateDueDiligenceList');
 requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
 requireBuyer(companyQueries, 'companiesGeneratePrequalificationList');
+requireBuyer(companyQueries, 'companiesPrequalifiedStatus');
 
 requireSupplier(companyQueries, 'companyDetailSupplierExport');
 

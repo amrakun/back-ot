@@ -533,6 +533,11 @@ class Company {
     // update
     await this.update({ _id }, { $set: { [key]: value } });
 
+    // if updating products info then reset validated status
+    if (key === 'productsInfo') {
+      await this.update({ _id }, { $set: { isProductsInfoValidated: false } });
+    }
+
     return this.findOne({ _id });
   }
 

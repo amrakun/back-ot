@@ -938,17 +938,7 @@ export const companiesGeneratePrequalificationList = async companies => {
    * Check per sections' all values are true
    */
   const isSectionPassed = sectionSchema => {
-    const section = sectionSchema.toJSON();
-    const fieldNames = Object.keys(section);
-
-    let isPassed = true;
-
-    for (const fieldName of fieldNames) {
-      if (!section[fieldName]) {
-        isPassed = false;
-        break;
-      }
-    }
+    const isPassed = Qualifications.isSectionPassed(sectionSchema);
 
     return isPassed ? 'Passed' : 'Failed';
   };

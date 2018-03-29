@@ -70,7 +70,7 @@ const auditResponseQueries = {
         if (!fieldValue.supplierAnswer) {
           invalidAnswers.push({
             label: fieldOptions.label.replace(/\s\s/g, ''),
-            recommendation: fieldValue.supplierComment,
+            recommendation: fieldValue.auditorRecommendation,
           });
         }
       });
@@ -97,20 +97,14 @@ const auditResponseQueries = {
         .range(cellPointer)
         .merged(true)
         .value(answer.recommendation);
+
+      // REQUIRED ACTION
+      cellPointer = `${cf(`R${rIndex}C9`)}:${cf(`R${rIndex}C10`)}`;
+      sheet
+        .range(cellPointer)
+        .merged(true)
+        .value('Send evindences');
     });
-
-    rIndex += 2;
-    cellPointer = `${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C7`)}`;
-
-    sheet.range(cellPointer).merged(true).value(`Acknowledged by
-      …………………………………………………………( Supplier )`);
-
-    rIndex += 2;
-    cellPointer = `${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C7`)}`;
-    sheet
-      .range(cellPointer)
-      .merged(true)
-      .value('Date:');
 
     // generate file
     const path = await generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
@@ -181,10 +175,10 @@ const auditResponseQueries = {
     fillCell(67, 10, bi.totalNumberOfEmployees);
 
     // sotri
-    fillCell(70, 10, auditResponse.basicInfo.sotri);
+    fillCell(70, 10, (auditResponse.basicInfo || {}).sotri);
 
     // sotie
-    fillCell(71, 10, auditResponse.basicInfo.sotie);
+    fillCell(71, 10, (auditResponse.basicInfo || {}).sotie);
 
     // short =======================
 

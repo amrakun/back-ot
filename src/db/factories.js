@@ -453,7 +453,10 @@ export const qualificationFactory = async (params = {}) => {
 
   const qualification = new Qualifications({
     supplierId: params.supplierId,
-    financialInfo: params.financialInfo || {},
+    financialInfo: params.financialInfo,
+    businessInfo: params.businessInfo,
+    environmentalInfo: params.environmentalInfo,
+    healthInfo: params.healthInfo,
   });
 
   return save(qualification);
@@ -603,7 +606,11 @@ export const auditResponseFactory = async (params = {}) => {
     supplierId: params.supplierId,
     isSent: params.isSent || false,
     isQualified: params.isQualified || false,
+
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
+    hrInfo: params.hrInfo,
+    businessInfo: params.businessInfo,
+
     improvementPlanFile: params.improvementPlanFile,
     improvementPlanSentDate: params.improvementPlanSentDate,
     reportFile: params.reportFile,

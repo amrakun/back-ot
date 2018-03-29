@@ -26,11 +26,14 @@ describe('Companies model tests', () => {
   };
 
   const checkSection = async name => {
-    const company = await companyFactory();
+    const company = await companyFactory({ isProductsInfoValidated: true });
+
     const doc = companyDocs[name]();
     const updatedCompany = await Companies.updateSection(company._id, `${name}Info`, doc);
 
     expect(toObject(updatedCompany[`${name}Info`])).toEqual(doc);
+
+    return updatedCompany;
   };
 
   test('Create', async () => {
@@ -88,7 +91,9 @@ describe('Companies model tests', () => {
   });
 
   test('Update products info', async () => {
-    await checkSection('products');
+    const updatedCompany = await checkSection('products');
+
+    expect(updatedCompany.isProductsInfoValidated).toBe(false);
   });
 
   test('Update certificate info', async () => {

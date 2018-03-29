@@ -14,7 +14,7 @@ const mutations = {
    * Send mass email
    */
   async massMailsSend(root, { supplierIds, subject, content }, { user }) {
-    const { COMPANY_EMAIL_FROM } = process.env;
+    const { FROM_EMAIL_MASS } = process.env;
 
     // create mass email entry
     const entryId = await MassMails.send(
@@ -39,7 +39,7 @@ const mutations = {
 
       // send email
       const mailOptions = {
-        from: COMPANY_EMAIL_FROM,
+        from: FROM_EMAIL_MASS,
         to: email,
         subject,
         html: content,

@@ -3,6 +3,7 @@ import {
   TenderResponses,
   FeedbackResponses,
   BlockedCompanies,
+  Qualifications,
   Audits,
 } from '../../db/models';
 
@@ -56,5 +57,25 @@ export default {
 
   audits(company) {
     return Audits.find({ supplierIds: { $in: [company._id] }, status: { $ne: 'draft' } });
+  },
+
+  async prequalifiedStatus(company) {
+    const qualif = await Qualifications.findOne({ supplierId: company._id });
+
+    if (!qualif) {
+      return {
+        financialInfo: false,
+        businessInfo: false,
+        environmentalInfo: false,
+        healthInfo: false,
+      };
+    }
+
+    return {
+      financialInfo: Qualifications.isSectionPassed(qualif.financialInfo),
+      businessInfo: Qualifications.isSectionPassed(qualif.businessInfo),
+      environmentalInfo: Qualifications.isSectionPassed(qualif.environmentalInfo),
+      healthInfo: Qualifications.isSectionPassed(qualif.healthInfo),
+    };
   },
 };
