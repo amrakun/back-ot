@@ -4,7 +4,13 @@
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, Users, Audits, AuditResponses } from '../db/models';
-import { userFactory, companyFactory, auditFactory, auditResponseFactory } from '../db/factories';
+import {
+  userFactory,
+  companyFactory,
+  auditFactory,
+  auditResponseFactory,
+  auditResponseDocs,
+} from '../db/factories';
 import queries from '../data/resolvers/queries/audits';
 
 beforeAll(() => connect());
@@ -406,5 +412,36 @@ describe('Company queries', () => {
 
     expect(response.qualified).toBe(2);
     expect(response.sentImprovementPlan).toBe(1);
+  });
+
+  test('auditResponsesQualifiedStatus', async () => {
+    const qry = `
+      query auditResponsesQualifiedStatus {
+        auditResponsesQualifiedStatus
+      }
+    `;
+
+    // core hseq info ===========
+    const coreHseqInfo = auditResponseDocs.coreHseqInfo(false, true);
+    await auditResponseFactory({});
+    await auditResponseFactory({ coreHseqInfo });
+    await auditResponseFactory({ coreHseqInfo });
+    await auditResponseFactory({ coreHseqInfo });
+
+    // business info ===========
+    const businessInfo = auditResponseDocs.businessInfo(false, true);
+    await auditResponseFactory({ businessInfo });
+    await auditResponseFactory({ businessInfo });
+
+    // hr info ===========
+    const hrInfo = auditResponseDocs.hrInfo(false, true);
+    await auditResponseFactory({ hrInfo });
+    await auditResponseFactory({ hrInfo });
+
+    const response = await graphqlRequest(qry, 'auditResponsesQualifiedStatus', {});
+
+    expect(response.coreHseqInfo).toBe(3);
+    expect(response.businessInfo).toBe(2);
+    expect(response.hrInfo).toBe(2);
   });
 });

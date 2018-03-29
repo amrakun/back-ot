@@ -222,19 +222,23 @@ export const types = `
   }
 `;
 
+const responsesParams = `
+  supplierSearch: String
+  isFileGenerated: Boolean
+  publishDate: Date
+  closeDate: Date
+  status: String
+`;
+
 export const queries = `
   audits: [Audit]
   auditDetail(_id: String!): Audit
 
-  auditResponses(
-    supplierSearch: String
-    isFileGenerated: Boolean
-    publishDate: Date
-    closeDate: Date
-    status: String
-  ): [AuditResponse]
+  auditResponses(${responsesParams}): [AuditResponse]
 
   auditResponseTotalCounts: AuditResponseTotalCounts
+
+  auditResponsesQualifiedStatus(${responsesParams}): JSON
 
   auditResponseDetail(auditId: String!, supplierId: String!): AuditResponse
   auditResponseByUser(auditId: String!): AuditResponse
