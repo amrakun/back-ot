@@ -324,6 +324,10 @@ const companyQueries = {
     for (const company of companies) {
       const qualif = await Qualifications.findOne({ supplierId: company._id });
 
+      if (!qualif) {
+        continue;
+      }
+
       financialInfo = count(qualif.financialInfo, financialInfo);
       businessInfo = count(qualif.businessInfo, businessInfo);
       environmentalInfo = count(qualif.environmentalInfo, environmentalInfo);
