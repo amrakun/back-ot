@@ -857,4 +857,28 @@ describe('Tender queries', () => {
 
     expect(count).toBe(1);
   });
+
+  test('tenderResponseNotRespondedSuppliers', async () => {
+    const user = await userFactory({ isSupplier: false });
+
+    const supplier1 = await companyFactory();
+    const supplier2 = await companyFactory();
+
+    const tender = await tenderFactory({ supplierIds: [supplier1._id, supplier2._id] });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier1._id });
+
+    const [notRespondedSupplier] = await graphqlRequest(
+      `query tenderResponseNotRespondedSuppliers($tenderId: String) {
+          tenderResponseNotRespondedSuppliers(tenderId: $tenderId) {
+            _id
+          }
+        }
+      `,
+      'tenderResponseNotRespondedSuppliers',
+      { tenderId: tender._id },
+      { user },
+    );
+
+    expect(notRespondedSupplier._id).toBe(supplier2._id);
+  });
 });
