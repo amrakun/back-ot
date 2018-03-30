@@ -66,14 +66,14 @@ export const companyFactory = (params = {}) => {
 
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
-    isProductsInfoValidated: params.isProductsInfoValidated || false,
+    isProductsInfoValidated: params.isProductsInfoValidated,
     productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
 
     isSentRegistrationInfo: params.isSentRegistrationInfo,
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
-    isPrequalified: params.isPrequalified || false,
-    isQualified: params.isQualified || false,
+    isPrequalified: params.isPrequalified,
+    isQualified: params.isQualified,
 
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,

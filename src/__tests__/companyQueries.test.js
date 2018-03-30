@@ -526,7 +526,6 @@ describe('Company queries', () => {
 
     const company1 = await companyFactory({ isPrequalified: true });
     const company2 = await companyFactory({ isPrequalified: false });
-    await Companies.update({ _id: company2._id }, { $set: { isPrequalified: undefined } });
 
     await qualificationFactory({ supplierId: company1._id, healthInfo });
     await qualificationFactory({ supplierId: company2._id, healthInfo });
@@ -540,8 +539,8 @@ describe('Company queries', () => {
 
     expect(response.approved).toBe(1);
     expect(response.expired).toBe(0);
-    expect(response.outstanding).toBe(0);
-    expect(response.failed).toBe(9);
+    expect(response.outstanding).toBe(8);
+    expect(response.failed).toBe(1);
   });
 
   test('company prequalified status object', async () => {
@@ -570,7 +569,7 @@ describe('Company queries', () => {
     expect(response.prequalifiedStatus.businessInfo).toBe(true);
     expect(response.prequalifiedStatus.environmentalInfo).toBe(true);
     expect(response.prequalifiedStatus.healthInfo).toBe(true);
-    expect(response.prequalifiedStatus.isFailed).toBe(true);
+    expect(response.prequalifiedStatus.isOutstanding).toBe(true);
   });
 
   test('companiesCountByProductCode', async () => {
