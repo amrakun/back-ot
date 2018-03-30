@@ -9,7 +9,7 @@ import {
   EnvironmentalInfoSchema,
   HealthInfoSchema,
 } from '../db/models/Companies';
-import { companyFactory } from '../db/factories';
+import { companyFactory, qualificationFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -91,5 +91,24 @@ describe('Qualification db', () => {
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(updatedCompany.tierType).toBe('national');
+  });
+
+  test('status', async () => {
+    // supplier did not send qualification info
+    let status = await Qualifications.status(_company._id);
+    expect(status).toEqual({});
+
+    // send qualification info but buyer did not send info
+    await qualificationFactory({ supplierId: _company._id });
+    await Companies.update({ _id: _company._id }, { $set: { isPrequalified: undefined } });
+
+    status = await Qualifications.status(_company._id);
+    expect(status).toEqual({ isFailed: true });
+
+    // approved
+    await Companies.update({ _id: _company._id }, { $set: { isPrequalified: true } });
+
+    status = await Qualifications.status(_company._id);
+    expect(status).toEqual({ isApproved: true });
   });
 });

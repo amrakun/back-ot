@@ -560,6 +560,7 @@ describe('Company queries', () => {
     expect(response.prequalifiedStatus.businessInfo).toBe(true);
     expect(response.prequalifiedStatus.environmentalInfo).toBe(true);
     expect(response.prequalifiedStatus.healthInfo).toBe(true);
+    expect(response.prequalifiedStatus.isFailed).toBe(true);
   });
 
   test('companiesCountByProductCode', async () => {

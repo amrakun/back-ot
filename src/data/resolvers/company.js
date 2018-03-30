@@ -62,20 +62,28 @@ export default {
   async prequalifiedStatus(company) {
     const qualif = await Qualifications.findOne({ supplierId: company._id });
 
+    const stats = {
+      financialInfo: false,
+      businessInfo: false,
+      environmentalInfo: false,
+      healthInfo: false,
+      isApproved: false,
+      isOutstanding: false,
+      isFailed: false,
+      isExpired: false,
+    };
+
     if (!qualif) {
-      return {
-        financialInfo: false,
-        businessInfo: false,
-        environmentalInfo: false,
-        healthInfo: false,
-      };
+      return stats;
     }
 
-    return {
-      financialInfo: Qualifications.isSectionPassed(qualif.financialInfo),
-      businessInfo: Qualifications.isSectionPassed(qualif.businessInfo),
-      environmentalInfo: Qualifications.isSectionPassed(qualif.environmentalInfo),
-      healthInfo: Qualifications.isSectionPassed(qualif.healthInfo),
-    };
+    stats.financialInfo = Qualifications.isSectionPassed(qualif.financialInfo);
+    stats.businessInfo = Qualifications.isSectionPassed(qualif.businessInfo);
+    stats.environmentalInfo = Qualifications.isSectionPassed(qualif.environmentalInfo);
+    stats.healthInfo = Qualifications.isSectionPassed(qualif.healthInfo);
+
+    const status = await Qualifications.status(company._id);
+
+    return { ...stats, ...status };
   },
 };
