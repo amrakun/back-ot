@@ -139,6 +139,8 @@ export const queries = `
     isNotInterested: Boolean
   ): [TenderResponse]
 
+  tenderResponseNotRespondedSuppliers(tenderId: String): [Company]
+
   tenderResponseDetail(_id: String!): TenderResponse
   tenderResponseByUser(tenderId: String!): TenderResponse
 

@@ -152,7 +152,7 @@ describe('Company mutations', () => {
   });
 
   test('Prequalify a supplier', async () => {
-    expect(_company.isPrequalified).toBe(false);
+    expect(_company.isPrequalified).not.toBeDefined();
 
     const mutation = `
       mutation qualificationsPrequalify($supplierId: String!, $qualified: Boolean) {

@@ -61,6 +61,31 @@ class Qualification {
     return isPassed;
   }
 
+  /*
+   * Check whether approved, failed, expired, outstanding
+   */
+  static async status(supplierId) {
+    const supplier = await Companies.findOne({ _id: supplierId });
+    const qualif = await this.findOne({ supplierId });
+
+    if (!qualif) {
+      return {};
+    }
+
+    // approved
+    if (supplier.isPrequalified) {
+      return { isApproved: true };
+    }
+
+    // failed
+    if (supplier.isPrequalified === false) {
+      return { isFailed: true };
+    }
+
+    // outstanding
+    return { isOutstanding: true };
+  }
+
   /**
    * Update sub section info
    * @param {String } supplierId - Company id

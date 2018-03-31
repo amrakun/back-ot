@@ -523,8 +523,12 @@ describe('Company queries', () => {
 
     // health info ===========
     const healthInfo = generateQualifDoc(HealthInfoSchema);
-    await qualificationFactory({ healthInfo });
-    await qualificationFactory({ healthInfo });
+
+    const company1 = await companyFactory({ isPrequalified: true });
+    const company2 = await companyFactory({ isPrequalified: false });
+
+    await qualificationFactory({ supplierId: company1._id, healthInfo });
+    await qualificationFactory({ supplierId: company2._id, healthInfo });
 
     const response = await graphqlRequest(qry, 'companiesPrequalifiedStatus', {});
 
@@ -532,6 +536,11 @@ describe('Company queries', () => {
     expect(response.businessInfo).toBe(2);
     expect(response.environmentalInfo).toBe(2);
     expect(response.healthInfo).toBe(2);
+
+    expect(response.approved).toBe(1);
+    expect(response.expired).toBe(0);
+    expect(response.outstanding).toBe(8);
+    expect(response.failed).toBe(1);
   });
 
   test('company prequalified status object', async () => {
@@ -560,6 +569,7 @@ describe('Company queries', () => {
     expect(response.prequalifiedStatus.businessInfo).toBe(true);
     expect(response.prequalifiedStatus.environmentalInfo).toBe(true);
     expect(response.prequalifiedStatus.healthInfo).toBe(true);
+    expect(response.prequalifiedStatus.isOutstanding).toBe(true);
   });
 
   test('companiesCountByProductCode', async () => {

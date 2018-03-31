@@ -367,6 +367,11 @@ const companyQueries = {
     let environmentalInfo = 0;
     let healthInfo = 0;
 
+    let approved = 0;
+    let outstanding = 0;
+    let failed = 0;
+    let expired = 0;
+
     // Check per section's all values are true
     const count = (section, count) => {
       if (Qualifications.isSectionPassed(section)) {
@@ -387,6 +392,25 @@ const companyQueries = {
       businessInfo = count(qualif.businessInfo, businessInfo);
       environmentalInfo = count(qualif.environmentalInfo, environmentalInfo);
       healthInfo = count(qualif.healthInfo, healthInfo);
+
+      // count by status =================
+      const status = await Qualifications.status(company._id);
+
+      if (status.isApproved) {
+        approved++;
+      }
+
+      if (status.isFailed) {
+        failed++;
+      }
+
+      if (status.isOutstanding) {
+        outstanding++;
+      }
+
+      if (status.isExpired) {
+        expired++;
+      }
     }
 
     return {
@@ -394,6 +418,10 @@ const companyQueries = {
       businessInfo,
       environmentalInfo,
       healthInfo,
+      approved,
+      outstanding,
+      failed,
+      expired,
     };
   },
 };
