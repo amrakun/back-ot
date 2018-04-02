@@ -21,7 +21,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
         template: {
           name: 'tender',
           data: {
-            content: tender.content,
+            tender,
           },
         },
       });
