@@ -944,13 +944,13 @@ export const companiesGeneratePrequalificationList = async companies => {
   };
 
   for (let company of companies) {
-    rowIndex++;
-
     const qualification = await Qualifications.findOne({ supplierId: company._id });
 
     if (!qualification) {
       continue;
     }
+
+    rowIndex++;
 
     const basicInfo = company.basicInfo || {};
 
