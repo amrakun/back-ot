@@ -465,13 +465,17 @@ export const buildSuppliersByProductCodeLogsExport = async (
 export const buildActivityLogsExport = async ({ startDate, endDate, module }, user) => {
   const { workbook, sheet } = await readTemplate('menu_review_by_buyer');
 
-  // Searches per buyer (search logs)
-  const items = await ActivityLogs.find({
+  const filter = {
     createdDate: {
       $gte: startDate,
       $lt: endDate,
     },
-  });
+  };
+
+  if (module) filter.module = module;
+
+  // Searches per buyer (search logs)
+  const items = await ActivityLogs.find(filter);
 
   let rowIndex = 3;
 
