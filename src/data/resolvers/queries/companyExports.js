@@ -907,7 +907,8 @@ export const companiesGenerateDueDiligenceList = async companies => {
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
     sheet.cell(rowIndex, 3).value(company.tierType);
-    sheet.cell(rowIndex, 4).value(company.isPrequalified);
+
+    sheet.cell(rowIndex, 4).value(lastDueDiligence ? 'YES' : 'NO');
 
     if (lastDueDiligence) {
       sheet.cell(rowIndex, 5).value(lastDueDiligence.file.url);
