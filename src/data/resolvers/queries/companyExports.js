@@ -907,7 +907,8 @@ export const companiesGenerateDueDiligenceList = async companies => {
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
     sheet.cell(rowIndex, 3).value(company.tierType);
-    sheet.cell(rowIndex, 4).value(company.isPrequalified);
+
+    sheet.cell(rowIndex, 4).value(lastDueDiligence ? 'YES' : 'NO');
 
     if (lastDueDiligence) {
       sheet.cell(rowIndex, 5).value(lastDueDiligence.file.url);
@@ -944,21 +945,35 @@ export const companiesGeneratePrequalificationList = async companies => {
   };
 
   for (let company of companies) {
-    rowIndex++;
-
     const qualification = await Qualifications.findOne({ supplierId: company._id });
 
-    if (!qualification) {
-      continue;
-    }
+    rowIndex++;
 
     const basicInfo = company.basicInfo || {};
 
-    sheet.cell(rowIndex, 1).value(basicInfo.enName);
-    sheet.cell(rowIndex, 2).value(isSectionPassed(qualification.businessInfo));
-    sheet.cell(rowIndex, 3).value(isSectionPassed(qualification.healthInfo));
-    sheet.cell(rowIndex, 4).value(isSectionPassed(qualification.environmentalInfo));
-    sheet.cell(rowIndex, 5).value(isSectionPassed(qualification.financialInfo));
+    const fill = ({ businessInfo, healthInfo, environmentalInfo, financialInfo }) => {
+      sheet.cell(rowIndex, 1).value(basicInfo.enName);
+      sheet.cell(rowIndex, 2).value(businessInfo);
+      sheet.cell(rowIndex, 3).value(healthInfo);
+      sheet.cell(rowIndex, 4).value(environmentalInfo);
+      sheet.cell(rowIndex, 5).value(financialInfo);
+    };
+
+    if (qualification) {
+      return fill({
+        businessInfo: isSectionPassed(qualification.businessInfo),
+        healthInfo: isSectionPassed(qualification.healthInfo),
+        environmentalInfo: isSectionPassed(qualification.environmentalInfo),
+        financialInfo: isSectionPassed(qualification.financialInfo),
+      });
+    }
+
+    fill({
+      businessInfo: 'Outstanding',
+      healthInfo: 'Outstanding',
+      environmentalInfo: 'Outstanding',
+      financialInfo: 'Outstanding',
+    });
   }
 
   // Write to file.
