@@ -968,7 +968,7 @@ export const companiesGeneratePrequalificationList = async companies => {
       });
     }
 
-    fill({
+    return fill({
       businessInfo: 'Outstanding',
       healthInfo: 'Outstanding',
       environmentalInfo: 'Outstanding',
