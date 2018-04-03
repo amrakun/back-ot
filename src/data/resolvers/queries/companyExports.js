@@ -960,15 +960,17 @@ export const companiesGeneratePrequalificationList = async companies => {
     };
 
     if (qualification) {
-      return fill({
+      fill({
         businessInfo: isSectionPassed(qualification.businessInfo),
         healthInfo: isSectionPassed(qualification.healthInfo),
         environmentalInfo: isSectionPassed(qualification.environmentalInfo),
         financialInfo: isSectionPassed(qualification.financialInfo),
       });
+
+      continue;
     }
 
-    return fill({
+    fill({
       businessInfo: 'Outstanding',
       healthInfo: 'Outstanding',
       environmentalInfo: 'Outstanding',
