@@ -1,6 +1,7 @@
 import schedule from 'node-schedule';
 import { Users, Companies, Tenders } from '../db/models';
 import utils from '../data/utils';
+import moment from 'moment';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
@@ -43,7 +44,9 @@ schedule.scheduleJob('*/1 * * * *', async () => {
       template: {
         name: 'tender_close',
         data: {
-          tender,
+          number: tender.number,
+          date: moment(tender.closeDate).format('MMM D, hh:mmA'),
+          type,
         },
       },
     });
