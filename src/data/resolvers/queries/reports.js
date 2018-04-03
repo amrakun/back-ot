@@ -133,24 +133,25 @@ const reportsQuery = {
 
     const { workbook, sheet } = await readTemplate('reports_tenders');
 
-    let rowIndex = 1;
+    let rowIndex = 4;
 
     for (const it of tenders) {
       rowIndex++;
 
-      sheet.cell(rowIndex, 1).value(rowIndex);
+      sheet.cell(rowIndex, 1).value(rowIndex - 4);
       sheet.cell(rowIndex, 2).value(it.number);
       sheet.cell(rowIndex, 3).value(it.name || '');
 
-      const suppliers = await Companies.find({ _id: it.supplierIds }, { enName: 1 });
+      const suppliers = await Companies.find({ _id: it.supplierIds }, { basicInfo: 1 });
       const supplierNames = suppliers.map(s => s.basicInfo && s.basicInfo.enName);
 
       sheet.cell(rowIndex, 4).value(supplierNames.join());
-      sheet.cell(rowIndex, 5).value(it.type);
-      sheet.cell(rowIndex, 6).value(it.publishDate.toString());
-      sheet.cell(rowIndex, 7).value(it.closeDate.toString());
-      sheet.cell(rowIndex, 8).value(it.status);
-      sheet.cell(rowIndex, 9).value(it.sentRegretLetter ? 'yes' : 'no');
+      sheet.cell(rowIndex, 5).value(it.sourcingOfficier);
+      sheet.cell(rowIndex, 6).value(it.type);
+      sheet.cell(rowIndex, 7).value(it.publishDate.toLocaleDateString());
+      sheet.cell(rowIndex, 8).value(it.closeDate.toLocaleDateString());
+      sheet.cell(rowIndex, 9).value(it.status);
+      sheet.cell(rowIndex, 10).value(it.sentRegretLetter ? 'yes' : 'no');
     }
 
     // Write to file.
