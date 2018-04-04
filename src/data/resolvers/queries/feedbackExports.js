@@ -8,15 +8,15 @@ const feedbackExports = {
    * Export feedback list
    * @return {String} - file url
    */
-  async feedbackResponsesExport(root, { supplierName, supplierIds }) {
+  async feedbackResponsesExport(root, { supplierName, responseIds }) {
     // read template
     const { workbook, sheet } = await readTemplate('success_feedback_responses');
 
     // filter responses ==========
     let query = await supplierFilter({}, supplierName);
 
-    if (supplierIds) {
-      query = { supplierId: { $in: supplierIds } };
+    if (responseIds) {
+      query = { _id: { $in: responseIds } };
     }
 
     const responses = await FeedbackResponses.find(query);

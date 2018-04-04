@@ -40,7 +40,7 @@ export const types = `
 export const queries = `
   feedbacks: [Feedback]
   feedbackResponses(supplierName: String): [FeedbackResponse]
-  feedbackResponsesExport(supplierName: String, supplierIds: [String]): String
+  feedbackResponsesExport(supplierName: String, responseIds: [String]): String
   feedbackDetail(_id: String!): Feedback
 `;
 
