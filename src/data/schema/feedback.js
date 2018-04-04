@@ -17,16 +17,18 @@ export const types = `
     status: String
     feedbackId: String
     supplierId: String
-    employmentNumberBefore: Float
-    employmentNumberNow: Float
-    nationalSpendBefore: Float
-    nationalSpendAfter: Float
-    umnugobiSpendBefore: Float
-    umnugobiSpendAfter: Float
-    investment: String
-    trainings: String
+
+    totalEmploymentOt: Float
+    totalEmploymentUmnugobi: Float
+    employmentChangesAfter: Float
+    numberOfEmployeeWorkToScopeNational: Float
+    numberOfEmployeeWorkToScopeUmnugobi: Float
+    procurementTotalSpend: Float
+    procurementNationalSpend: Float
+    procurementUmnugobiSpend: Float
+
     corporateSocial: String
-    technologyImprovement: String
+    otherStories: String
 
     feedback: Feedback
     supplier: Company
@@ -50,17 +52,19 @@ export const mutations = `
   ): Feedback
 
   feedbackResponsesAdd(
-    feedbackId: String!,
-    supplierId: String!,
-    employmentNumberBefore: Float!,
-    employmentNumberNow: Float!,
-    nationalSpendBefore: Float!,
-    nationalSpendAfter: Float!,
-    umnugobiSpendBefore: Float!,
-    umnugobiSpendAfter: Float!,
-    investment: String!,
-    trainings: String!,
-    corporateSocial: String!,
-    technologyImprovement: String!,
+    feedbackId: String!
+    supplierId: String!
+
+    totalEmploymentOt: Float!
+    totalEmploymentUmnugobi: Float!
+    employmentChangesAfter: Float!
+    numberOfEmployeeWorkToScopeNational: Float!
+    numberOfEmployeeWorkToScopeUmnugobi: Float!
+    procurementTotalSpend: Float!
+    procurementNationalSpend: Float!
+    procurementUmnugobiSpend: Float!
+
+    corporateSocial: String!
+    otherStories: String!
   ): FeedbackResponse
 `;

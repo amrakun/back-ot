@@ -55,22 +55,26 @@ const FeedbackResponseSchema = mongoose.Schema({
   feedbackId: field({ type: String }),
   supplierId: field({ type: String }),
 
+  createdDate: field({ type: Date }),
   status: field({ type: String }),
 
-  employmentNumberBefore: field({ type: Number }),
-  employmentNumberNow: field({ type: Number }),
+  // Please provide your employment details
+  totalEmploymentOt: field({ type: Number }),
+  totalEmploymentUmnugobi: field({ type: Number }),
+  // Changes in employment number after working with OT
+  employmentChangesAfter: field({ type: Number }),
 
-  nationalSpendBefore: field({ type: Number }),
-  nationalSpendAfter: field({ type: Number }),
+  // Of which, how many employee work related to the scope you provide to OT
+  numberOfEmployeeWorkToScopeNational: field({ type: Number }),
+  numberOfEmployeeWorkToScopeUmnugobi: field({ type: Number }),
 
-  umnugobiSpendBefore: field({ type: Number }),
-  umnugobiSpendAfter: field({ type: Number }),
+  // Please provide procurement spend details
+  procurementTotalSpend: field({ type: Number }),
+  procurementNationalSpend: field({ type: Number }),
+  procurementUmnugobiSpend: field({ type: Number }),
 
-  investment: field({ type: String }),
-  trainings: field({ type: String }),
-  corporateSocial: field({ type: String }),
-  technologyImprovement: field({ type: String }),
-  createdDate: field({ type: Date }),
+  corporateSocial: field({ type: String, optional: true }),
+  otherStories: field({ type: String, optional: true }),
 });
 
 class FeedbackResponse {

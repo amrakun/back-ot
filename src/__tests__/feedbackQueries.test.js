@@ -27,19 +27,21 @@ describe('Feedback queries', () => {
 
   const feedbackResponseFields = `
     _id
+
     status
     feedbackId
     supplierId
-    employmentNumberBefore
-    employmentNumberNow
-    nationalSpendBefore
-    nationalSpendAfter
-    umnugobiSpendBefore
-    umnugobiSpendAfter
-    investment
-    trainings
+    totalEmploymentOt
+    totalEmploymentUmnugobi
+    employmentChangesAfter
+    numberOfEmployeeWorkToScopeNational
+    numberOfEmployeeWorkToScopeUmnugobi
+    procurementTotalSpend
+    procurementNationalSpend
+    procurementUmnugobiSpend
     corporateSocial
-    technologyImprovement
+    otherStories
+    createdDate
 
     feedback {
       status
