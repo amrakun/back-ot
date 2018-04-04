@@ -1,16 +1,25 @@
 import { readTemplate, generateXlsx } from '../../utils';
 import { FeedbackResponses, Companies } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
+import { supplierFilter } from './utils';
 
 const feedbackExports = {
   /**
    * Export feedback list
    * @return {String} - file url
    */
-  async feedbackResponsesExport() {
+  async feedbackResponsesExport(root, { supplierName, supplierIds }) {
     // read template
     const { workbook, sheet } = await readTemplate('success_feedback_responses');
-    const responses = await FeedbackResponses.find({});
+
+    // filter responses ==========
+    let query = await supplierFilter({}, supplierName);
+
+    if (supplierIds) {
+      query = { supplierId: { $in: supplierIds } };
+    }
+
+    const responses = await FeedbackResponses.find(query);
 
     let rowIndex = 4;
 
