@@ -54,7 +54,7 @@ import {
   mutations as MassMailMutations,
 } from './massMail';
 
-import { queries as LogQueries } from './log';
+import { queries as LogQueries, mutations as LogMutations } from './log';
 
 export const types = `
   scalar JSON
@@ -104,5 +104,6 @@ export const mutations = `
     ${PhysicalAuditMutations}
     ${ConfigMutations}
     ${MassMailMutations}
+    ${LogMutations}
   }
 `;

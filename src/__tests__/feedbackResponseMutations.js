@@ -3,7 +3,7 @@
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { FeedbackResponses } from '../db/models';
-import { userFactory } from '../db/factories';
+import { userFactory, companyFactory, feedbackFactory } from '../db/factories';
 import feedbackResponseMutations from '../data/resolvers/mutations/feedbackResponses';
 
 beforeAll(() => connect());
@@ -11,34 +11,42 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Feedback mutations', () => {
+  afterEach(async () => {
+    await FeedbackResponses.remove({});
+  });
+
   const commonParams = `
-    $feedbackId: String!,
-    $supplierId: String!,
-    $employmentNumberBefore: Float!,
-    $employmentNumberNow: Float!,
-    $nationalSpendBefore: Float!,
-    $nationalSpendAfter: Float!,
-    $umnugobiSpendBefore: Float!,
-    $umnugobiSpendAfter: Float!,
-    $investment: String!,
-    $trainings: String!,
-    $corporateSocial: String!,
-    $technologyImprovement: String!,
+    $feedbackId: String!
+    $supplierId: String!
+
+    $totalEmploymentOt: Float!
+    $totalEmploymentUmnugobi: Float!
+    $employmentChangesAfter: Float!
+    $numberOfEmployeeWorkToScopeNational: Float!
+    $numberOfEmployeeWorkToScopeUmnugobi: Float!
+    $procurementTotalSpend: Float!
+    $procurementNationalSpend: Float!
+    $procurementUmnugobiSpend: Float!
+
+    $corporateSocial: String!
+    $otherStories: String!
   `;
 
   const commonValues = `
-    feedbackId: $feedbackId,
-    supplierId: $supplierId,
-    employmentNumberBefore: $employmentNumberBefore,
-    employmentNumberNow: $employmentNumberNow,
-    nationalSpendBefore: $nationalSpendBefore,
-    nationalSpendAfter: $nationalSpendAfter,
-    umnugobiSpendBefore: $umnugobiSpendBefore,
-    umnugobiSpendAfter: $umnugobiSpendAfter,
-    investment: $investment,
-    trainings: $trainings,
-    corporateSocial: $corporateSocial,
-    technologyImprovement: $technologyImprovement,
+    feedbackId: $feedbackId
+    supplierId: $supplierId
+
+    totalEmploymentOt: $totalEmploymentOt
+    totalEmploymentUmnugobi: $totalEmploymentUmnugobi
+    employmentChangesAfter: $employmentChangesAfter
+    numberOfEmployeeWorkToScopeNational: $numberOfEmployeeWorkToScopeNational
+    numberOfEmployeeWorkToScopeUmnugobi: $numberOfEmployeeWorkToScopeUmnugobi
+    procurementTotalSpend: $procurementTotalSpend
+    procurementNationalSpend: $procurementNationalSpend
+    procurementUmnugobiSpend: $procurementUmnugobiSpend
+
+    corporateSocial: $corporateSocial
+    otherStories: $otherStories
   `;
 
   test('FeedbackResponses supplier required functions', async () => {
@@ -59,28 +67,44 @@ describe('Feedback mutations', () => {
   });
 
   test('Create feedback response', async () => {
-    FeedbackResponses.createFeedbackResponse = jest.fn(() => ({ _id: 'DFAFDA' }));
+    const feedback = await feedbackFactory();
+    const supplier = await companyFactory();
 
     const doc = {
-      feedbackId: 'feedbackId',
-      supplierId: 'supplierId',
-      employmentNumberBefore: 10,
-      employmentNumberNow: 10,
-      nationalSpendBefore: 10,
-      nationalSpendAfter: 10,
-      umnugobiSpendBefore: 10,
-      umnugobiSpendAfter: 10,
+      feedbackId: feedback._id,
+      supplierId: supplier._id,
 
-      investment: 'investment',
-      trainings: 'trainings',
+      totalEmploymentOt: 10,
+      totalEmploymentUmnugobi: 10,
+      employmentChangesAfter: 10,
+      numberOfEmployeeWorkToScopeNational: 10,
+      numberOfEmployeeWorkToScopeUmnugobi: 10,
+      procurementTotalSpend: 10,
+      procurementNationalSpend: 10,
+      procurementUmnugobiSpend: 10,
+
       corporateSocial: 'corporateSocial',
-      technologyImprovement: 'technologyImprovement',
+      otherStories: 'otherStories',
     };
 
     const mutation = `
       mutation feedbackResponsesAdd(${commonParams}) {
         feedbackResponsesAdd(${commonValues}) {
           _id
+          status
+          feedbackId
+          supplierId
+          totalEmploymentOt
+          totalEmploymentUmnugobi
+          employmentChangesAfter
+          numberOfEmployeeWorkToScopeNational
+          numberOfEmployeeWorkToScopeUmnugobi
+          procurementTotalSpend
+          procurementNationalSpend
+          procurementUmnugobiSpend
+          corporateSocial
+          otherStories
+          createdDate
         }
       }
     `;
@@ -89,7 +113,6 @@ describe('Feedback mutations', () => {
 
     await graphqlRequest(mutation, 'feedbackResponsesAdd', doc, { user });
 
-    expect(FeedbackResponses.createFeedbackResponse.mock.calls.length).toBe(1);
-    expect(FeedbackResponses.createFeedbackResponse).toBeCalledWith(doc);
+    expect(await FeedbackResponses.find().count()).toBe(1);
   });
 });

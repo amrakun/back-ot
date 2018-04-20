@@ -66,14 +66,14 @@ export const companyFactory = (params = {}) => {
 
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
-    isProductsInfoValidated: params.isProductsInfoValidated || false,
+    isProductsInfoValidated: params.isProductsInfoValidated,
     productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
 
     isSentRegistrationInfo: params.isSentRegistrationInfo,
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
-    isPrequalified: params.isPrequalified || false,
-    isQualified: params.isQualified || false,
+    isPrequalified: params.isPrequalified,
+    isQualified: params.isQualified,
 
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
@@ -427,17 +427,22 @@ export const feedbackResponseFactory = async (params = {}) => {
     feedbackId: params.feedbackId,
     supplierId: params.supplierId,
     status: params.status || 'onTime',
-    employmentNumberBefore: params.employmentNumberBefore || faker.random.number(),
-    employmentNumberNow: params.employmentNumberNow || faker.random.number(),
-    nationalSpendBefore: params.nationalSpendBefore || faker.random.number(),
-    nationalSpendAfter: params.nationalSpendAfter || faker.random.number(),
-    umnugobiSpendBefore: params.umnugobiSpendBefore || faker.random.number(),
-    umnugobiSpendAfter: params.umnugobiSpendAfter || faker.random.number(),
 
-    investment: params.investment || faker.random.word(),
-    trainings: params.trainings || faker.random.word(),
+    totalEmploymentOt: params.totalEmploymentOt || faker.random.number(),
+    totalEmploymentUmnugobi: params.totalEmploymentUmnugobi || faker.random.number(),
+    employmentChangesAfter: params.employmentChangesAfter || faker.random.number(),
+
+    numberOfEmployeeWorkToScopeNational:
+      params.numberOfEmployeeWorkToScopeNational || faker.random.number(),
+    numberOfEmployeeWorkToScopeUmnugobi:
+      params.numberOfEmployeeWorkToScopeUmnugobi || faker.random.number(),
+
+    procurementTotalSpend: params.procurementTotalSpend || faker.random.number(),
+    procurementNationalSpend: params.procurementNationalSpend || faker.random.number(),
+    procurementUmnugobiSpend: params.procurementUmnugobiSpend || faker.random.number(),
+
     corporateSocial: params.corporateSocial || faker.random.word(),
-    technologyImprovement: params.technologyImprovement || faker.random.word(),
+    otherStories: params.otherStories || faker.random.word(),
 
     createdDate: params.createdDate || new Date(),
   });
@@ -453,7 +458,10 @@ export const qualificationFactory = async (params = {}) => {
 
   const qualification = new Qualifications({
     supplierId: params.supplierId,
-    financialInfo: params.financialInfo || {},
+    financialInfo: params.financialInfo,
+    businessInfo: params.businessInfo,
+    environmentalInfo: params.environmentalInfo,
+    healthInfo: params.healthInfo,
   });
 
   return save(qualification);
@@ -603,13 +611,23 @@ export const auditResponseFactory = async (params = {}) => {
     supplierId: params.supplierId,
     isSent: params.isSent || false,
     isQualified: params.isQualified || false,
+
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
+    hrInfo: params.hrInfo,
+    businessInfo: params.businessInfo,
+
     improvementPlanFile: params.improvementPlanFile,
     improvementPlanSentDate: params.improvementPlanSentDate,
     reportFile: params.reportFile,
   });
 
-  return save(auditResponse);
+  const savedResponse = await save(auditResponse);
+
+  if (params.status) {
+    await AuditResponses.update({ _id: savedResponse._id }, { $set: { status: params.status } });
+  }
+
+  return AuditResponses.findOne({ _id: savedResponse._id });
 };
 
 export const blockedCompanyFactory = params => {

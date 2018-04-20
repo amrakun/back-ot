@@ -49,8 +49,8 @@ const BasicInfoSchema = mongoose.Schema(
 
 const ReplyRecommendSchema = mongoose.Schema(
   {
-    supplierComment: field({ type: String }),
-    supplierAnswer: field({ type: Boolean }),
+    supplierComment: field({ type: String, optional: true }),
+    supplierAnswer: field({ type: Boolean, optional: true }),
 
     auditorComment: field({ type: String, optional: true }),
     auditorRecommendation: field({ type: String, optional: true }),
@@ -144,8 +144,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
 
 const HrReplyRecommendSchema = mongoose.Schema(
   {
-    supplierComment: field({ type: String }),
-    supplierAnswer: field({ type: Number }),
+    supplierComment: field({ type: String, optional: true }),
+    supplierAnswer: field({ type: Number, optional: true }),
 
     auditorComment: field({ type: String, optional: true }),
     auditorRecommendation: field({ type: String, optional: true }),
@@ -159,7 +159,7 @@ export const HrInfoSchema = mongoose.Schema(
     workContractManagement: field({
       type: HrReplyRecommendSchema,
       optional: true,
-      label: 'Work Contract Managemen',
+      label: 'Work Contract Management',
     }),
 
     jobDescriptionProcedure: field({
@@ -392,6 +392,65 @@ const AuditResponseSchema = mongoose.Schema({
 });
 
 class AuditResponse {
+  /*
+   * Check that given section has no invalid answers
+   *
+   * @param {Object} sectionValue -
+      doesHaveHealthSafety: {...},
+      doesHaveDocumentedPolicy: {...},
+     @param {Object} schema - coreHseqInfo, hrInfo, businessInfo
+
+     @returns Boolean - is Passed;
+   */
+  static isSectionPassed({ name, schemaValue }) {
+    if (!schemaValue) {
+      return false;
+    }
+
+    const value = schemaValue.toJSON();
+
+    if (Object.keys(value).length === 0) {
+      return false;
+    }
+
+    // determine schema ================
+    let schema = CoreHseqInfoSchema;
+
+    if (name === 'businessInfo') {
+      schema = BusinessInfoSchema;
+    }
+
+    if (name === 'hrInfo') {
+      schema = HrInfoSchema;
+    }
+
+    let isPassed = true;
+
+    const paths = schema.paths;
+
+    // doesHaveHealthSafety, doesHaveDocumentedPolicy ...
+    const fieldNames = Object.keys(paths);
+
+    for (const fieldName of fieldNames) {
+      // supplierComment: comment
+      // supplierAnswer: yes
+      // auditorComment: comment
+      // auditorRecommendation: recommendation
+      // auditorScore: no
+      const fieldValue = value[fieldName] || {};
+      const auditorScore = fieldValue.auditorScore;
+
+      // if auditor replied as no or gave 0 score then consider this
+      // supplier as not qualified
+      if (!auditorScore) {
+        isPassed = false;
+        break;
+      }
+    }
+
+    return isPassed;
+  }
+
   /**
    * Create or update sections that supplier reply then auditor recomment
    * shaped sections like coreHseqInfo

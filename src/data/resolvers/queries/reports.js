@@ -133,24 +133,25 @@ const reportsQuery = {
 
     const { workbook, sheet } = await readTemplate('reports_tenders');
 
-    let rowIndex = 1;
+    let rowIndex = 4;
 
     for (const it of tenders) {
       rowIndex++;
 
-      sheet.cell(rowIndex, 1).value(rowIndex);
+      sheet.cell(rowIndex, 1).value(rowIndex - 4);
       sheet.cell(rowIndex, 2).value(it.number);
       sheet.cell(rowIndex, 3).value(it.name || '');
 
-      const suppliers = await Companies.find({ _id: it.supplierIds }, { enName: 1 });
+      const suppliers = await Companies.find({ _id: it.supplierIds }, { basicInfo: 1 });
       const supplierNames = suppliers.map(s => s.basicInfo && s.basicInfo.enName);
 
       sheet.cell(rowIndex, 4).value(supplierNames.join());
-      sheet.cell(rowIndex, 5).value(it.type);
-      sheet.cell(rowIndex, 6).value(it.publishDate.toString());
-      sheet.cell(rowIndex, 7).value(it.closeDate.toString());
-      sheet.cell(rowIndex, 8).value(it.status);
-      sheet.cell(rowIndex, 9).value(it.sentRegretLetter ? 'yes' : 'no');
+      sheet.cell(rowIndex, 5).value(it.sourcingOfficier);
+      sheet.cell(rowIndex, 6).value(it.type);
+      sheet.cell(rowIndex, 7).value(it.publishDate.toLocaleDateString());
+      sheet.cell(rowIndex, 8).value(it.closeDate.toLocaleDateString());
+      sheet.cell(rowIndex, 9).value(it.status);
+      sheet.cell(rowIndex, 10).value(it.sentRegretLetter ? 'yes' : 'no');
     }
 
     // Write to file.
@@ -221,11 +222,24 @@ const reportsQuery = {
    * Supplier's shareholder owner report
    * @return {String} file url of the generated reports_shareholder.xlsx
    */
-  async reportsShareholder() {
+  async reportsShareholder(root, { name }) {
     const { workbook, sheet } = await readTemplate('reports_shareholder');
     const suppliers = await Companies.find({});
 
     let index = 5;
+
+    // is given value includes name filter
+    const checkIncludes = field => {
+      if (!name) {
+        return true;
+      }
+
+      if (field && field.name) {
+        return field.name.includes(name);
+      }
+
+      return false;
+    };
 
     for (const supplier of suppliers) {
       let colIndex = 0;
@@ -235,9 +249,39 @@ const reportsQuery = {
         sheet.cell(index, colIndex).value(value);
       };
 
-      // basic info ================
       const bi = (await supplier.basicInfo) || {};
+      const ci = (await supplier.contactInfo) || {};
+      const mt = (await supplier.managementTeamInfo) || {};
+      const shi = (await supplier.shareholderInfo) || { shareholders: [] };
 
+      // check is valid ==============================
+      let isValid = false;
+
+      if (checkIncludes(ci)) {
+        isValid = true;
+      }
+
+      if (
+        checkIncludes(mt.managingDirector) ||
+        checkIncludes(mt.executiveOfficer) ||
+        checkIncludes(mt.financialDirector) ||
+        checkIncludes(mt.salesDirector)
+      ) {
+        isValid = true;
+      }
+
+      for (const sh of shi.shareholders) {
+        if (checkIncludes(sh)) {
+          isValid = true;
+        }
+      }
+
+      // collect only name containing suppliers
+      if (!isValid) {
+        continue;
+      }
+
+      // basic info ================
       fill(bi.enName);
       fill(bi.website);
       fill(bi.email);
@@ -246,8 +290,6 @@ const reportsQuery = {
       fill(bi.address3);
 
       // contact info =================
-      const ci = (await supplier.contactInfo) || {};
-
       fill(ci.name);
       fill(ci.jobTitle);
       fill(ci.phone);
@@ -255,8 +297,6 @@ const reportsQuery = {
       fill(ci.email);
 
       // managment team info ===========
-      const mt = (await supplier.managementTeamInfo) || {};
-
       const fillPerson = (doc = {}) => {
         fill(doc.name);
         fill(doc.jobTitle);
@@ -270,8 +310,6 @@ const reportsQuery = {
       fillPerson(mt.salesDirector);
 
       // shareholders ===========
-      const shi = (await supplier.shareholderInfo) || { shareholders: [] };
-
       for (const sh of shi.shareholders) {
         fill(sh.name);
         fill(sh.jobTitle);

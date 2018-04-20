@@ -6,7 +6,9 @@ import {
   SearchLogs,
   Tenders,
   SuppliersByProductCodeLogs,
+  ActivityLogs,
 } from '../../../db/models';
+import { MODULES_TO_TEXT } from '../../constants';
 
 export const buildSupplierLoginsLog = async ({ startDate, endDate }, user) => {
   const { workbook, sheet } = await readTemplate('logs_supplier_logins');
@@ -458,4 +460,50 @@ export const buildSuppliersByProductCodeLogsExport = async (
 
   // Write to file.
   return generateXlsx(workbook, 'suppliers_by_product_code_logs_export');
+};
+
+export const buildActivityLogsExport = async ({ startDate, endDate, module }, user) => {
+  const { workbook, sheet } = await readTemplate('menu_review_by_buyer');
+
+  const filter = {
+    createdDate: {
+      $gte: startDate,
+      $lt: endDate,
+    },
+  };
+
+  if (module) filter.module = module;
+
+  // Searches per buyer (search logs)
+  const items = await ActivityLogs.find(filter);
+
+  let rowIndex = 3;
+
+  sheet.cell(rowIndex++, 2).value(`Produced by: ${user.firstName} ${user.lastName}`);
+  sheet.cell(rowIndex++, 2).value(`Date and Time Run: ${new Date().toLocaleString()}`);
+  sheet.cell(rowIndex++, 2).value(`Number of records: ${items.length}`);
+  sheet
+    .cell(rowIndex++, 2)
+    .value(`Date range: ${startDate.toLocaleDateString()} :  ${endDate.toLocaleDateString()}`);
+  sheet.cell(rowIndex++, 2).value(MODULES_TO_TEXT[module]);
+
+  rowIndex = 9;
+
+  for (let item of items) {
+    const user = await Users.findOne({ _id: item.userId });
+
+    sheet.cell(rowIndex, 2).value(user.username);
+    sheet.cell(rowIndex, 3).value(user.email);
+    sheet
+      .cell(rowIndex, 4)
+      .value(
+        item.createdDate.toLocaleDateString('mn-MN') +
+          ' ' +
+          item.createdDate.toLocaleTimeString('mn-MN'),
+      );
+
+    rowIndex++;
+  }
+
+  return generateXlsx(workbook, 'menu_review_by_buyer');
 };

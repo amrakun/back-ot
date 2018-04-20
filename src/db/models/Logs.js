@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 import { Tenders } from './Tenders';
+import { MODULES } from '../../data/constants';
 
 // SearchLog schema
 const SearchLogSchema = mongoose.Schema({
@@ -114,3 +115,25 @@ export const SuppliersByProductCodeLogs = mongoose.model(
   'suppliers_by_product_code_logs',
   SuppliersByProductCodeLogSchema,
 );
+
+const ActivityLogSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
+  userId: field({ type: String }),
+  module: field({ type: String }),
+});
+
+ActivityLogSchema.loadClass(
+  class {
+    static write({ apiCall, userId }) {
+      if (MODULES.ALL.indexOf(apiCall) != -1) {
+        return this.create({
+          module: apiCall,
+          userId,
+          createdDate: new Date(),
+        });
+      }
+    }
+  },
+);
+
+export const ActivityLogs = mongoose.model('activity_logs', ActivityLogSchema);

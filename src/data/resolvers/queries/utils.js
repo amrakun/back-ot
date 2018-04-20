@@ -38,3 +38,19 @@ export const supplierFilter = async (query, search) => {
 
   return query;
 };
+
+export const fixValue = value => {
+  if (typeof value === 'boolean') {
+    return value ? 'YES' : 'NO';
+  }
+
+  if (value === 'true') {
+    return 'YES';
+  }
+
+  if (value === 'false') {
+    return 'NO';
+  }
+
+  return value;
+};

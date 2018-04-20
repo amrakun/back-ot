@@ -59,7 +59,7 @@ describe('PhysicalAudit db', () => {
     expect(physicalAuditObj.reportFile).toEqual('/path');
 
     const updatedCompany = await Companies.findOne({ _id: doc.supplierId });
-    expect(updatedCompany.isQualified).toBe(false);
+    expect(updatedCompany.isQualified).not.toBeDefined();
   });
 
   test('Remove physicalAudit', async () => {

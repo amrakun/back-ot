@@ -324,6 +324,8 @@ export const types = `
     date: Date
     expireDate: Date
     file: JSON
+    createdUserId: String
+    createdUser: User
   }
 
   input CompanyDueDiligenceInput {
@@ -357,6 +359,9 @@ export const types = `
     isSentPrequalificationInfo: Boolean
 
     isPrequalified: Boolean
+    prequalifiedDate: Date
+    prequalifiedStatus: JSON
+
     isQualified: Boolean
 
     averageDifotScore: Float
@@ -401,10 +406,12 @@ export const queries = `
   companiesValidatedProductsInfoExport(${queryParams}): String
   companiesGenerateDifotScoreList(${queryParams}): String
   companiesGenerateDueDiligenceList(${queryParams}): String
+  companiesGeneratePrequalificationList(${queryParams}): String
 
   companyDetail(_id: String!): Company
   companyByUser: Company
   companyDetailExport(_id: String!): String
+  companyDetailSupplierExport: String
 
   companiesCountByTierType(
     startDate: Date!,
@@ -412,10 +419,14 @@ export const queries = `
   ): [JSON]
 
   companiesCountByRegisteredVsPrequalified(
-    startDate: Date!,
+    startDate: Date!
     endDate: Date!
     productCodes: String
   ): JSON
+
+  companiesCountByProductCode(startDate: Date, endDate: Date): JSON
+
+  companiesPrequalifiedStatus(${queryParams}): JSON
 `;
 
 export const mutations = `

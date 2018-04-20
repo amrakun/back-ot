@@ -398,10 +398,11 @@ const DateAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const DueDiligencSchema = mongoose.Schema(
+const DueDiligenceSchema = mongoose.Schema(
   {
     date: field({ type: String }),
     file: FileSchema,
+    createdUserId: field({ type: String }),
     expireDate: field({ type: String }),
   },
   { _id: false },
@@ -442,9 +443,10 @@ const CompanySchema = mongoose.Schema({
   healthInfo: field({ type: HealthInfoSchema, optional: true }),
 
   isPrequalified: field({ type: Boolean, optional: true }),
+  prequalifiedDate: field({ type: Date, optional: true }),
   isQualified: field({ type: Boolean, optional: true }),
 
-  dueDiligences: field({ type: [DueDiligencSchema], optional: true }),
+  dueDiligences: field({ type: [DueDiligenceSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
   averageDifotScore: field({ type: Number, optional: true }),
 });
@@ -474,14 +476,14 @@ class Company {
    * Get feedbacks that this supplier can see
    */
   getFeedbacks() {
-    return Feedbacks.find({ supplierIds: { $in: [this._id] } }).sort({ createdDate: -1 });
+    return Feedbacks.find({ supplierIds: { $in: [this._id] } });
   }
 
   /*
    * Get get last feedback
    */
   async getLastFeedback() {
-    const feedbacks = await this.getFeedbacks();
+    const feedbacks = await this.getFeedbacks().sort({ createdDate: 1 });
 
     return feedbacks.pop();
   }
@@ -531,6 +533,11 @@ class Company {
     // update
     await this.update({ _id }, { $set: { [key]: value } });
 
+    // if updating products info then reset validated status
+    if (key === 'productsInfo') {
+      await this.update({ _id }, { $set: { isProductsInfoValidated: false } });
+    }
+
     return this.findOne({ _id });
   }
 
@@ -578,10 +585,15 @@ class Company {
    * @param {String} file - File path
    * @return updated company
    */
-  async addDueDiligence({ file, expireDate }) {
+  async addDueDiligence({ file, expireDate }, user) {
     const dueDiligences = this.dueDiligences || [];
 
-    dueDiligences.push({ date: new Date(), file, expireDate });
+    dueDiligences.push({
+      date: new Date(),
+      file,
+      expireDate,
+      createdUserId: user._id,
+    });
 
     // update field
     await this.update({ dueDiligences });

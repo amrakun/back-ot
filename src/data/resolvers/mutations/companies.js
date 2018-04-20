@@ -17,12 +17,12 @@ const companyMutations = {
     }
   },
 
-  async companiesAddDueDiligences(root, { dueDiligences }) {
+  async companiesAddDueDiligences(root, { dueDiligences }, { user }) {
     for (let dueDiligence of dueDiligences) {
       const company = await Companies.findOne({ _id: dueDiligence.supplierId });
 
       // add new due diligence report to every supplier
-      await company.addDueDiligence(dueDiligence);
+      await company.addDueDiligence(dueDiligence, user);
     }
   },
 

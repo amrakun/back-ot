@@ -1,4 +1,4 @@
-import { TenderResponses } from '../../../db/models';
+import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { supplierFilter } from './utils';
 
@@ -9,12 +9,17 @@ const tenderResponseQueries = {
    * @return {Promise} filtered tenderResponses list by given parameters
    */
   async tenderResponses(root, args) {
-    const { tenderId, sort = {}, betweenSearch = {}, supplierSearch } = args;
+    const { tenderId, sort = {}, betweenSearch = {}, supplierSearch, isNotInterested } = args;
 
     const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch);
 
     const sortName = sort.name;
     const sortProductCode = sort.productCode;
+
+    // filter by interest
+    if (isNotInterested !== undefined) {
+      query.isNotInterested = isNotInterested;
+    }
 
     let tenders = await TenderResponses.find(query);
 
@@ -89,6 +94,23 @@ const tenderResponseQueries = {
    */
   tenderResponseDetail(root, { _id }) {
     return TenderResponses.findOne({ _id });
+  },
+
+  /**
+   * Not responded suppliers
+   * @param {String} tenderId - Tender id
+   * @return {Promise} - Companies list
+   */
+  async tenderResponseNotRespondedSuppliers(root, { tenderId }) {
+    const tender = await Tenders.findOne({ _id: tenderId });
+    const responses = await TenderResponses.find({ tenderId });
+    const responededSupplierIds = responses.map(response => response.supplierId);
+
+    const notRespondedSupplierIds = tender.supplierIds.filter(
+      supplierId => !responededSupplierIds.includes(supplierId),
+    );
+
+    return Companies.find({ _id: { $in: notRespondedSupplierIds } });
   },
 
   /**

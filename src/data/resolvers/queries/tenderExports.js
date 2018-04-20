@@ -23,6 +23,8 @@ export const tendersExport = async tenders => {
     sheet.cell(rowIndex, 7).value(await tender.submittedCount());
     sheet.cell(rowIndex, 8).value(await tender.notInterestedCount());
     sheet.cell(rowIndex, 9).value(await tender.notRespondedCount());
+    sheet.cell(rowIndex, 10).value(await tender.sourcingOfficer);
+    sheet.cell(rowIndex, 11).value((await tender.sentRegretLetter) ? 'YES' : 'NO');
   }
 
   // Write to file.

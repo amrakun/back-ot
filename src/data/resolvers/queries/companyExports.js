@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { BlockedCompanies } from '../../../db/models';
+import { BlockedCompanies, Qualifications } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
 export const companyDetailExport = async supplier => {
@@ -907,7 +907,8 @@ export const companiesGenerateDueDiligenceList = async companies => {
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
     sheet.cell(rowIndex, 3).value(company.tierType);
-    sheet.cell(rowIndex, 4).value(company.isPrequalified);
+
+    sheet.cell(rowIndex, 4).value(lastDueDiligence ? 'YES' : 'NO');
 
     if (lastDueDiligence) {
       sheet.cell(rowIndex, 5).value(lastDueDiligence.file.url);
@@ -921,4 +922,62 @@ export const companiesGenerateDueDiligenceList = async companies => {
 
   // Write to file.
   return generateXlsx(workbook, 'suppliers_due_diligence');
+};
+
+/**
+ * Prequalification list
+ * @param [Object] companies - filtered companies
+ * @return {String} - file url
+ */
+export const companiesGeneratePrequalificationList = async companies => {
+  // read template
+  const { workbook, sheet } = await readTemplate('suppliers_prequalification');
+
+  let rowIndex = 1;
+
+  /*
+   * Check per sections' all values are true
+   */
+  const isSectionPassed = sectionSchema => {
+    const isPassed = Qualifications.isSectionPassed(sectionSchema);
+
+    return isPassed ? 'Passed' : 'Failed';
+  };
+
+  for (let company of companies) {
+    const qualification = await Qualifications.findOne({ supplierId: company._id });
+
+    rowIndex++;
+
+    const basicInfo = company.basicInfo || {};
+
+    const fill = ({ businessInfo, healthInfo, environmentalInfo, financialInfo }) => {
+      sheet.cell(rowIndex, 1).value(basicInfo.enName);
+      sheet.cell(rowIndex, 2).value(businessInfo);
+      sheet.cell(rowIndex, 3).value(healthInfo);
+      sheet.cell(rowIndex, 4).value(environmentalInfo);
+      sheet.cell(rowIndex, 5).value(financialInfo);
+    };
+
+    if (qualification) {
+      fill({
+        businessInfo: isSectionPassed(qualification.businessInfo),
+        healthInfo: isSectionPassed(qualification.healthInfo),
+        environmentalInfo: isSectionPassed(qualification.environmentalInfo),
+        financialInfo: isSectionPassed(qualification.financialInfo),
+      });
+
+      continue;
+    }
+
+    fill({
+      businessInfo: 'Outstanding',
+      healthInfo: 'Outstanding',
+      environmentalInfo: 'Outstanding',
+      financialInfo: 'Outstanding',
+    });
+  }
+
+  // Write to file.
+  return generateXlsx(workbook, 'suppliers_prequalification');
 };

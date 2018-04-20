@@ -8,7 +8,7 @@ import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports'
  * Tender list & tender export helper
  */
 const tendersFilter = async (args, extraChecks) => {
-  const { type, status, search } = args;
+  const { type, status, search, month } = args;
 
   const query = { $and: [] };
 
@@ -29,6 +29,20 @@ const tendersFilter = async (args, extraChecks) => {
         { name: new RegExp(`.*${search}.*`, 'i') },
         { number: new RegExp(`.*${search}.*`, 'i') },
       ],
+    });
+  }
+
+  // month filter: month is date object
+  if (month) {
+    query.$and.push({
+      createdDate: {
+        $gt: moment(month)
+          .startOf('month')
+          .toDate(),
+        $lte: moment(month)
+          .endOf('month')
+          .toDate(),
+      },
     });
   }
 
@@ -66,6 +80,17 @@ const tendersSupplierFilter = async (args, user) => {
   const query = await tendersFilter(args, async query => {
     query.$and.push({ supplierIds: { $in: [user.companyId] } });
     query.$and.push({ status: { $ne: 'draft' } });
+
+    // ignore not interested tenders =============
+    const notInterestedTenders = await TenderResponses.find({
+      supplierId: user.companyId,
+      isNotInterested: true,
+    });
+
+    const notInterestedTenderIds = notInterestedTenders.map(res => res.tenderId);
+
+    query.$and.push({ _id: { $nin: notInterestedTenderIds } });
+    // =================== //
 
     // filter only user's responded tenders
     if (status && status.includes('participated')) {

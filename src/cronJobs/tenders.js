@@ -1,31 +1,56 @@
 import schedule from 'node-schedule';
-import { Companies, Tenders } from '../db/models';
+import { Users, Companies, Tenders } from '../db/models';
 import utils from '../data/utils';
+import moment from 'moment';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
+  const { FROM_EMAIL_TENDER } = process.env;
+
   const publishedTenderIds = await Tenders.publishDrafts();
   const publishedTenders = await Tenders.find({ _id: { $in: publishedTenderIds } });
 
-  // send email to suppliers
+  // send published email to suppliers
   for (const tender of publishedTenders) {
     const suppliers = await Companies.find({ _id: { $in: tender.supplierIds } });
 
     for (const supplier of suppliers) {
       utils.sendEmail({
+        fromEmail: FROM_EMAIL_TENDER,
         toEmails: [supplier.basicInfo.email],
         title: tender.name,
         template: {
           name: 'tender',
           data: {
-            content: tender.content,
+            tender,
           },
         },
       });
     }
   }
 
-  await Tenders.closeOpens();
+  const closedTenderIds = await Tenders.closeOpens();
+  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds } });
+
+  // send closed email to suppliers
+  for (const tender of closedTenders) {
+    const createdUser = await Users.findOne({ _id: tender.createdUserId });
+    const type = tender.type === 'rfq' ? 'RFQ' : 'EOI';
+
+    utils.sendEmail({
+      fromEmail: FROM_EMAIL_TENDER,
+      toEmails: [createdUser.email],
+      title: `${type} close notification - ${tender.number} - ${tender.name}`,
+      template: {
+        name: 'tender_close',
+        data: {
+          number: tender.number,
+          date: moment(tender.closeDate).format('MMM D, hh:mmA'),
+          type,
+        },
+      },
+    });
+  }
 
   console.log('Checked tender status'); // eslint-disable-line
 });

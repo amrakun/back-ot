@@ -4,7 +4,13 @@
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Companies, Users, Audits, AuditResponses } from '../db/models';
-import { userFactory, companyFactory, auditFactory, auditResponseFactory } from '../db/factories';
+import {
+  userFactory,
+  companyFactory,
+  auditFactory,
+  auditResponseFactory,
+  auditResponseDocs,
+} from '../db/factories';
 import queries from '../data/resolvers/queries/audits';
 
 beforeAll(() => connect());
@@ -35,7 +41,7 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(5);
 
     const user = await userFactory({ isSupplier: true });
 
@@ -44,6 +50,7 @@ describe('Company queries', () => {
       'auditDetail',
       'auditResponses',
       'auditResponseTotalCounts',
+      'auditResponsesQualifiedStatus',
       'auditResponseDetail',
     ];
 
@@ -287,16 +294,18 @@ describe('Company queries', () => {
   test('audit responses', async () => {
     const query = `
       query auditResponses(
-        $supplierSearch: String,
-        $isFileGenerated: Boolean,
-        $publishDate: Date,
+        $supplierSearch: String
+        $isFileGenerated: Boolean
+        $publishDate: Date
         $closeDate: Date
+        $status: String
       ) {
         auditResponses(
-          supplierSearch: $supplierSearch,
-          isFileGenerated: $isFileGenerated,
-          publishDate: $publishDate,
+          supplierSearch: $supplierSearch
+          isFileGenerated: $isFileGenerated
+          publishDate: $publishDate
           closeDate: $closeDate
+          status: $status
         ) {
           _id
           auditId
@@ -322,7 +331,11 @@ describe('Company queries', () => {
       closeDate: moment().add(1, 'days'),
     });
 
-    await auditResponseFactory({ auditId: audit1._id, reportFile: '/path' });
+    await auditResponseFactory({
+      auditId: audit1._id,
+      reportFile: '/path',
+      status: 'late',
+    });
 
     // respose 2 ===
     const audit2 = await auditFactory({
@@ -330,7 +343,11 @@ describe('Company queries', () => {
       closeDate: moment().add(-10, 'days'),
     });
 
-    await auditResponseFactory({ supplierId: supplier._id, auditId: audit2._id });
+    await auditResponseFactory({
+      supplierId: supplier._id,
+      auditId: audit2._id,
+      status: 'onTime',
+    });
 
     // supplier search ===================
     let args = { supplierSearch: 'enName' };
@@ -350,6 +367,12 @@ describe('Company queries', () => {
 
     // isFileGenerated search ===================
     args = { isFileGenerated: true };
+    response = await graphqlRequest(query, 'auditResponses', args);
+
+    expect(response.length).toBe(1);
+
+    // status search ===================
+    args = { status: 'onTime' };
     response = await graphqlRequest(query, 'auditResponses', args);
 
     expect(response.length).toBe(1);
@@ -390,5 +413,68 @@ describe('Company queries', () => {
 
     expect(response.qualified).toBe(2);
     expect(response.sentImprovementPlan).toBe(1);
+  });
+
+  test('auditResponsesQualifiedStatus', async () => {
+    const qry = `
+      query auditResponsesQualifiedStatus {
+        auditResponsesQualifiedStatus
+      }
+    `;
+
+    // core hseq info ===========
+    const coreHseqInfo = auditResponseDocs.coreHseqInfo(false, true);
+    await auditResponseFactory({});
+    await auditResponseFactory({ coreHseqInfo });
+    await auditResponseFactory({ coreHseqInfo });
+    await auditResponseFactory({ coreHseqInfo });
+
+    // business info ===========
+    const businessInfo = auditResponseDocs.businessInfo(false, true);
+    await auditResponseFactory({ businessInfo });
+    await auditResponseFactory({ businessInfo });
+
+    // hr info ===========
+    const hrInfo = auditResponseDocs.hrInfo(false, true);
+    await auditResponseFactory({ hrInfo });
+    await auditResponseFactory({ hrInfo });
+
+    const response = await graphqlRequest(qry, 'auditResponsesQualifiedStatus', {});
+
+    expect(response.coreHseqInfo).toBe(3);
+    expect(response.businessInfo).toBe(2);
+    expect(response.hrInfo).toBe(2);
+  });
+
+  test('audit response qualified status object', async () => {
+    const qry = `
+      query auditResponseByUser($auditId: String!) {
+        auditResponseByUser(auditId: $auditId) {
+          qualifiedStatus
+        }
+      }
+    `;
+
+    const user = await userFactory({ isSupplier: true });
+    const audit = await auditFactory({});
+
+    await auditResponseFactory({
+      supplierId: user.companyId,
+      auditId: audit._id,
+      coreHseqInfo: auditResponseDocs.coreHseqInfo(false, true),
+      businessInfo: auditResponseDocs.businessInfo(false, true),
+      hrInfo: auditResponseDocs.hrInfo(false, true),
+    });
+
+    const response = await graphqlRequest(
+      qry,
+      'auditResponseByUser',
+      { auditId: audit._id },
+      { user },
+    );
+
+    expect(response.qualifiedStatus.coreHseqInfo).toBe(true);
+    expect(response.qualifiedStatus.businessInfo).toBe(true);
+    expect(response.qualifiedStatus.hrInfo).toBe(true);
   });
 });

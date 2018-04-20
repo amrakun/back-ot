@@ -38,6 +38,54 @@ const QualificationSchema = mongoose.Schema({
 });
 
 class Qualification {
+  /*
+   * Check per sections' all values are true
+   */
+  static isSectionPassed(sectionSchema) {
+    if (!sectionSchema) {
+      return false;
+    }
+
+    const section = sectionSchema.toJSON();
+    const fieldNames = Object.keys(section);
+
+    let isPassed = true;
+
+    for (const fieldName of fieldNames) {
+      if (!section[fieldName]) {
+        isPassed = false;
+        break;
+      }
+    }
+
+    return isPassed;
+  }
+
+  /*
+   * Check whether approved, failed, expired, outstanding
+   */
+  static async status(supplierId) {
+    const supplier = await Companies.findOne({ _id: supplierId });
+    const qualif = await this.findOne({ supplierId });
+
+    if (!qualif) {
+      return {};
+    }
+
+    // approved
+    if (supplier.isPrequalified) {
+      return { isApproved: true };
+    }
+
+    // failed
+    if (supplier.isPrequalified === false) {
+      return { isFailed: true };
+    }
+
+    // outstanding
+    return { isOutstanding: true };
+  }
+
   /**
    * Update sub section info
    * @param {String } supplierId - Company id
@@ -75,7 +123,10 @@ class Qualification {
    */
   static async prequalify(supplierId, status) {
     // update supplier's tier type
-    await Companies.update({ _id: supplierId }, { $set: { isPrequalified: status } });
+    await Companies.update(
+      { _id: supplierId },
+      { $set: { isPrequalified: status, prequalifiedDate: new Date() } },
+    );
 
     return Companies.findOne({ _id: supplierId });
   }

@@ -26,11 +26,14 @@ describe('Companies model tests', () => {
   };
 
   const checkSection = async name => {
-    const company = await companyFactory();
+    const company = await companyFactory({ isProductsInfoValidated: true });
+
     const doc = companyDocs[name]();
     const updatedCompany = await Companies.updateSection(company._id, `${name}Info`, doc);
 
     expect(toObject(updatedCompany[`${name}Info`])).toEqual(doc);
+
+    return updatedCompany;
   };
 
   test('Create', async () => {
@@ -88,7 +91,9 @@ describe('Companies model tests', () => {
   });
 
   test('Update products info', async () => {
-    await checkSection('products');
+    const updatedCompany = await checkSection('products');
+
+    expect(updatedCompany.isProductsInfoValidated).toBe(false);
   });
 
   test('Update certificate info', async () => {
@@ -131,17 +136,18 @@ describe('Companies model tests', () => {
   });
 
   test('Add due dilingence', async () => {
+    const user = await userFactory({});
     const company = await Companies.findOne({ _id: _company._id });
 
-    let updatedCompany = await company.addDueDiligence({
-      file: { url: '/path1' },
-      expireDate: new Date(),
-    });
+    let updatedCompany = await company.addDueDiligence(
+      { file: { url: '/path1' }, expireDate: new Date() },
+      user,
+    );
 
-    updatedCompany = await company.addDueDiligence({
-      file: { url: '/path2' },
-      expireDate: new Date(),
-    });
+    updatedCompany = await company.addDueDiligence(
+      { file: { url: '/path2' }, expireDate: new Date() },
+      user,
+    );
 
     expect(updatedCompany.dueDiligences.length).toBe(2);
 
@@ -150,10 +156,12 @@ describe('Companies model tests', () => {
     expect(diligence1.date).toBeDefined();
     expect(diligence1.expireDate).toBeDefined();
     expect(diligence1.file.url).toBe('/path1');
+    expect(diligence1.createdUserId).toBeDefined();
 
     expect(diligence2.date).toBeDefined();
     expect(diligence2.expireDate).toBeDefined();
     expect(diligence2.file.url).toBe('/path2');
+    expect(diligence2.createdUserId).toBeDefined();
   });
 
   test('Validate product info', async () => {
