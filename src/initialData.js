@@ -3,7 +3,13 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import faker from 'faker';
 import { Users, Companies } from './db/models';
-import { userFactory, companyFactory, tenderFactory, tenderResponseFactory } from './db/factories';
+import {
+  userFactory,
+  companyFactory,
+  tenderFactory,
+  tenderResponseFactory,
+  physicalAuditFactory,
+} from './db/factories';
 
 dotenv.config();
 
@@ -37,7 +43,7 @@ export const importData = async () => {
   await userFactory({ isSupplier: false });
 
   // create supplier
-  await userFactory({ isSupplier: true, email: 'supplier@ot.mn' });
+  await userFactory({ isSupplier: true, email: 'supplier@ot.mn', password: '123' });
 
   // create suppliers =========================
   const companyFigures = [
@@ -174,6 +180,10 @@ export const importData = async () => {
 
       i++;
     }
+  }
+
+  for (let i = 0; i < 30; i++) {
+    await physicalAuditFactory();
   }
 
   mongoose.connection.close();
