@@ -316,8 +316,6 @@ const companyQueries = {
       };
     }
 
-    console.log('se:', selector);
-
     // find companies
     const companies = await Companies.find(selector);
 
