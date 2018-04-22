@@ -36,7 +36,7 @@ const responsesFilter = async args => {
     });
   }
 
-  return AuditResponses.find(query);
+  return AuditResponses.find(query).sort({ sentDate: -1 });
 };
 
 const auditQueries = {

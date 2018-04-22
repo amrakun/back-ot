@@ -388,6 +388,8 @@ const AuditResponseSchema = mongoose.Schema({
   reportSentDate: field({ type: Date, optional: true }),
 
   isSent: field({ type: Boolean, optional: true }),
+  sentDate: field({ type: Date, optional: true }),
+
   isQualified: field({ type: Boolean, optional: true }),
 });
 
@@ -595,7 +597,7 @@ class AuditResponse {
       status = 'late';
     }
 
-    await this.update({ isSent: true, status });
+    await this.update({ isSent: true, sentDate: new Date(), status });
 
     return AuditResponses.findOne({ _id: this._id });
   }

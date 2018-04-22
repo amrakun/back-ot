@@ -91,6 +91,7 @@ describe('Audit response db', () => {
     });
 
     expect(updatedResponse.isSent).toBe(false);
+    expect(updatedResponse.sentDate).not.toBeDefined();
 
     // must not created new response
     expect(await AuditResponses.find().count()).toBe(1);
@@ -218,7 +219,7 @@ describe('Audit response db', () => {
   });
 
   test('Send', async () => {
-    expect.assertions(4);
+    expect.assertions(5);
 
     const audit = await auditFactory({ status: 'open' });
 
@@ -235,6 +236,7 @@ describe('Audit response db', () => {
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
     expect(auditResponse.isSent).toBe(true);
+    expect(auditResponse.sentDate).toBeDefined();
     expect(auditResponse.status).toBe('onTime');
 
     // try to resend
