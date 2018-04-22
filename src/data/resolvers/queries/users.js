@@ -10,7 +10,7 @@ const userQueries = {
    */
   users(root, args) {
     const { search } = args;
-    const selector = { isSupplier: true };
+    const selector = { isSupplier: false };
 
     if (search) {
       selector.$or = [
