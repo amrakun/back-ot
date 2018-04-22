@@ -600,6 +600,27 @@ describe('Tender queries', () => {
     expect(response.isSent).toBe(false);
   });
 
+  test('tender responses: hide open tender responses', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+    const user = await userFactory({ isSupplier: false });
+
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+
+    const response = await graphqlRequest(
+      `query tenderResponses($tenderId: String!) {
+        tenderResponses(tenderId: $tenderId) {
+          _id
+        }
+      }
+    `,
+      'tenderResponses',
+      { tenderId: tender._id },
+      { user },
+    );
+
+    expect(response.length).toBe(0);
+  });
+
   test('tender responses search: not interested', async () => {
     const tender = await tenderFactory({});
     const user = await userFactory({ isSupplier: false });

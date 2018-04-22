@@ -11,6 +11,13 @@ const tenderResponseQueries = {
   async tenderResponses(root, args) {
     const { tenderId, sort = {}, betweenSearch = {}, supplierSearch, isNotInterested } = args;
 
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    // do not show open tender's responses
+    if (tender.status === 'open') {
+      return [];
+    }
+
     const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch);
 
     const sortName = sort.name;
