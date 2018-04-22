@@ -319,7 +319,7 @@ const companyQueries = {
     // find companies
     const companies = await Companies.find(selector);
 
-    const parentLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'];
+    const parentLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const results = {};
 
     parentLetters.forEach(letter => {

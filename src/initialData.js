@@ -1,9 +1,15 @@
-import moment from 'moment';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import faker from 'faker';
+import moment from 'moment';
 import { Users, Companies } from './db/models';
-import { userFactory, companyFactory, tenderFactory, tenderResponseFactory } from './db/factories';
+import {
+  userFactory,
+  companyFactory,
+  tenderFactory,
+  tenderResponseFactory,
+  physicalAuditFactory,
+} from './db/factories';
 
 dotenv.config();
 
@@ -25,32 +31,74 @@ export const importData = async () => {
     lastName: faker.name.firstName(),
   });
 
-  // create some users
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-  await userFactory({ isSupplier: false });
-
-  // create supplier
-  await userFactory({ isSupplier: true, email: 'supplier@ot.mn' });
+  await userFactory({
+    isSupplier: true,
+    email: 'supplier@ot.mn',
+    password: '123',
+  });
 
   // create suppliers =========================
   const companyFigures = [
-    { createdDate: '2018-01-01', times: 7, prequalifiedDuration: 2, tierType: 'tier1' },
-    { createdDate: '2018-01-02', times: 10, prequalifiedDuration: 3, tierType: 'tier2' },
-    { createdDate: '2018-01-03', times: 3, prequalifiedDuration: 2, tierType: 'tier3' },
-    { createdDate: '2018-01-04', times: 9, prequalifiedDuration: 5, tierType: 'tier1' },
-    { createdDate: '2018-01-05', times: 8, prequalifiedDuration: 4, tierType: 'national' },
-    { createdDate: '2018-01-06', times: 7, prequalifiedDuration: 1, tierType: 'umnugovi' },
-    { createdDate: '2018-01-07', times: 4, prequalifiedDuration: 2, tierType: 'tier3' },
-    { createdDate: '2018-01-08', times: 8, prequalifiedDuration: 2, tierType: 'umnugovi' },
-    { createdDate: '2018-01-09', times: 2, prequalifiedDuration: 2, tierType: 'tier3' },
-    { createdDate: '2018-01-10', times: 1, prequalifiedDuration: 1, tierType: 'umnugovi' },
+    {
+      createdDate: '2018-01-01',
+      times: 7,
+      prequalifiedDuration: 2,
+      tierType: 'tier1',
+    },
+    {
+      createdDate: '2018-01-02',
+      times: 10,
+      prequalifiedDuration: 3,
+      tierType: 'tier2',
+    },
+    {
+      createdDate: '2018-01-03',
+      times: 3,
+      prequalifiedDuration: 2,
+      tierType: 'tier3',
+    },
+    {
+      createdDate: '2018-01-04',
+      times: 9,
+      prequalifiedDuration: 5,
+      tierType: 'tier1',
+    },
+    {
+      createdDate: '2018-01-05',
+      times: 8,
+      prequalifiedDuration: 4,
+      tierType: 'national',
+    },
+    {
+      createdDate: '2018-01-06',
+      times: 7,
+      prequalifiedDuration: 1,
+      tierType: 'umnugovi',
+    },
+    {
+      createdDate: '2018-01-07',
+      times: 4,
+      prequalifiedDuration: 2,
+      tierType: 'tier3',
+    },
+    {
+      createdDate: '2018-01-08',
+      times: 8,
+      prequalifiedDuration: 2,
+      tierType: 'umnugovi',
+    },
+    {
+      createdDate: '2018-01-09',
+      times: 2,
+      prequalifiedDuration: 2,
+      tierType: 'tier3',
+    },
+    {
+      createdDate: '2018-01-10',
+      times: 1,
+      prequalifiedDuration: 1,
+      tierType: 'umnugovi',
+    },
   ];
 
   const createCompany = ({ tierType, createdDate, isPrequalified }) => {
@@ -174,6 +222,16 @@ export const importData = async () => {
 
       i++;
     }
+  }
+
+  await userFactory({
+    isSupplier: true,
+    email: 'chantsal1201@gmail.com',
+    password: '123',
+  });
+
+  for (let i = 0; i < 30; i++) {
+    await physicalAuditFactory();
   }
 
   mongoose.connection.close();
