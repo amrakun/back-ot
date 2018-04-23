@@ -429,17 +429,17 @@ export const feedbackResponseFactory = async (params = {}) => {
     status: params.status || 'onTime',
 
     totalEmploymentOt: params.totalEmploymentOt || faker.random.number(),
-    totalEmploymentUmnugobi: params.totalEmploymentUmnugobi || faker.random.number(),
+    totalEmploymentUmnugovi: params.totalEmploymentUmnugovi || faker.random.number(),
     employmentChangesAfter: params.employmentChangesAfter || faker.random.number(),
 
     numberOfEmployeeWorkToScopeNational:
       params.numberOfEmployeeWorkToScopeNational || faker.random.number(),
-    numberOfEmployeeWorkToScopeUmnugobi:
-      params.numberOfEmployeeWorkToScopeUmnugobi || faker.random.number(),
+    numberOfEmployeeWorkToScopeUmnugovi:
+      params.numberOfEmployeeWorkToScopeUmnugovi || faker.random.number(),
 
     procurementTotalSpend: params.procurementTotalSpend || faker.random.number(),
     procurementNationalSpend: params.procurementNationalSpend || faker.random.number(),
-    procurementUmnugobiSpend: params.procurementUmnugobiSpend || faker.random.number(),
+    procurementUmnugoviSpend: params.procurementUmnugoviSpend || faker.random.number(),
 
     corporateSocial: params.corporateSocial || faker.random.word(),
     otherStories: params.otherStories || faker.random.word(),

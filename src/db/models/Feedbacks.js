@@ -60,18 +60,18 @@ const FeedbackResponseSchema = mongoose.Schema({
 
   // Please provide your employment details
   totalEmploymentOt: field({ type: Number }),
-  totalEmploymentUmnugobi: field({ type: Number }),
+  totalEmploymentUmnugovi: field({ type: Number }),
   // Changes in employment number after working with OT
   employmentChangesAfter: field({ type: Number }),
 
   // Of which, how many employee work related to the scope you provide to OT
   numberOfEmployeeWorkToScopeNational: field({ type: Number }),
-  numberOfEmployeeWorkToScopeUmnugobi: field({ type: Number }),
+  numberOfEmployeeWorkToScopeUmnugovi: field({ type: Number }),
 
   // Please provide procurement spend details
   procurementTotalSpend: field({ type: Number }),
   procurementNationalSpend: field({ type: Number }),
-  procurementUmnugobiSpend: field({ type: Number }),
+  procurementUmnugoviSpend: field({ type: Number }),
 
   corporateSocial: field({ type: String, optional: true }),
   otherStories: field({ type: String, optional: true }),

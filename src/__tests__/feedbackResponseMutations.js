@@ -20,13 +20,13 @@ describe('Feedback mutations', () => {
     $supplierId: String!
 
     $totalEmploymentOt: Float!
-    $totalEmploymentUmnugobi: Float!
+    $totalEmploymentUmnugovi: Float!
     $employmentChangesAfter: Float!
     $numberOfEmployeeWorkToScopeNational: Float!
-    $numberOfEmployeeWorkToScopeUmnugobi: Float!
+    $numberOfEmployeeWorkToScopeUmnugovi: Float!
     $procurementTotalSpend: Float!
     $procurementNationalSpend: Float!
-    $procurementUmnugobiSpend: Float!
+    $procurementUmnugoviSpend: Float!
 
     $corporateSocial: String!
     $otherStories: String!
@@ -37,13 +37,13 @@ describe('Feedback mutations', () => {
     supplierId: $supplierId
 
     totalEmploymentOt: $totalEmploymentOt
-    totalEmploymentUmnugobi: $totalEmploymentUmnugobi
+    totalEmploymentUmnugovi: $totalEmploymentUmnugovi
     employmentChangesAfter: $employmentChangesAfter
     numberOfEmployeeWorkToScopeNational: $numberOfEmployeeWorkToScopeNational
-    numberOfEmployeeWorkToScopeUmnugobi: $numberOfEmployeeWorkToScopeUmnugobi
+    numberOfEmployeeWorkToScopeUmnugovi: $numberOfEmployeeWorkToScopeUmnugovi
     procurementTotalSpend: $procurementTotalSpend
     procurementNationalSpend: $procurementNationalSpend
-    procurementUmnugobiSpend: $procurementUmnugobiSpend
+    procurementUmnugoviSpend: $procurementUmnugoviSpend
 
     corporateSocial: $corporateSocial
     otherStories: $otherStories
@@ -75,13 +75,13 @@ describe('Feedback mutations', () => {
       supplierId: supplier._id,
 
       totalEmploymentOt: 10,
-      totalEmploymentUmnugobi: 10,
+      totalEmploymentUmnugovi: 10,
       employmentChangesAfter: 10,
       numberOfEmployeeWorkToScopeNational: 10,
-      numberOfEmployeeWorkToScopeUmnugobi: 10,
+      numberOfEmployeeWorkToScopeUmnugovi: 10,
       procurementTotalSpend: 10,
       procurementNationalSpend: 10,
-      procurementUmnugobiSpend: 10,
+      procurementUmnugoviSpend: 10,
 
       corporateSocial: 'corporateSocial',
       otherStories: 'otherStories',
@@ -95,13 +95,13 @@ describe('Feedback mutations', () => {
           feedbackId
           supplierId
           totalEmploymentOt
-          totalEmploymentUmnugobi
+          totalEmploymentUmnugovi
           employmentChangesAfter
           numberOfEmployeeWorkToScopeNational
-          numberOfEmployeeWorkToScopeUmnugobi
+          numberOfEmployeeWorkToScopeUmnugovi
           procurementTotalSpend
           procurementNationalSpend
-          procurementUmnugobiSpend
+          procurementUmnugoviSpend
           corporateSocial
           otherStories
           createdDate

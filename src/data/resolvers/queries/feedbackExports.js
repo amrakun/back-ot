@@ -33,15 +33,15 @@ const feedbackExports = {
       sheet.cell(rowIndex, 3).value(response.status);
 
       sheet.cell(rowIndex, 4).value(response.totalEmploymentOt);
-      sheet.cell(rowIndex, 5).value(response.totalEmploymentUmnugobi);
+      sheet.cell(rowIndex, 5).value(response.totalEmploymentUmnugovi);
       sheet.cell(rowIndex, 6).value(response.employmentChangesAfter);
 
       sheet.cell(rowIndex, 7).value(response.numberOfEmployeeWorkToScopeNational);
-      sheet.cell(rowIndex, 8).value(response.numberOfEmployeeWorkToScopeUmnugobi);
+      sheet.cell(rowIndex, 8).value(response.numberOfEmployeeWorkToScopeUmnugovi);
 
       sheet.cell(rowIndex, 9).value(response.procurementTotalSpend);
       sheet.cell(rowIndex, 10).value(response.procurementNationalSpend);
-      sheet.cell(rowIndex, 11).value(response.procurementUmnugobiSpend);
+      sheet.cell(rowIndex, 11).value(response.procurementUmnugoviSpend);
 
       sheet.cell(rowIndex, 12).value(response.corporateSocial);
       sheet.cell(rowIndex, 13).value(response.otherStories);

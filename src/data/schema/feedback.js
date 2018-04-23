@@ -19,13 +19,13 @@ export const types = `
     supplierId: String
 
     totalEmploymentOt: Float
-    totalEmploymentUmnugobi: Float
+    totalEmploymentUmnugovi: Float
     employmentChangesAfter: Float
     numberOfEmployeeWorkToScopeNational: Float
-    numberOfEmployeeWorkToScopeUmnugobi: Float
+    numberOfEmployeeWorkToScopeUmnugovi: Float
     procurementTotalSpend: Float
     procurementNationalSpend: Float
-    procurementUmnugobiSpend: Float
+    procurementUmnugoviSpend: Float
 
     corporateSocial: String
     otherStories: String
@@ -56,13 +56,13 @@ export const mutations = `
     supplierId: String!
 
     totalEmploymentOt: Float!
-    totalEmploymentUmnugobi: Float!
+    totalEmploymentUmnugovi: Float!
     employmentChangesAfter: Float!
     numberOfEmployeeWorkToScopeNational: Float!
-    numberOfEmployeeWorkToScopeUmnugobi: Float!
+    numberOfEmployeeWorkToScopeUmnugovi: Float!
     procurementTotalSpend: Float!
     procurementNationalSpend: Float!
-    procurementUmnugobiSpend: Float!
+    procurementUmnugoviSpend: Float!
 
     corporateSocial: String!
     otherStories: String!

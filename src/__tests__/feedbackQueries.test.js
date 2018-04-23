@@ -32,13 +32,13 @@ describe('Feedback queries', () => {
     feedbackId
     supplierId
     totalEmploymentOt
-    totalEmploymentUmnugobi
+    totalEmploymentUmnugovi
     employmentChangesAfter
     numberOfEmployeeWorkToScopeNational
-    numberOfEmployeeWorkToScopeUmnugobi
+    numberOfEmployeeWorkToScopeUmnugovi
     procurementTotalSpend
     procurementNationalSpend
-    procurementUmnugobiSpend
+    procurementUmnugoviSpend
     corporateSocial
     otherStories
     createdDate
