@@ -383,6 +383,10 @@ export const types = `
     lastDifotScore: JSON
     lastDueDiligence: JSON
 
+    tierTypeDisplay: String
+    prequalificationStatusDisplay: String
+    qualificationStatusDisplay: String
+    productsInfoValidationStatusDisplay: String
     isBlocked: Boolean
     openTendersCount: Int
 

@@ -42,10 +42,6 @@ export default {
     };
   },
 
-  isBlocked(company) {
-    return BlockedCompanies.isBlocked(company._id);
-  },
-
   async openTendersCount(company) {
     const responses = await TenderResponses.find({ supplierId: company._id });
     const submittedTenderIds = responses.map(r => r.tenderId);
@@ -89,5 +85,54 @@ export default {
     const status = await Qualifications.status(company._id);
 
     return { ...stats, ...status };
+  },
+
+  tierTypeDisplay(company) {
+    switch (company.tierType) {
+      case 'tier1':
+        return 'Tier 1';
+
+      case 'tier2':
+        return 'Tier 2';
+
+      case 'tier3':
+        return 'Tier 3';
+
+      case 'national':
+        return 'National';
+
+      default:
+        return 'Umnugovi';
+    }
+  },
+
+  prequalificationStatusDisplay(company) {
+    if (typeof company.isPrequalified === 'undefined') {
+      return 'In process';
+    }
+
+    return company.isPrequalified ? 'Pre-qualified' : 'Not-qualified';
+  },
+
+  qualificationStatusDisplay(company) {
+    if (typeof company.isQualified === 'undefined') {
+      return 'n/a';
+    }
+
+    return company.isQualified ? 'Qualified' : 'Not-qualified';
+  },
+
+  productsInfoValidationStatusDisplay(company) {
+    if (typeof company.isProductsInfoValidated === 'undefined') {
+      return 'In process';
+    }
+
+    return company.isProductsInfoValidated ? 'Validated' : 'Not-validated';
+  },
+
+  async isBlocked(company) {
+    const isBlocked = await BlockedCompanies.isBlocked(company._id);
+
+    return isBlocked ? 'Blocked' : 'n/a';
   },
 };
