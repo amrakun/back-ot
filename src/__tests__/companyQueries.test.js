@@ -411,14 +411,33 @@ describe('Company queries', () => {
       .endOf('day')
       .toDate(); // 1 days later
 
+    // not sent prequalification info
     await companyFactory({
       validatedProductsInfo: ['code1'],
       createdDate: c1Date,
+      isSentPrequalificationInfo: false,
     });
 
+    // sent prequalification info, but responded
     await companyFactory({
       validatedProductsInfo: ['code2'],
       createdDate: c2Date,
+      isSentPrequalificationInfo: true,
+    });
+
+    // sent prequalification info, responded as no
+    await companyFactory({
+      validatedProductsInfo: ['code1'],
+      createdDate: c2Date,
+      isSentPrequalificationInfo: true,
+      isPrequalified: false,
+    });
+
+    // sent prequalification info, responded as yes
+    await companyFactory({
+      validatedProductsInfo: ['code2'],
+      createdDate: c2Date,
+      isSentPrequalificationInfo: true,
       isPrequalified: true,
     });
 
@@ -434,8 +453,19 @@ describe('Company queries', () => {
 
     const response = await graphqlRequest(qry, 'companiesCountByRegisteredVsPrequalified', args);
 
-    expect(response[c1Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 0 });
-    expect(response[c2Date.toLocaleDateString()]).toEqual({ registered: 1, prequalified: 1 });
+    expect(response[c1Date.toLocaleDateString()]).toEqual({
+      registered: 1,
+      prequalified: 0,
+      notPrequalified: 0,
+      prequalificationPending: 0,
+    });
+
+    expect(response[c2Date.toLocaleDateString()]).toEqual({
+      registered: 3,
+      prequalified: 1,
+      notPrequalified: 1,
+      prequalificationPending: 1,
+    });
   });
 
   test('companies: sort', async () => {

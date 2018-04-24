@@ -279,21 +279,37 @@ const companyQueries = {
 
       // if key is not exists then create
       if (!results[key]) {
-        results[key] = { registered: 0, prequalified: 0 };
+        results[key] = {
+          registered: 0,
+          prequalified: 0,
+          notPrequalified: 0,
+          prequalificationPending: 0,
+        };
       }
 
       // increment registered count
       results[key].registered += 1;
 
-      // increment prequalified count
-      if (company.isPrequalified) {
-        results[key].prequalified += 1;
+      // buyer did something
+      if (typeof company.isPrequalified !== 'undefined') {
+        // qualified
+        if (company.isPrequalified) {
+          results[key].prequalified += 1;
+
+          // not qualified
+        } else {
+          results[key].notPrequalified += 1;
+        }
+
+        // supplier sent but buyer did not responded yet
+      } else if (company.isSentPrequalificationInfo) {
+        results[key].prequalificationPending += 1;
       }
     }
 
     // {
-    // '1/25/2018': { registered: 1, prequalified: 0 },
-    // '1/26/2018': { registered: 1, prequalified: 1 }
+    // '1/25/2018': { registered: 1, prequalified: 0, etc... },
+    // '1/26/2018': { registered: 1, prequalified: 1, etc... }
     // }
     return results;
   },
