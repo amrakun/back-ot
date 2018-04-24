@@ -154,7 +154,6 @@ const CertificateInfoSchema = mongoose.Schema(
 );
 
 // financial information =========
-
 const YearAmountSchema = mongoose.Schema(
   {
     year: field({ type: Number }),
@@ -408,6 +407,17 @@ const DueDiligenceSchema = mongoose.Schema(
   { _id: false },
 );
 
+const ProductsInfoValidation = mongoose.Schema(
+  {
+    date: field({ type: String }),
+    personName: field({ type: String }),
+    checkedItems: field({ type: [String] }),
+    files: [FileSchema],
+    justification: field({ type: String }),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   createdDate: field({ type: Date }),
@@ -417,11 +427,6 @@ const CompanySchema = mongoose.Schema({
   managementTeamInfo: field({ type: ManagementTeamInfoSchema, optional: true }),
   shareholderInfo: field({ type: ShareholderInfoSchema, optional: true }),
   groupInfo: field({ type: GroupInfoSchema, optional: true }),
-
-  productsInfo: field({ type: [String], optional: true }),
-  validatedProductsInfo: field({ type: [String], optional: true }),
-  isProductsInfoValidated: field({ type: Boolean, optional: true }),
-  productsInfoLastValidatedDate: field({ type: Date, optional: true }),
 
   tierType: field({ type: String, optional: true }),
 
@@ -442,10 +447,15 @@ const CompanySchema = mongoose.Schema({
   // health & safety management system
   healthInfo: field({ type: HealthInfoSchema, optional: true }),
 
+  isProductsInfoValidated: field({ type: Boolean, optional: true }),
   isPrequalified: field({ type: Boolean, optional: true }),
   prequalifiedDate: field({ type: Date, optional: true }),
   isQualified: field({ type: Boolean, optional: true }),
 
+  productsInfo: field({ type: [String], optional: true }),
+  validatedProductsInfo: field({ type: [String], optional: true }),
+
+  productsInfoValidations: field({ type: [ProductsInfoValidation], optional: true }),
   dueDiligences: field({ type: [DueDiligenceSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
   averageDifotScore: field({ type: Number, optional: true }),
@@ -453,23 +463,33 @@ const CompanySchema = mongoose.Schema({
 
 class Company {
   /*
+   * Sort by date and get last entry from products info validation
+   */
+  sortAndGetLast(fieldName) {
+    const sorted = (this[fieldName] || []).sort((prev, next) => prev.date > next.date);
+
+    return sorted.pop();
+  }
+
+  /*
+   * Sort by date and get last entry from products info validation
+   */
+  getLastProductsInfoValidation() {
+    return this.sortAndGetLast('productsInfoValidations');
+  }
+
+  /*
    * Sort by date and get last entry from difot scores
    */
   getLastDifotScore() {
-    const sortedDifotScores = (this.difotScores || []).sort((prev, next) => prev.date > next.date);
-
-    return sortedDifotScores.pop();
+    return this.sortAndGetLast('difotScores');
   }
 
   /*
    * Sort by date and get last entry from dueDilgences
    */
   getLastDueDiligence() {
-    const sortedDueDiligences = (this.dueDiligences || []).sort(
-      (prev, next) => prev.date > next.date,
-    );
-
-    return sortedDueDiligences.pop();
+    return this.sortAndGetLast('dueDiligences');
   }
 
   /*
@@ -606,27 +626,32 @@ class Company {
    * @param [String] codes - Product codes to validate
    * @return updated company
    */
-  async validateProductsInfo(codes) {
+  async validateProductsInfo({ checkedItems, personName, justification, files }) {
     const productsInfo = this.productsInfo || [];
-    const validatedProductsInfo = [];
+    const productsInfoValidations = this.productsInfoValidations || [];
+    const filteredCheckedItems = checkedItems.filter(code => productsInfo.includes(code));
 
+    let validatedProductsInfo = [];
     let isProductsInfoValidated = false;
 
-    codes.forEach(code => {
-      // check duplicate & valid
-      if (!validatedProductsInfo.includes(code) && productsInfo.includes(code)) {
-        validatedProductsInfo.push(code);
+    if (filteredCheckedItems.length > 0) {
+      productsInfoValidations.push({
+        date: new Date(),
+        checkedItems,
+        files,
+        personName,
+        justification,
+      });
 
-        // mark as validated
-        isProductsInfoValidated = true;
-      }
-    });
+      isProductsInfoValidated = filteredCheckedItems.length === productsInfo.length;
+      validatedProductsInfo = filteredCheckedItems;
+    }
 
     // update fields
     await this.update({
-      validatedProductsInfo,
+      productsInfoValidations,
       isProductsInfoValidated,
-      productsInfoLastValidatedDate: new Date(),
+      validatedProductsInfo,
     });
 
     return Companies.findOne({ _id: this._id });

@@ -56,7 +56,6 @@ describe('Company queries', () => {
         productsInfo
         validatedProductsInfo
         isProductsInfoValidated
-        productsInfoLastValidatedDate
 
         isSentRegistrationInfo
         isSentPrequalificationInfo
@@ -66,6 +65,14 @@ describe('Company queries', () => {
         isQualified
 
         averageDifotScore
+
+        productsInfoValidations {
+          date
+          files
+          checkedItems
+          justification
+          personName
+        }
 
         dueDiligences {
           date
@@ -314,12 +321,9 @@ describe('Company queries', () => {
   });
 
   test('check fields', async () => {
-    const validatedDate = new Date();
-
     const _company = await companyFactory({
       validatedProductsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
-      productsInfoLastValidatedDate: validatedDate,
     });
 
     await auditFactory({ supplierIds: [_company._id], status: 'open' });
@@ -333,7 +337,6 @@ describe('Company queries', () => {
     expect(company.isProductsInfoValidated).toBe(true);
     expect(company.validatedProductsInfo).toContain('code1');
     expect(company.validatedProductsInfo).toContain('code2');
-    expect(new Date(company.productsInfoLastValidatedDate)).toEqual(validatedDate);
 
     // audits
     expect(company.audits.length).toBe(1);

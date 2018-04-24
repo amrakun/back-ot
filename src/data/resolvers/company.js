@@ -8,6 +8,10 @@ import {
 } from '../../db/models';
 
 export default {
+  lastProductsInfoValidation(company) {
+    return company.getLastProductsInfoValidation();
+  },
+
   lastDifotScore(company) {
     return company.getLastDifotScore();
   },

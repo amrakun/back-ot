@@ -314,6 +314,14 @@ export const types = `
   type CompanyHealthInfo { ${healthInfoFields} }
   input CompanyHealthInfoInput { ${healthInfoFields} }
 
+  type CompanyProductsInfoValidation {
+    date: Date
+    files: [JSON]
+    checkedItems: [JSON]
+    personName: String
+    justification: String
+  }
+
   type CompanyDifotScore { ${difotScoreFields} }
   input CompanyDifotScoreInput {
     supplierName: String!
@@ -347,7 +355,6 @@ export const types = `
     productsInfo: [String]
     validatedProductsInfo: [String]
     isProductsInfoValidated: Boolean
-    productsInfoLastValidatedDate: Date
 
     certificateInfo: CompanyCertificateInfo
     financialInfo: CompanyFinancialInfo
@@ -365,13 +372,14 @@ export const types = `
     isQualified: Boolean
 
     averageDifotScore: Float
+
+    productsInfoValidations: [CompanyProductsInfoValidation]
     difotScores: [CompanyDifotScore]
-
     dueDiligences: [CompanyDueDiligence]
-
     feedbacks: [Feedback]
-    lastFeedback: Feedback
 
+    lastFeedback: Feedback
+    lastProductsInfoValidation: JSON
     lastDifotScore: JSON
     lastDueDiligence: JSON
 
@@ -444,7 +452,15 @@ export const mutations = `
 
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
-  companiesValidateProductsInfo(_id: String!, codes: [String]!): Company
+
+  companiesValidateProductsInfo(
+    _id: String!
+    personName: String
+    justification: String!
+    checkedItems: [String!]!
+    files: [JSON]
+  ): Company
+
 
   companiesSendRegistrationInfo: Company
   companiesSendPrequalificationInfo: Company

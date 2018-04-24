@@ -844,12 +844,20 @@ export const companiesValidatedProductsInfoExport = async companies => {
     const total = company.productsInfo.length;
     const validated = company.validatedProductsInfo.length;
 
+    const lastProductsInfoValidation = company.getLastProductsInfoValidation() || {};
+
+    let lastDate = '';
+
+    if (lastProductsInfoValidation.date) {
+      lastDate = new Date(lastProductsInfoValidation.date).toLocaleDateString();
+    }
+
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
     sheet.cell(rowIndex, 3).value(company.tierType);
     sheet.cell(rowIndex, 4).value(company.isProductsInfoValidated);
     sheet.cell(rowIndex, 5).value(`Total: ${total} | Validated: ${validated}`);
-    sheet.cell(rowIndex, 6).value(company.productsInfoLastValidatedDate.toLocaleDateString());
+    sheet.cell(rowIndex, 6).value(lastDate);
     sheet.cell(rowIndex, 7).value(company.isProductsInfoValidated);
     sheet.cell(rowIndex, 9).value(contactInfo.email);
     sheet.cell(rowIndex, 10).value(contactInfo.phone);

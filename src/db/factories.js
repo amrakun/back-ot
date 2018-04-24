@@ -64,17 +64,16 @@ export const companyFactory = (params = {}) => {
 
     tierType: params.tierType,
 
-    productsInfo: params.productsInfo || [],
-    validatedProductsInfo: params.validatedProductsInfo || [],
-    isProductsInfoValidated: params.isProductsInfoValidated,
-    productsInfoLastValidatedDate: params.productsInfoLastValidatedDate || new Date(),
-
     isSentRegistrationInfo: params.isSentRegistrationInfo,
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
+    isProductsInfoValidated: params.isProductsInfoValidated,
     isPrequalified: params.isPrequalified,
     isQualified: params.isQualified,
 
+    productsInfo: params.productsInfo || [],
+    validatedProductsInfo: params.validatedProductsInfo || [],
+    productsInfoValidations: params.productsInfoValidations || [],
     difotScores: params.difotScores || [],
     averageDifotScore: params.averageDifotScore || 0,
     dueDiligences: params.dueDiligences || [],

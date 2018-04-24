@@ -335,9 +335,31 @@ describe('Company mutations', () => {
     const supplier = await companyFactory({ productsInfo: ['code1', 'code2'] });
 
     const mutation = `
-      mutation companiesValidateProductsInfo($_id: String!, $codes: [String]!) {
-        companiesValidateProductsInfo(_id: $_id, codes: $codes) {
+      mutation companiesValidateProductsInfo(
+        $_id: String!
+        $personName: String
+        $justification: String!
+        $checkedItems: [String!]!
+        $files: [JSON]
+      ) {
+        companiesValidateProductsInfo(
+          _id: $_id
+          personName: $personName
+          justification: $justification
+          checkedItems: $checkedItems
+          files: $files
+        ) {
           _id
+
+          productsInfoValidations {
+            date
+            personName
+            justification
+            checkedItems
+            files
+          }
+
+          lastProductsInfoValidation
         }
       }
     `;
@@ -346,19 +368,34 @@ describe('Company mutations', () => {
       user: await userFactory({ companyId: _company._id }),
     };
 
-    const codes = ['code1', 'code2'];
-
-    await graphqlRequest(
+    const updatedCompany = await graphqlRequest(
       mutation,
       'companiesValidateProductsInfo',
-      { _id: supplier._id, codes },
+      {
+        _id: supplier._id,
+        checkedItems: ['code1', 'code2'],
+        personName: 'personName',
+        justification: 'justification',
+        files: [{}],
+      },
       context,
     );
 
-    const updatedSupplier = await Companies.findOne({ _id: supplier._id });
+    const [productsInfoValidation] = updatedCompany.productsInfoValidations;
 
-    expect(updatedSupplier.validatedProductsInfo).toContain('code1');
-    expect(updatedSupplier.validatedProductsInfo).toContain('code2');
+    expect(productsInfoValidation.date).toBeDefined();
+    expect(productsInfoValidation.personName).toBe('personName');
+    expect(productsInfoValidation.justification).toBe('justification');
+    expect(productsInfoValidation.checkedItems).toContain('code1');
+    expect(productsInfoValidation.checkedItems).toContain('code2');
+
+    const lastProductsInfoValidation = updatedCompany.lastProductsInfoValidation;
+
+    expect(lastProductsInfoValidation.date).toBeDefined();
+    expect(lastProductsInfoValidation.personName).toBe('personName');
+    expect(lastProductsInfoValidation.justification).toBe('justification');
+    expect(lastProductsInfoValidation.checkedItems).toContain('code1');
+    expect(lastProductsInfoValidation.checkedItems).toContain('code2');
   });
 
   test('send registration info', async () => {

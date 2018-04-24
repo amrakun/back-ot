@@ -26,10 +26,17 @@ const companyMutations = {
     }
   },
 
-  async companiesValidateProductsInfo(root, { _id, codes }) {
+  async companiesValidateProductsInfo(root, args) {
+    const { _id, checkedItems, personName, justification, files } = args;
+
     const company = await Companies.findOne({ _id });
 
-    return company.validateProductsInfo(codes);
+    return company.validateProductsInfo({
+      checkedItems,
+      personName,
+      justification,
+      files,
+    });
   },
 
   async companiesSendRegistrationInfo(root, args, { user }) {

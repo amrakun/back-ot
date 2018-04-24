@@ -169,25 +169,38 @@ describe('Companies model tests', () => {
     company = await Companies.findOne({ _id: company._id });
 
     // checking isProductsInfoValidated
-    let updatedCompany = await company.validateProductsInfo([]);
+    let updatedCompany = await company.validateProductsInfo({ checkedItems: [] });
     expect(updatedCompany.isProductsInfoValidated).toBe(false);
+    expect(updatedCompany.productsInfoValidations.length).toBe(0);
 
-    updatedCompany = await company.validateProductsInfo(['code1', 'code2']);
+    updatedCompany = await company.validateProductsInfo({
+      checkedItems: ['code1', 'code2', 'code3'],
+      personName: 'test',
+      justification: 'justification',
+    });
 
     expect(updatedCompany.isProductsInfoValidated).toBe(true);
-    expect(updatedCompany.productsInfoLastValidatedDate).toBeDefined();
     expect(updatedCompany.validatedProductsInfo).toContain('code1');
     expect(updatedCompany.validatedProductsInfo).toContain('code2');
+    expect(updatedCompany.validatedProductsInfo).toContain('code3');
 
-    // try to readd ==========
-    updatedCompany = await updatedCompany.validateProductsInfo(['code1', 'code2']);
+    let [info] = updatedCompany.productsInfoValidations;
 
-    expect(updatedCompany.validatedProductsInfo.length).toBe(2);
+    expect(info.date).toBeDefined();
+    expect(info.personName).toBe('test');
+    expect(info.justification).toBe('justification');
+    expect(info.checkedItems).toContain('code1');
+    expect(info.checkedItems).toContain('code2');
+    expect(info.checkedItems).toContain('code3');
 
     // try to add non existing code ==========
-    updatedCompany = await updatedCompany.validateProductsInfo(['code10']);
+    updatedCompany = await updatedCompany.validateProductsInfo({
+      checkedItems: ['code10'],
+    });
 
-    expect(updatedCompany.validatedProductsInfo).not.toContain('code10');
+    [info] = updatedCompany.productsInfoValidations;
+
+    expect(info.checkedItems).not.toContain('code10');
   });
 
   test('send registration info', async () => {
