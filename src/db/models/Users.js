@@ -330,7 +330,9 @@ class User {
    * @param {String} email - user email
    * @return {Promise} newly created user object
    */
-  static async register(email) {
+  static async register(rawEmail) {
+    const email = rawEmail.toLowerCase();
+
     if (await Users.findOne({ email })) {
       throw new Error('Invalid email');
     }
