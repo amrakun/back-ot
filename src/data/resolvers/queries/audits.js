@@ -1,4 +1,4 @@
-import { Audits, AuditResponses } from '../../../db/models';
+import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { supplierFilter } from './utils';
 
@@ -6,11 +6,35 @@ import { supplierFilter } from './utils';
  * Common audit responses filter
  */
 const responsesFilter = async args => {
-  const { status, supplierSearch, isFileGenerated, publishDate, closeDate } = args;
+  const {
+    status,
+    supplierSearch,
+    isFileGenerated,
+    publishDate,
+    closeDate,
+    isQualified,
+    isSentImprovementPlan,
+    isNew,
+  } = args;
 
   const query = {
     $and: [await supplierFilter({}, supplierSearch)],
   };
+
+  // qualified
+  if (isQualified !== undefined) {
+    query.isQualified = isQualified;
+  }
+
+  // is sent improvement plan
+  if (isSentImprovementPlan !== undefined) {
+    query.improvementPlanSentDate = { $ne: null };
+  }
+
+  // is new
+  if (isNew) {
+    query.isBuyerNotified = { $ne: true };
+  }
 
   // status filter
   if (status) {
@@ -45,6 +69,38 @@ const auditQueries = {
    */
   audits() {
     return Audits.find({});
+  },
+
+  /**
+   * Will give all invited, not responded suppliers information for
+   * all audits
+   */
+  async auditsSuppliers(root, { type }) {
+    const audits = await Audits.find({});
+
+    const response = [];
+
+    for (const audit of audits) {
+      let suppliers = await Companies.find({ _id: { $in: audit.supplierIds } });
+
+      if (type === 'notResponded') {
+        const auditResponses = await AuditResponses.find({ auditId: audit._id });
+
+        // responded supplier ids
+        const rsids = auditResponses.map(r => r.supplierId);
+
+        // not responded supplier ids
+        const nrsids = audit.supplierIds.filter(id => !rsids.includes(id));
+
+        suppliers = await Companies.find({ _id: { $in: nrsids } });
+      }
+
+      for (const supplier of suppliers) {
+        response.push({ audit, supplier });
+      }
+    }
+
+    return response;
   },
 
   /**
@@ -105,6 +161,7 @@ const auditQueries = {
     let notResponded = 0;
     let qualified = 0;
     let sentImprovementPlan = 0;
+    let notNotified = 0;
 
     for (const audit of audits) {
       const supplierIds = audit.supplierIds || [];
@@ -117,6 +174,7 @@ const auditQueries = {
 
       qualified += responses.filter(r => r.isQualified).length;
       sentImprovementPlan += responses.filter(r => r.improvementPlanSentDate).length;
+      notNotified += responses.filter(r => !r.isBuyerNotified).length;
     }
 
     return {
@@ -124,6 +182,7 @@ const auditQueries = {
       notResponded,
       qualified,
       sentImprovementPlan,
+      notNotified,
     };
   },
 

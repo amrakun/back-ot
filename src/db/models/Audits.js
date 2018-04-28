@@ -391,6 +391,9 @@ const AuditResponseSchema = mongoose.Schema({
   sentDate: field({ type: Date, optional: true }),
 
   isQualified: field({ type: Boolean, optional: true }),
+
+  // Buyer saved something on this response
+  isBuyerNotified: field({ type: Boolean, optional: true }),
 });
 
 class AuditResponse {
@@ -600,6 +603,18 @@ class AuditResponse {
     await this.update({ isSent: true, sentDate: new Date(), status });
 
     return AuditResponses.findOne({ _id: this._id });
+  }
+
+  /**
+   * Mark as buyer notified
+   * @return - Updated response
+   */
+  static async markAsBuyerNotified({ auditId, supplierId }) {
+    const selector = { auditId, supplierId };
+
+    await AuditResponses.update(selector, { $set: { isBuyerNotified: true } });
+
+    return AuditResponses.findOne(selector);
   }
 
   /**

@@ -610,6 +610,7 @@ export const auditResponseFactory = async (params = {}) => {
     supplierId: params.supplierId,
     isSent: params.isSent || false,
     isQualified: params.isQualified || false,
+    isBuyerNotified: params.isBuyerNotified || false,
 
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,
     hrInfo: params.hrInfo,

@@ -148,7 +148,12 @@ sections.forEach(section => {
   // buyer mutation ==================
   const buyerName = `auditsBuyerSave${capsedName}`;
 
-  auditMutations[buyerName] = (root, args) => {
+  auditMutations[buyerName] = async (root, args) => {
+    await AuditResponses.markAsBuyerNotified({
+      auditId: args.auditId,
+      supplierId: args.supplierId,
+    });
+
     return AuditResponses.saveReplyRecommentSection({
       auditId: args.auditId,
       supplierId: args.supplierId,

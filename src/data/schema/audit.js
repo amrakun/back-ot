@@ -202,6 +202,7 @@ export const types = `
     evidenceInfo: AuditEvidenceInfo
 
     isSent: Boolean
+    isBuyerNotified: Boolean
 
     isQualified: Boolean
     qualifiedStatus: JSON
@@ -221,6 +222,12 @@ export const types = `
     notResponded: Float
     qualified: Float
     sentImprovementPlan: Float
+    notNotified: Float
+  }
+
+  type AuditSuppliersResponse {
+    audit: Audit
+    supplier: Company
   }
 `;
 
@@ -230,10 +237,14 @@ const responsesParams = `
   publishDate: Date
   closeDate: Date
   status: String
+  isQualified: Boolean
+  isNew: Boolean
+  isSentImprovementPlan: Boolean
 `;
 
 export const queries = `
   audits: [Audit]
+  auditsSuppliers(type: String!): [AuditSuppliersResponse]
   auditDetail(_id: String!): Audit
 
   auditResponses(${responsesParams}): [AuditResponse]

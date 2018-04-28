@@ -225,6 +225,10 @@ describe('Audit mutations', () => {
       supplierId: _company._id,
     });
 
+    if (!isSupplier) {
+      expect(auditResponse.isBuyerNotified).toBe(true);
+    }
+
     for (const fieldName of Object.keys(args[name])) {
       for (const subFieldName of Object.keys(args[name][fieldName])) {
         const subValue = auditResponse[name][fieldName][subFieldName];

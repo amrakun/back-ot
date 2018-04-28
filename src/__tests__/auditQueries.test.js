@@ -291,35 +291,77 @@ describe('Company queries', () => {
     expect(response.audit._id).toBeDefined();
   });
 
-  test('audit responses', async () => {
-    const query = `
-      query auditResponses(
-        $supplierSearch: String
-        $isFileGenerated: Boolean
-        $publishDate: Date
-        $closeDate: Date
-        $status: String
+  const auditResponsesQuery = `
+    query auditResponses(
+      $supplierSearch: String
+      $isFileGenerated: Boolean
+      $publishDate: Date
+      $closeDate: Date
+      $status: String
+      $isQualified: Boolean
+      $isNew: Boolean
+      $isSentImprovementPlan: Boolean
+    ) {
+      auditResponses(
+        supplierSearch: $supplierSearch
+        isFileGenerated: $isFileGenerated
+        publishDate: $publishDate
+        closeDate: $closeDate
+        status: $status
+        isQualified: $isQualified
+        isNew: $isNew
+        isSentImprovementPlan: $isSentImprovementPlan
       ) {
-        auditResponses(
-          supplierSearch: $supplierSearch
-          isFileGenerated: $isFileGenerated
-          publishDate: $publishDate
-          closeDate: $closeDate
-          status: $status
-        ) {
-          _id
-          auditId
+        _id
+        auditId
 
-          supplier {
-            basicInfo {
-              enName
-              sapNumber
-            }
+        supplier {
+          basicInfo {
+            enName
+            sapNumber
           }
         }
       }
-    `;
+    }
+  `;
 
+  const doResponsesQuery = args => graphqlRequest(auditResponsesQuery, 'auditResponses', args);
+
+  test('audit responses: qualified, new, sent improvement plan', async () => {
+    await auditResponseFactory({});
+    await auditResponseFactory({});
+
+    // qualified ==========
+    const qualified = await auditResponseFactory({ isQualified: true });
+
+    let response = await doResponsesQuery({ isQualified: true });
+
+    expect(response.length).toBe(1);
+
+    let [firstItem] = response;
+
+    expect(firstItem._id).toBe(qualified._id.toString());
+
+    // sent improvement plan ==========
+    const sip = await auditResponseFactory({ improvementPlanSentDate: new Date() });
+
+    response = await doResponsesQuery({ isSentImprovementPlan: true });
+
+    expect(response.length).toBe(1);
+
+    [firstItem] = response;
+
+    expect(firstItem._id).toBe(sip._id.toString());
+
+    // isNew ==========
+    await auditResponseFactory({ isBuyerNotified: true });
+
+    response = await doResponsesQuery({ isNew: true });
+
+    expect(response.length).toBe(4);
+  });
+
+  test('audit responses', async () => {
     const supplier = await companyFactory({
       enName: 'enName',
       sapNumber: 'number',
@@ -351,7 +393,7 @@ describe('Company queries', () => {
 
     // supplier search ===================
     let args = { supplierSearch: 'enName' };
-    let response = await graphqlRequest(query, 'auditResponses', args);
+    let response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);
 
@@ -361,19 +403,19 @@ describe('Company queries', () => {
       closeDate: moment().add(2, 'days'),
     };
 
-    response = await graphqlRequest(query, 'auditResponses', args);
+    response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);
 
     // isFileGenerated search ===================
     args = { isFileGenerated: true };
-    response = await graphqlRequest(query, 'auditResponses', args);
+    response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);
 
     // status search ===================
     args = { status: 'onTime' };
-    response = await graphqlRequest(query, 'auditResponses', args);
+    response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);
   });
@@ -386,23 +428,25 @@ describe('Company queries', () => {
           notResponded
           qualified
           sentImprovementPlan
+          notNotified
         }
       }
     `;
 
     const sup1 = await companyFactory({});
     const sup2 = await companyFactory({});
-    const audit1 = await auditFactory({ supplierIds: [sup1._id, sup2._id] });
-    await auditResponseFactory({ auditId: audit1._id, supplierId: sup1._id });
-
     const sup3 = await companyFactory({});
     const sup4 = await companyFactory({});
+
+    const audit1 = await auditFactory({ supplierIds: [sup1._id, sup2._id] });
     const audit2 = await auditFactory({ supplierIds: [sup3._id, sup4._id] });
+
+    await auditResponseFactory({ auditId: audit1._id, supplierId: sup1._id });
     await auditResponseFactory({ auditId: audit2._id, supplierId: sup4._id });
 
-    await auditResponseFactory({ isQualified: true });
-    await auditResponseFactory({ isQualified: true });
-    await auditResponseFactory({ improvementPlanSentDate: new Date() });
+    await auditResponseFactory({ isQualified: true, isBuyerNotified: true });
+    await auditResponseFactory({ isQualified: true, isBuyerNotified: true });
+    await auditResponseFactory({ improvementPlanSentDate: new Date(), isBuyerNotified: true });
 
     const response = await graphqlRequest(query, 'auditResponseTotalCounts', {});
 
@@ -413,6 +457,7 @@ describe('Company queries', () => {
 
     expect(response.qualified).toBe(2);
     expect(response.sentImprovementPlan).toBe(1);
+    expect(response.notNotified).toBe(2);
   });
 
   test('auditResponsesQualifiedStatus', async () => {

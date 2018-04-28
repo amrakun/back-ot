@@ -34,7 +34,6 @@ export const importData = async () => {
   await userFactory({
     isSupplier: true,
     email: 'supplier@ot.mn',
-    password: '123',
   });
 
   // create suppliers =========================
@@ -227,7 +226,6 @@ export const importData = async () => {
   await userFactory({
     isSupplier: true,
     email: 'chantsal1201@gmail.com',
-    password: '123',
   });
 
   for (let i = 0; i < 30; i++) {
