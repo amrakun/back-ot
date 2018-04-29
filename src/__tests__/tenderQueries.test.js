@@ -572,7 +572,7 @@ describe('Tender queries', () => {
     // by type & name ==============
     response = await doQuery({ type: 'rfq', name: 'test' });
 
-    // by particated status and type ==============
+    // by participated status and type ==============
     response = await doQuery({ type: 'eoi', status: 'participated' });
 
     expect(response.length).toBe(1);

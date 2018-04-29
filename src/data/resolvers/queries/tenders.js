@@ -90,19 +90,30 @@ const tendersSupplierFilter = async (args, user) => {
     const notInterestedTenderIds = notInterestedTenders.map(res => res.tenderId);
 
     query.$and.push({ _id: { $nin: notInterestedTenderIds } });
-    // =================== //
 
-    // filter only user's responded tenders
-    if (status && status.includes('participated')) {
-      const submittedTenders = await TenderResponses.find({
-        supplierId: user.companyId,
-      });
+    // status filter ==========
+    if (status) {
+      const isParticipated = status.includes('participated');
 
-      const submittedTenderIds = submittedTenders.map(res => res.tenderId);
+      // exclude participated and empty values
+      const statuses = status.split(',').filter(s => !['', 'participated'].includes(s));
 
-      query.$and.push({
-        $or: [{ _id: { $in: submittedTenderIds } }, { status: { $in: status.split(',') } }],
-      });
+      // generate status filter depending on statuses length
+      const statusFilter = statuses.length > 0 ? { status: { $in: statuses } } : {};
+
+      // filter only user's responded tenders
+      if (isParticipated) {
+        const submittedTenders = await TenderResponses.find({
+          supplierId: user.companyId,
+        });
+
+        const submittedTenderIds = submittedTenders.map(res => res.tenderId);
+        const submittedFilter = { _id: { $in: submittedTenderIds } };
+
+        query.$and.push({ ...submittedFilter, ...statusFilter });
+      } else {
+        query.$and.push(statusFilter);
+      }
     }
   });
 
