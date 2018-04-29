@@ -116,7 +116,7 @@ export default {
 
   qualificationStatusDisplay(company) {
     if (typeof company.isQualified === 'undefined') {
-      return 'n/a';
+      return 'In process';
     }
 
     return company.isQualified ? 'Qualified' : 'Not-qualified';

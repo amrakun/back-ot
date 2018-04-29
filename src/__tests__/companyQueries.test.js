@@ -23,9 +23,10 @@ describe('Company queries', () => {
     $search: String,
     $region: String,
     $productCodes: String,
-    $isProductsInfoValidated: Boolean,
     $includeBlocked: Boolean,
-    $isPrequalified: Boolean,
+    $productsInfoStatus: String,
+    $prequalifiedStatus: String,
+    $qualifiedStatus: String,
     $_ids: [String],
     $perPage: Int,
     $page: Int,
@@ -35,9 +36,10 @@ describe('Company queries', () => {
     search: $search,
     region: $region,
     productCodes: $productCodes,
-    isProductsInfoValidated: $isProductsInfoValidated,
     includeBlocked: $includeBlocked,
-    isPrequalified: $isPrequalified,
+    productsInfoStatus: $productsInfoStatus,
+    prequalifiedStatus: $prequalifiedStatus,
+    qualifiedStatus: $qualifiedStatus,
     _ids: $_ids,
     perPage: $perPage,
     page: $page,
@@ -212,7 +214,7 @@ describe('Company queries', () => {
     expect(response.length).toBe(1);
 
     // filter isValidated =============
-    response = await graphqlRequest(query, 'companies', { isProductsInfoValidated: true });
+    response = await graphqlRequest(query, 'companies', { productsInfoStatus: 'yes' });
 
     expect(response.length).toBe(1);
 
@@ -261,63 +263,82 @@ describe('Company queries', () => {
     expect(response[0].averageDifotScore).toBe(77);
   });
 
-  // test checkbox typed filters
-  const checkbox = async ({ qry, name }) => {
-    await companyFactory({ [name]: true });
-    await companyFactory({ [name]: false });
+  // test status typed filters
+  const checkStatus = async ({ qry, fieldName, variableName }) => {
+    await companyFactory({ [fieldName]: true });
+    await companyFactory({ [fieldName]: false });
+    await companyFactory({ [fieldName]: null });
 
-    // checked ================
-    let response = await graphqlRequest(qry, 'companies', { [name]: true });
-
-    expect(response.length).toBe(1);
-    expect(response[0][name]).toBe(true);
-
-    // unchecked ================
-    response = await graphqlRequest(qry, 'companies', { [name]: false });
+    // yes ================
+    let response = await graphqlRequest(qry, 'companies', { [variableName]: 'yes' });
 
     expect(response.length).toBe(1);
-    expect(response[0][name]).toBe(false);
+    expect(response[0][fieldName]).toBe(true);
+
+    // no ================
+    response = await graphqlRequest(qry, 'companies', { [variableName]: 'no' });
+
+    expect(response.length).toBe(1);
+    expect(response[0][fieldName]).toBe(false);
 
     // undefined ================
+    response = await graphqlRequest(qry, 'companies', { [variableName]: 'undefined' });
+
+    expect(response.length).toBe(1);
+    expect(response[0][fieldName]).toBe(null);
+
+    // all ================
     response = await graphqlRequest(qry, 'companies', {});
 
-    expect(response.length).toBe(2);
+    expect(response.length).toBe(3);
   };
 
-  test('companies: isProductsInfoValidated', async () => {
+  test('companies: products info status', async () => {
     const qry = `
-      query companies($isProductsInfoValidated: Boolean) {
-        companies(isProductsInfoValidated: $isProductsInfoValidated) {
+      query companies($productsInfoStatus: String) {
+        companies(productsInfoStatus: $productsInfoStatus) {
           isProductsInfoValidated
         }
       }
     `;
 
-    await checkbox({ qry, name: 'isProductsInfoValidated' });
+    await checkStatus({
+      qry,
+      variableName: 'productsInfoStatus',
+      fieldName: 'isProductsInfoValidated',
+    });
   });
 
-  test('companies: isPrequalified', async () => {
+  test('companies: prequalified status', async () => {
     const qry = `
-      query companies($isPrequalified: Boolean) {
-        companies(isPrequalified: $isPrequalified) {
+      query companies($prequalifiedStatus: String) {
+        companies(prequalifiedStatus: $prequalifiedStatus) {
           isPrequalified
         }
       }
     `;
 
-    await checkbox({ qry, name: 'isPrequalified' });
+    await checkStatus({
+      qry,
+      variableName: 'prequalifiedStatus',
+      fieldName: 'isPrequalified',
+    });
   });
 
-  test('companies: isQualified', async () => {
+  test('companies: qualified status', async () => {
     const qry = `
-      query companies($isQualified: Boolean) {
-        companies(isQualified: $isQualified) {
+      query companies($qualifiedStatus: String) {
+        companies(qualifiedStatus: $qualifiedStatus) {
           isQualified
         }
       }
     `;
 
-    await checkbox({ qry, name: 'isQualified' });
+    await checkStatus({
+      qry,
+      variableName: 'qualifiedStatus',
+      fieldName: 'isQualified',
+    });
   });
 
   test('check fields', async () => {

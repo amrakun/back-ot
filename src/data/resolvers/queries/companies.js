@@ -19,10 +19,10 @@ const companiesFilter = async args => {
     search,
     _ids,
     productCodes,
-    isProductsInfoValidated,
     includeBlocked,
-    isPrequalified,
-    isQualified,
+    prequalifiedStatus,
+    qualifiedStatus,
+    productsInfoStatus,
     difotScore,
     region,
   } = args;
@@ -82,25 +82,29 @@ const companiesFilter = async args => {
     selector._id.$in = _ids;
   }
 
-  // by is products info validated
-  if (isProductsInfoValidated !== undefined) {
-    selector.isProductsInfoValidated = isProductsInfoValidated;
-  }
-
   // include blocked
   if (!includeBlocked) {
     selector._id.$nin = await BlockedCompanies.blockedIds();
   }
 
+  const checkStatus = (variable, fieldName) => {
+    if (variable) {
+      if (variable === 'undefined') {
+        selector[fieldName] = null;
+      } else {
+        selector[fieldName] = variable === 'yes' ? true : false;
+      }
+    }
+  };
+
+  // by is products info validated
+  checkStatus(productsInfoStatus, 'isProductsInfoValidated');
+
   // by pre qualified status
-  if (isPrequalified !== undefined) {
-    selector.isPrequalified = isPrequalified;
-  }
+  checkStatus(prequalifiedStatus, 'isPrequalified');
 
   // by qualified status
-  if (isQualified !== undefined) {
-    selector.isQualified = isQualified;
-  }
+  checkStatus(qualifiedStatus, 'isQualified');
 
   // remove emtpy selector
   if (Object.keys(selector._id).length === 0) {
