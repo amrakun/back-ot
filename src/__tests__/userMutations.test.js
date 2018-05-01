@@ -208,7 +208,7 @@ describe('User mutations', async () => {
   });
 
   test('Reset password', async () => {
-    Users.resetPassword = jest.fn();
+    Users.resetPassword = jest.fn(() => ({}));
 
     const doc = { token: '2424920429402', newPassword: 'newPassword' };
 

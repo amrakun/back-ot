@@ -137,8 +137,15 @@ const userMutations = {
    * @param {String} newPassword - New password to set
    * @return {Promise} - Updated user object
    */
-  resetPassword(root, args) {
-    return Users.resetPassword(args);
+  async resetPassword(root, args) {
+    const user = await Users.resetPassword(args);
+
+    // if user is not registered via buyer then create company for new user
+    if (!user.companyId) {
+      await Companies.createCompany(user._id);
+    }
+
+    return user;
   },
 
   /*
