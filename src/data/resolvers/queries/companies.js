@@ -62,14 +62,14 @@ const companiesFilter = async args => {
       min = 26;
     }
 
-    if (difotScore === '51-75') {
-      max = 75;
+    if (difotScore === '51-74') {
+      max = 74;
       min = 51;
     }
 
-    if (difotScore === '76-100') {
+    if (difotScore === '75-100') {
       max = 100;
-      min = 76;
+      min = 75;
     }
 
     selector.averageDifotScore = { $gte: min, $lte: max };

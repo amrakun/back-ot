@@ -252,13 +252,13 @@ describe('Company queries', () => {
     expect(response.length).toBe(1);
     expect(response[0].averageDifotScore).toBe(27);
 
-    // 51-75
-    response = await graphqlRequest(qry, 'companies', { difotScore: '51-75' });
+    // 51-74
+    response = await graphqlRequest(qry, 'companies', { difotScore: '51-74' });
     expect(response.length).toBe(1);
     expect(response[0].averageDifotScore).toBe(52);
 
-    // 76-100
-    response = await graphqlRequest(qry, 'companies', { difotScore: '76-100' });
+    // 75-100
+    response = await graphqlRequest(qry, 'companies', { difotScore: '75-100' });
     expect(response.length).toBe(1);
     expect(response[0].averageDifotScore).toBe(77);
   });
