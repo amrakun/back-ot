@@ -45,6 +45,11 @@ describe('Companies model tests', () => {
     expect(company.isSentRegistrationInfo).toBe(false);
     expect(company.isSentPrequalificationInfo).toBe(false);
 
+    const [difotScore] = company.difotScores;
+
+    expect(difotScore.date).toBeDefined();
+    expect(difotScore.amount).toBe(75);
+
     const updatedUser = await Users.findOne({ _id: user._id });
 
     expect(updatedUser.companyId).toEqual(company._id);

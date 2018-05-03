@@ -519,6 +519,9 @@ class Company {
       ...doc,
     });
 
+    // initial difot score is 75%
+    await company.addDifotScore(new Date(), 75);
+
     await Users.update({ _id: userId }, { $set: { companyId: company._id } });
 
     return company;
