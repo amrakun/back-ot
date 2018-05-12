@@ -240,7 +240,13 @@ class TenderResponse {
       return previousEntry;
     }
 
-    return this.create({ ...doc, isSent: false });
+    let isSent = false;
+
+    if (doc.isNotInterested) {
+      isSent = true;
+    }
+
+    return this.create({ ...doc, isSent });
   }
 
   /*
