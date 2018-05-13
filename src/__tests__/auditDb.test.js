@@ -1,10 +1,12 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import dbUtils from '../db/models/utils';
-import { Audits, AuditResponses, Companies } from '../db/models';
+import { Configs, Audits, AuditResponses, Companies } from '../db/models';
 import {
+  configFactory,
   userFactory,
   auditFactory,
   companyFactory,
@@ -338,5 +340,74 @@ describe('Audit response db', () => {
 
     expect(supplier.isQualified).toBe(true);
     expect(response.isQualified).toBe(true);
+  });
+
+  test('reset qualification status', async () => {
+    const check = async duration => {
+      await Configs.remove({});
+
+      await configFactory({
+        auditDow: {
+          duration,
+          amount: 2,
+        },
+      });
+
+      // ignore not qualified suppliers ============
+      const supplier = await companyFactory({ isQualified: false });
+
+      let response = await Audits.resetQualification(supplier._id);
+
+      expect(response).toBe('notQualified');
+
+      // due date is not here ============
+      await Companies.update(
+        { _id: supplier._id },
+        {
+          isQualified: true,
+          qualifiedDate: new Date(),
+        },
+      );
+
+      response = await Audits.resetQualification(supplier._id);
+
+      expect(response).toBe('dueDateIsNotHere');
+
+      // due date is here ============
+      await Companies.update(
+        { _id: supplier._id },
+        {
+          qualifiedDate: moment().subtract(3, `${duration}s`),
+        },
+      );
+
+      response = await Audits.resetQualification(supplier._id);
+
+      expect(response.isQualified).toBe(false);
+    };
+
+    await check('year');
+    await check('month');
+    await check('day');
+  });
+
+  test('reset qualification status: specific', async () => {
+    // ignore not qualified suppliers ============
+    const supplier = await companyFactory({
+      isQualified: true,
+      qualifiedDate: moment().subtract(3, 'years'),
+    });
+
+    await configFactory({
+      specificAuditDow: {
+        supplierIds: [supplier._id],
+        duration: 'year',
+        amount: 2,
+      },
+    });
+
+    const response = await Audits.resetQualification(supplier._id);
+
+    expect(response.isQualified).toBe(false);
   });
 });

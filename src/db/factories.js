@@ -73,6 +73,7 @@ export const companyFactory = (params = {}) => {
     prequalifiedDate: params.prequalifiedDate,
 
     isQualified: params.isQualified,
+    qualifiedDate: params.qualifiedDate,
 
     productsInfo: params.productsInfo || [],
     validatedProductsInfo: params.validatedProductsInfo || [],
@@ -761,6 +762,8 @@ export const configFactory = params => {
     name: params.name || faker.random.word(),
     prequalificationDow: params.prequalificationDow,
     specificPrequalificationDow: params.specificPrequalificationDow,
+    auditDow: params.auditDow,
+    specificAuditDow: params.specificAuditDow,
   });
 
   return save(config);

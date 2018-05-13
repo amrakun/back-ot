@@ -453,6 +453,7 @@ const CompanySchema = mongoose.Schema({
   prequalifiedDate: field({ type: Date, optional: true }),
 
   isQualified: field({ type: Boolean, optional: true }),
+  qualifiedDate: field({ type: Date, optional: true }),
 
   productsInfo: field({ type: [String], optional: true }),
   validatedProductsInfo: field({ type: [String], optional: true }),
