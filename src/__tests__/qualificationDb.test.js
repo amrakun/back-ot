@@ -1,15 +1,17 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
-import { Qualifications, Companies } from '../db/models';
+import { Configs, Qualifications, Companies } from '../db/models';
 import {
   FinancialInfoSchema,
   BusinessInfoSchema,
   EnvironmentalInfoSchema,
   HealthInfoSchema,
 } from '../db/models/Companies';
-import { companyFactory, qualificationFactory } from '../db/factories';
+
+import { configFactory, companyFactory, qualificationFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -34,6 +36,7 @@ describe('Qualification db', () => {
 
   afterEach(async () => {
     // Clearing test data
+    await Configs.remove({});
     await Qualifications.remove({});
     await Companies.remove({});
   });
@@ -110,5 +113,74 @@ describe('Qualification db', () => {
 
     status = await Qualifications.status(_company._id);
     expect(status).toEqual({ isApproved: true });
+  });
+
+  test('reset prequalification status', async () => {
+    const check = async duration => {
+      await Configs.remove({});
+
+      await configFactory({
+        prequalificationDow: {
+          duration,
+          amount: 2,
+        },
+      });
+
+      // ignore not prequalified suppliers ============
+      const supplier = await companyFactory({ isPrequalified: false });
+
+      let response = await Qualifications.resetPrequalification(supplier._id);
+
+      expect(response).toBe('notPrequalified');
+
+      // due date is not here ============
+      await Companies.update(
+        { _id: supplier._id },
+        {
+          isPrequalified: true,
+          prequalifiedDate: new Date(),
+        },
+      );
+
+      response = await Qualifications.resetPrequalification(supplier._id);
+
+      expect(response).toBe('dueDateIsNotHere');
+
+      // due date is here ============
+      await Companies.update(
+        { _id: supplier._id },
+        {
+          prequalifiedDate: moment().subtract(3, `${duration}s`),
+        },
+      );
+
+      response = await Qualifications.resetPrequalification(supplier._id);
+
+      expect(response.isPrequalified).toBe(false);
+    };
+
+    await check('year');
+    await check('month');
+    await check('day');
+  });
+
+  test('reset prequalification status: specific', async () => {
+    // ignore not prequalified suppliers ============
+    const supplier = await companyFactory({
+      isPrequalified: true,
+      prequalifiedDate: moment().subtract(3, 'years'),
+    });
+
+    await configFactory({
+      specificPrequalificationDow: {
+        supplierIds: [supplier._id],
+        duration: 'year',
+        amount: 2,
+      },
+    });
+
+    const response = await Qualifications.resetPrequalification(supplier._id);
+
+    expect(response.isPrequalified).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import { field } from './utils';
 import {
   FinancialInfoSchema,
@@ -7,7 +8,7 @@ import {
   HealthInfoSchema,
 } from './Companies';
 
-import { Companies } from './';
+import { Configs, Companies } from './';
 
 const generateFields = schema => {
   const names = Object.keys(schema.paths);
@@ -129,6 +130,39 @@ class Qualification {
     );
 
     return Companies.findOne({ _id: supplierId });
+  }
+
+  /*
+   * Reset supplier's prequalification status using config
+   * @return - Updated supplier
+   */
+  static async resetPrequalification(supplierId) {
+    const config = await Configs.getConfig();
+
+    let prequalificationConfig = config.prequalificationDow || {};
+
+    const specific = config.specificPrequalificationDow || {};
+
+    if (specific && specific.supplierIds && specific.supplierIds.includes(supplierId)) {
+      prequalificationConfig = specific;
+    }
+
+    const { duration, amount } = prequalificationConfig;
+
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    // ignore not prequalified suppliers
+    if (!supplier.isPrequalified) {
+      return 'notPrequalified';
+    }
+
+    const prequalifiedDate = supplier.prequalifiedDate;
+
+    if (moment().diff(prequalifiedDate, `${duration}s`) >= amount) {
+      return this.prequalify(supplierId, false);
+    }
+
+    return 'dueDateIsNotHere';
   }
 }
 

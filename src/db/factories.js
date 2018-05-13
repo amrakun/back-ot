@@ -68,7 +68,10 @@ export const companyFactory = (params = {}) => {
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
 
     isProductsInfoValidated: params.isProductsInfoValidated,
+
     isPrequalified: params.isPrequalified,
+    prequalifiedDate: params.prequalifiedDate,
+
     isQualified: params.isQualified,
 
     productsInfo: params.productsInfo || [],
@@ -756,6 +759,8 @@ export const physicalAuditFactory = async (params = {}) => {
 export const configFactory = params => {
   const config = new Configs({
     name: params.name || faker.random.word(),
+    prequalificationDow: params.prequalificationDow,
+    specificPrequalificationDow: params.specificPrequalificationDow,
   });
 
   return save(config);
