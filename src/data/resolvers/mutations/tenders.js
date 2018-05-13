@@ -32,13 +32,13 @@ const tenderMutations = {
   },
 
   /**
-   * Choose winner
+   * Choose winners
    * @param {String} _id - Tender id
-   * @param {String} supplierId - Company id
+   * @param {String} supplierIds - Company ids
    * @return {Promise} - updated tender
    */
-  tendersAward(root, { _id, supplierId }) {
-    return Tenders.award(_id, supplierId);
+  tendersAward(root, { _id, supplierIds }) {
+    return Tenders.award(_id, supplierIds);
   },
 
   /**
@@ -55,7 +55,7 @@ const tenderMutations = {
 
     const notAwardedResponses = await TenderResponses.find({
       tenderId: _id,
-      supplierId: { $ne: tender.winnerId },
+      supplierId: { $nin: tender.winnerIds },
     });
 
     // send emai to not awarded suppliers

@@ -102,14 +102,14 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect(_tender.winnerId).toBe(undefined);
+    expect(_tender.winnerIds).toEqual([]);
 
     const supplierId = 'DFAFDSFDSF';
 
-    const updatedTender = await Tenders.award(_tender._id, supplierId);
+    const updatedTender = await Tenders.award(_tender._id, [supplierId]);
 
     expect(updatedTender.status).toBe('awarded');
-    expect(updatedTender.winnerId).toBe(supplierId);
+    expect(updatedTender.winnerIds).toContain(supplierId);
   });
 
   test('Publish drafts', async () => {
@@ -158,7 +158,7 @@ describe('Tender db', () => {
       expect(e.message).toBe('Not awarded');
     }
 
-    await tender.update({ winnerId: 'DFAFFADSF' });
+    await tender.update({ winnerIds: ['DFAFFADSF'] });
     tender = await Tenders.findOne({ _id: tender._id });
 
     await tender.sendRegretLetter();

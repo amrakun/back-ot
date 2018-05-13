@@ -119,6 +119,7 @@ describe('Tender mutations', () => {
     delete _tender.status;
     delete _tender.createdDate;
     delete _tender.createdUserId;
+    delete _tender.winnerIds;
     delete _tender.sentRegretLetter;
     await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
 
@@ -151,6 +152,7 @@ describe('Tender mutations', () => {
     delete restParams.status;
     delete restParams.createdDate;
     delete restParams.createdUserId;
+    delete restParams.winnerIds;
     delete restParams.sentRegretLetter;
     restParams.publishDate = new Date(restParams.publishDate);
     restParams.closeDate = new Date(restParams.closeDate);
@@ -177,19 +179,20 @@ describe('Tender mutations', () => {
     Tenders.award = jest.fn(() => ({}));
 
     const mutation = `
-      mutation tendersAward($_id: String!, $supplierId: String!) {
-        tendersAward(_id: $_id, supplierId: $supplierId) {
-          winnerId
+      mutation tendersAward($_id: String!, $supplierIds: [String!]!) {
+        tendersAward(_id: $_id, supplierIds: $supplierIds) {
+          winnerIds
         }
       }
     `;
 
-    const args = { _id: _tender._id.toString(), supplierId: 'DFDAFFDSAFSDF' };
+    const supplierId = 'DFDAFFDSAFSDF';
+    const args = { _id: _tender._id.toString(), supplierIds: [supplierId] };
 
     await graphqlRequest(mutation, 'tendersAward', args);
 
     expect(Tenders.award.mock.calls.length).toBe(1);
-    expect(Tenders.award).toBeCalledWith(args._id, args.supplierId);
+    expect(Tenders.award).toBeCalledWith(args._id, args.supplierIds);
   });
 
   test('Send regret letter', async () => {
@@ -198,7 +201,7 @@ describe('Tender mutations', () => {
     const tender = await Tenders.findOne({ _id: _tender._id });
     const tenderId = tender._id.toString();
 
-    await tender.update({ winnerId: supplierId });
+    await tender.update({ winnerIds: [supplierId] });
 
     await tenderResponseFactory({ tenderId, supplierId });
     const notAwarded1 = await tenderResponseFactory({ tenderId });

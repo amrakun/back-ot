@@ -359,6 +359,7 @@ export const tenderFactory = async (params = {}) => {
     supplierIds: params.supplierIds,
     requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocuments,
+    winnerIds: params.winnnerIds || [],
     sentRegretLetter: params.sentRegretLetter || false,
   });
 

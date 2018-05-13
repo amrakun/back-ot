@@ -43,8 +43,8 @@ const TenderSchema = mongoose.Schema({
   supplierIds: field({ type: [String] }),
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
-  // Awarded response id
-  winnerId: field({ type: String, optional: true }),
+  // Awarded response ids
+  winnerIds: field({ type: [String], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
 
@@ -102,13 +102,13 @@ class Tender extends StatusPublishClose {
   }
 
   /*
-   * Choose tender winner
+   * Choose tender winners
    * @param {String} _id - Tender id
-   * @param {String} supplierId - Company id
+   * @param {String} supplierIds - Company ids
    * @return {Promise} - Updated tender object
    */
-  static async award(_id, supplierId) {
-    await this.update({ _id }, { $set: { status: 'awarded', winnerId: supplierId } });
+  static async award(_id, supplierIds) {
+    await this.update({ _id }, { $set: { status: 'awarded', winnerIds: supplierIds } });
 
     return this.findOne({ _id });
   }
@@ -117,7 +117,7 @@ class Tender extends StatusPublishClose {
    * Mark as sent regret letter
    */
   sendRegretLetter() {
-    if (this.type === 'rfq' && !this.winnerId) {
+    if (this.type === 'rfq' && (!this.winnerIds || this.winnerIds.length === 0)) {
       throw new Error('Not awarded');
     }
 
