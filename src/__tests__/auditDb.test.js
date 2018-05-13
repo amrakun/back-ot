@@ -356,7 +356,7 @@ describe('Audit response db', () => {
       // ignore not qualified suppliers ============
       const supplier = await companyFactory({ isQualified: false });
 
-      let response = await Audits.resetQualification(supplier._id);
+      let response = await AuditResponses.resetQualification(supplier._id);
 
       expect(response).toBe('notQualified');
 
@@ -369,7 +369,7 @@ describe('Audit response db', () => {
         },
       );
 
-      response = await Audits.resetQualification(supplier._id);
+      response = await AuditResponses.resetQualification(supplier._id);
 
       expect(response).toBe('dueDateIsNotHere');
 
@@ -381,7 +381,7 @@ describe('Audit response db', () => {
         },
       );
 
-      response = await Audits.resetQualification(supplier._id);
+      response = await AuditResponses.resetQualification(supplier._id);
 
       expect(response.isQualified).toBe(false);
     };
@@ -406,7 +406,7 @@ describe('Audit response db', () => {
       },
     });
 
-    const response = await Audits.resetQualification(supplier._id);
+    const response = await AuditResponses.resetQualification(supplier._id);
 
     expect(response.isQualified).toBe(false);
   });

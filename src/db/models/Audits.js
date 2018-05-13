@@ -26,44 +26,6 @@ class Audit extends StatusPublishClose {
       createdUserId: userId,
     });
   }
-
-  /*
-   * Reset supplier's qualification status using config
-   * @return - Updated supplier
-   */
-  static async resetQualification(supplierId) {
-    const config = await Configs.getConfig();
-
-    let auditConfig = config.auditDow || {};
-
-    const specific = config.specificAuditDow || {};
-
-    if (specific && specific.supplierIds && specific.supplierIds.includes(supplierId)) {
-      auditConfig = specific;
-    }
-
-    const { duration, amount } = auditConfig;
-
-    const supplier = await Companies.findOne({ _id: supplierId });
-
-    // ignore not qualified suppliers
-    if (!supplier.isQualified) {
-      return 'notQualified';
-    }
-
-    const qualifiedDate = supplier.qualifiedDate;
-
-    if (moment().diff(qualifiedDate, `${duration}s`) >= amount) {
-      await Companies.update(
-        { _id: supplierId },
-        { $set: { isQualified: false, qualifiedDate: new Date() } },
-      );
-
-      return Companies.findOne({ _id: supplierId });
-    }
-
-    return 'dueDateIsNotHere';
-  }
 }
 
 AuditSchema.loadClass(Audit);
@@ -696,6 +658,44 @@ class AuditResponse {
     }
 
     return AuditResponses.findOne({ _id: this._id });
+  }
+
+  /*
+   * Reset supplier's qualification status using config
+   * @return - Updated supplier
+   */
+  static async resetQualification(supplierId) {
+    const config = await Configs.getConfig();
+
+    let auditConfig = config.auditDow || {};
+
+    const specific = config.specificAuditDow || {};
+
+    if (specific && specific.supplierIds && specific.supplierIds.includes(supplierId)) {
+      auditConfig = specific;
+    }
+
+    const { duration, amount } = auditConfig;
+
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    // ignore not qualified suppliers
+    if (!supplier.isQualified) {
+      return 'notQualified';
+    }
+
+    const qualifiedDate = supplier.qualifiedDate;
+
+    if (moment().diff(qualifiedDate, `${duration}s`) >= amount) {
+      await Companies.update(
+        { _id: supplierId },
+        { $set: { isQualified: false, qualifiedDate: new Date() } },
+      );
+
+      return Companies.findOne({ _id: supplierId });
+    }
+
+    return 'dueDateIsNotHere';
   }
 }
 
