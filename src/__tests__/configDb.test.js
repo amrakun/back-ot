@@ -22,26 +22,6 @@ describe('Config db', () => {
     expect(config.address).toBe(doc.address);
   });
 
-  test('Save templates', async () => {
-    const testTemplate = async (name, content) => {
-      const config = await Configs.saveTemplate(name, content);
-
-      expect(config[name]).toBe(content);
-    };
-
-    const templateNames = [
-      'eoiTemplate',
-      'rfqTemplate',
-      'regretLetterTemplate',
-      'successFeedbackTemplate',
-      'auditTemplate',
-    ];
-
-    for (let templateName of templateNames) {
-      await testTemplate(templateName, 'content');
-    }
-  });
-
   test('Save prequalification duration of warranty', async () => {
     const doc = configDocs.prequalification;
 

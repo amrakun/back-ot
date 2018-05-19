@@ -8,8 +8,8 @@ const configMutations = {
   },
 
   // save template
-  configsSaveTemplate(root, { name, content }) {
-    return Configs.saveTemplate(name, content);
+  configsSaveTemplate(root, doc) {
+    return Configs.saveTemplate(doc);
   },
 
   // save prequalification duration of warranty

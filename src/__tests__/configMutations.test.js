@@ -87,34 +87,6 @@ describe('Config mutations', () => {
     expect(config.address).toBe(args.address);
   });
 
-  test('Save template', async () => {
-    const testTemplate = async (name, content) => {
-      const mutation = `
-        mutation configsSaveTemplate($name: String!, $content: String!) {
-          configsSaveTemplate(name: $name, content: $content) {
-            _id
-            ${name}
-          }
-        }
-      `;
-
-      const user = await userFactory({ isSupplier: false });
-      const args = { name, content };
-
-      await graphqlRequest(mutation, 'configsSaveTemplate', args, { user });
-
-      const config = await Configs.getConfig();
-
-      expect(config[name]).toBe(content);
-    };
-
-    await testTemplate('eoiTemplate', 'content');
-    await testTemplate('rfqTemplate', 'content');
-    await testTemplate('regretLetterTemplate', 'content');
-    await testTemplate('successFeedbackTemplate', 'content');
-    await testTemplate('auditTemplate', 'content');
-  });
-
   test('Save prequalification duration of warranty', async () => {
     const mutation = `
       mutation configsSavePrequalificationDow($doc: ConfigPrequalificationDowInput!) {

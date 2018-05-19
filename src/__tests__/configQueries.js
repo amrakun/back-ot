@@ -28,11 +28,13 @@ describe('Config queries', () => {
           email
           address
 
-          eoiTemplate
-          rfqTemplate
-          regretLetterTemplate
-          successFeedbackTemplate
-          auditTemplate
+          rfqTemplates
+          eoiTemplates
+          successFeedbackTemplates
+          capacityBuildingTemplates
+          blockTemplates
+          prequalificationTemplates
+          desktopAuditTemplates
 
           prequalificationDow
           specificPrequalificationDow

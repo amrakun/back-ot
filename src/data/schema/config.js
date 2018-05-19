@@ -51,11 +51,13 @@ export const types = `
     email: String
     address: String
 
-    eoiTemplate: String
-    rfqTemplate: String
-    regretLetterTemplate: String
-    successFeedbackTemplate: String
-    auditTemplate: String
+    rfqTemplates: JSON
+    eoiTemplates: JSON
+    successFeedbackTemplates: JSON
+    capacityBuildingTemplates: JSON
+    blockTemplates: JSON
+    prequalificationTemplates: JSON
+    desktopAuditTemplates: JSON
 
     prequalificationDow: JSON
     specificPrequalificationDow: JSON
@@ -77,7 +79,14 @@ export const mutations = `
     address: String!,
   ): Config
 
-  configsSaveTemplate(name: String!, content: String!): Config
+  configsSaveTemplate(
+    name: String!
+    kind: String!
+    from: String!
+    subject: JSON!
+    content: JSON!
+  ): Config
+
   configsSavePrequalificationDow(doc: ConfigPrequalificationDowInput!): Config
   configsSaveAuditDow(doc: ConfigAuditDowInput!): Config
   configsSaveImprovementPlanDow(doc: ConfigImprovementPlanDowInput!): Config

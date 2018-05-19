@@ -51,11 +51,13 @@ const ConfigSchema = mongoose.Schema({
   address: field({ type: String, optional: true }),
 
   // templates
-  eoiTemplate: field({ type: String, optional: true }),
-  rfqTemplate: field({ type: String, optional: true }),
-  regretLetterTemplate: field({ type: String, optional: true }),
-  successFeedbackTemplate: field({ type: String, optional: true }),
-  auditTemplate: field({ type: String, optional: true }),
+  rfqTemplates: field({ type: Object, optional: true }),
+  eoiTemplates: field({ type: Object, optional: true }),
+  successFeedbackTemplates: field({ type: Object, optional: true }),
+  capacityBuildingTemplates: field({ type: Object, optional: true }),
+  blockTemplates: field({ type: Object, optional: true }),
+  prequalificationTemplates: field({ type: Object, optional: true }),
+  desktopAuditTemplates: field({ type: Object, optional: true }),
 
   // Prequalification duration of warranty ========
   // { duration: 'year', amount: 2 }
@@ -112,10 +114,14 @@ class Config {
   /*
    * Save template
    */
-  static async saveTemplate(name, content) {
+  static async saveTemplate({ name, kind, from, subject, content }) {
     const config = await this.getConfig();
 
-    await config.update({ [name]: content });
+    const template = config[name] || {};
+
+    template[kind] = { from, subject, content };
+
+    await config.update({ [name]: template });
 
     return this.findOne({ _id: config._id });
   }
