@@ -1,5 +1,5 @@
 import { Tenders, TenderResponses, Companies } from '../../../db/models';
-import utils from '../../../data/utils';
+import { sendConfigEmail, sendEmail } from '../../../data/tenderUtils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const tenderMutations = {
@@ -37,8 +37,12 @@ const tenderMutations = {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - updated tender
    */
-  tendersAward(root, { _id, supplierIds }) {
-    return Tenders.award(_id, supplierIds);
+  async tendersAward(root, { _id, supplierIds }) {
+    const tender = await Tenders.award(_id, supplierIds);
+
+    await sendEmail({ kind: 'award', tender });
+
+    return tender;
   },
 
   /**
@@ -48,7 +52,7 @@ const tenderMutations = {
    * @param {String} content - Mail content
    * @return {[String]} - send supplier ids
    */
-  async tendersSendRegretLetter(root, { _id, subject, content }) {
+  async tendersSendRegretLetter(root, { _id }) {
     const tender = await Tenders.findOne({ _id });
 
     await tender.sendRegretLetter();
@@ -61,15 +65,12 @@ const tenderMutations = {
     // send emai to not awarded suppliers
     for (let notAwardedResponse of notAwardedResponses) {
       const supplier = (await Companies.findOne({ _id: notAwardedResponse.supplierId })) || {};
-      const basicInfo = supplier.basicInfo || {};
 
-      utils.sendEmail({
-        toEmails: [basicInfo.email],
-        title: subject,
-        template: {
-          name: 'regretLetter',
-          data: { content },
-        },
+      await sendConfigEmail({
+        name: `${tender.type}Templates`,
+        kind: 'supplier__regretLetter',
+        tender,
+        toEmails: [supplier.basicInfo.email],
       });
     }
 
@@ -85,7 +86,11 @@ const tenderMutations = {
     const tender = await Tenders.findOne({ _id });
 
     if (tender) {
-      return tender.cancel();
+      const canceledTender = await tender.cancel();
+
+      await sendEmail({ kind: 'cancel', tender: canceledTender });
+
+      return canceledTender;
     }
 
     return null;

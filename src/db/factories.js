@@ -757,13 +757,32 @@ export const physicalAuditFactory = async (params = {}) => {
   return save(physicalAudit);
 };
 
-export const configFactory = params => {
+export const configFactory = (params = {}) => {
+  const withLanguage = { mn: '', en: '' };
+
+  const commonTemplate = {
+    from: 'from@ot.mn',
+    subject: withLanguage,
+    content: withLanguage,
+  };
+
   const config = new Configs({
     name: params.name || faker.random.word(),
     prequalificationDow: params.prequalificationDow,
     specificPrequalificationDow: params.specificPrequalificationDow,
     auditDow: params.auditDow,
     specificAuditDow: params.specificAuditDow,
+    rfqTemplates: {
+      buyer__award: commonTemplate,
+      supplier__award: commonTemplate,
+      supplier__regretLetter: commonTemplate,
+      buyer__cancel: commonTemplate,
+      supplier__cancel: commonTemplate,
+    },
+    successFeedbackTemplates: {
+      buyer__new: commonTemplate,
+      supplier__new: commonTemplate,
+    },
   });
 
   return save(config);

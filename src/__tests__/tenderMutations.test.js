@@ -2,8 +2,14 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Tenders } from '../db/models';
-import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+import { Configs, Users, Tenders } from '../db/models';
+import {
+  userFactory,
+  configFactory,
+  tenderFactory,
+  tenderResponseFactory,
+  companyFactory,
+} from '../db/factories';
 
 import tenderMutations from '../data/resolvers/mutations/tenders';
 import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
@@ -48,10 +54,13 @@ describe('Tender mutations', () => {
     // Creating test data
     _tender = await tenderFactory();
     _user = await userFactory();
+
+    await configFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
+    await Configs.remove({});
     await Tenders.remove({});
     await Users.remove({});
   });
@@ -176,8 +185,6 @@ describe('Tender mutations', () => {
   });
 
   test('Award', async () => {
-    Tenders.award = jest.fn(() => ({}));
-
     const mutation = `
       mutation tendersAward($_id: String!, $supplierIds: [String!]!) {
         tendersAward(_id: $_id, supplierIds: $supplierIds) {
@@ -187,12 +194,12 @@ describe('Tender mutations', () => {
     `;
 
     const supplierId = 'DFDAFFDSAFSDF';
+
     const args = { _id: _tender._id.toString(), supplierIds: [supplierId] };
 
-    await graphqlRequest(mutation, 'tendersAward', args);
+    const response = await graphqlRequest(mutation, 'tendersAward', args);
 
-    expect(Tenders.award.mock.calls.length).toBe(1);
-    expect(Tenders.award).toBeCalledWith(args._id, args.supplierIds);
+    expect(response.winnerIds.length).toBe(1);
   });
 
   test('Send regret letter', async () => {

@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Feedbacks } from '../db/models';
-import { userFactory, feedbackFactory, companyFactory } from '../db/factories';
+import { Configs, Users, Feedbacks } from '../db/models';
+import { configFactory, userFactory, feedbackFactory, companyFactory } from '../db/factories';
 
 import feedbackMutations from '../data/resolvers/mutations/feedbacks';
 
@@ -31,10 +31,12 @@ describe('Feedback mutations', () => {
     // Creating test data
     _feedback = await feedbackFactory();
     _user = await userFactory();
+    await configFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
+    await Configs.remove({});
     await Feedbacks.remove({});
     await Users.remove({});
   });

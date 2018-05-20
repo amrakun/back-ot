@@ -1,4 +1,5 @@
-import { Feedbacks } from '../../../db/models';
+import { Companies, Feedbacks } from '../../../db/models';
+import { sendConfigEmail } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const feedbackMutations = {
@@ -8,7 +9,18 @@ const feedbackMutations = {
    * @return {Promise} newly created feedback object
    */
   async feedbacksAdd(root, doc, { user }) {
-    return Feedbacks.createFeedback(doc, user._id);
+    const feedback = await Feedbacks.createFeedback(doc, user._id);
+    const suppliers = await Companies.find({ _id: { $in: doc.supplierIds } });
+
+    for (const supplier of suppliers) {
+      await sendConfigEmail({
+        name: 'successFeedbackTemplates',
+        kind: 'supplier__new',
+        toEmails: [supplier.basicInfo.email],
+      });
+    }
+
+    return feedback;
   },
 };
 

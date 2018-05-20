@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
+import { Configs } from '../db/models';
 
 /*
  * Save binary data to amazon s3
@@ -106,7 +107,7 @@ export const createTransporter = async () => {
  * @return {Promise}
  */
 export const sendEmail = async args => {
-  const { toEmails, fromEmail, title, template, attachments = [] } = args;
+  const { toEmails, fromEmail, title, content = '', template, attachments = [] } = args;
   const { COMPANY_EMAIL_FROM, NODE_ENV } = process.env;
 
   // do not send email it is running in test mode
@@ -116,13 +117,17 @@ export const sendEmail = async args => {
 
   const transporter = await createTransporter();
 
-  const { isCustom, data, name } = template;
+  let html = await applyTemplate({ content }, 'base');
 
-  // generate email content by given template
-  let html = await applyTemplate(data, name);
+  if (template) {
+    const { isCustom, data, name } = template;
 
-  if (!isCustom) {
-    html = await applyTemplate({ content: html }, 'base');
+    // generate email content by given template
+    html = await applyTemplate(data, name);
+
+    if (!isCustom) {
+      html = await applyTemplate({ content: html }, 'base');
+    }
   }
 
   return toEmails.map(toEmail => {
@@ -138,6 +143,40 @@ export const sendEmail = async args => {
       console.log(error); // eslint-disable-line
       console.log(info); // eslint-disable-line
     });
+  });
+};
+
+/*
+ * Send email using config
+ */
+export const sendConfigEmail = async ({ name, kind, toEmails, replacer }) => {
+  const config = await Configs.getConfig();
+  const templates = config[name] || {};
+  const template = templates[kind];
+
+  if (!template) {
+    throw new Error(`${name} ${kind} template not found`);
+  }
+
+  const { from, subject, content } = template;
+
+  let subjectEn = subject.en;
+  let subjectMn = subject.mn;
+  let contentEn = content.en;
+  let contentMn = content.mn;
+
+  if (replacer) {
+    subjectEn = replacer(subjectEn);
+    subjectMn = replacer(subjectMn);
+    contentEn = replacer(contentEn);
+    contentMn = replacer(contentMn);
+  }
+
+  return sendEmail({
+    fromEmail: from,
+    toEmails,
+    title: `${subjectEn} ${subjectMn}`,
+    content: `${contentEn} ${contentMn}`,
   });
 };
 
@@ -166,6 +205,7 @@ export const generateXlsx = async (workbook, name) => {
 
 export default {
   sendEmail,
+  sendConfigEmail,
   readFile,
   createTransporter,
 };
