@@ -22,7 +22,7 @@ const feedbackResponseMutations = {
       replacer: text => {
         return text
           .replace('{supplier.name}', supplier.basicInfo.enName)
-          .replace('{date}', response.createdDate);
+          .replace('{date}', response.createdDate.toLocaleString());
       },
     });
 

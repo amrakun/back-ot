@@ -67,6 +67,7 @@ describe('Company queries', () => {
     await BlockedCompanies.block(
       {
         supplierId: supplier._id,
+        groupId: 'DFADFFDFDA',
         startDate: new Date(),
         endDate: new Date(),
         note: 'note',

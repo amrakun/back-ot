@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import { field } from './utils';
+import { Users, Companies } from './';
 
 // Blocked company schema
 const BlockedCompanySchema = mongoose.Schema({
   supplierId: field({ type: String }),
+
+  // suppliers that are blocked at the same time. will have same groupId
+  groupId: field({ type: String }),
+
   startDate: field({ type: Date }),
   endDate: field({ type: Date }),
   note: field({ type: String, optional: true }),
@@ -63,6 +68,31 @@ class BlockedCompany {
     const blockedItems = await this.find(this.blockedRangeQuery());
 
     return blockedItems.map(i => i.supplierId);
+  }
+
+  /*
+   * Get blocked suppliers grouped by groupId
+   */
+  static async blockedSuppliersByGroupId() {
+    const blockedEntities = await this.find(this.blockedRangeQuery());
+
+    const map = {};
+
+    for (const entity of blockedEntities) {
+      if (!map[entity.groupId]) {
+        map[entity.groupId] = {
+          createdUser: await Users.findOne({ _id: entity.createdUserId }),
+          endDate: entity.endDate,
+          suppliers: [],
+        };
+      }
+
+      const supplier = await Companies.findOne({ _id: entity.supplierId });
+
+      map[entity.groupId].suppliers.push(supplier);
+    }
+
+    return Object.keys(map).map(key => map[key]);
   }
 }
 

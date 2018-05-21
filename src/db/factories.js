@@ -635,13 +635,24 @@ export const auditResponseFactory = async (params = {}) => {
   return AuditResponses.findOne({ _id: savedResponse._id });
 };
 
-export const blockedCompanyFactory = params => {
+export const blockedCompanyFactory = async params => {
+  if (!params.supplierId) {
+    const supplier = await companyFactory();
+    params.supplierId = supplier._id;
+  }
+
+  if (!params.createdUserId) {
+    const user = await userFactory();
+    params.createdUserId = user._id;
+  }
+
   const blockedCompany = new BlockedCompanies({
-    supplierId: params.supplierId || 'DFAFSFD',
+    supplierId: params.supplierId,
+    groupId: params.groupId || 'DFAFSFD',
     startDate: params.startDate || new Date(),
     endDate: params.endDate || new Date(),
     note: params.note || 'note',
-    createdUserId: params.createdUserId || '_id',
+    createdUserId: params.createdUserId,
   });
 
   return save(blockedCompany);
@@ -782,6 +793,9 @@ export const configFactory = (params = {}) => {
     successFeedbackTemplates: {
       buyer__new: commonTemplate,
       supplier__new: commonTemplate,
+    },
+    blockTemplates: {
+      buyer__block: commonTemplate,
     },
   });
 

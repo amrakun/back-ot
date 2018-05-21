@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { BlockedCompanies } from '../db/models';
-import { userFactory, companyFactory } from '../db/factories';
+import { Configs, BlockedCompanies } from '../db/models';
+import { configFactory, userFactory, companyFactory } from '../db/factories';
 import blockedCompanyMutations from '../data/resolvers/mutations/blockedCompanies';
 
 beforeAll(() => connect());
@@ -11,6 +11,14 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Company mutations', () => {
+  beforeEach(async () => {
+    await configFactory();
+  });
+
+  afterEach(async () => {
+    await Configs.remove({});
+  });
+
   test('Buyer required functions', async () => {
     const checkLogin = async (fn, args, context) => {
       try {

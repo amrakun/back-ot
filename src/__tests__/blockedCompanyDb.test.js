@@ -4,7 +4,7 @@
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Companies, BlockedCompanies } from '../db/models';
-import { userFactory, companyFactory } from '../db/factories';
+import { userFactory, companyFactory, blockedCompanyFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -30,6 +30,7 @@ describe('BlockedCompany db', () => {
   test('base', async () => {
     const doc = {
       supplierId: 'DFAFSFD',
+      groupId: 'DFAFSFD',
       startDate: new Date(),
       endDate: new Date(),
       note: 'note',
@@ -68,6 +69,7 @@ describe('BlockedCompany db', () => {
 
     const doc = {
       supplierId: _company._id,
+      groupId: 'DFADFFASFD',
       startDate: today,
       endDate: tomorrow,
     };
@@ -96,6 +98,7 @@ describe('BlockedCompany db', () => {
     await BlockedCompanies.block(
       {
         supplierId: blockedSupplier._id,
+        groupId: 'FDSAFJDKFJDK',
         startDate: moment().endOf('day'), // today
         endDate: moment()
           .add(1, 'day')
@@ -108,6 +111,7 @@ describe('BlockedCompany db', () => {
     await BlockedCompanies.block(
       {
         supplierId: unblockedSupplier._id,
+        groupId: 'FMMMDSAFJDKFJDK',
         startDate: moment().add(2, 'day'), // 2 days after today
         endDate: moment()
           .add(4, 'day')
@@ -120,5 +124,32 @@ describe('BlockedCompany db', () => {
 
     expect(ids).toContain(blockedSupplier._id);
     expect(ids).not.toContain(unblockedSupplier._id);
+  });
+
+  test('blockedSuppliersByGroupId', async () => {
+    const range = {
+      startDate: moment().endOf('day'), // today
+      endDate: moment()
+        .add(1, 'day')
+        .endOf('day'), // tomorrow
+      createdUserId: _user._id,
+    };
+
+    await blockedCompanyFactory({ ...range, groupId: '1' });
+    await blockedCompanyFactory({ ...range, groupId: '1' });
+    await blockedCompanyFactory({ ...range, groupId: '2' });
+    await blockedCompanyFactory({ ...range, groupId: '2' });
+
+    const response = await BlockedCompanies.blockedSuppliersByGroupId();
+
+    expect(response.length).toBe(2);
+
+    const [entity1, entity2] = response;
+
+    expect(entity1.createdUser._id.toString()).toBe(_user._id);
+    expect(entity2.createdUser._id.toString()).toBe(_user._id);
+
+    expect(entity1.suppliers.length).toBe(2);
+    expect(entity2.suppliers.length).toBe(2);
   });
 });

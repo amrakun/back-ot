@@ -6,7 +6,7 @@ export const replacer = ({ text, tender }) => {
 
   result = result.replace(/{tender.number}/g, tender.number);
   result = result.replace(/{tender.name}/g, tender.name);
-  result = result.replace(/{now}/g, new Date());
+  result = result.replace(/{now}/g, new Date().toLocaleString());
 
   return result;
 };
