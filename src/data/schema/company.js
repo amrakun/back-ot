@@ -390,6 +390,7 @@ export const types = `
     isBlocked: Boolean
     openTendersCount: Int
 
+    hasNewAudit: Boolean
     audits: [Audit]
   }
 `;

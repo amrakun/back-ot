@@ -5,6 +5,7 @@ import {
   BlockedCompanies,
   Qualifications,
   Audits,
+  AuditResponses,
 } from '../../db/models';
 
 export default {
@@ -56,7 +57,33 @@ export default {
   },
 
   audits(company) {
-    return Audits.find({ supplierIds: { $in: [company._id] }, status: { $ne: 'draft' } });
+    return Audits.find({
+      supplierIds: { $in: [company._id] },
+      status: { $ne: 'draft' },
+    });
+  },
+
+  async hasNewAudit(company) {
+    const openAudits = await Audits.find({
+      supplierIds: { $in: [company._id] },
+      status: 'open',
+    });
+
+    let result = false;
+
+    for (const openAudit of openAudits) {
+      const response = await AuditResponses.findOne({
+        auditId: openAudit._id,
+        supplierId: company._id,
+      });
+
+      if (!response) {
+        result = true;
+        break;
+      }
+    }
+
+    return result;
   },
 
   async prequalifiedStatus(company) {
