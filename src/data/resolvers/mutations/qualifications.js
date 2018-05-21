@@ -1,4 +1,5 @@
 import { Qualifications, Companies, SuppliersByProductCodeLogs } from '../../../db/models';
+import { sendConfigEmail } from '../../../data/utils';
 import { requireBuyer } from '../../permissions';
 
 const qualificationMutations = {
@@ -16,6 +17,13 @@ const qualificationMutations = {
     const supplier = await Companies.findOne({ _id: supplierId });
 
     await SuppliersByProductCodeLogs.createLog(supplier);
+
+    // send notification email
+    await sendConfigEmail({
+      name: 'prequalificationTemplates',
+      kind: `supplier__${qualified ? 'qualified' : 'failed'}`,
+      toEmails: [supplier.basicInfo.email],
+    });
 
     return Qualifications.prequalify(supplierId, qualified);
   },

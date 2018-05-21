@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Companies } from '../db/models';
-import { userFactory, companyFactory, companyDocs } from '../db/factories';
+import { Companies, Configs } from '../db/models';
+import { userFactory, companyFactory, configFactory, companyDocs } from '../db/factories';
 import companyMutations from '../data/resolvers/mutations/companies';
 
 beforeAll(() => connect());
@@ -16,10 +16,12 @@ describe('Company mutations', () => {
   beforeEach(async () => {
     // Creating test data
     _company = await companyFactory();
+    await configFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
+    await Configs.remove({});
     await Companies.remove({});
   });
 

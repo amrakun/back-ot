@@ -797,6 +797,12 @@ export const configFactory = (params = {}) => {
     blockTemplates: {
       buyer__block: commonTemplate,
     },
+    prequalificationTemplates: {
+      supplier__qualified: commonTemplate,
+      supplier__failed: commonTemplate,
+      supplier__submit: commonTemplate,
+      buyer__submit: commonTemplate,
+    },
   });
 
   return save(config);

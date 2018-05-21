@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Companies } from '../db/models';
-import { userFactory, companyFactory } from '../db/factories';
+import { Users, Companies, Configs } from '../db/models';
+import { userFactory, companyFactory, configFactory } from '../db/factories';
 import {
   FinancialInfoSchema,
   BusinessInfoSchema,
@@ -24,12 +24,14 @@ describe('Company mutations', () => {
     // Creating test data
     _user = await userFactory();
     _company = await companyFactory();
+    await configFactory();
   });
 
   afterEach(async () => {
     // Clearing test data
     await Users.remove({});
     await Companies.remove({});
+    await Configs.remove({});
   });
 
   test('Buyer required functions', async () => {

@@ -1,5 +1,6 @@
 import { Companies } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
+import { sendConfigEmail } from '../../../data/utils';
 
 const companyMutations = {
   async companiesAddDifotScores(root, { difotScores }) {
@@ -47,6 +48,27 @@ const companyMutations = {
 
   async companiesSendPrequalificationInfo(root, args, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
+
+    // send notification email to supplier
+    await sendConfigEmail({
+      name: 'prequalificationTemplates',
+      kind: 'supplier__submit',
+      toEmails: [company.basicInfo.email],
+    });
+
+    // send notification email to buyer
+    const { PREQUALIFICATION_RECEIVER_EMAIL } = process.env;
+
+    await sendConfigEmail({
+      name: 'prequalificationTemplates',
+      kind: 'buyer__submit',
+      toEmails: [PREQUALIFICATION_RECEIVER_EMAIL],
+      replacer: text => {
+        return text
+          .replace('{supplier.name}', company.basicInfo.enName)
+          .replace('{supplier._id}', company._id);
+      },
+    });
 
     return company.sendPrequalificationInfo();
   },
