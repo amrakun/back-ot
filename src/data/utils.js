@@ -149,7 +149,7 @@ export const sendEmail = async args => {
 /*
  * Send email using config
  */
-export const sendConfigEmail = async ({ name, kind, toEmails, replacer }) => {
+export const sendConfigEmail = async ({ name, kind, toEmails, attachments, replacer }) => {
   const config = await Configs.getConfig();
   const templates = config[name] || {};
   const template = templates[kind];
@@ -177,6 +177,7 @@ export const sendConfigEmail = async ({ name, kind, toEmails, replacer }) => {
     toEmails,
     title: `${subjectEn} ${subjectMn}`,
     content: `${contentEn} ${contentMn}`,
+    attachments,
   });
 };
 

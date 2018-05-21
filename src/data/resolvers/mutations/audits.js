@@ -1,6 +1,6 @@
 import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
-import utils from '../../../data/utils';
+import { sendEmail } from '../../../data/auditUtils';
 
 const auditMutations = {
   // create new audit
@@ -40,19 +40,10 @@ const auditMutations = {
     }
 
     // send email ===================
-    const { MAIN_AUDITOR_EMAIL } = process.env;
-    const supplier = await Companies.findOne({ _id: user.companyId });
-
-    utils.sendEmail({
-      toEmails: [MAIN_AUDITOR_EMAIL],
-      title: 'New audit response notification',
-      template: {
-        name: 'audit',
-        data: {
-          content: `Supplier '${supplier.basicInfo.enName}' filled out and
-            submitted supplier qualification questionnaire (date).`,
-        },
-      },
+    sendEmail({
+      kind: 'buyer__submit',
+      toEmails: [process.env.MAIN_AUDITOR_EMAIL],
+      supplierId: user.companyId,
     });
 
     return updatedResponse;
@@ -103,20 +94,18 @@ const auditMutations = {
         });
       }
 
-      const contactInfo = company.contactInfo || {};
+      // send notification ==============
+      let kind = 'supplier__failed';
 
-      // send email ===================
-      utils.sendEmail({
-        toEmails: [contactInfo.email],
-        title: 'Desktop audit report',
-        template: {
-          name: 'audit',
-          data: {
-            content: 'Desktop audit report',
-          },
-        },
-        attachments,
-      });
+      if (response.isQualified) {
+        if (improvementPlan) {
+          kind = 'supplier__approved_with_improvement_plan';
+        } else {
+          kind = 'supplier__approved';
+        }
+      }
+
+      await sendEmail({ kind, toEmails: [company.basicInfo.email], attachments });
 
       // save dates
       await response.sendFiles({ improvementPlan, report });

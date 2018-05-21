@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Audits, AuditResponses, Companies } from '../db/models';
+import { Users, Audits, AuditResponses, Companies, Configs } from '../db/models';
 
 import {
   userFactory,
@@ -10,6 +10,7 @@ import {
   auditFactory,
   auditResponseFactory,
   auditResponseDocs,
+  configFactory,
 } from '../db/factories';
 
 import companyMutations from '../data/resolvers/mutations/audits';
@@ -28,6 +29,7 @@ describe('Audit mutations', () => {
     _company = await companyFactory();
     _user = await userFactory({ companyId: _company._id, isSupplier: true });
     _audit = await auditFactory();
+    await configFactory();
   });
 
   afterEach(async () => {
@@ -35,6 +37,7 @@ describe('Audit mutations', () => {
     await Users.remove({});
     await Companies.remove({});
     await Audits.remove({});
+    await Configs.remove({});
   });
 
   test('Supplier required functions', async () => {
