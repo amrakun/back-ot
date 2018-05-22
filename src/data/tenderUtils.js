@@ -28,23 +28,24 @@ export const sendEmailToSuppliers = async ({ kind, tender }) => {
   }
 };
 
-export const sendEmailToBuyer = async ({ kind, tender }) => {
+export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails }) => {
   const createdUser = await Users.findOne({ _id: tender.createdUserId });
 
   return utils.sendConfigEmail({
     name: `${tender.type}Templates`,
     kind,
-    toEmails: [createdUser.email],
+    toEmails: [...extraBuyerEmails, createdUser.email],
     replacer: text => {
       return replacer({ text, tender });
     },
   });
 };
 
-export const sendEmail = async ({ kind, tender }) => {
+export const sendEmail = async ({ kind, tender, extraBuyerEmails = [] }) => {
   await sendEmailToBuyer({
     kind: `buyer__${kind}`,
     tender,
+    extraBuyerEmails,
   });
 
   await sendEmailToSuppliers({
