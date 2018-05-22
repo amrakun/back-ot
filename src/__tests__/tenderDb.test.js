@@ -1,6 +1,7 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders } from '../db/models';
 import dbUtils from '../db/models/utils';
@@ -132,8 +133,15 @@ describe('Tender db', () => {
     // mocking datetime now
     dbUtils.getNow = jest.fn(() => new Date('2018/01/20 17:11'));
 
-    let tender1 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:10') });
-    let tender2 = await tenderFactory({ status: 'open', closeDate: new Date('2018/01/20 17:12') });
+    let tender1 = await tenderFactory({
+      status: 'open',
+      closeDate: new Date('2018/01/20 17:10'),
+    });
+
+    let tender2 = await tenderFactory({
+      status: 'open',
+      closeDate: new Date('2018/01/20 17:12'),
+    });
 
     await Tenders.closeOpens();
 
@@ -142,6 +150,26 @@ describe('Tender db', () => {
 
     expect(tender1.status).toBe('closed');
     expect(tender2.status).toBe('open');
+  });
+
+  test('tenders to remind', async () => {
+    dbUtils.getNow = jest.fn(() => new Date());
+
+    await tenderFactory({
+      status: 'open',
+      reminderDay: 3,
+      closeDate: moment().add(10, 'days'),
+    });
+
+    await tenderFactory({
+      status: 'open',
+      reminderDay: 3,
+      closeDate: moment().add(3, 'days'),
+    });
+
+    const tenders = await Tenders.tendersToRemind();
+
+    expect(tenders.length).toBe(1);
   });
 
   test('Send regret letter', async () => {

@@ -1,5 +1,6 @@
+import moment from 'moment';
 import mongoose from 'mongoose';
-import { field, StatusPublishClose } from './utils';
+import { field, isReached, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -169,6 +170,25 @@ class Tender extends StatusPublishClose {
     const respondedCount = (await this.submittedCount()) + (await this.notInterestedCount());
 
     return this.requestedCount() - respondedCount;
+  }
+
+  /*
+   * Find tenders that need to reminded now
+   */
+  static async tendersToRemind() {
+    const opens = await this.find({ status: 'open' });
+    const results = [];
+
+    for (let open of opens) {
+      // reminder date is reached
+      const date = moment(open.closeDate).subtract(open.reminderDay, 'days');
+
+      if (isReached(date)) {
+        results.push(open);
+      }
+    }
+
+    return results;
   }
 }
 
