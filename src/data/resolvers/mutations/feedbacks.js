@@ -17,6 +17,9 @@ const feedbackMutations = {
         name: 'successFeedbackTemplates',
         kind: 'supplier__new',
         toEmails: [supplier.basicInfo.email],
+        replacer: text => {
+          return text.replace('{closeDate}', feedback.closeDate.toLocaleString());
+        },
       });
     }
 
