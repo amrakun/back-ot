@@ -1,5 +1,5 @@
 import schedule from 'node-schedule';
-import { Audits } from '../db/models';
+import { Companies, Audits } from '../db/models';
 import { sendEmailToSupplier } from '../data/auditUtils';
 
 // every 1 minute
@@ -10,7 +10,18 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   // send published email to suppliers
   for (const audit of publishedAudits) {
     for (const supplierId of audit.supplierIds) {
-      await sendEmailToSupplier({ kind: 'supplier__invitation', supplierId });
+      const supplier = await Companies.findOne({ _id: supplierId });
+
+      await sendEmailToSupplier({
+        kind: 'supplier__invitation',
+        supplierId,
+        replacer: text => {
+          return text
+            .replace('{publishDate}', audit.publishDate.toLocaleString())
+            .replace('{closeDate}', audit.closeDate.toLocaleString())
+            .replace('{supplier.name}', supplier.basicInfo.enName);
+        },
+      });
     }
   }
 

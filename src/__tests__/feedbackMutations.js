@@ -61,7 +61,11 @@ describe('Feedback mutations', () => {
   test('Create feedback', async () => {
     const supplier = await companyFactory();
 
-    Feedbacks.createFeedback = jest.fn(() => ({ _id: 'DFAFSFASDF', supplierIds: [supplier._id] }));
+    Feedbacks.createFeedback = jest.fn(() => ({
+      _id: 'DFAFSFASDF',
+      supplierIds: [supplier._id],
+      closeDate: new Date(),
+    }));
 
     const mutation = `
       mutation feedbacksAdd(${commonParams}) {

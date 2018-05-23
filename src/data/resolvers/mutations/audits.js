@@ -28,6 +28,9 @@ const auditMutations = {
 
   // mark response as sent
   async auditsSupplierSendResponse(root, { auditId }, { user }) {
+    const audit = await Audits.findOne({ _id: auditId });
+    const supplier = await Companies.findOne({ _id: user.companyId });
+
     const response = await AuditResponses.findOne({
       auditId: auditId,
       supplierId: user.companyId,
@@ -44,6 +47,12 @@ const auditMutations = {
       kind: 'buyer__submit',
       toEmails: [process.env.MAIN_AUDITOR_EMAIL],
       supplierId: user.companyId,
+      replacer: text => {
+        return text
+          .replace('{publishDate}', audit.publishDate.toLocaleString())
+          .replace('{closeDate}', audit.closeDate.toLocaleString())
+          .replace('{supplier.name}', supplier.basicInfo.enName);
+      },
     });
 
     return updatedResponse;
