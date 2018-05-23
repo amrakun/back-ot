@@ -104,8 +104,16 @@ describe('Audit mutations', () => {
     };
 
     const mutation = `
-      mutation auditsAdd($supplierIds: [String]!, $publishDate: Date!, $closeDate: Date!) {
-        auditsAdd(supplierIds: $supplierIds, publishDate: $publishDate, closeDate: $closeDate) {
+      mutation auditsAdd(
+        $supplierIds: [String]!
+        $publishDate: Date!
+        $closeDate: Date!
+      ) {
+        auditsAdd(
+          supplierIds: $supplierIds
+          publishDate: $publishDate
+          closeDate: $closeDate
+        ) {
           _id
           publishDate
           closeDate

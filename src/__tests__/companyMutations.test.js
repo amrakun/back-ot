@@ -72,10 +72,10 @@ describe('Company mutations', () => {
     expect.assertions(4);
 
     const mutations = [
-      'companiesUndoIsSentPrequalificationInfo',
       'companiesAddDifotScores',
       'companiesAddDueDiligences',
       'companiesValidateProductsInfo',
+      'companiesTogglePrequalificationState',
     ];
 
     const user = await userFactory({ isSupplier: true });
@@ -422,8 +422,7 @@ describe('Company mutations', () => {
 
   test('send prequalification info', async () => {
     const response = await graphqlRequest(
-      `
-        mutation companiesSendPrequalificationInfo {
+      `mutation companiesSendPrequalificationInfo {
           companiesSendPrequalificationInfo {
             _id
             isSentPrequalificationInfo
@@ -440,25 +439,24 @@ describe('Company mutations', () => {
     expect(response.isSentPrequalificationInfo).toBe(true);
   });
 
-  test('undo isSentPrequalificationInfo', async () => {
+  test('enable prequalificationInfo to edit', async () => {
     const supplier = await companyFactory({});
 
     const response = await graphqlRequest(
-      `
-        mutation companiesUndoIsSentPrequalificationInfo($supplierId: String!) {
-          companiesUndoIsSentPrequalificationInfo(supplierId: $supplierId) {
+      `mutation companiesTogglePrequalificationState($supplierId: String!) {
+          companiesTogglePrequalificationState(supplierId: $supplierId) {
             _id
-            isSentPrequalificationInfo
+            isPrequalificationInfoEditable
           }
         }
       `,
-      'companiesUndoIsSentPrequalificationInfo',
+      'companiesTogglePrequalificationState',
       { supplierId: supplier._id },
       {
         user: await userFactory({ companyId: _company._id, isSupplier: false }),
       },
     );
 
-    expect(response.isSentPrequalificationInfo).toBe(false);
+    expect(response.isPrequalificationInfoEditable).toBe(false);
   });
 });

@@ -76,7 +76,7 @@ const groupInfoFields = `
 `;
 
 const certificateInfoFields = `
-  isReceived: Boolean
+  description: String
   file: JSON
 `;
 
@@ -363,8 +363,9 @@ export const types = `
     healthInfo: CompanyHealthInfo
 
     isSentRegistrationInfo: Boolean
-    isSentPrequalificationInfo: Boolean
 
+    isSentPrequalificationInfo: Boolean
+    isPrequalificationInfoEditable: Boolean
     isPrequalified: Boolean
     prequalifiedDate: Date
     prequalifiedStatus: JSON
@@ -445,16 +446,23 @@ export const queries = `
 export const mutations = `
   companiesEditBasicInfo(basicInfo: CompanyBasicInfoInput): Company
   companiesEditContactInfo(contactInfo: CompanyContactInfoInput): Company
-  companiesEditManagementTeamInfo(managementTeamInfo: CompanyManagementTeamInfoInput): Company
+
+  companiesEditManagementTeamInfo(
+    managementTeamInfo: CompanyManagementTeamInfoInput
+  ): Company
+
   companiesEditShareholderInfo(shareholderInfo: CompanyShareholderInfoInput): Company
   companiesEditGroupInfo(groupInfo: CompanyGroupInfoInput): Company
   companiesEditCertificateInfo(certificateInfo: CompanyCertificateInfoInput): Company
   companiesEditProductsInfo(productsInfo: [String]): Company
   companiesEditFinancialInfo(financialInfo: CompanyFinancialInfoInput): Company
   companiesEditBusinessInfo(businessInfo: CompanyBusinessInfoInput): Company
-  companiesEditEnvironmentalInfo(environmentalInfo: CompanyEnvironmentalInfoInput): Company
-  companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
 
+  companiesEditEnvironmentalInfo(
+    environmentalInfo: CompanyEnvironmentalInfoInput
+  ): Company
+
+  companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
   companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
 
@@ -466,8 +474,8 @@ export const mutations = `
     files: [JSON]
   ): Company
 
-
   companiesSendRegistrationInfo: Company
   companiesSendPrequalificationInfo: Company
-  companiesUndoIsSentPrequalificationInfo(supplierId: String!): Company
+
+  companiesTogglePrequalificationState(supplierId: String!): Company
 `;

@@ -126,7 +126,13 @@ class Qualification {
     // update supplier's tier type
     await Companies.update(
       { _id: supplierId },
-      { $set: { isPrequalified: status, prequalifiedDate: new Date() } },
+      {
+        $set: {
+          isPrequalified: status,
+          prequalifiedDate: new Date(),
+          isPrequalificationInfoEditable: false,
+        },
+      },
     );
 
     return Companies.findOne({ _id: supplierId });

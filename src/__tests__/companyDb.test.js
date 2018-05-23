@@ -121,6 +121,25 @@ describe('Companies model tests', () => {
     await checkSection('health');
   });
 
+  test('Prequalication changes disabled', async () => {
+    expect.assertions(4);
+
+    const company = await companyFactory({ isPrequalificationInfoEditable: false });
+
+    const checkException = async name => {
+      try {
+        await Companies.updateSection(company._id, `${name}Info`, companyDocs[name]());
+      } catch (e) {
+        expect(e.message).toBe('Changes disabled');
+      }
+    };
+
+    await checkException('financial');
+    await checkException('business');
+    await checkException('environmental');
+    await checkException('health');
+  });
+
   test('Add difot score', async () => {
     const company = await Companies.findOne({ _id: _company._id });
     const date = new Date();
@@ -226,5 +245,6 @@ describe('Companies model tests', () => {
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(updatedCompany.isSentPrequalificationInfo).toBe(true);
+    expect(updatedCompany.isPrequalificationInfoEditable).toBe(false);
   });
 });

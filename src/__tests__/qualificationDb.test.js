@@ -45,6 +45,7 @@ describe('Qualification db', () => {
     const doc = generateDoc(FinancialInfoSchema);
 
     const savedObject = await Qualifications.updateSection(_company._id, 'financialInfo', doc);
+
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(savedObject.financialInfo.toJSON()).toEqual(doc);
@@ -84,6 +85,7 @@ describe('Qualification db', () => {
 
     expect(updatedCompany.isPrequalified).toBe(false);
     expect(updatedCompany.prequalifiedDate).toBeDefined();
+    expect(updatedCompany.isPrequalificationInfoEditable).toBe(false);
   });
 
   test('Tier type', async () => {

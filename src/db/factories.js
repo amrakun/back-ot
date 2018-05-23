@@ -65,12 +65,13 @@ export const companyFactory = (params = {}) => {
     tierType: params.tierType,
 
     isSentRegistrationInfo: params.isSentRegistrationInfo,
+
     isSentPrequalificationInfo: params.isSentPrequalificationInfo,
-
-    isProductsInfoValidated: params.isProductsInfoValidated,
-
+    isPrequalificationInfoEditable: params.isPrequalificationInfoEditable,
     isPrequalified: params.isPrequalified,
     prequalifiedDate: params.prequalifiedDate,
+
+    isProductsInfoValidated: params.isProductsInfoValidated,
 
     isQualified: params.isQualified,
     qualifiedDate: params.qualifiedDate,
@@ -194,7 +195,7 @@ export const companyDocs = {
   products: () => ['a10', 'c12'],
 
   certificate: () => ({
-    isReceived: true,
+    description: 'description',
     file: { name: 'name', url: 'url' },
   }),
 

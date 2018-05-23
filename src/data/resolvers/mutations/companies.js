@@ -5,10 +5,14 @@ import { sendConfigEmail } from '../../../data/utils';
 const companyMutations = {
   async companiesAddDifotScores(root, { difotScores }) {
     for (let difotScore of difotScores) {
-      let company = await Companies.findOne({ 'basicInfo.enName': difotScore.supplierName });
+      let company = await Companies.findOne({
+        'basicInfo.enName': difotScore.supplierName,
+      });
 
       if (!company) {
-        company = await Companies.findOne({ 'basicInfo.mnName': difotScore.supplierName });
+        company = await Companies.findOne({
+          'basicInfo.mnName': difotScore.supplierName,
+        });
       }
 
       if (company) {
@@ -73,10 +77,8 @@ const companyMutations = {
     return company.sendPrequalificationInfo();
   },
 
-  async companiesUndoIsSentPrequalificationInfo(root, { supplierId }) {
-    await Companies.update({ _id: supplierId }, { $set: { isSentPrequalificationInfo: false } });
-
-    return Companies.findOne({ _id: supplierId });
+  companiesTogglePrequalificationState(root, { supplierId }) {
+    return Companies.togglePrequalificationState(supplierId);
   },
 };
 
@@ -112,6 +114,6 @@ requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
 requireBuyer(companyMutations, 'companiesAddDifotScores');
 requireBuyer(companyMutations, 'companiesAddDueDiligences');
 requireBuyer(companyMutations, 'companiesValidateProductsInfo');
-requireBuyer(companyMutations, 'companiesUndoIsSentPrequalificationInfo');
+requireBuyer(companyMutations, 'companiesTogglePrequalificationState');
 
 export default companyMutations;

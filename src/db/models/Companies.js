@@ -147,7 +147,7 @@ const GroupInfoSchema = mongoose.Schema(
 // capacity building certificate =========
 const CertificateInfoSchema = mongoose.Schema(
   {
-    isReceived: field({ type: Boolean }),
+    description: field({ type: String }),
     file: FileSchema,
   },
   { _id: false },
@@ -431,7 +431,15 @@ const CompanySchema = mongoose.Schema({
   tierType: field({ type: String, optional: true }),
 
   isSentRegistrationInfo: field({ type: Boolean, optional: true, default: false }),
+
   isSentPrequalificationInfo: field({ type: Boolean, optional: true, default: false }),
+  isPrequalificationInfoEditable: field({
+    type: Boolean,
+    optional: true,
+    default: true,
+  }),
+  isPrequalified: field({ type: Boolean, optional: true }),
+  prequalifiedDate: field({ type: Date, optional: true }),
 
   // capacity building certificate information
   certificateInfo: field({ type: CertificateInfoSchema, optional: true }),
@@ -448,9 +456,6 @@ const CompanySchema = mongoose.Schema({
   healthInfo: field({ type: HealthInfoSchema, optional: true }),
 
   isProductsInfoValidated: field({ type: Boolean, optional: true }),
-
-  isPrequalified: field({ type: Boolean, optional: true }),
-  prequalifiedDate: field({ type: Date, optional: true }),
 
   isQualified: field({ type: Boolean, optional: true }),
   qualifiedDate: field({ type: Date, optional: true }),
@@ -556,12 +561,22 @@ class Company {
    * @return Updated company object
    */
   static async updateSection(_id, key, value) {
+    const company = await this.findOne({ _id });
+
     // update
     await this.update({ _id }, { $set: { [key]: value } });
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {
       await this.update({ _id }, { $set: { isProductsInfoValidated: false } });
+    }
+
+    // prevent disabled prequalification info from editing ========
+    const preqTabs = ['financial', 'business', 'environmental', 'health'];
+    const editable = company.isPrequalificationInfoEditable;
+
+    if (preqTabs.includes(key.replace('Info', '')) && !editable) {
+      throw new Error('Changes disabled');
     }
 
     return this.findOne({ _id });
@@ -676,9 +691,31 @@ class Company {
    * Mark as sent prequalification info
    */
   async sendPrequalificationInfo() {
-    await this.update({ isSentPrequalificationInfo: true });
+    await this.update({
+      isSentPrequalificationInfo: true,
+      isPrequalificationInfoEditable: false,
+    });
 
     return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * toggle prequalification info editable state
+   */
+  static async togglePrequalificationState(_id) {
+    const company = await Companies.findOne({ _id });
+
+    const updateQuery = {
+      isPrequalificationInfoEditable: !company.isPrequalificationInfoEditable,
+    };
+
+    if (company.isPrequalified) {
+      updateQuery.isPrequalified = false;
+    }
+
+    await Companies.update({ _id }, { $set: updateQuery });
+
+    return Companies.findOne({ _id });
   }
 }
 
