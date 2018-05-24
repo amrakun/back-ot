@@ -52,7 +52,7 @@ const tenderMutations = {
    * @param {String} content - Mail content
    * @return {[String]} - send supplier ids
    */
-  async tendersSendRegretLetter(root, { _id }) {
+  async tendersSendRegretLetter(root, { _id, subject, content }) {
     const tender = await Tenders.findOne({ _id });
 
     await tender.sendRegretLetter();
@@ -64,13 +64,17 @@ const tenderMutations = {
 
     // send emai to not awarded suppliers
     for (let notAwardedResponse of notAwardedResponses) {
-      const supplier = (await Companies.findOne({ _id: notAwardedResponse.supplierId })) || {};
+      const selector = { _id: notAwardedResponse.supplierId };
+      const supplier = (await Companies.findOne(selector)) || {};
 
       await sendConfigEmail({
         name: `${tender.type}Templates`,
         kind: 'supplier__regretLetter',
         tender,
         toEmails: [supplier.basicInfo.email],
+        replacer: text => {
+          return text.replace('{content}', content).replace('{subject}', subject);
+        },
       });
     }
 

@@ -4,6 +4,7 @@ import { Users, Companies } from '../db/models';
 export const replacer = ({ text, tender }) => {
   let result = text;
 
+  result = result.replace(/{tender.content}/g, tender.content);
   result = result.replace(/{tender.number}/g, tender.number);
   result = result.replace(/{tender.name}/g, tender.name);
   result = result.replace(/{tender.closeDate}/g, tender.closeDate.toLocaleString());
