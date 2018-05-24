@@ -3,7 +3,7 @@ import { Companies, BlockedCompanies, Qualifications, SearchLogs } from '../../.
 import { paginate } from './utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import {
-  companyDetailExport,
+  companyRegistrationExport,
   companiesExport,
   companiesGenerateDifotScoreList,
   companiesGenerateDueDiligenceList,
@@ -221,21 +221,21 @@ const companyQueries = {
   },
 
   /*
-   * Export supplier from buyer
+   * Export supplier's registration info from buyer
    */
-  async companyDetailExport(root, { _id }) {
+  async companyRegistrationExport(root, { _id }) {
     const supplier = await Companies.findOne({ _id });
 
-    return companyDetailExport(supplier);
+    return companyRegistrationExport(supplier);
   },
 
   /*
-   * Export supplier from supplier
+   * Export supplier's registration info from supplier
    */
   async companyDetailSupplierExport(root, args, { user }) {
     const supplier = await Companies.findOne({ _id: user.companyId });
 
-    return companyDetailExport(supplier);
+    return companyRegistrationExport(supplier);
   },
 
   /*
@@ -448,7 +448,7 @@ const companyQueries = {
 
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
-requireBuyer(companyQueries, 'companyDetailExport');
+requireBuyer(companyQueries, 'companyRegistrationExport');
 requireBuyer(companyQueries, 'companiesValidatedProductsInfoExport');
 requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');

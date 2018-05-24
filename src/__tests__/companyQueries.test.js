@@ -121,7 +121,7 @@ describe('Company queries', () => {
     const items = [
       'companies',
       'companiesExport',
-      'companyDetailExport',
+      'companyRegistrationExport',
       'companiesValidatedProductsInfoExport',
       'companiesPrequalifiedStatus',
     ];

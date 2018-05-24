@@ -19,7 +19,7 @@ export const PERMISSION_LIST = [
   'tendersAward',
   'reportsTendersExport',
   'reportsAuditExport',
-  'companyDetailExport',
+  'companyRegistrationExport',
   'usersAdd',
   'usersEdit',
   'usersRemove',
@@ -85,7 +85,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Report',
-    permissions: ['reportsTendersExport', 'reportsAuditExport', 'companyDetailExport'],
+    permissions: ['reportsTendersExport', 'reportsAuditExport', 'companyRegistrationExport'],
   },
   {
     name: 'Settings',

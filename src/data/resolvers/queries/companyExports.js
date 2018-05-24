@@ -4,14 +4,10 @@ import cf from 'cellref';
 import { BlockedCompanies, Qualifications } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
-export const companyDetailExport = async supplier => {
+export const companyRegistrationExport = async supplier => {
   const { workbook } = await readTemplate('company_detail_export');
 
   const sheetA = workbook.sheet(0);
-  const sheetB = workbook.sheet(1);
-  const sheetC = workbook.sheet(2);
-  const sheetD = workbook.sheet(3);
-  const sheetE = workbook.sheet(4);
 
   const basicInfo = supplier.basicInfo || {};
   const contactInfo = supplier.contactInfo || {};
@@ -19,17 +15,13 @@ export const companyDetailExport = async supplier => {
   const shareholderInfo = supplier.shareholderInfo || {};
   const groupInfo = supplier.groupInfo || {};
   const certificateInfo = supplier.certificateInfo || {};
-  const financialInfo = supplier.financialInfo || {};
-  const businessInfo = supplier.businessInfo || {};
-  const environmentalInfo = supplier.environmentalInfo || {};
-  const healthInfo = supplier.healthInfo || {};
 
   let index = 1;
 
   sheetA.column('B').width(40);
   sheetA.column('C').width(40);
 
-  const fillAValue = (title, value, fill) => {
+  const fillValue = (sheet, title, value, fill) => {
     const style = {
       horizontalAlignment: 'left',
       wrapText: true,
@@ -40,19 +32,20 @@ export const companyDetailExport = async supplier => {
       style.fontColor = 'ffffff';
     }
 
-    sheetA
+    sheet
       .cell(index, 2)
       .style(style)
       .value(title);
-    sheetA
+    sheet
       .cell(index, 3)
       .style(style)
       .value(value || '');
+
     index++;
   };
 
-  const fillASection = title => {
-    sheetA
+  const fillSection = (sheet, title) => {
+    sheet
       .range(`${cf(`R${index}C2`)}:${cf(`R${index}C3`)}`)
       .merged(true)
       .style({
@@ -64,6 +57,9 @@ export const companyDetailExport = async supplier => {
       .value(title);
     index++;
   };
+
+  const fillAValue = (...args) => fillValue(sheetA, ...args);
+  const fillASection = title => fillSection(sheetA, title);
 
   fillAValue('Company name (English)', basicInfo.enName, '2496a9');
   fillAValue('Vendor number', basicInfo.sapNumber, '2496a9');
@@ -214,400 +210,6 @@ export const companyDetailExport = async supplier => {
     'Certificate url',
     (certificateInfo && certificateInfo.file && certificateInfo.file.url) || '',
   );
-
-  // Financial Information ==========
-  index = 1;
-  sheetB.cell(index, 2).value('Financial Information');
-
-  index = index + 2;
-  sheetB.cell(index, 2).value('Accounts for last 3 years');
-  sheetB.cell(index, 4).value(financialInfo.canProvideAccountsInfo ? 'yes' : 'no');
-
-  index = index + 2;
-  sheetB.cell(index, 2).value('Reasons');
-  sheetB.cell(index, 4).value(financialInfo.reasonToCannotNotProvide || '');
-
-  index = index + 2;
-  sheetB.cell(index, 2).value('Currency');
-  sheetB.cell(index, 4).value(financialInfo.currency || '');
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Annual Turnover');
-  for (let annualTurnover of financialInfo.annualTurnover || []) {
-    ++index;
-    sheetB.cell(index, 2).value(annualTurnover.year);
-    sheetB.cell(index, 3).value(annualTurnover.amount);
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Annual Turnover');
-  for (let preTaxProfit of financialInfo.preTaxProfit || []) {
-    ++index;
-    sheetB.cell(index, 2).value(preTaxProfit.year);
-    sheetB.cell(index, 3).value(preTaxProfit.amount);
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Total Assets');
-  for (let totalAssets of financialInfo.totalAssets || []) {
-    ++index;
-    sheetB.cell(index, 2).value(totalAssets.year);
-    sheetB.cell(index, 3).value(totalAssets.amount);
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Total Current Assets');
-  for (let totalCurrentAssets of financialInfo.totalCurrentAssets || []) {
-    ++index;
-    sheetB.cell(index, 2).value(totalCurrentAssets.year);
-    sheetB.cell(index, 3).value(totalCurrentAssets.amount);
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Total Short Term Liabilities');
-
-  index = index + 3;
-  sheetB.cell(index, 2).value("Total Shareholder's Equity");
-  for (let totalShareholderEquity of financialInfo.totalShareholderEquity || []) {
-    ++index;
-    sheetB.cell(index, 2).value(totalShareholderEquity.year);
-    sheetB.cell(index, 3).value(totalShareholderEquity.amount);
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Financial Records');
-  for (let record of financialInfo.recordsInfo || []) {
-    ++index;
-    sheetB.cell(index, 2).value(record.date);
-    sheetB.cell(index, 3).value(record.file && record.file.url ? 'yes' : 'no');
-  }
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Up to date with Social Security Payments');
-  sheetB.cell(index, 4).value(financialInfo.isUpToDateSSP ? 'yes' : 'no');
-
-  index = index + 3;
-  sheetB.cell(index, 2).value('Up to date with Corporation Tax Payments');
-  sheetB.cell(index, 4).value(financialInfo.isUpToDateCTP ? 'yes' : 'no');
-
-  // Business info (PQQ-Business Integrity, HR)
-  index = 1;
-  sheetC.cell(index, 2).value('Human Resource Management');
-
-  index += 2;
-  sheetC.cell(index, 2).value('Meets minimum standards of fair employment practice');
-  sheetC
-    .cell(index, 3)
-    .value((businessInfo.organizationChartFile && businessInfo.organizationChartFile.url) || '');
-  sheetC
-    .cell(index, 4)
-    .value(
-      businessInfo.doesMeetMinimumStandartsFile && businessInfo.doesMeetMinimumStandartsFile
-        ? businessInfo.doesMeetMinimumStandartsFile.url
-        : '',
-    );
-
-  index += 2;
-  sheetC.cell(index, 2).value('Has a job description procedure in place');
-  sheetC
-    .cell(index, 3)
-    .value((businessInfo.organizationChartFile && businessInfo.organizationChartFile.url) || '');
-  sheetC
-    .cell(index, 4)
-    .value(
-      businessInfo.doesHaveJobDescriptionFile && businessInfo.doesHaveJobDescriptionFile
-        ? businessInfo.doesHaveJobDescriptionFile.url
-        : '',
-    );
-
-  index += 2;
-  sheetC.cell(index, 2).value('Conclude valid contracts with all employees');
-  sheetC.cell(index, 3).value(businessInfo.doesConcludeValidContracts ? 'yes' : 'no');
-
-  index += 2;
-  sheetC.cell(index, 2).value('Turnover rate within company in the last 12 months');
-  sheetC.cell(index, 3).value(businessInfo.employeeTurnoverRate || 0);
-
-  index += 2;
-  sheetC.cell(index, 2).value('Has liability insurance');
-  sheetC.cell(index, 3).value(businessInfo.doesHaveLiabilityInsurance ? 'yes' : 'no');
-  sheetC
-    .cell(index, 4)
-    .value(
-      businessInfo.doesHaveLiabilityInsuranceFile && businessInfo.doesHaveLiabilityInsuranceFile
-        ? businessInfo.doesHaveLiabilityInsuranceFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetC.cell(index, 2).value('Corporate Business Integrity');
-
-  index++;
-  sheetC.cell(index, 2).value('Does have code ethics');
-  sheetC.cell(index, 3).value(businessInfo.doesHaveCodeEthics ? 'yes' : 'no');
-  sheetC
-    .cell(index, 4)
-    .value(
-      businessInfo.doesHaveCodeEthicsFile && businessInfo.doesHaveCodeEthicsFile
-        ? businessInfo.doesHaveCodeEthicsFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetC
-    .cell(index, 2)
-    .value(
-      'Meets minimum standards of fair employment practice required by Mongolian labor laws and regulations',
-    );
-  sheetC.cell(index, 3).value(businessInfo.doesHaveResponsiblityPolicy ? 'yes' : 'no');
-  sheetC
-    .cell(index, 4)
-    .value(
-      businessInfo.doesHaveResponsiblityPolicyFile && businessInfo.doesHaveResponsiblityPolicyFile
-        ? businessInfo.doesHaveResponsiblityPolicyFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetC.cell(index, 2).value('Has convicted labour laws');
-  sheetC.cell(index, 3).value(businessInfo.hasConvictedLabourLaws ? 'yes' : 'no');
-
-  index += 3;
-  sheetC.cell(index, 2).value('Has convicted for human rights');
-  sheetC.cell(index, 3).value(businessInfo.hasConvictedForHumanRights ? 'yes' : 'no');
-
-  index += 3;
-  sheetC.cell(index, 2).value('Was convicted for business integrity');
-  sheetC.cell(index, 3).value(businessInfo.hasConvictedForBusinessIntegrity ? 'yes' : 'no');
-
-  index += 2;
-  sheetC.cell(index, 2).value('Steps taken');
-  sheetC.cell(index, 3).value(businessInfo.proveHasNotConvicted);
-
-  index += 2;
-  sheetC.cell(index, 2).value('Company or any of its directors been investigated or convicted');
-  sheetC.cell(index, 3).value(businessInfo.hasLeadersConvicted ? 'yes' : 'no');
-
-  index += 3;
-  sheetC
-    .cell(index, 2)
-    .value(
-      'If the answer to the above question = YES then display the following highlit question.',
-    );
-
-  index += 2;
-  sheetC.cell(index, 3).value('Investigation');
-  sheetC.cell(index, 4).value('index Date');
-  sheetC.cell(index, 5).value('Status');
-  sheetC.cell(index, 6).value('Closure Date');
-
-  for (let investigation of businessInfo.investigations || []) {
-    ++index;
-    sheetC.cell(index, 3).value(investigation.name);
-    sheetC.cell(index, 4).value(investigation.date);
-    sheetC.cell(index, 5).value(investigation.status);
-    sheetC.cell(index, 6).value(investigation.statusDate);
-  }
-
-  index += 3;
-  sheetC.cell(index, 2).value('Employ any politically exposed person');
-  sheetC.cell(index, 3).value(businessInfo.doesEmployeePoliticallyExposed ? 'yes' : 'no');
-
-  index += 2;
-  sheetC.cell(index, 2).value('Pep name');
-  sheetC.cell(index, 3).value(businessInfo.dpepName || '');
-
-  // PQQ-Environment
-  index = 1;
-  sheetD.cell(index, 2).value('Environmental Management');
-
-  index += 3;
-  sheetD.cell(index, 2).value('Has plan');
-  sheetD.cell(index, 3).value(environmentalInfo.doesHavePlan ? 'yes' : 'no');
-  sheetD
-    .cell(index, 4)
-    .value(
-      environmentalInfo.doesHavePlanFile && environmentalInfo.doesHavePlanFile
-        ? environmentalInfo.doesHavePlanFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetD.cell(index, 2).value('Has environmental regulator investigated');
-  sheetD
-    .cell(index, 3)
-    .value(environmentalInfo.hasEnvironmentalRegulatorInvestigated ? 'yes' : 'no');
-
-  index += 3;
-  sheetD.cell(index, 2).value('Date of investigation');
-  sheetD.cell(index, 3).value(environmentalInfo.dateOfInvestigation ? 'yes' : 'no');
-
-  index += 3;
-  sheetD.cell(index, 2).value('Reason for investigation');
-  sheetD.cell(index, 3).value(environmentalInfo.reasonForInvestigation);
-
-  index += 3;
-  sheetD.cell(index, 2).value('Action status');
-  sheetD.cell(index, 3).value(environmentalInfo.actionStatus);
-
-  index += 3;
-  sheetD.cell(index, 2).value('Investigation Documentation');
-  sheetD.cell(index, 3).value(environmentalInfo.investigationDocumentation);
-
-  index += 3;
-  sheetD.cell(index, 2).value('Was convicted for environmental laws');
-  sheetD.cell(index, 3).value(environmentalInfo.hasConvictedForEnvironmentalLaws ? 'yes' : 'no');
-
-  index += 3;
-  sheetD.cell(index, 2).value('Steps taken');
-  sheetD.cell(index, 3).value(environmentalInfo.proveHasNotConvicted || '');
-
-  // PQQ-HSE
-  index = 1;
-  sheetE.cell(index, 2).value('Health & Safety Management System');
-
-  index += 3;
-  sheetE.cell(index, 2).value('Has health safety');
-  sheetE.cell(index, 3).value(healthInfo.doesHaveHealthSafety ? 'yes' : 'no');
-  sheetE
-    .cell(index, 4)
-    .value(
-      healthInfo.doesHaveHealthSafetyFile && healthInfo.doesHaveHealthSafetyFile
-        ? healthInfo.doesHaveHealthSafetyFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetE.cell(index, 2).value('HSE resources clearly identified');
-  sheetE.cell(index, 3).value(healthInfo.areHSEResourcesClearlyIdentified ? 'yes' : 'no');
-
-  index += 3;
-  sheetE.cell(index, 2).value('Documented process for health and safety training and induction');
-  sheetE.cell(index, 3).value(healthInfo.doesHaveDocumentedProcessToEnsure ? 'yes' : 'no');
-  sheetE
-    .cell(index, 4)
-    .value(
-      healthInfo.doesHaveDocumentedProcessToEnsureFile &&
-      healthInfo.doesHaveDocumentedProcessToEnsureFile
-        ? healthInfo.doesHaveDocumentedProcessToEnsureFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value('Utilise appropriate Personal Protective Equipment (PPE) at all times');
-  sheetE.cell(index, 3).value(healthInfo.areEmployeesUnderYourControl ? 'yes' : 'no');
-
-  index += 3;
-  sheetE.cell(index, 2).value('Has document for risk assessment');
-  sheetE.cell(index, 3).value(healthInfo.doesHaveDocumentForRiskAssesment ? 'yes' : 'no');
-  sheetE
-    .cell(index, 4)
-    .value(
-      healthInfo.doesHaveDocumentForRiskAssesmentFile &&
-      healthInfo.doesHaveDocumentForRiskAssesmentFile
-        ? healthInfo.doesHaveDocumentForRiskAssesmentFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetE.cell(index, 2).value('Has document for incident investigation');
-  sheetE.cell(index, 3).value(healthInfo.doesHaveDocumentForIncidentInvestigation ? 'yes' : 'no');
-  sheetE
-    .cell(index, 4)
-    .value(
-      healthInfo.doesHaveDocumentForIncidentInvestigationFile &&
-      healthInfo.doesHaveDocumentForIncidentInvestigationFile
-        ? healthInfo.doesHaveDocumentForIncidentInvestigationFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetE.cell(index, 2).value('Has documented Fitness for Work (FFW) policy');
-  sheetE.cell(index, 3).value(healthInfo.doesHaveDocumentedFitness ? 'yes' : 'no');
-  sheetE
-    .cell(index, 4)
-    .value(
-      healthInfo.doesHaveDocumentedFitnessFile && healthInfo.doesHaveDocumentedFitnessFile
-        ? healthInfo.doesHaveDocumentedFitnessFile.url
-        : '',
-    );
-
-  index += 3;
-  sheetE.cell(index, 2).value('Willing to comply with Oyu Tolgoi/RT HSE management system');
-  sheetE.cell(index, 3).value(healthInfo.isWillingToComply ? 'yes' : 'no');
-
-  index += 1;
-  sheetE.cell(index, 2).value('Industrial accident occurence during the last 5 years');
-  sheetE.cell(index, 3).value(healthInfo.hasIndustrialAccident ? 'yes' : 'no');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'Total man hours accrued for the previous five calendar years for all onsite personnel on Contractor managed projects',
-    );
-  sheetE.cell(index, 3).value(healthInfo.tmha || '');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'Lost Time Injury Frequency Rate (LTIFR) as defined for the previous five calendar years',
-    );
-  sheetE.cell(index, 3).value(healthInfo.ltifr || '');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value('Explanation of the fatality or injury event(s) that contributed to the above');
-  sheetE.cell(index, 3).value(healthInfo.injuryExplanation || '');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'Details of how senior management demonstrates its commitment to the Oyu Tolgoi HSE policy and management system',
-    );
-  sheetE.cell(index, 3).value(healthInfo.seniorManagement || '');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'Willing to commit itself, its employees and all Sub-contractors, to implementing and being held to KPIs relating to critical risk management',
-    );
-  sheetE.cell(index, 3).value(healthInfo.isWillingToCommit ? 'yes' : 'no');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'Prepared to compile weekly and monthly safety statistics for the work performed on Site',
-    );
-  sheetE.cell(index, 3).value(healthInfo.isPerparedToCompile ? 'yes' : 'no');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value('Previously worked on World Bank or International Finance Corporation projects');
-  sheetE.cell(index, 3).value(healthInfo.hasWorkedOnWorldBank ? 'yes' : 'no');
-  sheetE.cell(index, 4).value(healthInfo.hasWorkedOnWorldBankDescription || '');
-
-  index += 3;
-  sheetE.cell(index, 2).value('Previously worked on large scale mining construction projects');
-  sheetE.cell(index, 3).value(healthInfo.hasWorkedOnLargeProjects ? 'yes' : 'no');
-  sheetE.cell(index, 4).value(healthInfo.hasWorkedOnLargeProjectsDescription || '');
-
-  index += 3;
-  sheetE
-    .cell(index, 2)
-    .value(
-      'have valid industry certifications and/or licenses if required by the type of services provided',
-    );
-  sheetE.cell(index, 3).value(healthInfo.doesHaveLicense ? 'yes' : 'no');
-  sheetE.cell(index, 4).value(healthInfo.doesHaveLicenseDescription || '');
 
   return generateXlsx(workbook, 'company_detail_export');
 };
