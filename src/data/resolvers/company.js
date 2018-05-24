@@ -2,7 +2,6 @@ import {
   Tenders,
   TenderResponses,
   FeedbackResponses,
-  BlockedCompanies,
   Qualifications,
   Audits,
   AuditResponses,
@@ -115,51 +114,22 @@ export default {
   },
 
   tierTypeDisplay(company) {
-    switch (company.tierType) {
-      case 'tier1':
-        return 'Tier 1';
-
-      case 'tier2':
-        return 'Tier 2';
-
-      case 'tier3':
-        return 'Tier 3';
-
-      case 'national':
-        return 'National';
-
-      default:
-        return 'Umnugovi';
-    }
+    return company.tierTypeDisplay();
   },
 
   prequalificationStatusDisplay(company) {
-    if (typeof company.isPrequalified === 'undefined') {
-      return 'In process';
-    }
-
-    return company.isPrequalified ? 'Pre-qualified' : 'Not-qualified';
+    return company.prequalificationStatusDisplay();
   },
 
   qualificationStatusDisplay(company) {
-    if (typeof company.isQualified === 'undefined') {
-      return 'In process';
-    }
-
-    return company.isQualified ? 'Qualified' : 'Not-qualified';
+    return company.qualificationStatusDisplay();
   },
 
   productsInfoValidationStatusDisplay(company) {
-    if (typeof company.isProductsInfoValidated === 'undefined') {
-      return 'In process';
-    }
-
-    return company.isProductsInfoValidated ? 'Validated' : 'Not-validated';
+    return company.productsInfoValidationStatusDisplay();
   },
 
-  async isBlocked(company) {
-    const isBlocked = await BlockedCompanies.isBlocked(company._id);
-
-    return isBlocked ? 'Blocked' : 'n/a';
+  isBlocked(company) {
+    return company.isBlocked();
   },
 };

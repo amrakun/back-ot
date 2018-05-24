@@ -139,10 +139,9 @@ class Qualification {
   }
 
   /*
-   * Reset supplier's prequalification status using config
-   * @return - Updated supplier
+   * Get prequalification duration, amount config for given supplierId
    */
-  static async resetPrequalification(supplierId) {
+  static async getPrequalificationConfig(supplierId) {
     const config = await Configs.getConfig();
 
     let prequalificationConfig = config.prequalificationDow || {};
@@ -153,7 +152,35 @@ class Qualification {
       prequalificationConfig = specific;
     }
 
-    const { duration, amount } = prequalificationConfig;
+    return prequalificationConfig;
+  }
+
+  /*
+   * Generate expiry date
+   */
+  static async getExpiryDate(supplierId) {
+    const { duration, amount } = await this.getPrequalificationConfig(supplierId);
+
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    // ignore not prequalified suppliers
+    if (!supplier.isPrequalified) {
+      return;
+    }
+
+    const prequalifiedDate = supplier.prequalifiedDate;
+
+    return moment(prequalifiedDate)
+      .add(amount, `${duration}s`)
+      .toDate();
+  }
+
+  /*
+   * Reset supplier's prequalification status using config
+   * @return - Updated supplier
+   */
+  static async resetPrequalification(supplierId) {
+    const { duration, amount } = await this.getPrequalificationConfig(supplierId);
 
     const supplier = await Companies.findOne({ _id: supplierId });
 

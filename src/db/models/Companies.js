@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
-import { Users, Feedbacks } from './';
+import { Users, Feedbacks, BlockedCompanies } from './';
 
 const FileSchema = mongoose.Schema(
   {
@@ -716,6 +716,55 @@ class Company {
     await Companies.update({ _id }, { $set: updateQuery });
 
     return Companies.findOne({ _id });
+  }
+
+  tierTypeDisplay() {
+    switch (this.tierType) {
+      case 'tier1':
+        return 'Tier 1';
+
+      case 'tier2':
+        return 'Tier 2';
+
+      case 'tier3':
+        return 'Tier 3';
+
+      case 'national':
+        return 'National';
+
+      default:
+        return 'Umnugovi';
+    }
+  }
+
+  prequalificationStatusDisplay() {
+    if (typeof this.isPrequalified === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isPrequalified ? 'Pre-qualified' : 'Not-qualified';
+  }
+
+  qualificationStatusDisplay() {
+    if (typeof this.isQualified === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isQualified ? 'Qualified' : 'Not-qualified';
+  }
+
+  productsInfoValidationStatusDisplay() {
+    if (typeof this.isProductsInfoValidated === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isProductsInfoValidated ? 'Validated' : 'Not-validated';
+  }
+
+  async isBlocked() {
+    const isBlocked = await BlockedCompanies.isBlocked(this._id);
+
+    return isBlocked ? 'Blocked' : 'n/a';
   }
 }
 

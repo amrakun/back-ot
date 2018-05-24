@@ -365,7 +365,7 @@ export const companiesGeneratePrequalificationList = async companies => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers_prequalification');
 
-  let rowIndex = 1;
+  let rowIndex = 4;
 
   /*
    * Check per sections' all values are true
@@ -376,6 +376,13 @@ export const companiesGeneratePrequalificationList = async companies => {
     return isPassed ? 'Passed' : 'Failed';
   };
 
+  const fillCell = (rowIndex, colIndex, value) => {
+    sheet
+      .cell(rowIndex, colIndex)
+      .style({ horizontalAlignment: 'left' })
+      .value(value);
+  };
+
   for (let company of companies) {
     const qualification = await Qualifications.findOne({ supplierId: company._id });
 
@@ -383,16 +390,22 @@ export const companiesGeneratePrequalificationList = async companies => {
 
     const basicInfo = company.basicInfo || {};
 
-    const fill = ({ businessInfo, healthInfo, environmentalInfo, financialInfo }) => {
-      sheet.cell(rowIndex, 1).value(basicInfo.enName);
-      sheet.cell(rowIndex, 2).value(businessInfo);
-      sheet.cell(rowIndex, 3).value(healthInfo);
-      sheet.cell(rowIndex, 4).value(environmentalInfo);
-      sheet.cell(rowIndex, 5).value(financialInfo);
+    const fill = async ({ businessInfo, healthInfo, environmentalInfo, financialInfo }) => {
+      const expiryDate = await Qualifications.getExpiryDate(company._id);
+
+      fillCell(rowIndex, 1, basicInfo.enName);
+      fillCell(rowIndex, 2, basicInfo.sapNumber);
+      fillCell(rowIndex, 3, businessInfo);
+      fillCell(rowIndex, 4, healthInfo);
+      fillCell(rowIndex, 5, environmentalInfo);
+      fillCell(rowIndex, 6, financialInfo);
+      fillCell(rowIndex, 7, company.prequalificationStatusDisplay());
+      fillCell(rowIndex, 8, expiryDate ? expiryDate.toLocaleDateString() : '');
+      fillCell(rowIndex, 9, company.tierTypeDisplay());
     };
 
     if (qualification) {
-      fill({
+      await fill({
         businessInfo: isSectionPassed(qualification.businessInfo),
         healthInfo: isSectionPassed(qualification.healthInfo),
         environmentalInfo: isSectionPassed(qualification.environmentalInfo),
@@ -402,7 +415,7 @@ export const companiesGeneratePrequalificationList = async companies => {
       continue;
     }
 
-    fill({
+    await fill({
       businessInfo: 'Outstanding',
       healthInfo: 'Outstanding',
       environmentalInfo: 'Outstanding',
