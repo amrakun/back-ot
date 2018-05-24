@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 
+import cf from 'cellref';
 import { BlockedCompanies, Qualifications } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
@@ -25,375 +26,196 @@ export const companyDetailExport = async supplier => {
 
   let index = 1;
 
-  sheetA.cell(index, 2).value('Section 1. Company Information');
-  index += 2;
-  sheetA.cell(index, 2).value('Company name (English)');
-  sheetA.cell(index, 3).value(basicInfo.enName);
+  sheetA.column('B').width(40);
+  sheetA.column('C').width(40);
 
-  index += 1;
-  sheetA.cell(index, 2).value('Company name (Mongolian)');
-  sheetA.cell(index, 3).value(basicInfo.mnName);
+  const fillAValue = (title, value, fill) => {
+    const style = {
+      horizontalAlignment: 'left',
+      wrapText: true,
+    };
 
-  index += 2;
-  sheetA.cell(index, 2).value('Address');
+    if (fill) {
+      style.fill = fill;
+      style.fontColor = 'ffffff';
+    }
 
-  index += 2;
-  sheetA.cell(index, 2).value('Address Line 1');
-  sheetA.cell(index, 3).value(basicInfo.address || '');
+    sheetA
+      .cell(index, 2)
+      .style(style)
+      .value(title);
+    sheetA
+      .cell(index, 3)
+      .style(style)
+      .value(value || '');
+    index++;
+  };
 
-  index += 1;
-  sheetA.cell(index, 2).value('Address Line 2');
-  sheetA.cell(index, 3).value(basicInfo.address2 || '');
+  const fillASection = title => {
+    sheetA
+      .range(`${cf(`R${index}C2`)}:${cf(`R${index}C3`)}`)
+      .merged(true)
+      .style({
+        horizontalAlignment: 'center',
+        fill: 'f47721',
+        fontColor: 'ffffff',
+        bold: true,
+      })
+      .value(title);
+    index++;
+  };
 
-  index += 1;
-  sheetA.cell(index, 2).value('Address Line 3');
-  sheetA.cell(index, 3).value(basicInfo.address3 || '');
+  fillAValue('Company name (English)', basicInfo.enName, '2496a9');
+  fillAValue('Vendor number', basicInfo.sapNumber, '2496a9');
+  fillAValue('Tier type', supplier.tierType, '2496a9');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Town or city');
-  sheetA.cell(index, 3).value(basicInfo.townOrCity || '');
+  fillASection('Section 1. Company Information');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Province');
-  sheetA.cell(index, 3).value(basicInfo.province || '');
+  fillAValue('Address', '');
+  fillAValue('Address Line 1', basicInfo.address);
+  fillAValue('Address Line 2', basicInfo.address2);
+  fillAValue('Address Line 3', basicInfo.address3);
+  fillAValue('Town or city', basicInfo.townOrCity);
+  fillAValue('Province', basicInfo.province);
+  fillAValue('Zip code', basicInfo.zipCode);
+  fillAValue('Country', basicInfo.country);
+  fillAValue('Registered in country', basicInfo.registeredInCountry);
+  fillAValue('Registered in aimag', basicInfo.registeredInAimag);
+  fillAValue('Registered in sum', basicInfo.registeredInSum);
+  fillAValue('Is Chinese state owned entity', basicInfo.isChinese ? 'yes' : 'no');
+  fillAValue('Is registered sub-contractor', basicInfo.isSubcontractor ? 'yes' : 'no');
+  fillAValue('Closest matching corporate structure', basicInfo.corporateStructure);
+  fillAValue('Company Registration Number', basicInfo.registrationNumber);
+  fillAValue(
+    'Certificate of Registration',
+    basicInfo.certificateOfRegistration ? basicInfo.certificateOfRegistration.url : '',
+  );
+  fillAValue('Company web site', basicInfo.website);
+  fillAValue('Company email address', basicInfo.email);
+  fillAValue('Foreign ownership percentage', basicInfo.foreignOwnershipPercentage);
+  fillAValue('Total number of employees', basicInfo.totalNumberOfEmployees);
+  fillAValue('Total number of mongolian employees', basicInfo.totalNumberOfMongolianEmployees);
+  fillAValue('Total number of Umnugovi employees', basicInfo.totalNumberOfUmnugoviEmployees);
 
-  index += 2;
-  sheetA.cell(index, 2).value('Zip code');
-  sheetA.cell(index, 3).value(basicInfo.zipCode || '');
+  // contact details =====================
+  fillASection('Section 2. Contact Details');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Country');
-  sheetA.cell(index, 3).value(basicInfo.country || '');
+  fillAValue('Name', contactInfo.name);
+  fillAValue('Job title', contactInfo.jobTitle);
+  fillAValue('Address', contactInfo.address);
+  fillAValue('Address 2', contactInfo.address2);
+  fillAValue('Address 3', contactInfo.address3);
+  fillAValue('Phone', contactInfo.phone);
+  fillAValue('Phone 2', contactInfo.phone2);
+  fillAValue('Email address', contactInfo.email);
 
-  index += 3;
-  sheetA.cell(index, 2).value('Registered in country');
-  sheetA.cell(index, 3).value(basicInfo.registeredInCountry || '');
+  // management team =====================
+  fillASection('Section 3. Management Team');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Registered in aimag');
-  sheetA.cell(index, 3).value(basicInfo.registeredInAimag);
+  const renderManagementTeam = (title, value) => {
+    sheetA.cell(index, 2).value(title);
+    index++;
 
-  index += 2;
-  sheetA.cell(index, 2).value('Registered in sum');
-  sheetA.cell(index, 3).value(basicInfo.registeredInSum || '');
+    fillAValue('Name', value.name);
+    fillAValue('Job title', value.jobTitle);
+    fillAValue('Phone', value.phone);
+    fillAValue('Email', value.email);
+  };
 
-  index += 3;
-  sheetA.cell(index, 2).value('Is Chinese state owned entity');
-  sheetA.cell(index, 3).value(basicInfo.isChinese ? 'yes' : 'no');
+  const {
+    managingDirector = {},
+    executiveOfficer = {},
+    salesDirector = {},
+    financialDirector = {},
+  } = managementTeamInfo;
 
-  index += 3;
-  sheetA.cell(index, 2).value('Is registered sub-contractor');
-  sheetA.cell(index, 3).value(basicInfo.isSubcontractor ? 'yes' : 'no');
+  renderManagementTeam('Managing Director', managingDirector);
+  renderManagementTeam('Executive Officer', executiveOfficer);
+  renderManagementTeam('Sales Director', salesDirector);
+  renderManagementTeam('Financial Director', financialDirector);
 
-  index += 3;
-  sheetA.cell(index, 2).value('Closest matching corporate structure');
-  sheetA.cell(index, 3).value(basicInfo.corporateStructure);
+  const renderOtherMember = (title, value) => {
+    sheetA.cell(index, 2).value(title);
+    index++;
 
-  index += 3;
-  sheetA.cell(index, 2).value('Company Registration Number');
-  sheetA.cell(index, 3).value(basicInfo.registrationNumber);
+    fillAValue('Name', value.name);
+    fillAValue('Job title', value.jobTitle);
+    fillAValue('Phone', value.phone);
+    fillAValue('Email', value.email);
+  };
 
-  index += 3;
-  sheetA.cell(index, 2).value('Certificate of Registration');
-  sheetA
-    .cell(index, 3)
-    .value(basicInfo.certificateOfRegistration ? basicInfo.certificateOfRegistration.url : '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Company web site');
-  sheetA.cell(index, 3).value(basicInfo.website || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Company email address');
-  sheetA.cell(index, 3).value(basicInfo.email || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Foreign ownership percentage');
-  sheetA.cell(index, 3).value(basicInfo.foreignOwnershipPercentage || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Total number of employees');
-  sheetA.cell(index, 3).value(basicInfo.totalNumberOfEmployees || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Total number of mongolian employees');
-  sheetA.cell(index, 3).value(basicInfo.totalNumberOfMongolianEmployees || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Total number of Umnugovi employees');
-  sheetA.cell(index, 3).value(basicInfo.totalNumberOfUmnugoviEmployees || '');
-
-  index += 3;
-  sheetA.cell(index, 2).value('Section 2. Contact Details');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Name');
-  sheetA.cell(index, 3).value(contactInfo.name || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Job title');
-  sheetA.cell(index, 3).value(contactInfo.jobTitle || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Address');
-  sheetA.cell(index, 3).value(contactInfo.address || '');
-
-  index++;
-  sheetA.cell(index, 2).value('Address 2');
-  sheetA.cell(index, 3).value(contactInfo.address2 || '');
-
-  index++;
-  sheetA.cell(index, 2).value('Address 3');
-  sheetA.cell(index, 3).value(contactInfo.address3 || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Phone');
-  sheetA.cell(index, 3).value(contactInfo.phone || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Phone 2');
-  sheetA.cell(index, 3).value(contactInfo.phone2 || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Email address');
-  sheetA.cell(index, 3).value(contactInfo.email || '');
-
-  const { managingDirector = {} } = managementTeamInfo;
-
-  index += 3;
-  sheetA.cell(index, 2).value('Section 3. Management Team');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Managing Director');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Name');
-  sheetA.cell(index++, 3).value(managingDirector.name || '');
-
-  sheetA.cell(index, 2).value('Job title');
-  sheetA.cell(index++, 3).value(managingDirector.jobTitle || '');
-
-  sheetA.cell(index, 2).value('Phone');
-  sheetA.cell(index++, 3).value(managingDirector.phone || '');
-
-  sheetA.cell(index, 2).value('Email');
-  sheetA.cell(index++, 3).value(managingDirector.email || '');
-
-  const { executiveOfficer = {} } = managementTeamInfo;
-
-  index += 2;
-  sheetA.cell(index, 2).value('Executive Officer');
-  index += 2;
-
-  sheetA.cell(index, 2).value('Name');
-  sheetA.cell(index++, 3).value(executiveOfficer.name || '');
-
-  sheetA.cell(index, 2).value('Job title');
-  sheetA.cell(index++, 3).value(executiveOfficer.jobTitle || '');
-
-  sheetA.cell(index, 2).value('Phone');
-  sheetA.cell(index++, 3).value(executiveOfficer.phone || '');
-
-  sheetA.cell(index, 2).value('Email');
-  sheetA.cell(index++, 3).value(executiveOfficer.email || '');
-
-  const { salesDirector = {} } = managementTeamInfo;
-
-  index += 2;
-  sheetA.cell(index, 2).value('Sales Director');
-  index += 2;
-
-  sheetA.cell(index, 2).value('Name');
-  sheetA.cell(index++, 3).value(salesDirector.name || '');
-
-  sheetA.cell(index, 2).value('Job title');
-  sheetA.cell(index++, 3).value(salesDirector.jobTitle || '');
-
-  sheetA.cell(index, 2).value('Phone');
-  sheetA.cell(index++, 3).value(salesDirector.phone || '');
-
-  sheetA.cell(index, 2).value('Email');
-  sheetA.cell(index++, 3).value(salesDirector.email || '');
-
-  const { financialDirector = {} } = managementTeamInfo;
-
-  index += 2;
-  sheetA.cell(index, 2).value('Financial Director');
-  index += 2;
-
-  sheetA.cell(index, 2).value('Name');
-  sheetA.cell(index++, 3).value(financialDirector.name || '');
-
-  sheetA.cell(index, 2).value('Job title');
-  sheetA.cell(index++, 3).value(financialDirector.jobTitle || '');
-
-  sheetA.cell(index, 2).value('Phone');
-  sheetA.cell(index++, 3).value(financialDirector.phone || '');
-
-  sheetA.cell(index, 2).value('Email');
-  sheetA.cell(index++, 3).value(financialDirector.email || '');
-
-  const otherMember1 = managementTeamInfo.otherMember1 || null;
+  const otherMember1 = managementTeamInfo.otherMember1;
+  const otherMember2 = managementTeamInfo.otherMember2;
+  const otherMember3 = managementTeamInfo.otherMember3;
 
   if (otherMember1) {
-    index += 2;
-    sheetA.cell(index, 2).value('Other member 1');
-    index += 2;
-
-    sheetA.cell(index, 2).value('Name');
-    sheetA.cell(index++, 3).value(otherMember1.name || '');
-
-    sheetA.cell(index, 2).value('Job title');
-    sheetA.cell(index++, 3).value(otherMember1.jobTitle || '');
-
-    sheetA.cell(index, 2).value('Phone');
-    sheetA.cell(index++, 3).value(otherMember1.phone || '');
-
-    sheetA.cell(index, 2).value('Email');
-    sheetA.cell(index++, 3).value(otherMember1.email || '');
+    renderOtherMember('Other member 1', otherMember1);
   }
-
-  const otherMember2 = managementTeamInfo.otherMember2 || null;
 
   if (otherMember2) {
-    index += 2;
-    sheetA.cell(index, 2).value('Other member 2');
-    index += 2;
-
-    sheetA.cell(index, 2).value('Name');
-    sheetA.cell(index++, 3).value(otherMember2.name || '');
-
-    sheetA.cell(index, 2).value('Job title');
-    sheetA.cell(index++, 3).value(otherMember2.jobTitle || '');
-
-    sheetA.cell(index, 2).value('Phone');
-    sheetA.cell(index++, 3).value(otherMember2.phone || '');
-
-    sheetA.cell(index, 2).value('Email');
-    sheetA.cell(index++, 3).value(otherMember2.email || '');
+    renderOtherMember('Other member 2', otherMember2);
   }
-
-  const { otherMember3 = {} } = managementTeamInfo;
 
   if (otherMember3) {
-    index += 2;
-    sheetA.cell(index, 2).value('Other member 3');
-    index += 2;
-
-    sheetA.cell(index, 2).value('Name');
-    sheetA.cell(index++, 3).value(otherMember3.name || '');
-
-    sheetA.cell(index, 2).value('Job title');
-    sheetA.cell(index++, 3).value(otherMember3.jobTitle || '');
-
-    sheetA.cell(index, 2).value('Phone');
-    sheetA.cell(index++, 3).value(otherMember3.phone || '');
-
-    sheetA.cell(index, 2).value('Email');
-    sheetA.cell(index++, 3).value(otherMember3.email || '');
+    renderOtherMember('Other member 3', otherMember3);
   }
 
-  // company shareholders
-  let shareholders =
-    shareholderInfo.shareholders && shareholderInfo.shareholders.length > 0
-      ? shareholderInfo.shareholders
-      : [];
+  // company shareholders ===============
+  const shareholders = shareholderInfo.shareholders || [];
 
-  index += 3;
-  sheetA.cell(index, 2).value('Section 4. Company Shareholder Information');
-  index += 2;
+  fillASection('Section 4. Company Shareholder Information');
 
   for (let shareholder of shareholders) {
-    sheetA.cell(index, 2).value('Name');
-    sheetA.cell(index++, 3).value(shareholder.name || '');
-
-    sheetA.cell(index, 2).value('Job title');
-    sheetA.cell(index++, 3).value(shareholder.jobTitle || '');
-
-    sheetA.cell(index, 2).value('Share percentage');
-    sheetA.cell(index++, 3).value(shareholder.percentage || 0);
-    index++;
+    fillAValue('Name', shareholder.name);
+    fillAValue('Job title', shareholder.jobTitle);
+    fillAValue('Share percentage', shareholder.percentage || 0);
   }
 
-  // groupInfo
-  index += 3;
-  sheetA.cell(index, 2).value('Section 5. Group Information');
+  // groupInfo ===================
+  fillASection('Section 5. Group Information');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Has a parent company');
-  sheetA.cell(index, 3).value(groupInfo.hasParent ? 'yes' : 'no');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Parent company is existing supplier?');
-  sheetA.cell(index, 3).value(groupInfo.isParentExistingSup ? 'yes' : 'no');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Parent company name');
-  sheetA.cell(index, 3).value(groupInfo.parentName || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Parent company address');
-  sheetA.cell(index, 3).value(groupInfo.parentAddress || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Registration number of parent company');
-  sheetA.cell(index, 3).value(groupInfo.parentRegistrationNumber || '');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Company role');
-  sheetA.cell(index, 3).value(groupInfo.role || '');
+  fillAValue('Has a parent company', groupInfo.hasParent ? 'yes' : 'no');
+  fillAValue('Parent company is existing supplier?', groupInfo.isParentExistingSup ? 'yes' : 'no');
+  fillAValue('Parent company name', groupInfo.parentName);
+  fillAValue('Parent company address', groupInfo.parentAddress);
+  fillAValue('Registration number of parent company', groupInfo.parentRegistrationNumber);
+  fillAValue('Company role', groupInfo.role);
 
   if (groupInfo.role == 'EOM') {
-    index += 2;
     sheetA.cell(index, 2).value('Factory name');
     sheetA.cell(index, 3).value('Town or City');
     sheetA.cell(index, 4).value('Country');
     sheetA.cell(index, 5).value('Associated Product');
+    index++;
 
     for (let factory of groupInfo.factories || []) {
-      ++index;
       sheetA.cell(index, 2).value(factory.name || '');
       sheetA.cell(index, 3).value(factory.townOrCity || '');
       sheetA.cell(index, 4).value(factory.country || '');
       sheetA.cell(index, 5).value(factory.productCodes || '');
+      index++;
     }
   }
 
-  index += 3;
-  sheetA.cell(index, 2).value('Is exclusive distributor?');
-  sheetA.cell(index, 3).value(groupInfo.isExclusiveDistributor ? 'yes' : 'no');
+  fillAValue('Is exclusive distributor?', groupInfo.isExclusiveDistributor ? 'yes' : 'no');
+  fillAValue('Primary manufacturer name', groupInfo.primaryManufacturerName);
+  fillAValue('Country of primary manufacture', groupInfo.countryOfPrimaryManufacturer);
 
-  index += 2;
-  sheetA.cell(index, 2).value('Primary manufacturer name');
-  sheetA.cell(index, 3).value(groupInfo.primaryManufacturerName || '');
+  // Product and Services ==========
+  fillASection('Section 6. Product and Services');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Country of primary manufacture');
-  sheetA.cell(index, 3).value(groupInfo.countryOfPrimaryManufacturer || '');
+  fillAValue('Product/Service code', (supplier.productsInfo || []).join());
 
-  // Product and Services
-  index += 3;
-  sheetA.cell(index, 2).value('Section 6. Product and Services');
+  // Capacity building certificate ===============
+  fillASection('Capacity building certificate');
 
-  index += 2;
-  sheetA.cell(index, 2).value('Product/Service code');
-  sheetA.cell(index, 3).value((groupInfo.productsInfo || []).join());
+  fillAValue('Company received capacity building certificate', certificateInfo.description);
+  fillAValue(
+    'Certificate url',
+    (certificateInfo && certificateInfo.file && certificateInfo.file.url) || '',
+  );
 
-  // Capacity building certificate
-  index += 3;
-  sheetA.cell(index, 2).value('Capacity building certificate');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Company received capacity building certificate');
-  sheetA.cell(index, 3).value(certificateInfo.isReceived ? 'yes' : 'no');
-
-  index += 2;
-  sheetA.cell(index, 2).value('Certificate url');
-  sheetA
-    .cell(index, 3)
-    .value((certificateInfo && certificateInfo.file && certificateInfo.file.url) || '');
-
-  // Financial Information
+  // Financial Information ==========
   index = 1;
   sheetB.cell(index, 2).value('Financial Information');
 
