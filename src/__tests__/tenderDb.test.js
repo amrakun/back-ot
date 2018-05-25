@@ -3,9 +3,9 @@
 
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
-import { Users, Tenders } from '../db/models';
+import { Users, Tenders, TenderResponses } from '../db/models';
 import dbUtils from '../db/models/utils';
-import { userFactory, tenderFactory } from '../db/factories';
+import { userFactory, companyFactory, tenderFactory, tenderResponseFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -103,14 +103,39 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
+    expect.assertions(5);
+
     expect(_tender.winnerIds).toEqual([]);
 
-    const supplierId = 'DFAFDSFDSF';
+    // can not award not responded supplier ===============
+    try {
+      await Tenders.award(_tender._id, ['DFAFDSFDSF']);
+    } catch (e) {
+      expect(e.message).toBe('Invalid supplier');
+    }
 
-    const updatedTender = await Tenders.award(_tender._id, [supplierId]);
+    // can not award not interested supplier ===============
+    const supplier = await companyFactory();
+
+    const response = await tenderResponseFactory({
+      tenderId: _tender._id,
+      supplierId: supplier._id,
+      isNotInterested: true,
+    });
+
+    try {
+      await Tenders.award(_tender._id, [supplier._id]);
+    } catch (e) {
+      expect(e.message).toBe('Invalid supplier');
+    }
+
+    // valid =============
+    await TenderResponses.update({ _id: response._id }, { $set: { isNotInterested: false } });
+
+    const updatedTender = await Tenders.award(_tender._id, [supplier._id]);
 
     expect(updatedTender.status).toBe('awarded');
-    expect(updatedTender.winnerIds).toContain(supplierId);
+    expect(updatedTender.winnerIds).toContain(supplier._id);
   });
 
   test('Publish drafts', async () => {

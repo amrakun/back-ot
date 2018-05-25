@@ -109,6 +109,21 @@ class Tender extends StatusPublishClose {
    * @return {Promise} - Updated tender object
    */
   static async award(_id, supplierIds) {
+    for (const supplierId of supplierIds) {
+      const response = await TenderResponses.findOne({
+        tenderId: _id,
+        supplierId,
+      });
+
+      if (!response) {
+        throw new Error('Invalid supplier');
+      }
+
+      if (response.isNotInterested) {
+        throw new Error('Invalid supplier');
+      }
+    }
+
     await this.update({ _id }, { $set: { status: 'awarded', winnerIds: supplierIds } });
 
     return this.findOne({ _id });

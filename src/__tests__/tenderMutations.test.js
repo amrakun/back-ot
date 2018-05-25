@@ -193,9 +193,14 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const supplierId = 'DFDAFFDSAFSDF';
+    const supplier = await companyFactory({});
 
-    const args = { _id: _tender._id.toString(), supplierIds: [supplierId] };
+    await tenderResponseFactory({
+      tenderId: _tender._id,
+      supplierId: supplier._id,
+    });
+
+    const args = { _id: _tender._id.toString(), supplierIds: [supplier._id] };
 
     const response = await graphqlRequest(mutation, 'tendersAward', args);
 
