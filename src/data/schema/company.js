@@ -425,6 +425,7 @@ export const queries = `
   companyDetail(_id: String!): Company
   companyByUser: Company
   companyRegistrationExport(_id: String!): String
+  companyPrequalificationExport(_id: String!): String
   companyDetailSupplierExport: String
 
   companiesCountByTierType(
