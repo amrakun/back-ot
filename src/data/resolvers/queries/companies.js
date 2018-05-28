@@ -242,10 +242,19 @@ const companyQueries = {
   /*
    * Export supplier's registration info from supplier
    */
-  async companyDetailSupplierExport(root, args, { user }) {
+  async companyRegistrationSupplierExport(root, args, { user }) {
     const supplier = await Companies.findOne({ _id: user.companyId });
 
     return companyRegistration(supplier);
+  },
+
+  /*
+   * Export supplier's prequalification info from supplier
+   */
+  async companyPrequalificationSupplierExport(root, args, { user }) {
+    const supplier = await Companies.findOne({ _id: user.companyId });
+
+    return companyPrequalification(supplier);
   },
 
   /*
@@ -459,6 +468,7 @@ const companyQueries = {
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesExport');
 requireBuyer(companyQueries, 'companyRegistrationExport');
+requireBuyer(companyQueries, 'companyPrequalificationExport');
 requireBuyer(companyQueries, 'companiesValidatedProductsInfoExport');
 requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
@@ -467,6 +477,7 @@ requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
 requireBuyer(companyQueries, 'companiesGeneratePrequalificationList');
 requireBuyer(companyQueries, 'companiesPrequalifiedStatus');
 
-requireSupplier(companyQueries, 'companyDetailSupplierExport');
+requireSupplier(companyQueries, 'companyRegistrationSupplierExport');
+requireSupplier(companyQueries, 'companyPrequalificationSupplierExport');
 
 export default companyQueries;
