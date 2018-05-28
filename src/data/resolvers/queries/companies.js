@@ -3,13 +3,14 @@ import { Companies, BlockedCompanies, Qualifications, SearchLogs } from '../../.
 import { paginate } from './utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import {
-  companyRegistrationExport,
   companiesExport,
   companiesGenerateDifotScoreList,
   companiesGenerateDueDiligenceList,
   companiesValidatedProductsInfoExport,
   companiesGeneratePrequalificationList,
 } from './companyExports';
+
+import { companyRegistration, companyPrequalification } from './exports';
 
 /*
  * Filter companies
@@ -226,7 +227,16 @@ const companyQueries = {
   async companyRegistrationExport(root, { _id }) {
     const supplier = await Companies.findOne({ _id });
 
-    return companyRegistrationExport(supplier);
+    return companyRegistration(supplier);
+  },
+
+  /*
+   * Export supplier's prequalification info from buyer
+   */
+  async companyPrequalificationExport(root, { _id }) {
+    const supplier = await Companies.findOne({ _id });
+
+    return companyPrequalification(supplier);
   },
 
   /*
@@ -235,7 +245,7 @@ const companyQueries = {
   async companyDetailSupplierExport(root, args, { user }) {
     const supplier = await Companies.findOne({ _id: user.companyId });
 
-    return companyRegistrationExport(supplier);
+    return companyRegistration(supplier);
   },
 
   /*
