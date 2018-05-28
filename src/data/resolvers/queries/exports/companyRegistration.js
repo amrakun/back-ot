@@ -207,7 +207,7 @@ const companyRegistration = async supplier => {
     (certificateInfo && certificateInfo.file && certificateInfo.file.url) || '',
   );
 
-  return generateXlsx(workbook, 'company_detail_export');
+  return generateXlsx(workbook, 'company_registration');
 };
 
 export default companyRegistration;
