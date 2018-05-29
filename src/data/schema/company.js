@@ -365,6 +365,7 @@ export const types = `
     isSentRegistrationInfo: Boolean
 
     isSentPrequalificationInfo: Boolean
+    prequalificationSubmittedCount: Float
     isPrequalificationInfoEditable: Boolean
     isPrequalified: Boolean
     prequalifiedDate: Date

@@ -433,6 +433,7 @@ const CompanySchema = mongoose.Schema({
   isSentRegistrationInfo: field({ type: Boolean, optional: true, default: false }),
 
   isSentPrequalificationInfo: field({ type: Boolean, optional: true, default: false }),
+  prequalificationSubmittedCount: field({ type: Number, optional: true }),
   isPrequalificationInfoEditable: field({
     type: Boolean,
     optional: true,
@@ -694,6 +695,7 @@ class Company {
     await this.update({
       isSentPrequalificationInfo: true,
       isPrequalificationInfoEditable: false,
+      prequalificationSubmittedCount: (this.prequalificationSubmittedCount || 0) + 1,
     });
 
     return Companies.findOne({ _id: this._id });
