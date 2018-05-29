@@ -80,6 +80,11 @@ export default {
         result = true;
         break;
       }
+
+      if (response.isSupplierNotified === false) {
+        result = true;
+        break;
+      }
     }
 
     return result;

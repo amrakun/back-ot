@@ -9,21 +9,33 @@ const auditMutations = {
   },
 
   // save basic info
-  auditsSupplierSaveBasicInfo(root, { auditId, basicInfo }, { user }) {
-    return AuditResponses.saveBasicInfo({
-      auditId: auditId,
-      supplierId: user.companyId,
+  async auditsSupplierSaveBasicInfo(root, { auditId, basicInfo }, { user }) {
+    const supplierId = user.companyId;
+
+    const response = await AuditResponses.saveBasicInfo({
+      auditId,
+      supplierId,
       doc: basicInfo,
     });
+
+    await AuditResponses.markAsSupplierNotified({ auditId, supplierId });
+
+    return response;
   },
 
   // save evidence info
-  auditsSupplierSaveEvidenceInfo(root, { auditId, evidenceInfo }, { user }) {
-    return AuditResponses.saveEvidenceInfo({
+  async auditsSupplierSaveEvidenceInfo(root, { auditId, evidenceInfo }, { user }) {
+    const supplierId = user.companyId;
+
+    const response = await AuditResponses.saveEvidenceInfo({
       auditId: auditId,
       supplierId: user.companyId,
       doc: evidenceInfo,
     });
+
+    await AuditResponses.markAsSupplierNotified({ auditId, supplierId });
+
+    return response;
   },
 
   // mark response as sent
@@ -138,16 +150,20 @@ sections.forEach(section => {
 
     const prevEntry = await AuditResponses.findOne({ auditId, supplierId });
 
-    if (prevEntry && !prevEntry.isEditable) {
+    if (prevEntry && prevEntry.isEditable == false) {
       throw new Error('Not editable');
     }
 
-    return AuditResponses.saveReplyRecommentSection({
+    const response = await AuditResponses.saveReplyRecommentSection({
       auditId,
       supplierId,
       name: section,
       doc: args[section],
     });
+
+    await AuditResponses.markAsSupplierNotified({ auditId, supplierId });
+
+    return response;
   };
 
   requireSupplier(auditMutations, supplierName);

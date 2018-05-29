@@ -146,7 +146,7 @@ describe('Audit response db', () => {
   };
 
   test('Basic info', async () => {
-    expect.assertions(2);
+    expect.assertions(3);
 
     const doc = {
       sotri: 'sotri',
@@ -160,6 +160,7 @@ describe('Audit response db', () => {
       doc,
     });
 
+    expect(response.isSupplierNotified).toBe(true);
     expect(response.basicInfo.toJSON()).toEqual(doc);
 
     // check isEditable validation
@@ -486,5 +487,6 @@ describe('Audit response db', () => {
     response = await AuditResponses.findOne({ _id: response._id });
 
     expect(response.isEditable).toBe(true);
+    expect(response.isSupplierNotified).toBe(false);
   });
 });

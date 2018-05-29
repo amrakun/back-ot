@@ -398,6 +398,9 @@ const AuditResponseSchema = mongoose.Schema({
 
   // Buyer saved something on this response
   isBuyerNotified: field({ type: Boolean, optional: true }),
+
+  // Supplier saved something on this response
+  isSupplierNotified: field({ type: Boolean, optional: true }),
 });
 
 class AuditResponse {
@@ -516,7 +519,7 @@ class AuditResponse {
 
     const response = await this.findOne({ auditId, supplierId });
 
-    if (response && !response.isEditable) {
+    if (response && response.isEditable === false) {
       throw new Error('Not editable');
     }
   }
@@ -597,7 +600,13 @@ class AuditResponse {
       return response;
     }
 
-    return this.create({ auditId, isSent: false, supplierId, [name]: doc });
+    return this.create({
+      auditId,
+      isSent: false,
+      isSupplierNotified: true,
+      supplierId,
+      [name]: doc,
+    });
   }
 
   /**
@@ -634,6 +643,18 @@ class AuditResponse {
     const selector = { auditId, supplierId };
 
     await AuditResponses.update(selector, { $set: { isBuyerNotified: true } });
+
+    return AuditResponses.findOne(selector);
+  }
+
+  /**
+   * Mark as supplier notified
+   * @return - Updated response
+   */
+  static async markAsSupplierNotified({ auditId, supplierId }) {
+    const selector = { auditId, supplierId };
+
+    await AuditResponses.update(selector, { $set: { isSupplierNotified: true } });
 
     return AuditResponses.findOne(selector);
   }
@@ -760,7 +781,10 @@ class AuditResponse {
     const deadline = moment(sentDate).add(amount, `${duration}s`);
 
     if (moment(deadline).diff(now, 'days') === 14) {
-      return this.update({ _id: responseId }, { $set: { isEditable: true } });
+      return this.update(
+        { _id: responseId },
+        { $set: { isEditable: true, isSupplierNotified: false } },
+      );
     }
 
     return 'dueDateIsNotHere';
