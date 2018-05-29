@@ -19,6 +19,7 @@ const responsesFilter = async args => {
 
   const query = {
     $and: [await supplierFilter({}, supplierSearch)],
+    isSent: true,
   };
 
   // qualified
@@ -168,7 +169,7 @@ const auditQueries = {
 
       invited += supplierIds.length;
 
-      const responses = await AuditResponses.find({ auditId: audit._id });
+      const responses = await AuditResponses.find({ isSent: true, auditId: audit._id });
 
       notResponded += supplierIds.length - responses.length;
 

@@ -52,7 +52,7 @@ describe('Companies model tests', () => {
 
     const updatedUser = await Users.findOne({ _id: user._id });
 
-    expect(updatedUser.companyId).toEqual(company._id);
+    expect(updatedUser.companyId).toBe(company._id.toString());
   });
 
   test('Update basic info: validations', async () => {

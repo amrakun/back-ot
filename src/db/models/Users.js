@@ -11,7 +11,7 @@ const SALT_WORK_FACTOR = 10;
 
 // User schema
 const UserSchema = mongoose.Schema({
-  companyId: field({ type: mongoose.Schema.Types.ObjectId, optional: true }),
+  companyId: field({ type: String, optional: true }),
 
   username: field({ type: String }),
   password: field({ type: String, optional: true }),

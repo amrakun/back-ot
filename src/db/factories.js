@@ -615,6 +615,7 @@ export const auditResponseFactory = async (params = {}) => {
     auditId: params.auditId,
     supplierId: params.supplierId,
     isSent: params.isSent || false,
+    isEditable: params.isEditable || false,
     isQualified: params.isQualified || false,
     isBuyerNotified: params.isBuyerNotified || false,
 
@@ -784,6 +785,8 @@ export const configFactory = (params = {}) => {
     specificPrequalificationDow: params.specificPrequalificationDow,
     auditDow: params.auditDow,
     specificAuditDow: params.specificAuditDow,
+    improvementPlanDow: params.improvementPlanDow,
+    specificImprovementPlanDow: params.specificImprovementPlanDow,
     rfqTemplates: {
       buyer__award: commonTemplate,
       supplier__award: commonTemplate,

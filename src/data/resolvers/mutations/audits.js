@@ -132,10 +132,19 @@ sections.forEach(section => {
   // supplier mutation ===========
   const supplierName = `auditsSupplierSave${capsedName}`;
 
-  auditMutations[supplierName] = (root, args, { user }) => {
+  auditMutations[supplierName] = async (root, args, { user }) => {
+    const auditId = args.auditId;
+    const supplierId = user.companyId;
+
+    const prevEntry = await AuditResponses.findOne({ auditId, supplierId });
+
+    if (prevEntry && !prevEntry.isEditable) {
+      throw new Error('Not editable');
+    }
+
     return AuditResponses.saveReplyRecommentSection({
-      auditId: args.auditId,
-      supplierId: user.companyId,
+      auditId,
+      supplierId,
       name: section,
       doc: args[section],
     });

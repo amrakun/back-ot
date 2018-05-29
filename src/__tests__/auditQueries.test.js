@@ -328,11 +328,11 @@ describe('Company queries', () => {
   const doResponsesQuery = args => graphqlRequest(auditResponsesQuery, 'auditResponses', args);
 
   test('audit responses: qualified, new, sent improvement plan', async () => {
-    await auditResponseFactory({});
-    await auditResponseFactory({});
+    await auditResponseFactory({ isSent: true });
+    await auditResponseFactory({ isSent: true });
 
     // qualified ==========
-    const qualified = await auditResponseFactory({ isQualified: true });
+    const qualified = await auditResponseFactory({ isSent: true, isQualified: true });
 
     let response = await doResponsesQuery({ isQualified: true });
 
@@ -343,7 +343,10 @@ describe('Company queries', () => {
     expect(firstItem._id).toBe(qualified._id.toString());
 
     // sent improvement plan ==========
-    const sip = await auditResponseFactory({ improvementPlanSentDate: new Date() });
+    const sip = await auditResponseFactory({
+      isSent: true,
+      improvementPlanSentDate: new Date(),
+    });
 
     response = await doResponsesQuery({ isSentImprovementPlan: true });
 
@@ -354,7 +357,7 @@ describe('Company queries', () => {
     expect(firstItem._id).toBe(sip._id.toString());
 
     // isNew ==========
-    await auditResponseFactory({ isBuyerNotified: true });
+    await auditResponseFactory({ isSent: true, isBuyerNotified: true });
 
     response = await doResponsesQuery({ isNew: true });
 
@@ -374,6 +377,7 @@ describe('Company queries', () => {
     });
 
     await auditResponseFactory({
+      isSent: true,
       auditId: audit1._id,
       reportFile: '/path',
       status: 'late',
@@ -386,6 +390,7 @@ describe('Company queries', () => {
     });
 
     await auditResponseFactory({
+      isSent: true,
       supplierId: supplier._id,
       auditId: audit2._id,
       status: 'onTime',
@@ -441,12 +446,35 @@ describe('Company queries', () => {
     const audit1 = await auditFactory({ supplierIds: [sup1._id, sup2._id] });
     const audit2 = await auditFactory({ supplierIds: [sup3._id, sup4._id] });
 
-    await auditResponseFactory({ auditId: audit1._id, supplierId: sup1._id });
-    await auditResponseFactory({ auditId: audit2._id, supplierId: sup4._id });
+    await auditResponseFactory({
+      auditId: audit1._id,
+      supplierId: sup1._id,
+      isSent: true,
+    });
 
-    await auditResponseFactory({ isQualified: true, isBuyerNotified: true });
-    await auditResponseFactory({ isQualified: true, isBuyerNotified: true });
-    await auditResponseFactory({ improvementPlanSentDate: new Date(), isBuyerNotified: true });
+    await auditResponseFactory({
+      auditId: audit2._id,
+      supplierId: sup4._id,
+      isSent: true,
+    });
+
+    await auditResponseFactory({
+      isQualified: true,
+      isBuyerNotified: true,
+      isSent: true,
+    });
+
+    await auditResponseFactory({
+      isQualified: true,
+      isBuyerNotified: true,
+      isSent: true,
+    });
+
+    await auditResponseFactory({
+      improvementPlanSentDate: new Date(),
+      isBuyerNotified: true,
+      isSent: true,
+    });
 
     const response = await graphqlRequest(query, 'auditResponseTotalCounts', {});
 
@@ -469,20 +497,20 @@ describe('Company queries', () => {
 
     // core hseq info ===========
     const coreHseqInfo = auditResponseDocs.coreHseqInfo(false, true);
-    await auditResponseFactory({});
-    await auditResponseFactory({ coreHseqInfo });
-    await auditResponseFactory({ coreHseqInfo });
-    await auditResponseFactory({ coreHseqInfo });
+    await auditResponseFactory({ isSent: true });
+    await auditResponseFactory({ isSent: true, coreHseqInfo });
+    await auditResponseFactory({ isSent: true, coreHseqInfo });
+    await auditResponseFactory({ isSent: true, coreHseqInfo });
 
     // business info ===========
     const businessInfo = auditResponseDocs.businessInfo(false, true);
-    await auditResponseFactory({ businessInfo });
-    await auditResponseFactory({ businessInfo });
+    await auditResponseFactory({ isSent: true, businessInfo });
+    await auditResponseFactory({ isSent: true, businessInfo });
 
     // hr info ===========
     const hrInfo = auditResponseDocs.hrInfo(false, true);
-    await auditResponseFactory({ hrInfo });
-    await auditResponseFactory({ hrInfo });
+    await auditResponseFactory({ isSent: true, hrInfo });
+    await auditResponseFactory({ isSent: true, hrInfo });
 
     const response = await graphqlRequest(qry, 'auditResponsesQualifiedStatus', {});
 

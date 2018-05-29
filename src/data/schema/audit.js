@@ -202,6 +202,8 @@ export const types = `
     evidenceInfo: AuditEvidenceInfo
 
     isSent: Boolean
+    submittedCount: Float
+    isEditable: Boolean
     isBuyerNotified: Boolean
 
     isQualified: Boolean

@@ -1,5 +1,5 @@
 import schedule from 'node-schedule';
-import { Companies, Audits } from '../db/models';
+import { Companies, Audits, AuditResponses } from '../db/models';
 import { sendEmailToSupplier } from '../data/auditUtils';
 
 // every 1 minute
@@ -28,4 +28,16 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   await Audits.closeOpens();
 
   console.log('Checked audit status'); // eslint-disable-line
+});
+
+// every day at 23 45
+schedule.scheduleJob('* 45 23 * *', async () => {
+  // check improvement date due date
+  const responses = await AuditResponses.find({ isQualified: { $ne: true } });
+
+  for (const response of responses) {
+    await AuditResponses.notifyImprovementPlan(response._id);
+  }
+
+  console.log('Checked improvement plan notification'); // eslint-disable-line
 });

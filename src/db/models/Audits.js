@@ -390,6 +390,9 @@ const AuditResponseSchema = mongoose.Schema({
 
   isSent: field({ type: Boolean, optional: true }),
   sentDate: field({ type: Date, optional: true }),
+  submittedCount: field({ type: Number, optional: true }),
+
+  isEditable: field({ type: Boolean, optional: true }),
 
   isQualified: field({ type: Boolean, optional: true }),
 
@@ -508,22 +511,36 @@ class AuditResponse {
     });
   }
 
+  static async checkEditable(args) {
+    const { auditId, supplierId } = args;
+
+    const response = await this.findOne({ auditId, supplierId });
+
+    if (response && !response.isEditable) {
+      throw new Error('Not editable');
+    }
+  }
+
   /*
    * Save basic info
    */
-  static saveBasicInfo(args) {
-    return this.saveSection({ ...args, name: 'basicInfo' }, ({ doc, selector }) => {
-      this.update(selector, { $set: { basicInfo: doc } });
-    });
+  static async saveBasicInfo(args) {
+    await this.checkEditable(args);
+
+    return this.saveSection({ ...args, name: 'basicInfo' }, ({ doc, selector }) =>
+      this.update(selector, { $set: { basicInfo: doc } }),
+    );
   }
 
   /*
    * Save evidence info
    */
-  static saveEvidenceInfo(args) {
-    return this.saveSection({ ...args, name: 'evidenceInfo' }, ({ doc, selector }) => {
-      this.update(selector, { $set: { evidenceInfo: doc } });
-    });
+  static async saveEvidenceInfo(args) {
+    await this.checkEditable(args);
+
+    return this.saveSection({ ...args, name: 'evidenceInfo' }, ({ doc, selector }) =>
+      this.update(selector, { $set: { evidenceInfo: doc } }),
+    );
   }
 
   /*
@@ -588,10 +605,6 @@ class AuditResponse {
    * @return - Updated response object
    */
   async send() {
-    if (this.isSent) {
-      throw new Error('Already sent');
-    }
-
     let status = 'onTime';
 
     const audit = await Audits.findOne({ _id: this.auditId });
@@ -601,7 +614,14 @@ class AuditResponse {
       status = 'late';
     }
 
-    await this.update({ isSent: true, sentDate: new Date(), status });
+    await this.update({
+      isSent: true,
+      isBuyerNotified: false,
+      sentDate: new Date(),
+      submittedCount: (this.submittedCount || 0) + 1,
+      status,
+      isEditable: false,
+    });
 
     return AuditResponses.findOne({ _id: this._id });
   }
@@ -693,6 +713,54 @@ class AuditResponse {
       );
 
       return Companies.findOne({ _id: supplierId });
+    }
+
+    return 'dueDateIsNotHere';
+  }
+
+  /*
+   * Get improvement plan duration, amount config for given supplierId
+   */
+  static async getImprovementPlanConfig(supplierId) {
+    const config = await Configs.getConfig();
+
+    let improvementPlanConfig = config.improvementPlanDow || {};
+
+    const specific = config.specificImprovementPlanDow || {};
+
+    if (specific && specific.supplierIds && specific.supplierIds.includes(supplierId)) {
+      improvementPlanConfig = specific;
+    }
+
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    return improvementPlanConfig[supplier.tierType];
+  }
+
+  /*
+   * Notify supplier about improvement plan config and make response editable
+   */
+  static async notifyImprovementPlan(responseId) {
+    const response = await this.findOne({ _id: responseId });
+    const supplier = await Companies.findOne({ _id: response.supplierId });
+    const config = await this.getImprovementPlanConfig(response.supplierId);
+
+    if (supplier.isQualified) {
+      return 'qualified';
+    }
+
+    if (!config) {
+      return 'notConfigured';
+    }
+
+    const { duration, amount } = config;
+
+    const now = new Date();
+    const sentDate = response.improvementPlanSentDate;
+    const deadline = moment(sentDate).add(amount, `${duration}s`);
+
+    if (moment(deadline).diff(now, 'days') === 14) {
+      return this.update({ _id: responseId }, { $set: { isEditable: true } });
     }
 
     return 'dueDateIsNotHere';

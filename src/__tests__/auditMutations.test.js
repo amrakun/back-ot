@@ -136,8 +136,6 @@ describe('Audit mutations', () => {
   });
 
   test('Save basic info', async () => {
-    AuditResponses.saveBasicInfo = jest.fn(() => ({ _id: 'DFAFDA' }));
-
     const args = {
       supplierId: _company._id,
       auditId: _audit._id,
@@ -163,15 +161,11 @@ describe('Audit mutations', () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'auditsSaveBasicInfo', args, { user: _user });
-
-    expect(AuditResponses.saveBasicInfo.mock.calls.length).toBe(1);
-
-    expect(AuditResponses.saveBasicInfo).toBeCalledWith({
-      supplierId: args.supplierId,
-      auditId: args.auditId,
-      doc: args.basicInfo,
+    const response = await graphqlRequest(mutation, 'auditsSupplierSaveBasicInfo', args, {
+      user: _user,
     });
+
+    expect(response._id).toBeDefined();
   });
 
   test('Save evidence info', async () => {

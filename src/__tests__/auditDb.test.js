@@ -30,6 +30,7 @@ describe('Audit response db', () => {
 
   afterEach(async () => {
     // Clearing test data
+    await Configs.remove({});
     await Audits.remove({});
     await AuditResponses.remove({});
     await Companies.remove({});
@@ -145,19 +146,34 @@ describe('Audit response db', () => {
   };
 
   test('Basic info', async () => {
+    expect.assertions(2);
+
     const doc = {
       sotri: 'sotri',
       sotie: 'sotie',
       otExperience: 'otExperience',
     };
 
-    const updatedResponse = await AuditResponses.saveBasicInfo({
+    const response = await AuditResponses.saveBasicInfo({
       auditId: _audit._id,
       supplierId: _company._id,
       doc,
     });
 
-    expect(updatedResponse.basicInfo.toJSON()).toEqual(doc);
+    expect(response.basicInfo.toJSON()).toEqual(doc);
+
+    // check isEditable validation
+    await AuditResponses.update({ _id: response._id }, { $set: { isEditable: false } });
+
+    try {
+      await AuditResponses.saveBasicInfo({
+        auditId: _audit._id,
+        supplierId: _company._id,
+        doc,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Not editable');
+    }
   });
 
   test('Core HSEQ info', async () => {
@@ -177,15 +193,30 @@ describe('Audit response db', () => {
   });
 
   test('Evidence info', async () => {
+    expect.assertions(2);
+
     const doc = auditResponseDocs.evidenceInfo();
 
-    const updatedResponse = await AuditResponses.saveEvidenceInfo({
+    const response = await AuditResponses.saveEvidenceInfo({
       auditId: _audit._id,
       supplierId: _company._id,
       doc,
     });
 
-    expect(updatedResponse.evidenceInfo.toJSON()).toEqual(doc);
+    expect(response.evidenceInfo.toJSON()).toEqual(doc);
+
+    // check isEditable validation
+    await AuditResponses.update({ _id: response._id }, { $set: { isEditable: false } });
+
+    try {
+      await AuditResponses.saveEvidenceInfo({
+        auditId: _audit._id,
+        supplierId: _company._id,
+        doc,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Not editable');
+    }
   });
 
   test('Publish drafts', async () => {
@@ -221,7 +252,7 @@ describe('Audit response db', () => {
   });
 
   test('Send', async () => {
-    expect.assertions(5);
+    expect.assertions(7);
 
     const audit = await auditFactory({ status: 'open' });
 
@@ -238,15 +269,11 @@ describe('Audit response db', () => {
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
     expect(auditResponse.isSent).toBe(true);
+    expect(auditResponse.isBuyerNotified).toBe(false);
+    expect(auditResponse.isEditable).toBe(false);
     expect(auditResponse.sentDate).toBeDefined();
+    expect(auditResponse.submittedCount).toBe(1);
     expect(auditResponse.status).toBe('onTime');
-
-    // try to resend
-    try {
-      await auditResponse.send();
-    } catch (e) {
-      expect(e.message).toBe('Already sent');
-    }
   });
 
   test('Send: late', async () => {
@@ -392,7 +419,6 @@ describe('Audit response db', () => {
   });
 
   test('reset qualification status: specific', async () => {
-    // ignore not qualified suppliers ============
     const supplier = await companyFactory({
       isQualified: true,
       qualifiedDate: moment().subtract(3, 'years'),
@@ -409,5 +435,56 @@ describe('Audit response db', () => {
     const response = await AuditResponses.resetQualification(supplier._id);
 
     expect(response.isQualified).toBe(false);
+  });
+
+  test('notify improvement plan', async () => {
+    await Configs.remove({});
+
+    // not configured ================
+    const supplier = await companyFactory({ tierType: 'national' });
+
+    let response = await auditResponseFactory({
+      supplierId: supplier._id,
+      improvementPlanSentDate: moment().subtract(4, 'days'),
+      isEditable: false,
+    });
+
+    const result = await AuditResponses.notifyImprovementPlan(response._id);
+
+    expect(result).toBe('notConfigured');
+
+    // configfured && 14 days is not reached ========================
+    await Configs.update(
+      {},
+      {
+        $set: {
+          specificImprovementPlanDow: {
+            supplierIds: [supplier._id],
+            national: {
+              duration: 'day',
+              amount: 20,
+            },
+          },
+        },
+      },
+    );
+
+    await AuditResponses.notifyImprovementPlan(response._id);
+
+    response = await AuditResponses.findOne({ _id: response._id });
+
+    expect(response.isEditable).toBe(false);
+
+    // 14 days is reached ========================
+    await AuditResponses.update(
+      { _id: response._id },
+      { $set: { improvementPlanSentDate: moment().subtract(5, 'days') } },
+    );
+
+    await AuditResponses.notifyImprovementPlan(response._id);
+
+    response = await AuditResponses.findOne({ _id: response._id });
+
+    expect(response.isEditable).toBe(true);
   });
 });
