@@ -43,7 +43,10 @@ export default {
   },
 
   async openTendersCount(company) {
-    const responses = await TenderResponses.find({ supplierId: company._id });
+    const responses = await TenderResponses.find({
+      supplierId: company._id,
+    });
+
     const submittedTenderIds = responses.map(r => r.tenderId);
 
     const openTenders = await Tenders.find({
@@ -62,6 +65,31 @@ export default {
     });
   },
 
+  async auditImprovementPlanNotification(company) {
+    const openAudits = await Audits.find({
+      supplierIds: { $in: [company._id] },
+      status: 'open',
+    });
+
+    let result;
+
+    for (const audit of openAudits) {
+      const response = await AuditResponses.findOne({
+        auditId: audit._id,
+        supplierId: company._id,
+        isQualified: false,
+        isSupplierNotified: false,
+      });
+
+      if (response) {
+        result = response;
+        break;
+      }
+    }
+
+    return result;
+  },
+
   async hasNewAudit(company) {
     const openAudits = await Audits.find({
       supplierIds: { $in: [company._id] },
@@ -77,11 +105,6 @@ export default {
       });
 
       if (!response) {
-        result = true;
-        break;
-      }
-
-      if (response.isSupplierNotified === false) {
         result = true;
         break;
       }
@@ -109,8 +132,11 @@ export default {
     }
 
     stats.financialInfo = Qualifications.isSectionPassed(qualif.financialInfo);
+
     stats.businessInfo = Qualifications.isSectionPassed(qualif.businessInfo);
+
     stats.environmentalInfo = Qualifications.isSectionPassed(qualif.environmentalInfo);
+
     stats.healthInfo = Qualifications.isSectionPassed(qualif.healthInfo);
 
     const status = await Qualifications.status(company._id);
