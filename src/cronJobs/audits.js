@@ -1,6 +1,6 @@
 import schedule from 'node-schedule';
 import { Companies, Audits, AuditResponses } from '../db/models';
-import { sendEmailToSupplier } from '../data/auditUtils';
+import { sendEmail } from '../data/auditUtils';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
@@ -12,15 +12,11 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     for (const supplierId of audit.supplierIds) {
       const supplier = await Companies.findOne({ _id: supplierId });
 
-      await sendEmailToSupplier({
+      await sendEmail({
         kind: 'supplier__invitation',
-        supplierId,
-        replacer: text => {
-          return text
-            .replace('{publishDate}', audit.publishDate.toLocaleString())
-            .replace('{closeDate}', audit.closeDate.toLocaleString())
-            .replace('{supplier.name}', supplier.basicInfo.enName);
-        },
+        toEmails: [supplier.basicInfo.email],
+        audit,
+        supplier,
       });
     }
   }

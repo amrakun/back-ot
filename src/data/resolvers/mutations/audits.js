@@ -58,13 +58,8 @@ const auditMutations = {
     sendEmail({
       kind: 'buyer__submit',
       toEmails: [process.env.MAIN_AUDITOR_EMAIL],
-      supplierId: user.companyId,
-      replacer: text => {
-        return text
-          .replace('{publishDate}', audit.publishDate.toLocaleString())
-          .replace('{closeDate}', audit.closeDate.toLocaleString())
-          .replace('{supplier.name}', supplier.basicInfo.enName);
-      },
+      supplier,
+      audit,
     });
 
     return updatedResponse;
@@ -96,7 +91,8 @@ const auditMutations = {
   async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }) {
     for (const responseId of responseIds) {
       const response = await AuditResponses.findOne({ _id: responseId });
-      const company = await Companies.findOne({ _id: response.supplierId });
+      const audit = await Audits.findOne({ _id: response.auditId });
+      const supplier = await Companies.findOne({ _id: response.supplierId });
 
       // collection attachments =========
       const attachments = [];
@@ -126,7 +122,13 @@ const auditMutations = {
         }
       }
 
-      await sendEmail({ kind, toEmails: [company.basicInfo.email], attachments });
+      await sendEmail({
+        kind,
+        toEmails: [supplier.basicInfo.email],
+        attachments,
+        audit,
+        supplier,
+      });
 
       // save dates
       await response.sendFiles({ improvementPlan, report });

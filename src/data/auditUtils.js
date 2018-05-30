@@ -1,31 +1,16 @@
-import { Companies } from '../db/models';
 import { sendConfigEmail } from './utils';
 
-export const sendEmail = async ({ kind, toEmails, supplierId, attachments }) => {
-  const supplier = await Companies.findOne({ _id: supplierId });
-
+export const sendEmail = async ({ kind, toEmails, supplier, audit, attachments }) => {
   return sendConfigEmail({
     name: 'desktopAuditTemplates',
     kind,
     toEmails,
     attachments,
     replacer: text => {
-      if (supplier) {
-        return text.replace('{supplier.name}', supplier.basicInfo.enName);
-      }
-
-      return text;
+      return text
+        .replace('{publishDate}', audit.publishDate.toLocaleString())
+        .replace('{closeDate}', audit.closeDate.toLocaleString())
+        .replace('{supplier.name}', supplier.basicInfo.enName);
     },
-  });
-};
-
-export const sendEmailToSupplier = async ({ kind, supplierId, attachments }) => {
-  const supplier = await Companies.findOne({ _id: supplierId });
-
-  return sendEmail({
-    kind,
-    toEmails: [supplier.basicInfo.email],
-    attachments,
-    supplierId,
   });
 };
