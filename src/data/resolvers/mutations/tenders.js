@@ -1,5 +1,11 @@
 import { Tenders, TenderResponses, Companies } from '../../../db/models';
-import { sendConfigEmail, sendEmail } from '../../../data/tenderUtils';
+import {
+  sendConfigEmail,
+  sendEmailToBuyer,
+  sendEmailToSuppliers,
+  sendEmail,
+} from '../../../data/tenderUtils';
+
 import { moduleRequireBuyer } from '../../permissions';
 
 const tenderMutations = {
@@ -40,7 +46,8 @@ const tenderMutations = {
   async tendersAward(root, { _id, supplierIds }) {
     const tender = await Tenders.award(_id, supplierIds);
 
-    await sendEmail({ kind: 'award', tender });
+    await sendEmailToBuyer({ kind: 'buyer__award', tender });
+    await sendEmailToSuppliers({ kind: 'supplier__award', tender, supplierIds });
 
     return tender;
   },

@@ -14,8 +14,10 @@ export const replacer = ({ text, tender }) => {
   return result;
 };
 
-export const sendEmailToSuppliers = async ({ kind, tender }) => {
-  const suppliers = await Companies.find({ _id: { $in: tender.supplierIds } });
+export const sendEmailToSuppliers = async ({ kind, tender, supplierIds }) => {
+  const filterIds = supplierIds || tender.supplierIds;
+
+  const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
   for (const supplier of suppliers) {
     await utils.sendConfigEmail({
@@ -29,7 +31,7 @@ export const sendEmailToSuppliers = async ({ kind, tender }) => {
   }
 };
 
-export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails }) => {
+export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) => {
   const createdUser = await Users.findOne({ _id: tender.createdUserId });
 
   return utils.sendConfigEmail({
