@@ -389,7 +389,7 @@ export const types = `
     prequalificationStatusDisplay: String
     qualificationStatusDisplay: String
     productsInfoValidationStatusDisplay: String
-    isBlocked: Boolean
+    isBlocked: String
     openTendersCount: Int
 
     hasNewAudit: Boolean
