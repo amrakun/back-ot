@@ -37,10 +37,10 @@ const auditResponseQueries = {
     fillMainInfoCell(basicInfo.enName);
 
     // Audit date
-    fillMainInfoCell(auditDate.toLocaleString());
+    fillMainInfoCell(auditDate.toLocaleDateString());
 
     // Planned review date
-    fillMainInfoCell(reassessmentDate.toLocaleString());
+    fillMainInfoCell(reassessmentDate.toLocaleDateString());
 
     // QUALIFICATION AUDITOR(S) NAME(S)
     fillMainInfoCell(auditorName);
