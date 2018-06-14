@@ -122,7 +122,7 @@ export default {
       environmentalInfo: false,
       healthInfo: false,
       isApproved: false,
-      isOutstanding: false,
+      isOutstanding: true,
       isFailed: false,
       isExpired: false,
     };
