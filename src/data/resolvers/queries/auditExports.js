@@ -240,7 +240,8 @@ const auditResponseQueries = {
 
         if (extraAction) {
           extraAction({
-            ...fieldValue,
+            supplierComment: fieldValue.supplierComment,
+            auditorComment: fieldValue.auditorComment,
             supplierAnswer,
             auditorScore,
           });
