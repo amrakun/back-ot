@@ -569,7 +569,15 @@ class Company {
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {
-      await this.update({ _id }, { $set: { isProductsInfoValidated: false } });
+      await this.update(
+        { _id },
+        {
+          $set: {
+            isProductsInfoValidated: false,
+            validatedProductsInfo: [],
+          },
+        },
+      );
     }
 
     // prevent disabled prequalification info from editing ========
