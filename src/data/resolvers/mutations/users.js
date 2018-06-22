@@ -31,7 +31,9 @@ const userMutations = {
    * @return - Confirmation link
    */
   async register(root, { email }) {
-    return email;
+    const { link } = await register(email);
+
+    return link;
   },
 
   /*
