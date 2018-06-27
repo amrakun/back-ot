@@ -40,7 +40,7 @@ const TenderSchema = mongoose.Schema({
   closeDate: field({ type: Date }),
   file: field({ type: FileSchema, optional: true }),
   sourcingOfficer: field({ type: String, optional: true }),
-  reminderDay: field({ type: Number }),
+  reminderDay: field({ type: Number, optional: true }),
   supplierIds: field({ type: [String] }),
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
@@ -191,7 +191,11 @@ class Tender extends StatusPublishClose {
    * Find tenders that need to reminded now
    */
   static async tendersToRemind() {
-    const opens = await this.find({ status: 'open' });
+    const opens = await this.find({
+      status: 'open',
+      reminderDay: { $exists: true },
+    });
+
     const results = [];
 
     for (let open of opens) {

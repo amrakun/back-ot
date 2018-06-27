@@ -39,7 +39,7 @@ const commonTenderFields = `
   closeDate: Date!
   sourcingOfficer: String
   file: JSON
-  reminderDay: Float!
+  reminderDay: Float
   requestedProducts: [TenderRequestedProduct]!
   requestedDocuments: [String]!
   isAwarded: Boolean
@@ -186,7 +186,7 @@ const commonParams = `
   closeDate: Date!
   file: JSON
   sourcingOfficer: String
-  reminderDay: Float!
+  reminderDay: Float
   supplierIds: [String]!
   requestedProducts: [TenderRequestedProductInput]
   requestedDocuments: [String]
