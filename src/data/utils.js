@@ -83,16 +83,16 @@ const applyTemplate = async (data, templateName) => {
  * @return nodemailer transporter
  */
 export const createTransporter = async () => {
-  const { MAIL_HOST, MAIL_PORT, MAIL_SECURE, MAIL_USER, MAIL_PASS } = process.env;
+  const { AWS_SES_ACCESS_KEY_ID, AWS_SES_SECRET_ACCESS_KEY, AWS_REGION } = process.env;
+
+  AWS.config.update({
+    region: AWS_REGION,
+    accessKeyId: AWS_SES_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SES_SECRET_ACCESS_KEY,
+  });
 
   return nodemailer.createTransport({
-    host: MAIL_HOST,
-    port: MAIL_PORT,
-    secure: MAIL_SECURE || false,
-    auth: {
-      user: MAIL_USER,
-      pass: MAIL_PASS,
-    },
+    SES: new AWS.SES({ apiVersion: '2010-12-01' }),
   });
 };
 
