@@ -115,7 +115,7 @@ export const businessInfoFields = `
   doesHaveJobDescriptionFile: JSON
 
   doesConcludeValidContracts: Boolean
-  employeeTurnoverRate: Int
+  employeeTurnoverRate: Float
 
   doesHaveLiabilityInsurance: Boolean
   doesHaveLiabilityInsuranceFile: JSON
