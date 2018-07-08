@@ -50,7 +50,7 @@ export const uploadFile = async file => {
     );
   });
 
-  return `https://s3.amazonaws.com/${AWS_BUCKET}/${fileName}`;
+  return `https://${AWS_BUCKET}.s3.amazonaws.com/${fileName}`;
 };
 
 /**
