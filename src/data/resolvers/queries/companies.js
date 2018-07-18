@@ -128,7 +128,7 @@ const companyQueries = {
       SearchLogs.createLog(user._id);
     }
 
-    return paginate(Companies.find(selector), args);
+    return paginate(Companies.find(selector).sort({ createdDate: -1 }), args);
   },
 
   /**

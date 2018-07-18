@@ -508,7 +508,7 @@ describe('Company queries', () => {
     // sort by average difot score 1 =====================
     let response = await graphqlRequest(qry, 'companies', { sortField: 'averageDifotScore' });
 
-    let [sup1, sup2] = response;
+    let [sup2, sup1] = response;
 
     expect(sup1.basicInfo.mnName).toBe('sup1');
     expect(sup2.basicInfo.mnName).toBe('sup2');
