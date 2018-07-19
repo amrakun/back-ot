@@ -15,7 +15,8 @@ const generate = async supplier => {
   sheet.column('D').width(30);
   sheet.column('E').width(60);
 
-  const qualification = await Qualifications.findOne({ supplierId: supplier._id });
+  const qualificationDb = await Qualifications.findOne({ supplierId: supplier._id });
+  const qualification = qualificationDb || {};
 
   const basicInfo = supplier.basicInfo || {};
   const financialInfo = supplier.financialInfo || {};
