@@ -50,7 +50,7 @@ const personFields = `
 const shareholderFields = `
   name: String
   jobTitle: String
-  percentage: Int
+  percentage: Float
   attachments: [JSON]
 `;
 
