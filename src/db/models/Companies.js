@@ -175,7 +175,7 @@ export const FinancialInfoSchema = mongoose.Schema(
     // Can you provide accounts for the last 3 financial year?
     canProvideAccountsInfo: field({ type: Boolean }),
 
-    reasonToCannotNotProvide: field({ type: String }),
+    reasonToCannotNotProvide: field({ type: String, optional: true }),
 
     currency: field({ type: String, optional: true }),
     annualTurnover: field({ type: [YearAmountSchema], optional: true }),
