@@ -109,6 +109,61 @@ describe('Companies model tests', () => {
     await checkSection('financial');
   });
 
+  // Can you provide accounts for the last 3 financial years'
+  test('Update Financial Info: check last 3 financial years', async () => {
+    const company = await companyFactory({});
+
+    // canProvideAccountsInfo true =======
+    const doc = companyDocs['financial']();
+
+    let updatedCompany = await Companies.updateSection(company._id, 'financialInfo', doc);
+    let financialInfo = updatedCompany.financialInfo;
+
+    expect(financialInfo.canProvideAccountsInfo).toBe(true);
+    expect(financialInfo.reasonToCannotNotProvide).toBeUndefined();
+    expect(financialInfo.currency).toBeDefined();
+    expect(financialInfo.annualTurnover).toBeDefined();
+    expect(financialInfo.preTaxProfit).toBeDefined();
+    expect(financialInfo.totalAssets).toBeDefined();
+    expect(financialInfo.totalCurrentAssets).toBeDefined();
+    expect(financialInfo.totalShareholderEquity).toBeDefined();
+    expect(financialInfo.recordsInfo).toBeDefined();
+
+    // canProvideAccountsInfo false =======
+    doc.canProvideAccountsInfo = false;
+
+    updatedCompany = await Companies.updateSection(company._id, 'financialInfo', doc);
+    financialInfo = updatedCompany.financialInfo;
+
+    expect(financialInfo.canProvideAccountsInfo).toBe(false);
+    expect(financialInfo.currency).toBeUndefined();
+    expect(financialInfo.annualTurnover.length).toBe(0);
+    expect(financialInfo.preTaxProfit.length).toBe(0);
+    expect(financialInfo.totalAssets.length).toBe(0);
+    expect(financialInfo.totalCurrentAssets.length).toBe(0);
+    expect(financialInfo.totalShareholderEquity.length).toBe(0);
+    expect(financialInfo.recordsInfo.length).toBe(0);
+  });
+
+  test('Create', async () => {
+    const user = await userFactory({});
+    const company = await Companies.createCompany(user._id);
+
+    expect(company).toBeDefined();
+    expect(company._id).toBeDefined();
+    expect(company.isSentRegistrationInfo).toBe(false);
+    expect(company.isSentPrequalificationInfo).toBe(false);
+
+    const [difotScore] = company.difotScores;
+
+    expect(difotScore.date).toBeDefined();
+    expect(difotScore.amount).toBe(75);
+
+    const updatedUser = await Users.findOne({ _id: user._id });
+
+    expect(updatedUser.companyId).toBe(company._id.toString());
+  });
+
   test('Update Business integrity and Human resource', async () => {
     await checkSection('business');
   });

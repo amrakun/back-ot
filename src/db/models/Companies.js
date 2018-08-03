@@ -183,7 +183,6 @@ export const FinancialInfoSchema = mongoose.Schema(
     totalAssets: field({ type: [YearAmountSchema], optional: true }),
     totalCurrentAssets: field({ type: [YearAmountSchema], optional: true }),
     totalShareholderEquity: field({ type: [YearAmountSchema], optional: true }),
-
     recordsInfo: field({ type: [DateFileSchema], optional: true }),
 
     // Is your company up to date with Social Security payments?
@@ -563,6 +562,22 @@ class Company {
    */
   static async updateSection(_id, key, value) {
     const company = await this.findOne({ _id });
+
+    if (key === 'financialInfo' && value) {
+      // if canProvideAccountsInfo is false then below field values must
+      // be reseted
+      if (!value.canProvideAccountsInfo) {
+        value.currency = undefined;
+        value.annualTurnover = [];
+        value.preTaxProfit = [];
+        value.totalAssets = [];
+        value.totalCurrentAssets = [];
+        value.totalShareholderEquity = [];
+        value.recordsInfo = [];
+      } else {
+        value.reasonToCannotNotProvide = undefined;
+      }
+    }
 
     // update
     await this.update({ _id }, { $set: { [key]: value } });
