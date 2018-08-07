@@ -563,19 +563,41 @@ class Company {
   static async updateSection(_id, key, value) {
     const company = await this.findOne({ _id });
 
-    if (key === 'financialInfo' && value) {
-      // if canProvideAccountsInfo is false then below field values must
-      // be reseted
-      if (!value.canProvideAccountsInfo) {
-        value.currency = undefined;
-        value.annualTurnover = [];
-        value.preTaxProfit = [];
-        value.totalAssets = [];
-        value.totalCurrentAssets = [];
-        value.totalShareholderEquity = [];
-        value.recordsInfo = [];
-      } else {
-        value.reasonToCannotNotProvide = undefined;
+    if (value) {
+      if (key === 'financialInfo') {
+        // if canProvideAccountsInfo is false then below field values must
+        // be reseted
+        if (!value.canProvideAccountsInfo) {
+          value.currency = undefined;
+          value.annualTurnover = [];
+          value.preTaxProfit = [];
+          value.totalAssets = [];
+          value.totalCurrentAssets = [];
+          value.totalShareholderEquity = [];
+          value.recordsInfo = [];
+        } else {
+          value.reasonToCannotNotProvide = undefined;
+        }
+      }
+
+      // Reseting file field's value back to null after related boolean
+      // field's value setted to false
+      const fieldNames = Object.keys(value);
+
+      for (const fieldName of fieldNames) {
+        if (!fieldName.includes('File')) {
+          continue;
+        }
+
+        const relatedBoolField = fieldName.replace('File', '');
+
+        if (!fieldNames.includes(relatedBoolField)) {
+          continue;
+        }
+
+        if (!value[relatedBoolField] && value[fieldName]) {
+          value[fieldName] = undefined;
+        }
       }
     }
 

@@ -145,6 +145,32 @@ describe('Companies model tests', () => {
     expect(financialInfo.recordsInfo.length).toBe(0);
   });
 
+  test('Check file field is being reseted to null', async () => {
+    const company = await companyFactory({});
+
+    const doc = companyDocs['business']();
+
+    let updatedCompany = await Companies.updateSection(company._id, 'businessInfo', doc);
+    let businessInfo = updatedCompany.businessInfo;
+
+    expect(businessInfo.doesHaveJobDescription).toBe(true);
+    expect(businessInfo.doesHaveJobDescriptionFile).toBeDefined();
+    expect(businessInfo.doesHaveLiabilityInsurance).toBe(true);
+    expect(businessInfo.doesHaveLiabilityInsuranceFile).toBeDefined();
+
+    // setting to false =======
+    doc.doesHaveJobDescription = false;
+    doc.doesHaveLiabilityInsurance = false;
+
+    updatedCompany = await Companies.updateSection(company._id, 'businessInfo', doc);
+    businessInfo = updatedCompany.businessInfo;
+
+    expect(businessInfo.doesHaveJobDescription).toBe(false);
+    expect(businessInfo.doesHaveJobDescriptionFile).toBeUndefined();
+    expect(businessInfo.doesHaveLiabilityInsurance).toBe(false);
+    expect(businessInfo.doesHaveLiabilityInsuranceFile).toBeUndefined();
+  });
+
   test('Create', async () => {
     const user = await userFactory({});
     const company = await Companies.createCompany(user._id);
