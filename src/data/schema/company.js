@@ -15,7 +15,7 @@ const basicInfoFields = `
   registeredInSum: String
   isChinese: Boolean
   corporateStructure: String!
-  registrationNumber: Float
+  registrationNumber: String
   certificateOfRegistration: JSON
   email: String
   website: String

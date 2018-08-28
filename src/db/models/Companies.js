@@ -29,7 +29,7 @@ const BasicInfoSchema = mongoose.Schema(
     registeredInSum: field({ type: String, optional: true }),
     isChinese: field({ type: Boolean, optional: true }),
     corporateStructure: field({ type: String, optional: true }),
-    registrationNumber: field({ type: Number, optional: true }),
+    registrationNumber: field({ type: String, optional: true }),
     certificateOfRegistration: field({ type: FileSchema, optional: true }),
     email: field({ type: String, optional: true }),
     website: field({ type: String, optional: true }),
