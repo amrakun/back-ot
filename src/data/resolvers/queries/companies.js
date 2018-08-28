@@ -31,7 +31,6 @@ const companiesFilter = async args => {
   const selector = {
     // ignore incomplete suppliers
     isSentRegistrationInfo: true,
-    isSentPrequalificationInfo: true,
   };
 
   // main filter
