@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { Users } from '../db/models';
+import { Companies } from '../db/models';
 
 dotenv.config();
 
@@ -9,11 +9,31 @@ mongoose.Promise = global.Promise;
 export const customCommand = async () => {
   mongoose.connect(process.env.MONGO_URL, { useMongoClient: true });
 
-  const users = await Users.find({});
+  const companies = await Companies.find({});
 
-  for (const user of users) {
-    if (user.companyId) {
-      await Users.update({ _id: user._id }, { $set: { companyId: user.companyId.toString() } });
+  for (const company of companies) {
+    if (company.financialInfo && company.financialInfo.currency) {
+      const currency = company.financialInfo.currency;
+
+      console.log('updating....', currency, company._id);
+
+      let value;
+
+      if (currency === 'Tugrug (MNT)') {
+        value = 'MNT';
+      }
+
+      if (currency === 'Dollar – United States (USD)') {
+        value = 'USD';
+      }
+
+      if (currency === 'Euro (EUR)') {
+        value = 'EUR';
+      }
+
+      if (value) {
+        await Companies.update({ _id: company._id }, { $set: { 'financialInfo.currency': value } });
+      }
     }
   }
 
