@@ -26,12 +26,17 @@ const companiesFilter = async args => {
     productsInfoStatus,
     difotScore,
     region,
+    source,
   } = args;
 
   const selector = {
     // ignore incomplete suppliers
     isSentRegistrationInfo: true,
   };
+
+  if (source === 'prequalification') {
+    selector.isSentPrequalificationInfo = true;
+  }
 
   // main filter
   if (search) {
