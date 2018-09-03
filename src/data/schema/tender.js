@@ -99,6 +99,7 @@ export const types = `
     supplierId: String!
     respondedProducts: [TenderRespondedProduct]
     respondedDocuments: [TenderRespondedDocument]
+    respondedServiceFiles: [JSON]
 
     supplier: Company
 
@@ -197,6 +198,7 @@ const responseCommonParams = `
   isNotInterested: Boolean
   respondedProducts: [TenderRespondedProductInput]
   respondedDocuments: [TenderRespondedDocumentInput]
+  respondedServiceFiles: [JSON]
 `;
 
 export const mutations = `

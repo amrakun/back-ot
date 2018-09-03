@@ -52,6 +52,7 @@ export const types = `
     address: String
 
     rfqTemplates: JSON
+    srfqTemplates: JSON
     eoiTemplates: JSON
     successFeedbackTemplates: JSON
     capacityBuildingTemplates: JSON

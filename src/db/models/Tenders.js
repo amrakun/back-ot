@@ -245,6 +245,7 @@ const TenderResponseSchema = mongoose.Schema({
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
+  respondedServiceFiles: [FileSchema],
   respondedDocuments: [RespondedDocumentSchema],
 
   // when tender type is eoi, we can still receive responses after closedDate

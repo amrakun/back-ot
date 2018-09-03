@@ -52,6 +52,7 @@ const ConfigSchema = mongoose.Schema({
 
   // templates
   rfqTemplates: field({ type: Object, optional: true }),
+  srfqTemplates: field({ type: Object, optional: true }),
   eoiTemplates: field({ type: Object, optional: true }),
   successFeedbackTemplates: field({ type: Object, optional: true }),
   capacityBuildingTemplates: field({ type: Object, optional: true }),
