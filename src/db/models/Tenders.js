@@ -326,7 +326,7 @@ class TenderResponse {
     }
 
     // can send to only open rfqs
-    if (tender.type === 'rfq' && tender.status === 'closed') {
+    if (tender.type !== 'eoi' && tender.status === 'closed') {
       throw Error('This tender is not available');
     }
 
