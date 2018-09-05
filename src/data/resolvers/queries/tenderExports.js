@@ -17,8 +17,8 @@ export const tendersExport = async tenders => {
     sheet.cell(rowIndex, 1).value(tender.status);
     sheet.cell(rowIndex, 2).value(tender.number);
     sheet.cell(rowIndex, 3).value(tender.name);
-    sheet.cell(rowIndex, 4).value(tender.publishDate);
-    sheet.cell(rowIndex, 5).value(tender.closeDate);
+    sheet.cell(rowIndex, 4).value(new Date(tender.publishDate).toLocaleDateString());
+    sheet.cell(rowIndex, 5).value(new Date(tender.closeDate).toLocaleDateString());
     sheet.cell(rowIndex, 6).value(tender.requestedCount());
     sheet.cell(rowIndex, 7).value(await tender.submittedCount());
     sheet.cell(rowIndex, 8).value(await tender.notInterestedCount());
