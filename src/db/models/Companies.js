@@ -754,6 +754,10 @@ class Company {
    * Skip prequalification
    */
   async skipPrequalification(reason) {
+    if (this.isPrequalified !== undefined) {
+      throw new Error('Invalid action');
+    }
+
     await this.update({
       isSkippedPrequalification: true,
       isSentPrequalificationInfo: true,
