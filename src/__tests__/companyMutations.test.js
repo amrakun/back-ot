@@ -34,7 +34,7 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(13);
+    expect.assertions(14);
 
     const mutations = [
       'companiesEditBasicInfo',
@@ -51,6 +51,7 @@ describe('Company mutations', () => {
 
       'companiesSendRegistrationInfo',
       'companiesSendPrequalificationInfo',
+      'companiesSkipPrequalification',
     ];
 
     const user = await userFactory();
@@ -437,6 +438,29 @@ describe('Company mutations', () => {
     );
 
     expect(response.isSentPrequalificationInfo).toBe(true);
+  });
+
+  test('skip prequalification', async () => {
+    const response = await graphqlRequest(
+      `mutation companiesSkipPrequalification($reason: String!) {
+          companiesSkipPrequalification(reason: $reason) {
+            _id
+            isSkippedPrequalification
+            prequalificationSkippedReason
+          }
+        }
+      `,
+      'companiesSkipPrequalification',
+      {
+        reason: 'reason',
+      },
+      {
+        user: await userFactory({ companyId: _company._id, isSupplier: true }),
+      },
+    );
+
+    expect(response.isSkippedPrequalification).toBe(true);
+    expect(response.prequalificationSkippedReason).toBe('reason');
   });
 
   test('enable prequalificationInfo to edit', async () => {

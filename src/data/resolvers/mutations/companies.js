@@ -50,6 +50,12 @@ const companyMutations = {
     return company.sendRegistrationInfo();
   },
 
+  async companiesSkipPrequalification(root, { reason }, { user }) {
+    const company = await Companies.findOne({ _id: user.companyId });
+
+    return company.skipPrequalification(reason);
+  },
+
   async companiesSendPrequalificationInfo(root, args, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
 
@@ -110,6 +116,7 @@ sections.forEach(section => {
 
 requireSupplier(companyMutations, 'companiesSendRegistrationInfo');
 requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
+requireSupplier(companyMutations, 'companiesSkipPrequalification');
 
 requireBuyer(companyMutations, 'companiesAddDifotScores');
 requireBuyer(companyMutations, 'companiesAddDueDiligences');

@@ -328,4 +328,15 @@ describe('Companies model tests', () => {
     expect(updatedCompany.isSentPrequalificationInfo).toBe(true);
     expect(updatedCompany.isPrequalificationInfoEditable).toBe(false);
   });
+
+  test('skip prequalification', async () => {
+    const company = await Companies.findOne({ _id: _company._id });
+
+    await company.skipPrequalification('reason');
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.isSkippedPrequalification).toBe(true);
+    expect(updatedCompany.prequalificationSkippedReason).toBe('reason');
+  });
 });

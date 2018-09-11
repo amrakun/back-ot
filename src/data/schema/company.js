@@ -367,6 +367,10 @@ export const types = `
     isSentPrequalificationInfo: Boolean
     prequalificationSubmittedCount: Float
     isPrequalificationInfoEditable: Boolean
+
+    isSkippedPrequalification: Boolean
+    prequalificationSkippedReason: String
+
     isPrequalified: Boolean
     prequalifiedDate: Date
     prequalifiedStatus: JSON
@@ -481,6 +485,7 @@ export const mutations = `
 
   companiesSendRegistrationInfo: Company
   companiesSendPrequalificationInfo: Company
+  companiesSkipPrequalification(reason: String!): Company
 
   companiesTogglePrequalificationState(supplierId: String!): Company
 `;

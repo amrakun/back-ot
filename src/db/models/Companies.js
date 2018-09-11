@@ -438,6 +438,10 @@ const CompanySchema = mongoose.Schema({
     optional: true,
     default: true,
   }),
+
+  isSkippedPrequalification: field({ type: Boolean, default: false }),
+  prequalificationSkippedReason: field({ type: String, optional: true }),
+
   isPrequalified: field({ type: Boolean, optional: true }),
   prequalifiedDate: field({ type: Date, optional: true }),
 
@@ -741,6 +745,19 @@ class Company {
       isSentPrequalificationInfo: true,
       isPrequalificationInfoEditable: false,
       prequalificationSubmittedCount: (this.prequalificationSubmittedCount || 0) + 1,
+    });
+
+    return Companies.findOne({ _id: this._id });
+  }
+
+  /*
+   * Skip prequalification
+   */
+  async skipPrequalification(reason) {
+    await this.update({
+      isSkippedPrequalification: true,
+      isSentPrequalificationInfo: true,
+      prequalificationSkippedReason: reason,
     });
 
     return Companies.findOne({ _id: this._id });
