@@ -69,7 +69,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Success feedback',
-    permissions: ['tenderResponses', 'feedbacksAdd'],
+    permissions: ['feedbacksAdd'],
   },
   {
     name: 'RFQ/EOI responses',
@@ -77,11 +77,11 @@ export const PERMISSIONS = [
   },
   {
     name: 'RFQ responses',
-    permissions: ['tenderResponsesRfqBidSummaryReport', 'tendersAward'],
+    permissions: ['tenderResponses', 'tenderResponsesRfqBidSummaryReport', 'tendersAward'],
   },
   {
     name: 'EOI responses',
-    permissions: ['tenderResponsesEoiShortList', 'tenderResponsesEoiBidderList'],
+    permissions: ['tenderResponses', 'tenderResponsesEoiShortList', 'tenderResponsesEoiBidderList'],
   },
   {
     name: 'Report',
