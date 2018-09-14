@@ -133,7 +133,7 @@ class Tender extends StatusPublishClose {
    * Mark as sent regret letter
    */
   sendRegretLetter() {
-    if (this.type === 'rfq' && (!this.winnerIds || this.winnerIds.length === 0)) {
+    if (this.type !== 'eoi' && (!this.winnerIds || this.winnerIds.length === 0)) {
       throw new Error('Not awarded');
     }
 
