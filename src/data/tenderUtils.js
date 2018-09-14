@@ -45,16 +45,24 @@ export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) 
 };
 
 export const sendEmail = async ({ kind, tender, extraBuyerEmails = [] }) => {
-  await sendEmailToBuyer({
-    kind: `buyer__${kind}`,
-    tender,
-    extraBuyerEmails,
-  });
+  try {
+    await sendEmailToBuyer({
+      kind: `buyer__${kind}`,
+      tender,
+      extraBuyerEmails,
+    });
+  } catch (e) {
+    console.log(e); // eslint-disable-line
+  }
 
-  await sendEmailToSuppliers({
-    kind: `supplier__${kind}`,
-    tender,
-  });
+  try {
+    await sendEmailToSuppliers({
+      kind: `supplier__${kind}`,
+      tender,
+    });
+  } catch (e) {
+    console.log(e); // eslint-disable-line
+  }
 };
 
 export const sendConfigEmail = async ({ kind, tender, toEmails }) => {
