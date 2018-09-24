@@ -19,11 +19,17 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds }) => {
 
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
+  const attachments = (tender.attachments || []).map(attachment => ({
+    filename: attachment.name,
+    path: attachment.url,
+  }));
+
   for (const supplier of suppliers) {
     await utils.sendConfigEmail({
       name: `${tender.type}Templates`,
       kind,
       toEmails: [supplier.basicInfo.email],
+      attachments,
       replacer: text => {
         return replacer({ text, tender });
       },
