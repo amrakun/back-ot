@@ -36,6 +36,7 @@ const TenderSchema = mongoose.Schema({
   number: field({ type: String }),
   name: field({ type: String }),
   content: field({ type: String }),
+  attachments: field({ type: [FileSchema], optional: true }),
   publishDate: field({ type: Date }),
   closeDate: field({ type: Date }),
   file: field({ type: FileSchema, optional: true }),

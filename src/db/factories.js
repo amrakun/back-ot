@@ -352,6 +352,7 @@ export const tenderFactory = async (params = {}) => {
     sourcingOfficer: params.sourcingOfficer || faker.random.word(),
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
+    attachments: params.attachments || [{ name: 'name', url: 'url' }],
 
     createdUserId: params.createdUserId,
     createdDate: params.createdDate || new Date(),

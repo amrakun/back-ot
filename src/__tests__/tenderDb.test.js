@@ -17,7 +17,7 @@ describe('Tender db', () => {
 
   beforeEach(async () => {
     // Creating test data
-    _tender = await tenderFactory();
+    _tender = await tenderFactory({ attachments: [{ name: 'name', url: 'url' }] });
     _user = await userFactory();
   });
 
@@ -35,9 +35,8 @@ describe('Tender db', () => {
 
     let tenderObj = await Tenders.createTender(_tender, _user._id);
 
-    const status = tenderObj.status;
-    const createdDate = tenderObj.createdDate;
-    const createdUserId = tenderObj.createdUserId;
+    const { status, createdDate, createdUserId } = tenderObj;
+    const [attachment] = tenderObj.attachments;
 
     tenderObj = JSON.parse(JSON.stringify(tenderObj));
 
@@ -48,6 +47,8 @@ describe('Tender db', () => {
     delete tenderObj.status;
 
     expect(tenderObj).toEqual(_tender);
+    expect(attachment.name).toBe('name');
+    expect(attachment.url).toBe('url');
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');

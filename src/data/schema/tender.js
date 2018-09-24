@@ -35,6 +35,7 @@ const commonTenderFields = `
   number: String!
   name: String!
   content: String!
+  attachments: [JSON]
   publishDate: Date!
   closeDate: Date!
   sourcingOfficer: String
@@ -183,6 +184,7 @@ const commonParams = `
   number: String!
   name: String!
   content: String!
+  attachments: [JSON]
   publishDate: Date!
   closeDate: Date!
   file: JSON
