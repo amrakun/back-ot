@@ -215,9 +215,11 @@ class Tender extends StatusPublishClose {
   }
 }
 
+const { ENCRYPTION_SECRET } = process.env;
+
 TenderSchema.plugin(fieldEncryption, {
-  fields: ['name'],
-  secret: 'key',
+  fields: ['name', 'number', 'content'],
+  secret: ENCRYPTION_SECRET,
 });
 
 TenderSchema.loadClass(Tender);

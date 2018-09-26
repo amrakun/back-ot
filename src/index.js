@@ -2,6 +2,10 @@
 
 import path from 'path';
 import dotenv from 'dotenv';
+
+// load environment variables
+dotenv.config();
+
 import express from 'express';
 import { createServer } from 'http';
 import bodyParser from 'body-parser';
@@ -13,9 +17,6 @@ import { userMiddleware } from './auth';
 import { uploadFile } from './data/utils';
 import schema from './data';
 import './startup';
-
-// load environment variables
-dotenv.config();
 
 // connect to mongo database
 connect();

@@ -24,12 +24,15 @@ const tendersFilter = async (args, extraChecks) => {
 
   // main filter
   if (search) {
-    query.$and.push({
-      $or: [
-        { name: new RegExp(`.*${search}.*`, 'i') },
-        { number: new RegExp(`.*${search}.*`, 'i') },
-      ],
+    const tenders = await Tenders.find({});
+
+    const filtered = tenders.filter(({ name, number }) => {
+      return name.includes(search) || number.includes(search);
     });
+
+    const ids = filtered.map(tender => tender._id);
+
+    query.$and.push({ _id: { $in: ids } });
   }
 
   // month filter: month is date object
