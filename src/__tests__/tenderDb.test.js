@@ -4,7 +4,7 @@
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses } from '../db/models';
-import dbUtils, { encryptArray } from '../db/models/utils';
+import dbUtils from '../db/models/utils';
 import {
   userFactory,
   companyFactory,
@@ -60,11 +60,11 @@ describe('Tender db', () => {
 
     const savedTender = await Tenders.createTender(doc, _user._id);
 
-    const { supplierIds, status, createdDate, createdUserId } = savedTender;
+    const { status, createdDate, createdUserId } = savedTender;
 
     compare(flatten(doc), flatten(savedTender));
 
-    expect(supplierIds.toObject()).toEqual(encryptArray(doc.supplierIds));
+    expect(savedTender.getSupplierIds()).toEqual(doc.supplierIds);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');
@@ -77,7 +77,7 @@ describe('Tender db', () => {
 
     compare(flatten(doc), flatten(updated));
 
-    expect(updated.supplierIds.toObject()).toEqual(encryptArray(doc.supplierIds));
+    expect(updated.getSupplierIds()).toEqual(doc.supplierIds);
   });
 
   test('Update tender: with closed status', async () => {
