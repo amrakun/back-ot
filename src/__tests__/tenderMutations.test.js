@@ -235,6 +235,7 @@ describe('Tender mutations', () => {
 
     expect(response).toContain(notAwarded1.supplierId);
     expect(response).toContain(notAwarded2.supplierId);
+
     expect(updatedTender.sentRegretLetter).toBe(true);
   });
 

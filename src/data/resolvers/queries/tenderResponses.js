@@ -1,4 +1,5 @@
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
+import { encrypt } from '../../../db/models/utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { supplierFilter } from './utils';
 
@@ -18,7 +19,9 @@ const tenderResponseQueries = {
       return [];
     }
 
-    const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch);
+    const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch, ids =>
+      ids.map(id => encrypt(id.toString())),
+    );
 
     const sortName = sort.name;
     const sortProductCode = sort.productCode;
@@ -123,8 +126,10 @@ const tenderResponseQueries = {
   /**
    * Get response by logged in user
    */
-  tenderResponseByUser(root, { tenderId }, { user }) {
-    return TenderResponses.findOne({ tenderId, supplierId: user.companyId });
+  async tenderResponseByUser(root, { tenderId }, { user }) {
+    const responses = await TenderResponses.find({ tenderId });
+
+    return (responses || []).find(res => res.supplierId === user.companyId);
   },
 };
 

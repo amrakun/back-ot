@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { encryptAes256Ctr } from 'mongoose-field-encryption';
 
 /*
  * A base class for models with status, publishDate, closeDate fields
@@ -76,5 +77,10 @@ const utils = {
  * Checks that given date is reached
  */
 export const isReached = date => moment(date) <= utils.getNow();
+
+export const encrypt = encrypted => {
+  const { ENCRYPTION_SECRET } = process.env;
+  return encryptAes256Ctr(encrypted, ENCRYPTION_SECRET);
+};
 
 export default utils;

@@ -404,7 +404,15 @@ export const tenderResponseFactory = async (params = {}) => {
     isNotInterested: params.isNotInterested || false,
   });
 
-  return save(tenderResponse);
+  const savedResponse = await tenderResponse.save();
+  const decrypted = await TenderResponses.findOne({ _id: savedResponse._id });
+
+  const fixed = JSON.parse(JSON.stringify(decrypted));
+
+  delete fixed.__v;
+  delete fixed.__enc_supplierId;
+
+  return fixed;
 };
 
 export const feedbackFactory = async (params = {}) => {

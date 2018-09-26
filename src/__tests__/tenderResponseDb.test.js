@@ -137,7 +137,7 @@ describe('Tender response db', () => {
   test('Edit tender response', async () => {
     const response = await tenderResponseFactory({});
 
-    expect.assertions(3);
+    expect.assertions(4);
 
     // tender is closed or canceled
     try {
@@ -180,6 +180,7 @@ describe('Tender response db', () => {
 
     const updatedResponse = await TenderResponses.updateTenderResponse(doc);
 
+    expect(updatedResponse.supplierId).toEqual(doc.supplierId);
     expect(toObject(updatedResponse.respondedProducts)).toEqual(doc.respondedProducts);
     expect(toObject(updatedResponse.respondedDocuments)).toEqual(doc.respondedDocuments);
   });

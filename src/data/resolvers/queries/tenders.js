@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Tenders, TenderResponses } from '../../../db/models';
+import { encrypt } from '../../../db/models/utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { paginate } from './utils';
 import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
@@ -86,7 +87,7 @@ const tendersSupplierFilter = async (args, user) => {
 
     // ignore not interested tenders =============
     const notInterestedTenders = await TenderResponses.find({
-      supplierId: user.companyId,
+      supplierId: encrypt(user.companyId),
       isNotInterested: true,
     });
 
@@ -107,7 +108,7 @@ const tendersSupplierFilter = async (args, user) => {
       // filter only user's responded tenders
       if (isParticipated) {
         const submittedTenders = await TenderResponses.find({
-          supplierId: user.companyId,
+          supplierId: encrypt(user.companyId),
         });
 
         const submittedTenderIds = submittedTenders.map(res => res.tenderId);

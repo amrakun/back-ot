@@ -114,10 +114,8 @@ class Tender extends StatusPublishClose {
    */
   static async award(_id, supplierIds) {
     for (const supplierId of supplierIds) {
-      const response = await TenderResponses.findOne({
-        tenderId: _id,
-        supplierId,
-      });
+      const responses = await TenderResponses.find({ tenderId: _id });
+      const response = (responses || []).find(res => res.supplierId === supplierId);
 
       if (!response) {
         throw new Error('Invalid supplier');
@@ -220,6 +218,7 @@ const { ENCRYPTION_SECRET } = process.env;
 TenderSchema.plugin(fieldEncryption, {
   fields: ['name', 'number', 'content'],
   secret: ENCRYPTION_SECRET,
+  useAes256Ctr: true,
 });
 
 TenderSchema.loadClass(Tender);
@@ -268,7 +267,18 @@ const TenderResponseSchema = mongoose.Schema({
   isNotInterested: field({ type: Boolean, default: false }),
 });
 
+TenderResponseSchema.plugin(fieldEncryption, {
+  fields: ['supplierId'],
+  secret: ENCRYPTION_SECRET,
+  useAes256Ctr: true,
+});
+
 class TenderResponse {
+  static async findBySupplierId({ tenderId, supplierId }) {
+    const responses = await TenderResponses.find({ tenderId });
+    return (responses || []).find(res => res.supplierId === supplierId);
+  }
+
   /**
    * Create new tender response
    * @param {Object} doc - tender response fields
@@ -284,7 +294,7 @@ class TenderResponse {
       throw Error('This tender is not available');
     }
 
-    const previousEntry = await this.findOne({ tenderId, supplierId });
+    const previousEntry = await this.findBySupplierId({ tenderId, supplierId });
 
     // prevent duplications
     if (previousEntry) {
@@ -297,7 +307,9 @@ class TenderResponse {
       isSent = true;
     }
 
-    return this.create({ ...doc, isSent });
+    const saved = await this.create({ ...doc, isSent });
+
+    return this.findOne({ _id: saved._id });
   }
 
   /*
@@ -306,9 +318,7 @@ class TenderResponse {
    * @return - Updated tender response
    */
   static async updateTenderResponse(doc) {
-    const { tenderId, supplierId } = doc;
-    const selector = { tenderId, supplierId };
-    const response = await this.findOne(selector);
+    const response = await this.findBySupplierId(doc);
 
     if (!response) {
       throw new Error('Response not found');
@@ -320,9 +330,9 @@ class TenderResponse {
       throw Error('This tender is not available');
     }
 
-    await this.update(selector, { $set: doc });
+    await response.update(doc);
 
-    return this.findOne(selector);
+    return this.findBySupplierId(doc);
   }
 
   /**
