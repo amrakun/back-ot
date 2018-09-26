@@ -1,7 +1,7 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
-import { field, isReached, StatusPublishClose } from './utils';
+import { field, isReached, encryptArray, decryptArray, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -43,7 +43,10 @@ const TenderSchema = mongoose.Schema({
   file: field({ type: FileSchema, optional: true }),
   sourcingOfficer: field({ type: String, optional: true }),
   reminderDay: field({ type: Number, optional: true }),
+
+  // encrypted supplier ids
   supplierIds: field({ type: [String] }),
+
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
   // Awarded response ids
@@ -68,6 +71,7 @@ class Tender extends StatusPublishClose {
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
+      supplierIds: encryptArray(doc.supplierIds),
     });
 
     return this.findOne({ _id: saved._id });
@@ -85,6 +89,8 @@ class Tender extends StatusPublishClose {
     if (tender.status === 'closed') {
       throw new Error('Can not update closed tender');
     }
+
+    doc.supplierIds = encryptArray(doc.supplierIds);
 
     await this.update({ _id }, { $set: doc }, { runValidators: true });
 
@@ -129,6 +135,10 @@ class Tender extends StatusPublishClose {
     await this.update({ _id }, { $set: { status: 'awarded', winnerIds: supplierIds } });
 
     return this.findOne({ _id });
+  }
+
+  getSupplierIds() {
+    return decryptArray(this.supplierIds);
   }
 
   /*

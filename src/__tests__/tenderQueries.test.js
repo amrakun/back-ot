@@ -131,7 +131,7 @@ describe('Tender queries', () => {
     supplier2 = await companyFactory();
 
     // below tender must be excluded by created user check
-    await tenderFactory({ type: 'rfq' });
+    await tenderFactory({ type: 'rfq', status: 'open' });
 
     user = await userFactory({
       companyId: supplier1._id,
@@ -139,13 +139,19 @@ describe('Tender queries', () => {
       isSupplier: false,
     });
 
-    const tender = await tenderFactory({ type: 'rfq', createdUserId: user._id });
+    const tender = await tenderFactory({
+      type: 'rfq',
+      createdUserId: user._id,
+      status: 'open',
+    });
 
     await tenderResponseFactory({
       tenderId: tender._id,
       supplierId: supplier1._id,
       isNotInterested: true,
     });
+
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'draft' } });
 
     await tenderFactory({
       type: 'rfq',
@@ -229,7 +235,7 @@ describe('Tender queries', () => {
 
     let [tender] = response;
 
-    expect(tender._id).toBe(tender1._id);
+    expect(tender._id.toString()).toBe(tender1._id.toString());
 
     // case2 ==============
     response = await doQuery({ month: new Date('2012-03-01') });
@@ -238,7 +244,7 @@ describe('Tender queries', () => {
 
     [tender] = response;
 
-    expect(tender._id).toBe(tender2._id);
+    expect(tender._id.toString()).toBe(tender2._id.toString());
   });
 
   test('count by tender status', async () => {
@@ -459,7 +465,7 @@ describe('Tender queries', () => {
 
   test('tender response by user', async () => {
     const company = await companyFactory();
-    const tender = await tenderFactory();
+    const tender = await tenderFactory({ status: 'open' });
 
     user = await userFactory({ isSupplier: true, companyId: company._id });
 
@@ -491,17 +497,17 @@ describe('Tender queries', () => {
       { user },
     );
 
-    expect(response.tenderId).toBe(tender._id);
+    expect(response.tenderId.toString()).toBe(tender._id.toString());
     expect(response.supplierId).toBe(company._id);
     expect(response.supplier._id).toBeDefined();
   });
 
   test('exclude not sent responses', async () => {
-    const tender = await tenderFactory({});
+    const tender = await tenderFactory({ status: 'open' });
     const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
-    await tenderResponseFactory({ tenderId: tender._id });
+    await tenderResponseFactory({ tenderId: tender._id, isSent: false });
 
     const response = await graphqlRequest(
       `query tenderDetail($_id: String!) {
@@ -622,11 +628,12 @@ describe('Tender queries', () => {
   });
 
   test('tender responses search: not interested', async () => {
-    const tender = await tenderFactory({});
+    const tender = await tenderFactory({ status: 'open' });
     const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true, isNotInterested: true });
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
     const doQuery = isNotInterested =>
       graphqlRequest(
@@ -655,7 +662,7 @@ describe('Tender queries', () => {
   });
 
   test('tender responses search & sort', async () => {
-    const tender = await tenderFactory({});
+    const tender = await tenderFactory({ status: 'open' });
     const user = await userFactory({ isSupplier: false });
     const supplier = await companyFactory({ enName: 'enName' });
 
@@ -717,6 +724,8 @@ describe('Tender queries', () => {
       ],
     });
 
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
+
     const doQuery = (sort, betweenSearch, supplierSearch) =>
       graphqlRequest(
         `query tenderResponses(
@@ -756,9 +765,9 @@ describe('Tender queries', () => {
 
     let [rr1, rr2, rr3] = response;
 
-    expect(rr1._id).toBe(tr3._id);
-    expect(rr2._id).toBe(tr2._id);
-    expect(rr3._id).toBe(tr1._id);
+    expect(rr1._id.toString()).toBe(tr3._id.toString());
+    expect(rr2._id.toString()).toBe(tr2._id.toString());
+    expect(rr3._id.toString()).toBe(tr1._id.toString());
 
     // sort by minLeadTime =============
     response = await doQuery({
@@ -768,9 +777,9 @@ describe('Tender queries', () => {
 
     [rr1, rr2, rr3] = response;
 
-    expect(rr1._id).toBe(tr2._id);
-    expect(rr2._id).toBe(tr3._id);
-    expect(rr3._id).toBe(tr1._id);
+    expect(rr1._id.toString()).toBe(tr2._id.toString());
+    expect(rr2._id.toString()).toBe(tr3._id.toString());
+    expect(rr3._id.toString()).toBe(tr1._id.toString());
 
     // sort by totalPrice =============
     response = await doQuery({
@@ -780,9 +789,9 @@ describe('Tender queries', () => {
 
     [rr1, rr2, rr3] = response;
 
-    expect(rr1._id).toBe(tr2._id);
-    expect(rr2._id).toBe(tr3._id);
-    expect(rr3._id).toBe(tr1._id);
+    expect(rr1._id.toString()).toBe(tr2._id.toString());
+    expect(rr2._id.toString()).toBe(tr3._id.toString());
+    expect(rr3._id.toString()).toBe(tr1._id.toString());
 
     // search by between totalPrice =============
     response = await doQuery(
@@ -885,8 +894,15 @@ describe('Tender queries', () => {
     const supplier1 = await companyFactory();
     const supplier2 = await companyFactory();
 
-    const tender = await tenderFactory({ supplierIds: [supplier1._id, supplier2._id] });
-    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier1._id });
+    const tender = await tenderFactory({
+      supplierIds: [supplier1._id, supplier2._id],
+      status: 'open',
+    });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier1._id,
+    });
 
     const [notRespondedSupplier] = await graphqlRequest(
       `query tenderResponseNotRespondedSuppliers($tenderId: String) {

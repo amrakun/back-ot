@@ -10,7 +10,7 @@ export default {
   },
 
   suppliers(tender) {
-    return Companies.find({ _id: { $in: tender.supplierIds } });
+    return Companies.find({ _id: { $in: tender.getSupplierIds() } });
   },
 
   requestedCount(tender) {

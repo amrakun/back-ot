@@ -95,11 +95,10 @@ describe('Tender response db', () => {
   });
 
   test('Send', async () => {
-    const tender = await tenderFactory({ status: 'canceled' });
+    const tender = await tenderFactory({ status: 'open' });
 
     let tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
-
-    tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'canceled' } });
 
     expect(tenderResponse.isSent).toBe(false);
 
@@ -120,22 +119,24 @@ describe('Tender response db', () => {
   });
 
   test('Send: EOI with late status', async () => {
-    const tender = await tenderFactory({ type: 'eoi', status: 'closed' });
+    const tender = await tenderFactory({ type: 'eoi', status: 'open' });
+    const tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
 
-    await tenderResponseFactory({ tenderId: tender._id });
-
-    let tenderResponse = await TenderResponses.findOne({ tenderId: tender._id });
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
     await tenderResponse.send();
 
-    tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
+    const response = await TenderResponses.findOne({ _id: tenderResponse._id });
 
-    expect(tenderResponse.status).toBe('late');
-    expect(tenderResponse.isSent).toBe(true);
+    expect(response.status).toBe('late');
+    expect(response.isSent).toBe(true);
   });
 
   test('Edit tender response', async () => {
-    const response = await tenderResponseFactory({});
+    const tender = await tenderFactory({ status: 'open' });
+    const response = await tenderResponseFactory({ tenderId: tender._id });
+
+    await Tenders.update({ _id: response.tenderId }, { $set: { status: 'closed' } });
 
     expect.assertions(4);
 

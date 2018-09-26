@@ -320,7 +320,7 @@ export const userFactory = async (params = {}) => {
   return save(user);
 };
 
-export const tenderFactory = async (params = {}) => {
+export const tenderDoc = async (params = {}) => {
   const requestedProduct = {
     code: faker.random.word(),
     purchaseRequestNumber: faker.random.number(),
@@ -331,31 +331,17 @@ export const tenderFactory = async (params = {}) => {
     manufacturerPartNumber: faker.random.number(),
   };
 
-  if (!params.createdUserId) {
-    const user = await userFactory({ isSupplier: true });
-    params.createdUserId = user._id;
-  }
-
   if (!params.supplierIds) {
     const supplier = await companyFactory();
-    params.supplierIds = [supplier._id];
+    params.supplierIds = [supplier._id.toString()];
   }
 
-  if (!params.type) {
-    params.type = 'rfq';
-  }
-
-  const tender = new Tenders({
-    type: params.type,
-    status: params.status || 'draft',
+  const doc = {
     number: params.number || faker.random.word(),
     sourcingOfficer: params.sourcingOfficer || faker.random.word(),
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
     attachments: params.attachments || [{ name: 'name', url: 'url' }],
-
-    createdUserId: params.createdUserId,
-    createdDate: params.createdDate || new Date(),
 
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
@@ -364,27 +350,48 @@ export const tenderFactory = async (params = {}) => {
     file: params.file || { name: 'name', url: 'url' },
     supplierIds: params.supplierIds,
     requestedProducts: params.requestedProducts || [requestedProduct],
-    requestedDocuments: params.requestedDocuments,
-    winnerIds: params.winnnerIds || [],
-    sentRegretLetter: params.sentRegretLetter || false,
-  });
+    requestedDocuments: params.requestedDocument || [],
+  };
 
-  const savedTender = await tender.save();
-  const decrypted = await Tenders.findOne({ _id: savedTender._id });
+  if (params.type) {
+    doc.type = params.type;
+  }
 
-  const fixedTender = JSON.parse(JSON.stringify(decrypted));
-
-  delete fixedTender.createdDate;
-  delete fixedTender.createdUserId;
-  delete fixedTender.__v;
-  delete fixedTender.__enc_name;
-  delete fixedTender.__enc_number;
-  delete fixedTender.__enc_content;
-
-  return fixedTender;
+  return doc;
 };
 
-export const tenderResponseFactory = async (params = {}) => {
+export const tenderFactory = async (params = {}) => {
+  const doc = await tenderDoc(params);
+
+  doc.winnerIds = params.winnnerIds || [];
+  doc.sentRegretLetter = params.sentRegretLetter || false;
+
+  if (!params.type) {
+    doc.type = 'rfq';
+  }
+
+  let createdUserId = params.createdUserId;
+
+  if (!createdUserId) {
+    const user = await userFactory({ isSupplier: true });
+    createdUserId = user._id;
+  }
+
+  let tender = await Tenders.createTender(doc, createdUserId);
+  const _id = tender._id;
+
+  // force status
+  await Tenders.update({ _id }, { $set: { status: params.status || 'draft' } });
+
+  // force createdDate
+  if (params.createdDate) {
+    await Tenders.update({ _id }, { $set: { createdDate: params.createdDate } });
+  }
+
+  return Tenders.findOne({ _id });
+};
+
+export const tenderResponseDoc = async (params = {}) => {
   if (!params.tenderId) {
     const tender = await tenderFactory();
     params.tenderId = tender._id;
@@ -395,24 +402,25 @@ export const tenderResponseFactory = async (params = {}) => {
     params.supplierId = supplier._id;
   }
 
-  const tenderResponse = new TenderResponses({
+  return {
     tenderId: params.tenderId,
     supplierId: params.supplierId,
     respondedProducts: params.respondedProducts,
     respondedDocuments: params.respondedDocuments,
-    isSent: params.isSent || false,
     isNotInterested: params.isNotInterested || false,
-  });
+  };
+};
 
-  const savedResponse = await tenderResponse.save();
-  const decrypted = await TenderResponses.findOne({ _id: savedResponse._id });
+export const tenderResponseFactory = async (params = {}) => {
+  const doc = await tenderResponseDoc(params);
 
-  const fixed = JSON.parse(JSON.stringify(decrypted));
+  const response = await TenderResponses.createTenderResponse(doc);
 
-  delete fixed.__v;
-  delete fixed.__enc_supplierId;
+  if (typeof params.isSent !== 'undefined') {
+    await TenderResponses.update({ _id: response._id }, { $set: { isSent: params.isSent } });
+  }
 
-  return fixed;
+  return TenderResponses.findOne({ _id: response._id });
 };
 
 export const feedbackFactory = async (params = {}) => {
