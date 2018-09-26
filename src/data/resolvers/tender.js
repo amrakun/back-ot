@@ -9,6 +9,10 @@ export default {
     return tender.winnerId;
   },
 
+  supplierIds(tender) {
+    return tender.getSupplierIds();
+  },
+
   suppliers(tender) {
     return Companies.find({ _id: { $in: tender.getSupplierIds() } });
   },
