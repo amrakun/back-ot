@@ -101,11 +101,12 @@ describe('Qualification db', () => {
   test('status', async () => {
     // supplier did not send qualification info
     let status = await Qualifications.status(_company._id);
+
     expect(status).toEqual({});
 
     // send qualification info but buyer did not send info
     await qualificationFactory({ supplierId: _company._id });
-    await Companies.update({ _id: _company._id }, { $set: { isPrequalified: undefined } });
+    await Companies.update({ _id: _company._id }, { $set: { isPrequalified: false } });
 
     status = await Qualifications.status(_company._id);
     expect(status).toEqual({ isFailed: true });
