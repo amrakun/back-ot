@@ -11,6 +11,26 @@ beforeAll(() => connect());
 
 afterAll(() => disconnect());
 
+const flatten = tender => JSON.parse(JSON.stringify(tender));
+
+const compare = (o1, o2) => {
+  expect(o1.type).toBe(o2.type);
+  expect(o1.number).toBe(o2.number);
+  expect(o1.name).toBe(o2.name);
+  expect(o1.content).toBe(o2.content);
+  expect(o1.attachments.toString()).toBe(o2.attachments.toString());
+  expect(o1.publishDate).toBe(o2.publishDate);
+  expect(o1.closeDate).toBe(o2.closeDate);
+  expect(o1.file.toString()).toBe(o2.file.toString());
+  expect(o1.sourcingOfficer).toBe(o2.sourcingOfficer);
+  expect(o1.reminderDay).toBe(o2.reminderDay);
+  expect(o1.supplierIds).toEqual(o2.supplierIds);
+  expect(o1.requestedProducts.toString()).toBe(o2.requestedProducts.toString());
+  expect(o1.winnerIds).toEqual(o2.winnerIds);
+  expect(o1.sentRegretLetter).toBe(o2.sentRegretLetter);
+  expect(o1.requestedDocuments.toString()).toBe(o2.requestedDocuments.toString());
+};
+
 describe('Tender db', () => {
   let _tender;
   let _user;
@@ -30,25 +50,12 @@ describe('Tender db', () => {
   test('Create tender: open status', async () => {
     delete _tender._id;
     delete _tender.status;
-    delete _tender.createdDate;
-    delete _tender.createdUserId;
 
-    let tenderObj = await Tenders.createTender(_tender, _user._id);
+    const savedTender = await Tenders.createTender(_tender, _user._id);
 
-    const { status, createdDate, createdUserId } = tenderObj;
-    const [attachment] = tenderObj.attachments;
+    const { status, createdDate, createdUserId } = savedTender;
 
-    tenderObj = JSON.parse(JSON.stringify(tenderObj));
-
-    delete tenderObj._id;
-    delete tenderObj.__v;
-    delete tenderObj.createdDate;
-    delete tenderObj.createdUserId;
-    delete tenderObj.status;
-
-    expect(tenderObj).toEqual(_tender);
-    expect(attachment.name).toBe('name');
-    expect(attachment.url).toBe('url');
+    compare(_tender, flatten(savedTender));
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');
@@ -58,15 +65,9 @@ describe('Tender db', () => {
     const doc = await tenderFactory();
     delete doc._id;
 
-    let tenderObj = await Tenders.updateTender(_tender._id, doc);
+    const updated = await Tenders.updateTender(_tender._id, doc);
 
-    tenderObj = JSON.parse(JSON.stringify(tenderObj));
-    delete tenderObj._id;
-    delete tenderObj.__v;
-    tenderObj.publishDate = tenderObj.publishDate.toString();
-    tenderObj.closeDate = tenderObj.closeDate.toString();
-
-    expect(tenderObj).toEqual(doc);
+    compare(doc, flatten(updated));
   });
 
   test('Update tender: with closed status', async () => {

@@ -1,5 +1,6 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
+import { fieldEncryption } from 'mongoose-field-encryption';
 import { field, isReached, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
@@ -61,13 +62,15 @@ class Tender extends StatusPublishClose {
    * @param {Object} userId - Creating user
    * @return {Promise} newly created tender object
    */
-  static createTender(doc, userId) {
-    return this.create({
+  static async createTender(doc, userId) {
+    const saved = await Tenders.create({
       ...doc,
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
     });
+
+    return this.findOne({ _id: saved._id });
   }
 
   /**
@@ -211,6 +214,11 @@ class Tender extends StatusPublishClose {
     return results;
   }
 }
+
+TenderSchema.plugin(fieldEncryption, {
+  fields: ['name'],
+  secret: 'key',
+});
 
 TenderSchema.loadClass(Tender);
 

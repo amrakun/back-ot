@@ -369,7 +369,19 @@ export const tenderFactory = async (params = {}) => {
     sentRegretLetter: params.sentRegretLetter || false,
   });
 
-  return save(tender);
+  const savedTender = await tender.save();
+  const decrypted = await Tenders.findOne({ _id: savedTender._id });
+
+  const fixedTender = JSON.parse(JSON.stringify(decrypted));
+
+  delete fixedTender.createdDate;
+  delete fixedTender.createdUserId;
+  delete fixedTender.__v;
+  delete fixedTender.__enc_name;
+  delete fixedTender.__enc_number;
+  delete fixedTender.__enc_content;
+
+  return fixedTender;
 };
 
 export const tenderResponseFactory = async (params = {}) => {

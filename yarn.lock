@@ -3262,6 +3262,10 @@ mongodb@2.2.33:
     mongodb-core "2.1.17"
     readable-stream "2.2.7"
 
+mongoose-field-encryption@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/mongoose-field-encryption/-/mongoose-field-encryption-2.1.1.tgz#35b5b78dd348bc405965da032e34493ae6234619"
+
 mongoose-type-email@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/mongoose-type-email/-/mongoose-type-email-1.0.5.tgz#89e797f98bc59aac2263fd7c9d5b669854aff679"
