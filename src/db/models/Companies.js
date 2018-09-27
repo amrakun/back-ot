@@ -584,6 +584,17 @@ class Company {
         }
       }
 
+      // if hasEnvironmentalRegulatorInvestigated is false then below field
+      // values must be reseted
+      if (key === 'environmentalInfo') {
+        if (!value.hasEnvironmentalRegulatorInvestigated) {
+          value.dateOfInvestigation = undefined;
+          value.reasonForInvestigation = undefined;
+          value.actionStatus = undefined;
+          value.investigationDocumentation = undefined;
+        }
+      }
+
       // Reseting file field's value back to null after related boolean
       // field's value setted to false
       const fieldNames = Object.keys(value);

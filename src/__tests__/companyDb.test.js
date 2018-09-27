@@ -145,6 +145,36 @@ describe('Companies model tests', () => {
     expect(financialInfo.recordsInfo.length).toBe(0);
   });
 
+  // Has any environmental regulator inspected / investigated your
+  // company within the last 5 years?
+  test('Update Environmental management: has investigated', async () => {
+    const company = await companyFactory({});
+
+    // hasEnvironmentalRegulatorInvestigated true =======
+    const doc = companyDocs['environmental']();
+
+    let updatedCompany = await Companies.updateSection(company._id, 'environmentalInfo', doc);
+    let environmentalInfo = updatedCompany.environmentalInfo;
+
+    expect(environmentalInfo.hasEnvironmentalRegulatorInvestigated).toBe(true);
+    expect(environmentalInfo.dateOfInvestigation).toBeDefined();
+    expect(environmentalInfo.reasonForInvestigation).toBeDefined();
+    expect(environmentalInfo.actionStatus).toBeDefined();
+    expect(environmentalInfo.investigationDocumentation).toBeDefined();
+
+    // hasEnvironmentalRegulatorInvestigated false =======
+    doc.hasEnvironmentalRegulatorInvestigated = false;
+
+    updatedCompany = await Companies.updateSection(company._id, 'environmentalInfo', doc);
+    environmentalInfo = updatedCompany.environmentalInfo;
+
+    expect(environmentalInfo.hasEnvironmentalRegulatorInvestigated).toBe(false);
+    expect(environmentalInfo.dateOfInvestigation).toBeUndefined();
+    expect(environmentalInfo.reasonForInvestigation).toBeUndefined();
+    expect(environmentalInfo.actionStatus).toBeUndefined();
+    expect(environmentalInfo.investigationDocumentation).toBeUndefined();
+  });
+
   test('Check file field is being reseted to null', async () => {
     const company = await companyFactory({});
 
