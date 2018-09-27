@@ -186,7 +186,7 @@ export const FinancialInfoSchema = mongoose.Schema(
     recordsInfo: field({ type: [DateFileSchema], optional: true }),
 
     // Is your company up to date with Social Security payments?
-    isUpToDateSSP: field({ type: Boolean }),
+    isUpToDateSSP: field({ type: Boolean, optional: true }),
 
     // Is your company up to date with Corporation Tax payments?
     isUpToDateCTP: field({ type: Boolean }),
