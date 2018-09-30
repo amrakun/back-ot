@@ -81,7 +81,10 @@ export const isReached = date => moment(date) <= utils.getNow();
 
 export const encrypt = text => {
   const { ENCRYPTION_SECRET } = process.env;
-  return encryptAes256Ctr(text, ENCRYPTION_SECRET);
+
+  const fixedString = text && text.toString ? text.toString() : text;
+
+  return encryptAes256Ctr(fixedString, ENCRYPTION_SECRET);
 };
 
 export const decrypt = encryptedHex => {
