@@ -49,7 +49,7 @@ const TenderSchema = mongoose.Schema({
 
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
-  // Awarded response ids
+  // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
@@ -136,13 +136,20 @@ class Tender extends StatusPublishClose {
       }
     }
 
-    await this.update({ _id }, { $set: { status: 'awarded', winnerIds: supplierIds } });
+    await this.update(
+      { _id },
+      { $set: { status: 'awarded', winnerIds: encryptArray(supplierIds) } },
+    );
 
     return this.findOne({ _id });
   }
 
   getSupplierIds() {
     return decryptArray(this.supplierIds);
+  }
+
+  getWinnerIds() {
+    return decryptArray(this.winnerIds);
   }
 
   /*

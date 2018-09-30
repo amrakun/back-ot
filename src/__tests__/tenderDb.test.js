@@ -163,7 +163,7 @@ describe('Tender db', () => {
 
     expect(updatedTender.status).toBe('awarded');
     expect(updatedTender.winnerIds.length).toBe(1);
-    expect(updatedTender.winnerIds).toContain(supplier._id);
+    expect(updatedTender.getWinnerIds()).toContain(supplier._id);
   });
 
   test('Publish drafts', async () => {
