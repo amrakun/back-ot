@@ -119,6 +119,10 @@ class Tender extends StatusPublishClose {
    * @return {Promise} - Updated tender object
    */
   static async award(_id, supplierIds) {
+    if (supplierIds.length === 0) {
+      throw new Error('Select some suppliers');
+    }
+
     for (const supplierId of supplierIds) {
       const responses = await TenderResponses.find({ tenderId: _id });
       const response = (responses || []).find(res => res.supplierId === supplierId);

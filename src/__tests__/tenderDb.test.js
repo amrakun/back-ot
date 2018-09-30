@@ -116,11 +116,18 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect.assertions(6);
+    expect.assertions(7);
 
     const tender = await tenderFactory({ status: 'open' });
 
     expect(tender.winnerIds.length).toBe(0);
+
+    // select at least one supplier ===============
+    try {
+      await Tenders.award(tender._id, []);
+    } catch (e) {
+      expect(e.message).toBe('Select some suppliers');
+    }
 
     // can not award not responded supplier ===============
     try {
