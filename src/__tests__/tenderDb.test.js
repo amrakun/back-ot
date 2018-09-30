@@ -116,7 +116,7 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect.assertions(5);
+    expect.assertions(6);
 
     const tender = await tenderFactory({ status: 'open' });
 
@@ -146,10 +146,16 @@ describe('Tender db', () => {
 
     // valid =============
     await TenderResponses.update({ _id: response._id }, { $set: { isNotInterested: false } });
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier._id,
+      isNotInterested: false,
+    });
 
     const updatedTender = await Tenders.award(tender._id, [supplier._id]);
 
     expect(updatedTender.status).toBe('awarded');
+    expect(updatedTender.winnerIds.length).toBe(1);
     expect(updatedTender.winnerIds).toContain(supplier._id);
   });
 

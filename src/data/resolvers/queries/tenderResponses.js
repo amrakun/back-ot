@@ -31,12 +31,12 @@ const tenderResponseQueries = {
       query.isNotInterested = isNotInterested;
     }
 
-    let tenders = await TenderResponses.find(query);
+    let responses = await TenderResponses.find(query);
 
     // search by between values =========
     // filter by sub field value
     const filterBySubField = name =>
-      tenders.filter(tender => {
+      responses.filter(tender => {
         const { minValue, maxValue, productCode } = betweenSearch;
 
         const respondedProducts = tender.respondedProducts || [];
@@ -47,22 +47,22 @@ const tenderResponseQueries = {
 
     // totalPrice
     if (betweenSearch.name === 'totalPrice') {
-      tenders = filterBySubField('totalPrice');
+      responses = filterBySubField('totalPrice');
     }
 
     // unit price
     if (betweenSearch.name === 'unitPrice') {
-      tenders = filterBySubField('unitPrice');
+      responses = filterBySubField('unitPrice');
     }
 
     // lead time
     if (betweenSearch.name === 'leadTime') {
-      tenders = filterBySubField('leadTime');
+      responses = filterBySubField('leadTime');
     }
 
     // sort by sub field value ===================
     const sortBySubField = name =>
-      tenders.sort((doc1, doc2) => {
+      responses.sort((doc1, doc2) => {
         if (!sortProductCode) {
           return;
         }
@@ -80,20 +80,20 @@ const tenderResponseQueries = {
 
     // minimum unit price
     if (sortName === 'minUnitPrice') {
-      tenders = sortBySubField('unitPrice');
+      responses = sortBySubField('unitPrice');
     }
 
     // minimum lead time
     if (sortName === 'minLeadTime') {
-      tenders = sortBySubField('leadTime');
+      responses = sortBySubField('leadTime');
     }
 
     // minimum total price
     if (sortName === 'minTotalPrice') {
-      tenders = sortBySubField('totalPrice');
+      responses = sortBySubField('totalPrice');
     }
 
-    return tenders;
+    return responses;
   },
 
   /**
