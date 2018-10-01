@@ -24,6 +24,15 @@ const qualificationMutations = {
     const replacer = text => {
       let failedSectionsEn = '';
       let failedSectionsMn = '';
+      let percentage = '';
+
+      if (supplier.tierType === 'national' || supplier.tierType === 'tier1') {
+        percentage = '25%';
+      }
+
+      if (supplier.tierType === 'umnugobi') {
+        percentage = '50%';
+      }
 
       const collect = (status, enText, mnText) => {
         if (!status) {
@@ -62,14 +71,17 @@ const qualificationMutations = {
         .replace('{supplier.tierType}', supplier.tierTypeDisplay())
         .replace('{failedSectionsEn}', failedSectionsEn)
         .replace('{failedSectionsMn}', failedSectionsMn)
+        .replace('{percentage}', percentage)
         .replace('{supplier._id}', supplier._id);
     };
+
+    const { PREQUALIFICATION_STATUS_EMAILS } = process.env;
 
     // send notification email
     await sendConfigEmail({
       name: 'prequalificationTemplates',
       kind: `supplier__${qualified ? 'qualified' : 'failed'}`,
-      toEmails: [supplier.basicInfo.email],
+      toEmails: [supplier.basicInfo.email, ...PREQUALIFICATION_STATUS_EMAILS.split(',')],
       replacer,
     });
 
