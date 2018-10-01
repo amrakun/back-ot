@@ -65,14 +65,14 @@ const qualificationMutations = {
       }
 
       return text
-        .replace('{supplier.enName}', basicInfo.enName || '')
-        .replace('{supplier.mnName}', basicInfo.mnName || '')
-        .replace('{supplier.vendorNumber}', basicInfo.sapNumber || '')
-        .replace('{supplier.tierType}', supplier.tierTypeDisplay())
-        .replace('{failedSectionsEn}', failedSectionsEn)
-        .replace('{failedSectionsMn}', failedSectionsMn)
-        .replace('{percentage}', percentage)
-        .replace('{supplier._id}', supplier._id);
+        .replace(/{supplier.enName}/g, basicInfo.enName || '')
+        .replace(/{supplier.mnName}/g, basicInfo.mnName || '')
+        .replace(/{supplier.vendorNumber}/g, basicInfo.sapNumber || '')
+        .replace(/{supplier.tierType}/g, supplier.tierTypeDisplay())
+        .replace(/{failedSectionsEn}/g, failedSectionsEn)
+        .replace(/{failedSectionsMn}/g, failedSectionsMn)
+        .replace(/{percentage}/g, percentage)
+        .replace(/{supplier._id}/g, supplier._id);
     };
 
     const { PREQUALIFICATION_STATUS_EMAILS } = process.env;
