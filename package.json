@@ -11,14 +11,17 @@
   "private": true,
   "scripts": {
     "start": "node dist",
-    "dev": "NODE_ENV=development ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' nodemon src --exec babel-node",
+    "dev": "NODE_ENV=development ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' nodemon src --exec babel-node",
     "build": "babel src --out-dir dist --ignore __tests__,tests --copy-files",
     "lint": "eslint src",
     "format": "prettier --write --print-width 100 --single-quote --trailing-comma all 'src/**/*.js'",
     "precommit": "lint-staged",
     "test": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' jest --runInBand --coverage",
     "loadInitialData": "babel-node ./src/initialData.js",
-    "customCommand": "babel-node ./src/scripts/customCommand.js"
+    "generateSecret": "openssl rand -base64 32",
+    "customCommand": "babel-node ./src/scripts/customCommand.js",
+    "addPlainFields": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' babel-node ./src/scripts/addPlainFields.js",
+    "encryptTenders": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/encryptTenders.js"
   },
   "lint-staged": {
     "*.js": [

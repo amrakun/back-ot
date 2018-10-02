@@ -56,6 +56,13 @@ const TenderSchema = mongoose.Schema({
 
   // eoi documents
   requestedDocuments: field({ type: [String], optional: true }),
+
+  // TODO: remove
+  plainName: field({ type: String, optional: true }),
+  plainNumber: field({ type: String, optional: true }),
+  plainContent: field({ type: String, optional: true }),
+  plainSupplierIds: field({ type: [String], optional: true }),
+  plainWinnerIds: field({ type: [String], optional: true }),
 });
 
 class Tender extends StatusPublishClose {
@@ -286,6 +293,9 @@ const TenderResponseSchema = mongoose.Schema({
   isSent: field({ type: Boolean, optional: true }),
 
   isNotInterested: field({ type: Boolean, default: false }),
+
+  // TODO: remove
+  plainSupplierId: field({ type: String, optional: true }),
 });
 
 TenderResponseSchema.plugin(fieldEncryption, {
