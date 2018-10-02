@@ -19,9 +19,7 @@
     "test": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' jest --runInBand --coverage",
     "loadInitialData": "babel-node ./src/initialData.js",
     "generateSecret": "openssl rand -base64 32",
-    "customCommand": "babel-node ./src/scripts/customCommand.js",
-    "addPlainFields": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' babel-node ./src/scripts/addPlainFields.js",
-    "encryptTenders": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/encryptTenders.js"
+    "customCommand": "babel-node ./src/scripts/customCommand.js"
   },
   "lint-staged": {
     "*.js": [

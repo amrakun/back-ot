@@ -22,7 +22,6 @@ export const customCommand = async () => {
 
     // is encrypted tender
     if (typeof tender.__enc_name !== 'undefined') {
-      // eslint-disable-line
       doc.plainSupplierIds = decryptArray(tender.supplierIds);
       doc.plainWinnerIds = decryptArray(tender.winnerIds);
     } else {
