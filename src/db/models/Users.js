@@ -278,7 +278,9 @@ class User {
    * @param {String} secret - Token secret
    * @return [String] - list of tokens
    */
-  static async createTokens(user, secret) {
+  static async createTokens(_user, secret) {
+    const user = _user.toJSON();
+
     delete user.password;
     delete user.registrationToken;
     delete user.registrationTokenExpires;
