@@ -67,6 +67,7 @@ export const types = `
 export const queries = `
   qualificationDetail(supplierId: String!): Qualification
   qualificationDetailByUser: Qualification
+  qualificationPrequalificationReplacer(supplierId: String!): JSON
 `;
 
 export const mutations = `
