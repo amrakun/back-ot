@@ -568,6 +568,11 @@ class Company {
     const company = await this.findOne({ _id });
 
     if (value) {
+      // is not existing supplier
+      if (key === 'basicInfo' && !value.isRegisteredOnSup) {
+        value.sapNumber = undefined;
+      }
+
       if (key === 'financialInfo') {
         // if canProvideAccountsInfo is false then below field values must
         // be reseted

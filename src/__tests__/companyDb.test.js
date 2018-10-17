@@ -75,6 +75,32 @@ describe('Companies model tests', () => {
     }
   });
 
+  test('Update basic Info: vendorNumber reset to null', async () => {
+    const company = await companyFactory();
+
+    const doc = companyDocs['basic']();
+
+    // is existing supplier true
+    doc.isRegisteredOnSup = true;
+    doc.sapNumber = '1';
+
+    let updatedCompany = await Companies.updateSection(company._id, 'basicInfo', doc);
+
+    let basicInfo = updatedCompany.basicInfo;
+
+    expect(basicInfo.isRegisteredOnSup).toBe(true);
+    expect(basicInfo.sapNumber).toBe('1');
+
+    // is existing supplier false
+    doc.isRegisteredOnSup = false;
+
+    updatedCompany = await Companies.updateSection(company._id, 'basicInfo', doc);
+    basicInfo = updatedCompany.basicInfo;
+
+    expect(basicInfo.isRegisteredOnSup).toBe(false);
+    expect(basicInfo.sapNumber).toBe(undefined);
+  });
+
   test('Update basic info: valid', async () => {
     await checkSection('basic');
   });
