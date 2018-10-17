@@ -95,5 +95,9 @@ export const mutations = `
     tierType: String!
   ): Qualification
 
-  qualificationsPrequalify(supplierId: String!, qualified: Boolean): Company
+  qualificationsPrequalify(
+    supplierId: String!,
+    qualified: Boolean,
+    templateObject: JSON
+  ): Company
 `;

@@ -149,10 +149,17 @@ export const sendEmail = async args => {
 /*
  * Send email using config
  */
-export const sendConfigEmail = async ({ name, kind, toEmails, attachments, replacer }) => {
+export const sendConfigEmail = async ({
+  templateObject,
+  name,
+  kind,
+  toEmails,
+  attachments,
+  replacer,
+}) => {
   const config = await Configs.getConfig();
   const templates = config[name] || {};
-  const template = templates[kind];
+  const template = templateObject || templates[kind];
 
   if (!template) {
     throw new Error(`${name} ${kind} template not found`);

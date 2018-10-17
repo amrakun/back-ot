@@ -13,7 +13,7 @@ const qualificationMutations = {
   /*
    * Prequalify a supplier
    */
-  async qualificationsPrequalify(root, { supplierId, qualified }) {
+  async qualificationsPrequalify(root, { supplierId, qualified, templateObject }) {
     const supplier = await Companies.findOne({ _id: supplierId });
 
     await SuppliersByProductCodeLogs.createLog(supplier);
@@ -79,6 +79,7 @@ const qualificationMutations = {
 
     // send notification email
     await sendConfigEmail({
+      templateObject,
       name: 'prequalificationTemplates',
       kind: `supplier__${qualified ? 'qualified' : 'failed'}`,
       toEmails: [supplier.basicInfo.email, ...PREQUALIFICATION_STATUS_EMAILS.split(',')],
