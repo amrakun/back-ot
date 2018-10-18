@@ -44,7 +44,7 @@ describe('User db utils', () => {
   });
 
   test('Create user', async () => {
-    const testPassword = 'test';
+    const testPassword = 'Dombo$1234';
 
     delete _user._id;
 
@@ -89,7 +89,7 @@ describe('User db utils', () => {
     const updateDoc = await userFactory();
     delete updateDoc._id;
 
-    const testPassword = 'updatedPass';
+    const testPassword = 'updatedPass$1234';
     const testEmail = 'test@gmail.com';
 
     // try with password ============
@@ -250,12 +250,12 @@ describe('User db utils', () => {
     // valid
     const user = await Users.resetPassword({
       token: 'token',
-      newPassword: 'password',
+      newPassword: 'Password$123',
     });
 
     expect(user.resetPasswordToken).toBe(null);
     expect(user.resetPasswordExpires).toBe(null);
-    expect(bcrypt.compare('password', user.password)).toBeTruthy();
+    expect(bcrypt.compare('Password$123', user.password)).toBeTruthy();
   });
 
   test('Change password: incorrect current password', async () => {
@@ -432,11 +432,11 @@ describe('User db utils', () => {
     }
 
     // valid
-    const user = await Users.confirmRegistration('token', 'password');
+    const user = await Users.confirmRegistration('token', 'Password$123');
 
     expect(user.registrationToken).toBe(null);
     expect(user.registrationTokenExpires).toBe(null);
-    expect(bcrypt.compare('password', user.password)).toBeTruthy();
+    expect(bcrypt.compare('Password$123', user.password)).toBeTruthy();
   });
 
   test('Refresh tokens', async () => {

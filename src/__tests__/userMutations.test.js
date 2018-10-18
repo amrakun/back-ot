@@ -80,8 +80,8 @@ describe('User mutations', async () => {
 
   const args = {
     token: 'token',
-    password: 'pass',
-    passwordConfirmation: 'pass',
+    password: 'Password$123',
+    passwordConfirmation: 'Password$123',
   };
 
   // valid tokens =================
@@ -210,7 +210,7 @@ describe('User mutations', async () => {
   test('Reset password', async () => {
     Users.resetPassword = jest.fn(() => ({}));
 
-    const doc = { token: '2424920429402', newPassword: 'newPassword' };
+    const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
     await userMutations.resetPassword({}, doc);
 
@@ -222,7 +222,7 @@ describe('User mutations', async () => {
 
     const doc = {
       currentPassword: 'currentPassword',
-      newPassword: 'newPassword',
+      newPassword: 'Password$123',
     };
 
     const user = { _id: 'DFAFASD' };

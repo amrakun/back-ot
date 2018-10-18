@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
+import passwordValidator from 'password-validator';
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
 import { Session, Audits, BlockedCompanies, Feedbacks, Tenders } from './';
@@ -56,6 +57,33 @@ class User {
     return 'dfjklsafjjekjtejifjidfjsfd';
   }
 
+  static validatePassword(password) {
+    const schema = new passwordValidator();
+
+    schema
+      .is()
+      .min(8) // Minimum length 8
+      .is()
+      .max(100) // Maximum length 100
+      .has()
+      .uppercase() // Must have uppercase letters
+      .has()
+      .lowercase() // Must have lowercase letters
+      .has()
+      .digits() // Must have digits
+      .has()
+      .symbols() // Must include symbols
+      .has()
+      .not()
+      .spaces(); // Should not have spaces
+
+    if (!schema.validate(password)) {
+      throw new Error(
+        'Password must have uppercase letters, lowercase letters, digits and symbols. Minimum length is 8',
+      );
+    }
+  }
+
   /**
    * Create new user
    * @param {Object} doc - user fields
@@ -67,6 +95,8 @@ class User {
     if (await this.findOne({ email })) {
       throw new Error('Duplicated email');
     }
+
+    this.validatePassword(password);
 
     return this.create({
       ...doc,
@@ -93,6 +123,8 @@ class User {
 
     // change password
     if (password) {
+      this.validatePassword(password);
+
       doc.password = await this.generatePassword(password);
 
       // if there is no password specified then leave password field alone
@@ -205,6 +237,8 @@ class User {
       throw new Error('Password is required.');
     }
 
+    this.validatePassword(newPassword);
+
     // set new password
     await this.findByIdAndUpdate(
       { _id: user._id },
@@ -233,6 +267,8 @@ class User {
     if (!valid) {
       throw new Error('Incorrect current password');
     }
+
+    this.validatePassword(newPassword);
 
     // set new password
     await this.findByIdAndUpdate(
@@ -371,6 +407,8 @@ class User {
     if (!password) {
       throw new Error('Password is required.');
     }
+
+    this.validatePassword(password);
 
     // set new password
     await this.findByIdAndUpdate(
