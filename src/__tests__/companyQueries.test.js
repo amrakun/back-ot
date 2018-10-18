@@ -114,12 +114,13 @@ describe('Company queries', () => {
       }
     };
 
-    expect.assertions(5);
+    expect.assertions(6);
 
     const user = await userFactory({ isSupplier: true });
 
     const items = [
       'companies',
+      'companiesTotalCount',
       'companiesExport',
       'companyRegistrationExport',
       'companiesValidatedProductsInfoExport',

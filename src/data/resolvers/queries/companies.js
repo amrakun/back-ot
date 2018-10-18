@@ -470,6 +470,7 @@ const companyQueries = {
 };
 
 requireBuyer(companyQueries, 'companies');
+requireBuyer(companyQueries, 'companiesTotalCount');
 requireBuyer(companyQueries, 'companiesExport');
 requireBuyer(companyQueries, 'companyRegistrationExport');
 requireBuyer(companyQueries, 'companyPrequalificationExport');
