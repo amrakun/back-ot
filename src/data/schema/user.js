@@ -68,6 +68,7 @@ export const mutations = `
   ): User
 
   login(email: String!, password: String!, loginAs: String): AuthPayload!
+  logout: String
   forgotPassword(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String
 

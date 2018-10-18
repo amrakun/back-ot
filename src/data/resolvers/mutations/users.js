@@ -104,6 +104,10 @@ const userMutations = {
     return Users.login(args);
   },
 
+  logout(root, args, { user }) {
+    return Users.logout(user);
+  },
+
   /*
    * Send forgot password email
    * @param {String} email - Email to send link

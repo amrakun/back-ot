@@ -5,7 +5,7 @@ import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
-import { Audits, BlockedCompanies, Feedbacks, Tenders } from './';
+import { Session, Audits, BlockedCompanies, Feedbacks, Tenders } from './';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -274,6 +274,7 @@ class User {
 
   /*
    * Creates regular and refresh tokens using given user information
+   * Not using refresh tokens for now
    * @param {Object} _user - User object
    * @param {String} secret - Token secret
    * @return [String] - list of tokens
@@ -287,10 +288,10 @@ class User {
     delete user.resetPasswordToken;
     delete user.resetPasswordExpires;
 
-    const createToken = await jwt.sign({ user }, secret, { expiresIn: '20m' });
+    const createToken = await jwt.sign({ user }, secret, { expiresIn: '1d' });
 
     const createRefreshToken = await jwt.sign({ user }, secret, {
-      expiresIn: '7d',
+      expiresIn: '1d',
     });
 
     return [createToken, createRefreshToken];
@@ -440,6 +441,7 @@ class User {
     const [token, refreshToken] = await this.createTokens(user, this.getSecret());
 
     user.lastLoginDate = new Date();
+
     await user.save();
 
     return {
@@ -448,6 +450,14 @@ class User {
       refreshToken,
       user,
     };
+  }
+
+  static logout(user) {
+    Session.create({
+      invalidToken: user && user.loginToken,
+    });
+
+    return 'loggedOut';
   }
 
   /*

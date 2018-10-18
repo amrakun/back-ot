@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Users } from './db/models';
+import { Session, Users } from './db/models';
 
 /*
  * Finds user object by passed tokens
@@ -15,24 +15,18 @@ export const userMiddleware = async (req, res, next) => {
       // verify user token and retrieve stored user information
       const { user } = jwt.verify(token, Users.getSecret());
 
-      // save user in request
-      req.user = user;
+      // logged out
+      const isLoggedout = await Session.findOne({ invalidToken: token });
 
-      // if token is invalid or expired
-    } catch (e) {
-      const refreshToken = req.headers['x-refresh-token'];
-
-      // create new tokens using refresh token & refresh token
-      const newTokens = await Users.refreshTokens(refreshToken);
-
-      if (newTokens.token && newTokens.refreshToken) {
-        res.set('Access-Control-Expose-Headers', 'x-token, x-refresh-token');
-        res.set('x-token', newTokens.token);
-        res.set('x-refresh-token', newTokens.refreshToken);
+      if (isLoggedout) {
+        return next();
       }
 
       // save user in request
-      req.user = newTokens.user;
+      req.user = user;
+      req.user.loginToken = token;
+    } catch (e) {
+      return next();
     }
   }
 
