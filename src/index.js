@@ -35,9 +35,27 @@ app.post('/upload-file', async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, response) => {
-    const url = await uploadFile(response.file);
+    const { type, size } = response.file;
 
-    return res.end(url);
+    // 20mb
+    if (size > 20000000) {
+      return res.status(500).send('Too large file');
+    }
+
+    if (
+      [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/pdf',
+      ].includes(type)
+    ) {
+      const url = await uploadFile(response.file);
+      return res.end(url);
+    }
+
+    return res.status(500).send('Invalid file');
   });
 });
 
