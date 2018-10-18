@@ -472,11 +472,13 @@ const companyQueries = {
 requireBuyer(companyQueries, 'companies');
 requireBuyer(companyQueries, 'companiesTotalCount');
 requireBuyer(companyQueries, 'companiesExport');
+requireBuyer(companyQueries, 'companyDetail');
 requireBuyer(companyQueries, 'companyRegistrationExport');
 requireBuyer(companyQueries, 'companyPrequalificationExport');
 requireBuyer(companyQueries, 'companiesValidatedProductsInfoExport');
 requireBuyer(companyQueries, 'companiesCountByTierType');
 requireBuyer(companyQueries, 'companiesCountByRegisteredVsPrequalified');
+requireBuyer(companyQueries, 'companiesCountByProductCode');
 requireBuyer(companyQueries, 'companiesGenerateDueDiligenceList');
 requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
 requireBuyer(companyQueries, 'companiesGeneratePrequalificationList');
