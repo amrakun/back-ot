@@ -26,7 +26,24 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use('/static', express.static(path.join(__dirname, 'private')));
+app.use(userMiddleware);
+
+app.use(
+  '/static',
+  (req, res, next) => {
+    if (!req.user) {
+      return res.end('foribidden');
+    }
+
+    // hide all files from supplier
+    if (req.user.isSupplier) {
+      return res.end('foribidden');
+    }
+
+    return next();
+  },
+  express.static(path.join(__dirname, 'private')),
+);
 
 app.use(cors());
 
@@ -59,11 +76,7 @@ app.post('/upload-file', async (req, res) => {
   });
 });
 
-app.use(
-  '/graphql',
-  userMiddleware,
-  graphqlExpress(req => ({ schema, context: { user: req.user } })),
-);
+app.use('/graphql', graphqlExpress(req => ({ schema, context: { user: req.user } })));
 
 // Wrap the Express server
 const server = createServer(app);

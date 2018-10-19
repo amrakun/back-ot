@@ -8,7 +8,7 @@ import { Session, Users } from './db/models';
  * @param {Function} next - Next function
  */
 export const userMiddleware = async (req, res, next) => {
-  const token = req.headers['x-token'];
+  const token = req.headers['x-token'] || req.query.token;
 
   if (token) {
     try {
