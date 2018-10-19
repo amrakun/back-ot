@@ -400,6 +400,43 @@ describe('User db utils', () => {
     expect(userObj.role).toBe(undefined);
   });
 
+  test('Regenerate registration tokens', async () => {
+    expect.assertions(3);
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: undefined,
+          registrationTokenExpires: undefined,
+        },
+      },
+    );
+
+    const user = await Users.findOne({ _id: _user._id });
+
+    try {
+      await Users.regenerateRegistrationTokens(user.email);
+    } catch (e) {
+      expect(e.message).toBe('Invalid email');
+    }
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: Date.now() + 86400000,
+        },
+      },
+    );
+
+    const userObj = await Users.regenerateRegistrationTokens(user.email);
+
+    expect(userObj.registrationToken).toBeDefined();
+    expect(userObj.registrationTokenExpires).toBeDefined();
+  });
+
   test('Confirm registration', async () => {
     expect.assertions(5);
 

@@ -2,16 +2,14 @@ import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
 import { requireLogin, requireBuyer } from '../../permissions';
 
-const register = async email => {
-  const user = await Users.register(email);
-
+const registrationEmail = async user => {
   // send email ==============
   const { MAIN_APP_DOMAIN } = process.env;
 
   const link = `${MAIN_APP_DOMAIN}/confirm-registration?token=${user.registrationToken}`;
 
   utils.sendEmail({
-    toEmails: [email],
+    toEmails: [user.email],
     title: 'Registration',
     template: {
       name: 'registration',
@@ -24,6 +22,12 @@ const register = async email => {
   return { user, link };
 };
 
+const register = async email => {
+  const user = await Users.register(email);
+
+  return registrationEmail(user);
+};
+
 const userMutations = {
   /*
    * Register
@@ -32,6 +36,19 @@ const userMutations = {
    */
   async register(root, { email }) {
     const { link } = await register(email);
+
+    return link;
+  },
+
+  /*
+   * Resend confirmation link
+   * @param {String} email - User email
+   * @return - Confirmation link
+   */
+  async resendConfirmationLink(root, { email }) {
+    const user = await Users.regenerateRegistrationTokens(email);
+
+    const { link } = await registrationEmail(user);
 
     return link;
   },

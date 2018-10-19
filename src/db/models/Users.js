@@ -385,6 +385,37 @@ class User {
     });
   }
 
+  /**
+   * Regenerate registration tokens
+   * @param {String} email - user email
+   * @return {Promise} updated user object
+   */
+  static async regenerateRegistrationTokens(rawEmail) {
+    const email = rawEmail.toLowerCase();
+
+    const user = await Users.findOne({
+      email,
+      registrationToken: { $ne: null },
+      registrationTokenExpires: { $ne: null },
+    });
+
+    if (!user) {
+      throw new Error('Invalid email');
+    }
+
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          registrationToken: await this.generateRandomToken(),
+          registrationTokenExpires: Date.now() + 86400000,
+        },
+      },
+    );
+
+    return this.findOne({ _id: user._id });
+  }
+
   /*
    * Confirms user registration by given token & password
    * @param {String} token - User's temporary token for registration

@@ -62,6 +62,30 @@ describe('User mutations', async () => {
     expect(user._id).toBeDefined();
   });
 
+  test('Resend confirmation link', async () => {
+    const user = await userFactory({});
+
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: new Date(),
+        },
+      },
+    );
+
+    const mutation = `
+      mutation resendConfirmationLink($email: String!) {
+        resendConfirmationLink(email: $email)
+      }
+    `;
+
+    const link = await graphqlRequest(mutation, 'resendConfirmationLink', { email: user.email });
+
+    expect(link).toBeDefined();
+  });
+
   const confirmMutation = `
     mutation confirmRegistration(
       $token: String!,

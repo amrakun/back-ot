@@ -53,6 +53,7 @@ const commonParams = `
 
 export const mutations = `
   register(email: String!): String!
+  resendConfirmationLink(email: String!): String!
 
   registerViaBuyer(
     companyName: String!,
