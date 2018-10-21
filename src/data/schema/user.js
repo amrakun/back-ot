@@ -16,6 +16,8 @@ export const types = `
     delegatedUserId: String
     delegationStartDate: Date
     delegationEndDate: Date
+
+    temporarySecureInformation: JSON
   }
 
   type AuthPayload {
@@ -67,6 +69,8 @@ export const mutations = `
     password: String!,
     passwordConfirmation: String!
   ): User
+
+  confirmProfileEdit(token: String!): User
 
   login(email: String!, password: String!, loginAs: String): AuthPayload!
   logout: String

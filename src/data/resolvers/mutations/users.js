@@ -111,6 +111,17 @@ const userMutations = {
   },
 
   /*
+   * Confirm profile edit
+   * @param {String} token - Temporary token
+   * @return - Updated user object
+   */
+  async confirmProfileEdit(root, args) {
+    const { token } = args;
+
+    return Users.confirmProfileEdit(token);
+  },
+
+  /*
    * Login
    * @param {String} email - User email
    * @param {String} password - User password
@@ -228,7 +239,27 @@ const userMutations = {
       throw new Error('Invalid password');
     }
 
-    return Users.editProfile(user._id, args);
+    const updatedUser = await Users.editProfile(user._id, args);
+
+    if (updatedUser.temporarySecureInformation) {
+      const { MAIN_APP_DOMAIN } = process.env;
+      const link = `${MAIN_APP_DOMAIN}/confirm-profile-edition?token=${
+        updatedUser.temporarySecureInformation.token
+      }`;
+
+      utils.sendEmail({
+        toEmails: [user.email],
+        title: 'Confirm profile edition',
+        template: {
+          name: 'profileEditConfirmation',
+          data: {
+            content: link,
+          },
+        },
+      });
+    }
+
+    return updatedUser;
   },
 
   /*

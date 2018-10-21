@@ -187,7 +187,7 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
-    expect.assertions(7);
+    expect.assertions(11);
 
     const updateDoc = await userFactory();
 
@@ -208,8 +208,14 @@ describe('User db utils', () => {
 
     const userObj = await Users.findOne({ _id: _user._id });
 
-    expect(userObj.username).toBe(updateDoc.username);
-    expect(userObj.email).toBe('test@gmail.com');
+    // do not update secure informations right away
+    expect(userObj.username).toBe(_user.username);
+    expect(userObj.email).toBe(_user.email);
+    expect(userObj.temporarySecureInformation.token).toBeDefined();
+    expect(userObj.temporarySecureInformation.expires).toBeDefined();
+    expect(userObj.temporarySecureInformation.username).toBe(updateDoc.username);
+    expect(userObj.temporarySecureInformation.email).toBe('test@gmail.com');
+
     expect(userObj.firstName).toBe(updateDoc.firstName);
     expect(userObj.lastName).toBe(updateDoc.lastName);
     expect(userObj.jobTitle).toBe(updateDoc.jobTitle);
@@ -474,6 +480,42 @@ describe('User db utils', () => {
     expect(user.registrationToken).toBe(null);
     expect(user.registrationTokenExpires).toBe(null);
     expect(bcrypt.compare('Password$123', user.password)).toBeTruthy();
+  });
+
+  test('Confirm profile edit', async () => {
+    expect.assertions(4);
+
+    // token expired ==============
+    try {
+      await Users.confirmProfileEdit('token');
+    } catch (e) {
+      expect(e.message).toBe('Token is invalid or has expired.');
+    }
+
+    // valid token =================
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          temporarySecureInformation: {
+            token: 'token',
+            expires: tomorrow,
+            email: 'tempemail',
+            username: 'tempUsername',
+          },
+        },
+      },
+    );
+
+    const user = await Users.confirmProfileEdit('token');
+
+    expect(user.temporarySecureInformation).toBe(null);
+    expect(user.email).toBe('tempemail');
+    expect(user.username).toBe('tempUsername');
   });
 
   test('Refresh tokens', async () => {

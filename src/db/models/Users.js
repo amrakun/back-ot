@@ -49,6 +49,8 @@ const UserSchema = mongoose.Schema({
   delegationStartDate: field({ type: Date, optional: true }),
   delegationEndDate: field({ type: Date, optional: true }),
 
+  temporarySecureInformation: field({ type: Object, optional: true }),
+
   lastLoginDate: field({ type: Date, optional: true }),
 });
 
@@ -146,9 +148,57 @@ class User {
   static async editProfile(_id, doc) {
     delete doc.password;
 
+    const userOnDb = await Users.findOne({ _id });
+
+    // changed secure information
+    if (userOnDb.email !== doc.email || userOnDb.username !== doc.username) {
+      const token = await this.generateRandomToken();
+
+      doc.temporarySecureInformation = {
+        email: doc.email,
+        username: doc.username,
+        token: token,
+        expires: Date.now() + 86400000,
+      };
+
+      delete doc.email;
+      delete doc.username;
+    }
+
     await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
+  }
+
+  /*
+   * Confirms profile edition by given token
+   * @param {String} token - User's temporary token for profile edition
+   * @return {Promise} - Updated user information
+   */
+  static async confirmProfileEdit(token) {
+    // find user by token
+    const user = await this.findOne({
+      'temporarySecureInformation.token': token,
+      'temporarySecureInformation.expires': {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      throw new Error('Token is invalid or has expired.');
+    }
+
+    // set new information
+    await this.findByIdAndUpdate(
+      { _id: user._id },
+      {
+        email: user.temporarySecureInformation.email,
+        username: user.temporarySecureInformation.username,
+        temporarySecureInformation: undefined,
+      },
+    );
+
+    return this.findOne({ _id: user._id });
   }
 
   /*

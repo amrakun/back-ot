@@ -455,7 +455,7 @@ describe('User mutations', async () => {
   });
 
   test('Users edit profile: successfull', async () => {
-    Users.editProfile = jest.fn();
+    Users.editProfile = jest.fn(() => ({ _id: Math.random() }));
 
     const mutation = `
       mutation usersEditProfile(
