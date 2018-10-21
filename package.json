@@ -32,6 +32,7 @@
     "bcrypt": "^1.0.3",
     "body-parser": "^1.17.1",
     "cellref": "^3.0.0",
+    "cookie-parser": "^1.4.3",
     "cors": "^2.8.1",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",

@@ -128,8 +128,28 @@ const userMutations = {
    * @return tokens.token - Token to use authenticate against graphql endpoints
    * @return tokens.refreshToken - Token to use refresh expired token
    */
-  login(root, args) {
-    return Users.login(args);
+  async login(root, args, { res }) {
+    const response = await Users.login(args);
+
+    const { token } = response;
+
+    const oneDay = 1 * 24 * 3600 * 1000; // 1 day
+
+    const cookieOptions = {
+      httpOnly: true,
+      expires: new Date(Date.now() + oneDay),
+      maxAge: oneDay,
+    };
+
+    const { NODE_ENV } = process.env;
+
+    if (NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+    }
+
+    res.cookie('auth-token', token, cookieOptions);
+
+    return response;
   },
 
   logout(root, args, { user }) {

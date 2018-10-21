@@ -6,9 +6,12 @@ import dotenv from 'dotenv';
 // load environment variables
 dotenv.config();
 
+const { MAIN_APP_DOMAIN } = process.env;
+
 import express from 'express';
 import { createServer } from 'http';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import formidable from 'formidable';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
@@ -25,6 +28,7 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use(userMiddleware);
 
@@ -45,7 +49,12 @@ app.use(
   express.static(path.join(__dirname, 'private')),
 );
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: MAIN_APP_DOMAIN,
+  }),
+);
 
 // file upload
 app.post('/upload-file', async (req, res) => {
@@ -76,7 +85,7 @@ app.post('/upload-file', async (req, res) => {
   });
 });
 
-app.use('/graphql', graphqlExpress(req => ({ schema, context: { user: req.user } })));
+app.use('/graphql', graphqlExpress((req, res) => ({ schema, context: { res, user: req.user } })));
 
 // Wrap the Express server
 const server = createServer(app);
