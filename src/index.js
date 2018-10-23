@@ -39,6 +39,11 @@ app.use(
       return res.end('foribidden');
     }
 
+    // TODO: do not allow
+    if (req.url === '/templateOutputs/company_prequalification.xlsx') {
+      return next();
+    }
+
     // hide all files from supplier
     if (req.user.isSupplier) {
       return res.end('foribidden');
@@ -46,6 +51,7 @@ app.use(
 
     return next();
   },
+
   express.static(path.join(__dirname, 'private')),
 );
 
