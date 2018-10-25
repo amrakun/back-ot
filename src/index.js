@@ -17,7 +17,7 @@ import formidable from 'formidable';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
-import { uploadFile } from './data/utils';
+import { uploadFile, readS3File } from './data/utils';
 import schema from './data';
 import './startup';
 
@@ -62,8 +62,27 @@ app.use(
   }),
 );
 
+// read file from amazon s3
+app.get('/read-file', async (req, res) => {
+  if (!req.user) {
+    return res.end('foribidden');
+  }
+
+  const key = req.query.key;
+
+  const response = await readS3File(key);
+
+  res.attachment(key);
+
+  return res.send(response.Body);
+});
+
 // file upload
 app.post('/upload-file', async (req, res) => {
+  if (!req.user) {
+    return res.status(500).send('Forbidden');
+  }
+
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, response) => {
