@@ -11,7 +11,7 @@ const reportsQuery = {
    * @param {String} args.tierType - Tier type
    * @return {String} file url of the generated reports_suppliers.xlsx
    */
-  async reportsSuppliersExport(root, { productCodes, isPrequalified, tierType }) {
+  async reportsSuppliersExport(root, { productCodes, isPrequalified, tierType }, { user }) {
     const query = {};
 
     if (productCodes && productCodes.length > 0) {
@@ -93,7 +93,7 @@ const reportsQuery = {
     }
 
     // Write to file.
-    return generateXlsx(workbook, 'reports_suppliers');
+    return generateXlsx(user, workbook, 'reports_suppliers');
   },
 
   /**
@@ -108,7 +108,7 @@ const reportsQuery = {
    * @param {String} args - Query params
    * @return {String} file url of the generated reports_tenders.xlsx
    */
-  async reportsTendersExport(root, { type, publishDate, closeDate }) {
+  async reportsTendersExport(root, { type, publishDate, closeDate }, { user }) {
     let filter = {};
 
     if (publishDate) {
@@ -155,7 +155,7 @@ const reportsQuery = {
     }
 
     // Write to file.
-    return generateXlsx(workbook, 'reports_tenders');
+    return generateXlsx(user, workbook, 'reports_tenders');
   },
 
   /**
@@ -170,7 +170,7 @@ const reportsQuery = {
    * @param {String} args - Query params
    * @return {String} file url of the generated reports_audit_export.xlsx
    */
-  async reportsAuditExport(root, { publishDate, closeDate }) {
+  async reportsAuditExport(root, { publishDate, closeDate }, { user }) {
     const { workbook, sheet } = await readTemplate('reports_audit_export');
 
     let filter = {};
@@ -215,14 +215,14 @@ const reportsQuery = {
       }
     }
 
-    return generateXlsx(workbook, 'reports_audit_export');
+    return generateXlsx(user, workbook, 'reports_audit_export');
   },
 
   /**
    * Supplier's shareholder owner report
    * @return {String} file url of the generated reports_shareholder.xlsx
    */
-  async reportsShareholder(root, { name }) {
+  async reportsShareholder(root, { name }, { user }) {
     const { workbook, sheet } = await readTemplate('reports_shareholder');
     const suppliers = await Companies.find({});
 
@@ -319,7 +319,7 @@ const reportsQuery = {
       index++;
     }
 
-    return generateXlsx(workbook, 'reports_shareholder');
+    return generateXlsx(user, workbook, 'reports_shareholder');
   },
 };
 

@@ -25,7 +25,7 @@ const tenderResponseQueries = {
    * @param {[String]} supplierIds - Selected supplier ids
    * @return {String} generated file link
    */
-  async tenderResponsesRfqBidSummaryReport(root, { tenderId, supplierIds }) {
+  async tenderResponsesRfqBidSummaryReport(root, { tenderId, supplierIds }, { user }) {
     const { tender, responses, workbook, sheet } = await prepareReport({
       tenderId,
       supplierIds,
@@ -65,7 +65,7 @@ const tenderResponseQueries = {
       }
     }
 
-    return generateXlsx(workbook, `rfq_bid_summary_${tender._id}`);
+    return generateXlsx(user, workbook, `rfq_bid_summary_${tender._id}`);
   },
 
   /**
@@ -74,7 +74,7 @@ const tenderResponseQueries = {
    * @param {[String]} supplierIds - Selected supplier ids
    * @return {String} generated file link
    */
-  async tenderResponsesEoiShortList(root, { tenderId, supplierIds }) {
+  async tenderResponsesEoiShortList(root, { tenderId, supplierIds }, { user }) {
     const { tender, responses, workbook, sheet } = await prepareReport({
       tenderId,
       supplierIds,
@@ -124,7 +124,7 @@ const tenderResponseQueries = {
     }
 
     // Write to file.
-    return generateXlsx(workbook, `eoi_short_list${tender._id}`);
+    return generateXlsx(user, workbook, `eoi_short_list${tender._id}`);
   },
 
   /**
@@ -133,7 +133,7 @@ const tenderResponseQueries = {
    * @param {[String]} supplierIds - Selected supplier ids
    * @return {String} generated file link
    */
-  async tenderResponsesEoiBidderList(root, { tenderId, supplierIds }) {
+  async tenderResponsesEoiBidderList(root, { tenderId, supplierIds }, { user }) {
     const { tender, responses, workbook, sheet } = await prepareReport({
       tenderId,
       supplierIds,
@@ -251,7 +251,7 @@ const tenderResponseQueries = {
     sheet.usedRange().style({ fontFamily: 'Calibri' });
 
     // Write to file.
-    return generateXlsx(workbook, `eoi_bidder_list${tender._id}`);
+    return generateXlsx(user, workbook, `eoi_bidder_list${tender._id}`);
   },
 };
 

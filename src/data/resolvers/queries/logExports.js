@@ -63,7 +63,7 @@ export const buildSupplierLoginsLog = async ({ startDate, endDate }, user) => {
     rowIndex++;
   }
 
-  return generateXlsx(workbook, 'logs_supplier_logins');
+  return generateXlsx(user, workbook, 'logs_supplier_logins');
 };
 
 export const buildBuyerLoginsLog = async ({ startDate, endDate }, user) => {
@@ -110,7 +110,7 @@ export const buildBuyerLoginsLog = async ({ startDate, endDate }, user) => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'logs_buyer_logins');
+  return generateXlsx(user, workbook, 'logs_buyer_logins');
 };
 
 export const buildSupplierLoginsByEoiSubmissions = async ({ startDate, endDate }, user) => {
@@ -157,7 +157,7 @@ export const buildSupplierLoginsByEoiSubmissions = async ({ startDate, endDate }
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'logs_supplier_logins_by_eoi_submissions');
+  return generateXlsx(user, workbook, 'logs_supplier_logins_by_eoi_submissions');
 };
 
 export const buildSupplierLoginsByRfqSubmissions = async ({ startDate, endDate }, user) => {
@@ -201,7 +201,7 @@ export const buildSupplierLoginsByRfqSubmissions = async ({ startDate, endDate }
 
     rowIndex++;
   }
-  return generateXlsx(workbook, 'logs_supplier_logins_by_rfq_submissions');
+  return generateXlsx(user, workbook, 'logs_supplier_logins_by_rfq_submissions');
 };
 
 export const buildSearchesPerBuyer = async ({ startDate, endDate }, user) => {
@@ -236,7 +236,7 @@ export const buildSearchesPerBuyer = async ({ startDate, endDate }, user) => {
     rowIndex++;
   }
 
-  return generateXlsx(workbook, 'searches_per_buyer');
+  return generateXlsx(user, workbook, 'searches_per_buyer');
 };
 
 export const buildEoiCreatedAndSentExport = async ({ startDate, endDate }, user) => {
@@ -312,7 +312,7 @@ export const buildEoiCreatedAndSentExport = async ({ startDate, endDate }, user)
     rowIndex++;
   }
 
-  return generateXlsx(workbook, 'eoi_created_and_sent');
+  return generateXlsx(user, workbook, 'eoi_created_and_sent');
 };
 
 export const buildRfqCreatedAndSentExport = async ({ startDate, endDate }, user) => {
@@ -390,7 +390,7 @@ export const buildRfqCreatedAndSentExport = async ({ startDate, endDate }, user)
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'rfq_created_and_sent');
+  return generateXlsx(user, workbook, 'rfq_created_and_sent');
 };
 
 export const buildSuppliersByProductCodeLogsExport = async (
@@ -459,7 +459,7 @@ export const buildSuppliersByProductCodeLogsExport = async (
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'suppliers_by_product_code_logs_export');
+  return generateXlsx(user, workbook, 'suppliers_by_product_code_logs_export');
 };
 
 export const buildActivityLogsExport = async ({ startDate, endDate, module }, user) => {
@@ -505,5 +505,5 @@ export const buildActivityLogsExport = async ({ startDate, endDate, module }, us
     rowIndex++;
   }
 
-  return generateXlsx(workbook, 'menu_review_by_buyer');
+  return generateXlsx(user, workbook, 'menu_review_by_buyer');
 };

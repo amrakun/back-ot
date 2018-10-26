@@ -235,7 +235,7 @@ export const readTemplate = async name => {
 /*
  * Generate xlsx
  */
-export const generateXlsx = async (workbook, name) => {
+export const generateXlsx = async (user, workbook, name) => {
   const { DOMAIN } = process.env;
   const url = `templateOutputs/${name}.xlsx`;
 

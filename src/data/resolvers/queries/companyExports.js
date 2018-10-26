@@ -8,7 +8,7 @@ import { readTemplate, generateXlsx } from '../../utils';
  * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
-export const companiesExport = async companies => {
+export const companiesExport = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers');
 
@@ -34,7 +34,7 @@ export const companiesExport = async companies => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'suppliers');
+  return generateXlsx(user, workbook, 'suppliers');
 };
 
 /**
@@ -42,7 +42,7 @@ export const companiesExport = async companies => {
  * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
-export const companiesValidatedProductsInfoExport = async companies => {
+export const companiesValidatedProductsInfoExport = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers_products_info');
 
@@ -77,7 +77,7 @@ export const companiesValidatedProductsInfoExport = async companies => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'suppliers_products_info');
+  return generateXlsx(user, workbook, 'suppliers_products_info');
 };
 
 /**
@@ -85,7 +85,7 @@ export const companiesValidatedProductsInfoExport = async companies => {
  * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
-export const companiesGenerateDifotScoreList = async companies => {
+export const companiesGenerateDifotScoreList = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('difot_score');
 
@@ -103,7 +103,7 @@ export const companiesGenerateDifotScoreList = async companies => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'difot_score');
+  return generateXlsx(user, workbook, 'difot_score');
 };
 
 /**
@@ -111,7 +111,7 @@ export const companiesGenerateDifotScoreList = async companies => {
  * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
-export const companiesGenerateDueDiligenceList = async companies => {
+export const companiesGenerateDueDiligenceList = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers_due_diligence');
 
@@ -142,7 +142,7 @@ export const companiesGenerateDueDiligenceList = async companies => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'suppliers_due_diligence');
+  return generateXlsx(user, workbook, 'suppliers_due_diligence');
 };
 
 /**
@@ -150,7 +150,7 @@ export const companiesGenerateDueDiligenceList = async companies => {
  * @param [Object] companies - filtered companies
  * @return {String} - file url
  */
-export const companiesGeneratePrequalificationList = async companies => {
+export const companiesGeneratePrequalificationList = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers_prequalification');
 
@@ -213,5 +213,5 @@ export const companiesGeneratePrequalificationList = async companies => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'suppliers_prequalification');
+  return generateXlsx(user, workbook, 'suppliers_prequalification');
 };

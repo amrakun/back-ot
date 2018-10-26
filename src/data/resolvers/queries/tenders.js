@@ -179,7 +179,7 @@ const tenderQueries = {
 
     const tenders = await Tenders.find(query).sort({ createdDate: -1 });
 
-    return tendersExport(tenders);
+    return tendersExport(user, tenders);
   },
 
   /**
@@ -187,10 +187,10 @@ const tenderQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async tenderGenerateMaterialsTemplate(root, { tenderId }) {
+  async tenderGenerateMaterialsTemplate(root, { tenderId }, { user }) {
     const tender = await Tenders.findOne({ _id: tenderId });
 
-    return tenderGenerateMaterialsTemplate(tender);
+    return tenderGenerateMaterialsTemplate(user, tender);
   },
 
   /**

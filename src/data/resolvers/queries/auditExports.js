@@ -14,7 +14,7 @@ const auditResponseQueries = {
    * @param {String} auditorName - Auditor name
    * @return {String} generated file link
    */
-  async auditImprovementPlan(root, args) {
+  async auditImprovementPlan(root, args, { user }) {
     const { auditId, supplierId, auditDate, reassessmentDate, auditorName } = args;
 
     const company = await Companies.findOne({ _id: supplierId });
@@ -107,7 +107,11 @@ const auditResponseQueries = {
     });
 
     // generate file
-    const path = await generateXlsx(workbook, `auditor_improvement_plan_${auditId}_${supplierId}`);
+    const path = await generateXlsx(
+      user,
+      workbook,
+      `auditor_improvement_plan_${auditId}_${supplierId}`,
+    );
 
     // save file url to response for later use
     await auditResponse.update({ improvementPlanFile: path });
@@ -124,7 +128,7 @@ const auditResponseQueries = {
    * @param {String} reportNo - Report no
    * @return {String} generated file link
    */
-  async auditReport(root, args) {
+  async auditReport(root, args, { user }) {
     const { auditId, supplierId, auditDate, auditor, reportNo } = args;
 
     const company = await Companies.findOne({ _id: supplierId });
@@ -302,7 +306,7 @@ const auditResponseQueries = {
     renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema, extraAction);
 
     // generate file
-    const path = await generateXlsx(workbook, `auditor_report_${auditId}_${supplierId}`);
+    const path = await generateXlsx(user, workbook, `auditor_report_${auditId}_${supplierId}`);
 
     // save file url to response for later use
     await auditResponse.update({ reportFile: path });

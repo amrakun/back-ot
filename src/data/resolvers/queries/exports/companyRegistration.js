@@ -3,7 +3,7 @@
 import cf from 'cellref';
 import { readTemplate, generateXlsx } from '../../../utils';
 
-const companyRegistration = async supplier => {
+const companyRegistration = async (user, supplier) => {
   const { workbook } = await readTemplate('company_registration');
 
   const sheet = workbook.sheet(0);
@@ -207,7 +207,7 @@ const companyRegistration = async supplier => {
     (certificateInfo && certificateInfo.file && certificateInfo.file.url) || '',
   );
 
-  return generateXlsx(workbook, 'company_registration');
+  return generateXlsx(user, workbook, 'company_registration');
 };
 
 export default companyRegistration;

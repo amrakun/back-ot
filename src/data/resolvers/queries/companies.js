@@ -151,11 +151,11 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesExport(root, args) {
+  async companiesExport(root, args, { user }) {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    return companiesExport(companies);
+    return companiesExport(user, companies);
   },
 
   /**
@@ -163,11 +163,11 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesValidatedProductsInfoExport(root, args) {
+  async companiesValidatedProductsInfoExport(root, args, { user }) {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    return companiesValidatedProductsInfoExport(companies);
+    return companiesValidatedProductsInfoExport(user, companies);
   },
 
   /**
@@ -175,11 +175,11 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesGenerateDifotScoreList(root, args) {
+  async companiesGenerateDifotScoreList(root, args, { user }) {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    return companiesGenerateDifotScoreList(companies);
+    return companiesGenerateDifotScoreList(user, companies);
   },
 
   /**
@@ -187,11 +187,11 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesGenerateDueDiligenceList(root, args) {
+  async companiesGenerateDueDiligenceList(root, args, { user }) {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    return companiesGenerateDueDiligenceList(companies);
+    return companiesGenerateDueDiligenceList(user, companies);
   },
 
   /**
@@ -199,11 +199,11 @@ const companyQueries = {
    * @param {Object} args - Query params
    * @return {String} - file url
    */
-  async companiesGeneratePrequalificationList(root, args) {
+  async companiesGeneratePrequalificationList(root, args, { user }) {
     const selector = await companiesFilter(args);
     const companies = await Companies.find(selector);
 
-    return companiesGeneratePrequalificationList(companies);
+    return companiesGeneratePrequalificationList(user, companies);
   },
 
   /**
@@ -237,10 +237,10 @@ const companyQueries = {
   /*
    * Export supplier's prequalification info from buyer
    */
-  async companyPrequalificationExport(root, { _id }) {
+  async companyPrequalificationExport(root, { _id }, { user }) {
     const supplier = await Companies.findOne({ _id });
 
-    return companyPrequalification(supplier);
+    return companyPrequalification(user, supplier);
   },
 
   /*
@@ -249,7 +249,7 @@ const companyQueries = {
   async companyRegistrationSupplierExport(root, args, { user }) {
     const supplier = await Companies.findOne({ _id: user.companyId });
 
-    return companyRegistration(supplier);
+    return companyRegistration(user, supplier);
   },
 
   /*

@@ -8,7 +8,7 @@ const feedbackExports = {
    * Export feedback list
    * @return {String} - file url
    */
-  async feedbackResponsesExport(root, { supplierName, responseIds }) {
+  async feedbackResponsesExport(root, { supplierName, responseIds }, { user }) {
     // read template
     const { workbook, sheet } = await readTemplate('success_feedback_responses');
 
@@ -48,7 +48,7 @@ const feedbackExports = {
     }
 
     // Write to file.
-    return generateXlsx(workbook, 'success_feedback_responses');
+    return generateXlsx(user, workbook, 'success_feedback_responses');
   },
 };
 

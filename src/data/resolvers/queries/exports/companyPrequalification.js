@@ -5,7 +5,7 @@ import xlsxPopulate from 'xlsx-populate';
 import { generateXlsx } from '../../../utils';
 import { Qualifications } from '../../../../db/models';
 
-const generate = async supplier => {
+const generate = async (user, supplier) => {
   const workbook = await xlsxPopulate.fromBlankAsync();
 
   const sheet = workbook.sheet('Sheet1');
@@ -411,7 +411,7 @@ const generate = async supplier => {
 
   fillSectionResult('Health & Safety Management System', 'healthInfo');
 
-  return generateXlsx(workbook, 'company_prequalification');
+  return generateXlsx(user, workbook, 'company_prequalification');
 };
 
 export default generate;

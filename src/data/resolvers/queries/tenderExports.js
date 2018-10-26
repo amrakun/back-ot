@@ -6,7 +6,7 @@ import { formatDate } from './utils';
  * @param [Object] tenders - Filtered tenders
  * @return {String} - file url
  */
-export const tendersExport = async tenders => {
+export const tendersExport = async (user, tenders) => {
   // read template
   const { workbook, sheet } = await readTemplate('tenders');
 
@@ -29,7 +29,7 @@ export const tendersExport = async tenders => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'tenders');
+  return generateXlsx(user, workbook, 'tenders');
 };
 
 /**
@@ -37,7 +37,7 @@ export const tendersExport = async tenders => {
  * @param Object tender - Tender object
  * @return {String} - file url
  */
-export const tenderGenerateMaterialsTemplate = async tender => {
+export const tenderGenerateMaterialsTemplate = async (user, tender) => {
   // read template
   const { workbook, sheet } = await readTemplate('rfq_responded_products');
 
@@ -58,5 +58,5 @@ export const tenderGenerateMaterialsTemplate = async tender => {
   }
 
   // Write to file.
-  return generateXlsx(workbook, 'rfq_responded_products');
+  return generateXlsx(user, workbook, 'rfq_responded_products');
 };
