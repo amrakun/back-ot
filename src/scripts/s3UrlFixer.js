@@ -10,9 +10,17 @@ export const customCommand = async () => {
   mongoose.connect(process.env.MONGO_URL);
 
   const replaceUrl = file => {
+    if (!file) {
+      return file;
+    }
+
+    if (!file.url) {
+      return file;
+    }
+
     return {
       name: file.name,
-      url: file.url.replace(/1/g, '2'),
+      url: file.url.replace('https://ot-supplier.s3.amazonaws.com/', ''),
     };
   };
 
