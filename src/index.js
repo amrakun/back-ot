@@ -39,17 +39,10 @@ app.use(
       return res.end('foribidden');
     }
 
-    // TODO: do not allow
     if (
-      req.url === '/templateOutputs/company_prequalification.xlsx' ||
-      req.url === '/templateOutputs/company_registration.xlsx' ||
-      req.url === '/templateOutputs/rfq_responded_products.xlsx'
+      req.path.includes('templateOutputs') &&
+      !req.path.includes(`templateOutputs/${req.user.username}`)
     ) {
-      return next();
-    }
-
-    // hide all files from supplier
-    if (req.user.isSupplier) {
       return res.end('foribidden');
     }
 

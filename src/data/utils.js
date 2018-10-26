@@ -236,12 +236,21 @@ export const readTemplate = async name => {
  * Generate xlsx
  */
 export const generateXlsx = async (user, workbook, name) => {
+  if (!user) {
+    return '';
+  }
+
+  const dir = `${__dirname}/../private/templateOutputs/${user.username}`;
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+
   const { DOMAIN } = process.env;
-  const url = `templateOutputs/${name}.xlsx`;
 
-  await workbook.toFileAsync(`${__dirname}/../private/${url}`);
+  await workbook.toFileAsync(`${dir}/${name}.xlsx`);
 
-  return `${DOMAIN}/static/${url}`;
+  return `${DOMAIN}/static/templateOutputs/${user.username}/${name}.xlsx`;
 };
 
 export default {
