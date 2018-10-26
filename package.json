@@ -19,7 +19,8 @@
     "test": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' jest --runInBand --coverage",
     "loadInitialData": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/initialData.js",
     "generateSecret": "openssl rand -base64 32",
-    "customCommand": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/customCommand.js"
+    "customCommand": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/customCommand.js",
+    "s3UrlFixer": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/s3UrlFixer.js"
   },
   "lint-staged": {
     "*.js": [

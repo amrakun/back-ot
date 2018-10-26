@@ -40,7 +40,11 @@ app.use(
     }
 
     // TODO: do not allow
-    if (req.url === '/templateOutputs/company_prequalification.xlsx') {
+    if (
+      req.url === '/templateOutputs/company_prequalification.xlsx' ||
+      req.url === '/templateOutputs/company_registration.xlsx' ||
+      req.url === '/templateOutputs/rfq_responded_products.xlsx'
+    ) {
       return next();
     }
 
