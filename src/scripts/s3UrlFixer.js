@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { Companies } from '../db/models';
+import { Companies, Tenders, TenderResponses } from '../db/models';
 
 dotenv.config();
 
@@ -24,17 +24,7 @@ export const customCommand = async () => {
     };
   };
 
-  const replace = async (company, section, name) => {
-    let value = company[section];
-
-    if (name) {
-      value = (company[section] || {})[name];
-    }
-
-    if (!value) {
-      return;
-    }
-
+  const generateModifier = value => {
     let modifier;
 
     if (value instanceof Array) {
@@ -57,11 +47,27 @@ export const customCommand = async () => {
       modifier = replaceUrl(value);
     }
 
+    return modifier;
+  };
+
+  const replace = async (company, section, name) => {
+    let value = company[section];
+
+    if (name) {
+      value = (company[section] || {})[name];
+    }
+
+    if (!value) {
+      return;
+    }
+
     let selector = section;
 
     if (name) {
       selector = `${section}.${name}`;
     }
+
+    const modifier = generateModifier(value);
 
     return Companies.update({ _id: company._id }, { $set: { [selector]: modifier } });
   };
@@ -101,6 +107,36 @@ export const customCommand = async () => {
     await replace(company, 'healthInfo', 'doesHaveDocumentedFitnessFile');
 
     await replace(company, 'dueDiligences');
+  }
+
+  const tenders = await Tenders.find({});
+  const responses = await TenderResponses.find({});
+
+  const replaceTender = async (object, name, type = 'tender') => {
+    let value = object[name];
+
+    if (!value) {
+      return;
+    }
+
+    const modifier = generateModifier(value);
+
+    if (type === 'tender') {
+      return Tenders.update({ _id: object._id }, { $set: { [name]: modifier } });
+    } else {
+      return TenderResponses.update({ _id: object._id }, { $set: { [name]: modifier } });
+    }
+  };
+
+  for (const tender of tenders) {
+    await replaceTender(tender, 'file');
+    await replaceTender(tender, 'attachments');
+  }
+
+  for (const response of responses) {
+    await replaceTender(response, 'respondedServiceFiles', 'response');
+    await replaceTender(response, 'respondedDocuments', 'response');
+    await replaceTender(response, 'respondedProducts', 'response');
   }
 
   mongoose.connection.close();
