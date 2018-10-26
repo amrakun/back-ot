@@ -5,11 +5,39 @@ import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses } from '../db/models';
 import dbUtils from '../db/models/utils';
-import { userFactory, companyFactory, tenderFactory, tenderResponseFactory } from '../db/factories';
+import {
+  userFactory,
+  companyFactory,
+  tenderFactory,
+  tenderDoc,
+  tenderResponseFactory,
+} from '../db/factories';
 
 beforeAll(() => connect());
 
 afterAll(() => disconnect());
+
+const flatten = tender => JSON.parse(JSON.stringify(tender));
+
+const compare = (o1, o2) => {
+  expect(o1.number).toBe(o2.number);
+  expect(o1.name).toBe(o2.name);
+  expect(o1.content).toBe(o2.content);
+  expect(o1.attachments.toString()).toBe(o2.attachments.toString());
+  expect(o1.publishDate).toBe(o2.publishDate);
+  expect(o1.closeDate).toBe(o2.closeDate);
+  expect(o1.file.toString()).toBe(o2.file.toString());
+  expect(o1.sourcingOfficer).toBe(o2.sourcingOfficer);
+  expect(o1.reminderDay).toBe(o2.reminderDay);
+
+  if (o1.requestedProducts || o2.requestedProducts) {
+    expect(o1.requestedProducts.toString()).toBe(o2.requestedProducts.toString());
+  }
+
+  if (o1.requestedDocuments || o2.requestedDocuments) {
+    expect(o1.requestedDocuments.toString()).toBe(o2.requestedDocuments.toString());
+  }
+};
 
 describe('Tender db', () => {
   let _tender;
@@ -28,54 +56,38 @@ describe('Tender db', () => {
   });
 
   test('Create tender: open status', async () => {
-    delete _tender._id;
-    delete _tender.status;
-    delete _tender.createdDate;
-    delete _tender.createdUserId;
+    const doc = await tenderDoc({ type: 'rfq' });
 
-    let tenderObj = await Tenders.createTender(_tender, _user._id);
+    const savedTender = await Tenders.createTender(doc, _user._id);
 
-    const { status, createdDate, createdUserId } = tenderObj;
-    const [attachment] = tenderObj.attachments;
+    const { status, createdDate, createdUserId } = savedTender;
 
-    tenderObj = JSON.parse(JSON.stringify(tenderObj));
+    compare(flatten(doc), flatten(savedTender));
 
-    delete tenderObj._id;
-    delete tenderObj.__v;
-    delete tenderObj.createdDate;
-    delete tenderObj.createdUserId;
-    delete tenderObj.status;
-
-    expect(tenderObj).toEqual(_tender);
-    expect(attachment.name).toBe('name');
-    expect(attachment.url).toBe('url');
+    expect(savedTender.getSupplierIds()).toEqual(doc.supplierIds);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');
   });
 
   test('Update tender', async () => {
-    const doc = await tenderFactory();
-    delete doc._id;
+    const doc = await tenderDoc();
 
-    let tenderObj = await Tenders.updateTender(_tender._id, doc);
+    const updated = await Tenders.updateTender(_tender._id, { ...doc });
 
-    tenderObj = JSON.parse(JSON.stringify(tenderObj));
-    delete tenderObj._id;
-    delete tenderObj.__v;
-    tenderObj.publishDate = tenderObj.publishDate.toString();
-    tenderObj.closeDate = tenderObj.closeDate.toString();
+    compare(flatten(doc), flatten(updated));
 
-    expect(tenderObj).toEqual(doc);
+    expect(updated.getSupplierIds()).toEqual(doc.supplierIds);
   });
 
   test('Update tender: with closed status', async () => {
     const tender = await tenderFactory({ status: 'closed' });
+    const doc = await tenderDoc();
 
     expect.assertions(1);
 
     try {
-      await Tenders.updateTender(tender._id, {});
+      await Tenders.updateTender(tender._id, doc);
     } catch (e) {
       expect(e.message).toBe('Can not update closed tender');
     }
@@ -104,13 +116,22 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect.assertions(5);
+    expect.assertions(7);
 
-    expect(_tender.winnerIds).toEqual([]);
+    const tender = await tenderFactory({ status: 'open' });
+
+    expect(tender.winnerIds.length).toBe(0);
+
+    // select at least one supplier ===============
+    try {
+      await Tenders.award(tender._id, []);
+    } catch (e) {
+      expect(e.message).toBe('Select some suppliers');
+    }
 
     // can not award not responded supplier ===============
     try {
-      await Tenders.award(_tender._id, ['DFAFDSFDSF']);
+      await Tenders.award(tender._id, ['DFAFDSFDSF']);
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
@@ -119,24 +140,30 @@ describe('Tender db', () => {
     const supplier = await companyFactory();
 
     const response = await tenderResponseFactory({
-      tenderId: _tender._id,
+      tenderId: tender._id,
       supplierId: supplier._id,
       isNotInterested: true,
     });
 
     try {
-      await Tenders.award(_tender._id, [supplier._id]);
+      await Tenders.award(tender._id, [supplier._id]);
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
 
     // valid =============
     await TenderResponses.update({ _id: response._id }, { $set: { isNotInterested: false } });
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier._id,
+      isNotInterested: false,
+    });
 
-    const updatedTender = await Tenders.award(_tender._id, [supplier._id]);
+    const updatedTender = await Tenders.award(tender._id, [supplier._id]);
 
     expect(updatedTender.status).toBe('awarded');
-    expect(updatedTender.winnerIds).toContain(supplier._id);
+    expect(updatedTender.winnerIds.length).toBe(1);
+    expect(updatedTender.getWinnerIds()).toContain(supplier._id);
   });
 
   test('Publish drafts', async () => {

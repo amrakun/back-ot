@@ -2,16 +2,14 @@ import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
 import { requireLogin, requireBuyer } from '../../permissions';
 
-const register = async email => {
-  const user = await Users.register(email);
-
+const registrationEmail = async user => {
   // send email ==============
   const { MAIN_APP_DOMAIN } = process.env;
 
   const link = `${MAIN_APP_DOMAIN}/confirm-registration?token=${user.registrationToken}`;
 
   utils.sendEmail({
-    toEmails: [email],
+    toEmails: [user.email],
     title: 'Registration',
     template: {
       name: 'registration',
@@ -24,6 +22,12 @@ const register = async email => {
   return { user, link };
 };
 
+const register = async email => {
+  const user = await Users.register(email);
+
+  return registrationEmail(user);
+};
+
 const userMutations = {
   /*
    * Register
@@ -32,6 +36,19 @@ const userMutations = {
    */
   async register(root, { email }) {
     const { link } = await register(email);
+
+    return link;
+  },
+
+  /*
+   * Resend confirmation link
+   * @param {String} email - User email
+   * @return - Confirmation link
+   */
+  async resendConfirmationLink(root, { email }) {
+    const user = await Users.regenerateRegistrationTokens(email);
+
+    const { link } = await registrationEmail(user);
 
     return link;
   },
@@ -94,14 +111,49 @@ const userMutations = {
   },
 
   /*
+   * Confirm profile edit
+   * @param {String} token - Temporary token
+   * @return - Updated user object
+   */
+  async confirmProfileEdit(root, args) {
+    const { token } = args;
+
+    return Users.confirmProfileEdit(token);
+  },
+
+  /*
    * Login
    * @param {String} email - User email
    * @param {String} password - User password
    * @return tokens.token - Token to use authenticate against graphql endpoints
    * @return tokens.refreshToken - Token to use refresh expired token
    */
-  login(root, args) {
-    return Users.login(args);
+  async login(root, args, { res }) {
+    const response = await Users.login(args);
+
+    const { token } = response;
+
+    const oneDay = 1 * 24 * 3600 * 1000; // 1 day
+
+    const cookieOptions = {
+      httpOnly: true,
+      expires: new Date(Date.now() + oneDay),
+      maxAge: oneDay,
+    };
+
+    const { NODE_ENV } = process.env;
+
+    if (NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+    }
+
+    res.cookie('auth-token', token, cookieOptions);
+
+    return response;
+  },
+
+  logout(root, args, { user }) {
+    return Users.logout(user);
   },
 
   /*
@@ -207,7 +259,27 @@ const userMutations = {
       throw new Error('Invalid password');
     }
 
-    return Users.editProfile(user._id, args);
+    const updatedUser = await Users.editProfile(user._id, args);
+
+    if (updatedUser.temporarySecureInformation) {
+      const { MAIN_APP_DOMAIN } = process.env;
+      const link = `${MAIN_APP_DOMAIN}/confirm-profile-edition?token=${
+        updatedUser.temporarySecureInformation.token
+      }`;
+
+      utils.sendEmail({
+        toEmails: [user.email],
+        title: 'Confirm profile edition',
+        template: {
+          name: 'profileEditConfirmation',
+          data: {
+            content: link,
+          },
+        },
+      });
+    }
+
+    return updatedUser;
   },
 
   /*

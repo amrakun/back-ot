@@ -5,14 +5,8 @@ import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { Configs } from '../db/models';
 
-/*
- * Save binary data to amazon s3
- * @param {String} name - File name
- * @param {Object} data - File binary data
- * @return {String} - Uploaded file url
- */
-export const uploadFile = async file => {
-  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET, AWS_PREFIX = '' } = process.env;
+export const createAWS = () => {
+  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
 
   // check credentials
   if (!(AWS_ACCESS_KEY_ID || AWS_SECRET_ACCESS_KEY || AWS_BUCKET)) {
@@ -20,10 +14,50 @@ export const uploadFile = async file => {
   }
 
   // initialize s3
-  const s3 = new AWS.S3({
+  return new AWS.S3({
     accessKeyId: AWS_ACCESS_KEY_ID,
     secretAccessKey: AWS_SECRET_ACCESS_KEY,
   });
+};
+
+/*
+ * Read file from amazon s3
+ * @param {String} key - File name
+ * @return {String} - file
+ */
+export const readS3File = key => {
+  const { AWS_BUCKET } = process.env;
+
+  const s3 = createAWS();
+
+  // upload to s3
+  return new Promise((resolve, reject) => {
+    s3.getObject(
+      {
+        Bucket: AWS_BUCKET,
+        Key: key,
+      },
+      (error, response) => {
+        if (error) {
+          return reject(error);
+        }
+
+        return resolve(response);
+      },
+    );
+  });
+};
+
+/*
+ * Save binary data to amazon s3
+ * @param {String} name - File name
+ * @param {Object} data - File binary data
+ * @return {String} - Uploaded file url
+ */
+export const uploadFile = async file => {
+  const { AWS_BUCKET, AWS_PREFIX = '' } = process.env;
+
+  const s3 = createAWS();
 
   // generate unique name
   const fileName = `${AWS_PREFIX}${Math.random()}${file.name}`;
@@ -38,7 +72,6 @@ export const uploadFile = async file => {
         Bucket: AWS_BUCKET,
         Key: fileName,
         Body: buffer,
-        ACL: 'public-read',
       },
       (error, response) => {
         if (error) {
@@ -50,7 +83,7 @@ export const uploadFile = async file => {
     );
   });
 
-  return `https://${AWS_BUCKET}.s3.amazonaws.com/${fileName}`;
+  return fileName;
 };
 
 /**
@@ -149,10 +182,17 @@ export const sendEmail = async args => {
 /*
  * Send email using config
  */
-export const sendConfigEmail = async ({ name, kind, toEmails, attachments, replacer }) => {
+export const sendConfigEmail = async ({
+  templateObject,
+  name,
+  kind,
+  toEmails,
+  attachments,
+  replacer,
+}) => {
   const config = await Configs.getConfig();
   const templates = config[name] || {};
-  const template = templates[kind];
+  const template = templateObject || templates[kind];
 
   if (!template) {
     throw new Error(`${name} ${kind} template not found`);

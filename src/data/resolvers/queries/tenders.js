@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Tenders, TenderResponses } from '../../../db/models';
+import { encrypt } from '../../../db/models/utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { paginate } from './utils';
 import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
@@ -24,12 +25,15 @@ const tendersFilter = async (args, extraChecks) => {
 
   // main filter
   if (search) {
-    query.$and.push({
-      $or: [
-        { name: new RegExp(`.*${search}.*`, 'i') },
-        { number: new RegExp(`.*${search}.*`, 'i') },
-      ],
+    const tenders = await Tenders.find({});
+
+    const filtered = tenders.filter(({ name, number }) => {
+      return name.includes(search) || number.includes(search);
     });
+
+    const ids = filtered.map(tender => tender._id);
+
+    query.$and.push({ _id: { $in: ids } });
   }
 
   // month filter: month is date object
@@ -78,12 +82,12 @@ const tendersSupplierFilter = async (args, user) => {
   delete args.status;
 
   const query = await tendersFilter(args, async query => {
-    query.$and.push({ supplierIds: { $in: [user.companyId] } });
+    query.$and.push({ supplierIds: { $in: [encrypt(user.companyId)] } });
     query.$and.push({ status: { $ne: 'draft' } });
 
     // ignore not interested tenders =============
     const notInterestedTenders = await TenderResponses.find({
-      supplierId: user.companyId,
+      supplierId: encrypt(user.companyId),
       isNotInterested: true,
     });
 
@@ -104,7 +108,7 @@ const tendersSupplierFilter = async (args, user) => {
       // filter only user's responded tenders
       if (isParticipated) {
         const submittedTenders = await TenderResponses.find({
-          supplierId: user.companyId,
+          supplierId: encrypt(user.companyId),
         });
 
         const submittedTenderIds = submittedTenders.map(res => res.tenderId);
@@ -205,8 +209,8 @@ const tenderQueries = {
    * @param {String} args._id
    * @return {Promise} found tender
    */
-  tenderDetailSupplier(root, { _id }, { user }) {
-    return Tenders.findOne({ _id, supplierIds: { $in: [user.companyId] } });
+  async tenderDetailSupplier(root, { _id }, { user }) {
+    return Tenders.findOne({ _id, supplierIds: { $in: [encrypt(user.companyId)] } });
   },
 
   /*

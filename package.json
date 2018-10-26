@@ -11,14 +11,16 @@
   "private": true,
   "scripts": {
     "start": "node dist",
-    "dev": "NODE_ENV=development nodemon src --exec babel-node",
+    "dev": "NODE_ENV=development ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' nodemon src --exec babel-node",
     "build": "babel src --out-dir dist --ignore __tests__,tests --copy-files",
     "lint": "eslint src",
     "format": "prettier --write --print-width 100 --single-quote --trailing-comma all 'src/**/*.js'",
     "precommit": "lint-staged",
-    "test": "jest --runInBand --coverage",
-    "loadInitialData": "babel-node ./src/initialData.js",
-    "customCommand": "babel-node ./src/scripts/customCommand.js"
+    "test": "ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' jest --runInBand --coverage",
+    "loadInitialData": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/initialData.js",
+    "generateSecret": "openssl rand -base64 32",
+    "customCommand": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/customCommand.js",
+    "s3UrlFixer": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/s3UrlFixer.js"
   },
   "lint-staged": {
     "*.js": [
@@ -31,6 +33,7 @@
     "bcrypt": "^1.0.3",
     "body-parser": "^1.17.1",
     "cellref": "^3.0.0",
+    "cookie-parser": "^1.4.3",
     "cors": "^2.8.1",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
@@ -42,10 +45,12 @@
     "graphql-tools": "^1.0.0",
     "jsonwebtoken": "^8.1.0",
     "moment": "^2.18.1",
-    "mongoose": "^4.9.2",
+    "mongoose": "5.0.6",
+    "mongoose-field-encryption": "^2.1.1",
     "mongoose-type-email": "^1.0.5",
     "node-schedule": "^1.2.5",
     "nodemailer": "^4.4.1",
+    "password-validator": "^4.1.1",
     "sha256": "^0.2.0",
     "xlsx-populate": "^1.11.0"
   },
@@ -60,6 +65,7 @@
     "jest-tobetype": "^1.1.0",
     "lint-staged": "^3.6.0",
     "nodemon": "^1.11.0",
-    "prettier": "^1.4.4"
+    "prettier": "^1.4.4",
+    "sinon": "^6.3.4"
   }
 }

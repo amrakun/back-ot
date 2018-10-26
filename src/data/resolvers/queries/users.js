@@ -50,7 +50,7 @@ const userQueries = {
 
   /**
    * Current user
-   * @return {Promise} total count
+   * @return {Promise} user object
    */
   currentUser(root, args, { user }) {
     if (user) {

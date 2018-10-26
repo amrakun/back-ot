@@ -24,7 +24,7 @@ const tenderResponseMutations = {
    * Mark tender response as sent
    */
   async tenderResponsesSend(root, doc, { user }) {
-    const response = await TenderResponses.findOne(doc);
+    const response = await TenderResponses.findBySupplierId(doc);
 
     if (response) {
       return response.send();

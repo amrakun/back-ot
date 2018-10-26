@@ -7,6 +7,8 @@ import {
   AuditResponses,
 } from '../../db/models';
 
+import { encrypt } from '../../db/models/utils';
+
 export default {
   lastProductsInfoValidation(company) {
     return company.getLastProductsInfoValidation();
@@ -44,14 +46,14 @@ export default {
 
   async openTendersCount(company) {
     const responses = await TenderResponses.find({
-      supplierId: company._id,
+      supplierId: encrypt(company._id),
     });
 
     const submittedTenderIds = responses.map(r => r.tenderId);
 
     const openTenders = await Tenders.find({
       _id: { $nin: submittedTenderIds },
-      supplierIds: { $in: [company._id] },
+      supplierIds: { $in: [encrypt(company._id)] },
       status: 'open',
     });
 

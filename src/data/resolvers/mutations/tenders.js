@@ -69,7 +69,7 @@ const tenderMutations = {
       supplierId: { $nin: tender.winnerIds },
     });
 
-    // send emai to not awarded suppliers
+    // send email to not awarded suppliers
     for (let notAwardedResponse of notAwardedResponses) {
       const selector = { _id: notAwardedResponse.supplierId };
       const supplier = (await Companies.findOne(selector)) || {};

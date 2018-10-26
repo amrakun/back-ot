@@ -3,9 +3,10 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
+import passwordValidator from 'password-validator';
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
-import { Audits, BlockedCompanies, Feedbacks, Tenders } from './';
+import { Session, Audits, BlockedCompanies, Feedbacks, Tenders } from './';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -48,12 +49,41 @@ const UserSchema = mongoose.Schema({
   delegationStartDate: field({ type: Date, optional: true }),
   delegationEndDate: field({ type: Date, optional: true }),
 
+  temporarySecureInformation: field({ type: Object, optional: true }),
+
   lastLoginDate: field({ type: Date, optional: true }),
 });
 
 class User {
   static getSecret() {
     return 'dfjklsafjjekjtejifjidfjsfd';
+  }
+
+  static validatePassword(password) {
+    const schema = new passwordValidator();
+
+    schema
+      .is()
+      .min(8) // Minimum length 8
+      .is()
+      .max(100) // Maximum length 100
+      .has()
+      .uppercase() // Must have uppercase letters
+      .has()
+      .lowercase() // Must have lowercase letters
+      .has()
+      .digits() // Must have digits
+      .has()
+      .symbols() // Must include symbols
+      .has()
+      .not()
+      .spaces(); // Should not have spaces
+
+    if (!schema.validate(password)) {
+      throw new Error(
+        'Password must have uppercase letters, lowercase letters, digits and symbols. Minimum length is 8',
+      );
+    }
   }
 
   /**
@@ -67,6 +97,8 @@ class User {
     if (await this.findOne({ email })) {
       throw new Error('Duplicated email');
     }
+
+    this.validatePassword(password);
 
     return this.create({
       ...doc,
@@ -93,6 +125,8 @@ class User {
 
     // change password
     if (password) {
+      this.validatePassword(password);
+
       doc.password = await this.generatePassword(password);
 
       // if there is no password specified then leave password field alone
@@ -114,9 +148,57 @@ class User {
   static async editProfile(_id, doc) {
     delete doc.password;
 
+    const userOnDb = await Users.findOne({ _id });
+
+    // changed secure information
+    if (userOnDb.email !== doc.email || userOnDb.username !== doc.username) {
+      const token = await this.generateRandomToken();
+
+      doc.temporarySecureInformation = {
+        email: doc.email,
+        username: doc.username,
+        token: token,
+        expires: Date.now() + 86400000,
+      };
+
+      delete doc.email;
+      delete doc.username;
+    }
+
     await this.update({ _id }, { $set: doc });
 
     return this.findOne({ _id });
+  }
+
+  /*
+   * Confirms profile edition by given token
+   * @param {String} token - User's temporary token for profile edition
+   * @return {Promise} - Updated user information
+   */
+  static async confirmProfileEdit(token) {
+    // find user by token
+    const user = await this.findOne({
+      'temporarySecureInformation.token': token,
+      'temporarySecureInformation.expires': {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      throw new Error('Token is invalid or has expired.');
+    }
+
+    // set new information
+    await this.findByIdAndUpdate(
+      { _id: user._id },
+      {
+        email: user.temporarySecureInformation.email,
+        username: user.temporarySecureInformation.username,
+        temporarySecureInformation: undefined,
+      },
+    );
+
+    return this.findOne({ _id: user._id });
   }
 
   /*
@@ -205,6 +287,8 @@ class User {
       throw new Error('Password is required.');
     }
 
+    this.validatePassword(newPassword);
+
     // set new password
     await this.findByIdAndUpdate(
       { _id: user._id },
@@ -233,6 +317,8 @@ class User {
     if (!valid) {
       throw new Error('Incorrect current password');
     }
+
+    this.validatePassword(newPassword);
 
     // set new password
     await this.findByIdAndUpdate(
@@ -274,21 +360,24 @@ class User {
 
   /*
    * Creates regular and refresh tokens using given user information
+   * Not using refresh tokens for now
    * @param {Object} _user - User object
    * @param {String} secret - Token secret
    * @return [String] - list of tokens
    */
-  static async createTokens(user, secret) {
+  static async createTokens(_user, secret) {
+    const user = _user.toJSON();
+
     delete user.password;
     delete user.registrationToken;
     delete user.registrationTokenExpires;
     delete user.resetPasswordToken;
     delete user.resetPasswordExpires;
 
-    const createToken = await jwt.sign({ user }, secret, { expiresIn: '20m' });
+    const createToken = await jwt.sign({ user }, secret, { expiresIn: '1d' });
 
     const createRefreshToken = await jwt.sign({ user }, secret, {
-      expiresIn: '7d',
+      expiresIn: '1d',
     });
 
     return [createToken, createRefreshToken];
@@ -346,6 +435,37 @@ class User {
     });
   }
 
+  /**
+   * Regenerate registration tokens
+   * @param {String} email - user email
+   * @return {Promise} updated user object
+   */
+  static async regenerateRegistrationTokens(rawEmail) {
+    const email = rawEmail.toLowerCase();
+
+    const user = await Users.findOne({
+      email,
+      registrationToken: { $ne: null },
+      registrationTokenExpires: { $ne: null },
+    });
+
+    if (!user) {
+      throw new Error('Invalid email');
+    }
+
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          registrationToken: await this.generateRandomToken(),
+          registrationTokenExpires: Date.now() + 86400000,
+        },
+      },
+    );
+
+    return this.findOne({ _id: user._id });
+  }
+
   /*
    * Confirms user registration by given token & password
    * @param {String} token - User's temporary token for registration
@@ -368,6 +488,8 @@ class User {
     if (!password) {
       throw new Error('Password is required.');
     }
+
+    this.validatePassword(password);
 
     // set new password
     await this.findByIdAndUpdate(
@@ -438,6 +560,7 @@ class User {
     const [token, refreshToken] = await this.createTokens(user, this.getSecret());
 
     user.lastLoginDate = new Date();
+
     await user.save();
 
     return {
@@ -446,6 +569,14 @@ class User {
       refreshToken,
       user,
     };
+  }
+
+  static logout(user) {
+    Session.create({
+      invalidToken: user && user.loginToken,
+    });
+
+    return 'loggedOut';
   }
 
   /*

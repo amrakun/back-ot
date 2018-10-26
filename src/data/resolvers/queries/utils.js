@@ -21,7 +21,7 @@ export const paginate = (collection, params) => {
   return sortedCollection.limit(_limit).skip((_page - 1) * _limit);
 };
 
-export const supplierFilter = async (query, search) => {
+export const supplierFilter = async (query, search, hook) => {
   if (search) {
     const suppliers = await Companies.find({
       $or: [
@@ -33,7 +33,7 @@ export const supplierFilter = async (query, search) => {
 
     const supplierIds = suppliers.map(s => s._id);
 
-    query.supplierId = { $in: supplierIds };
+    query.supplierId = { $in: hook ? hook(supplierIds) : supplierIds };
   }
 
   return query;
@@ -53,4 +53,10 @@ export const fixValue = value => {
   }
 
   return value;
+};
+
+export const formatDate = dateString => {
+  const date = new Date(dateString);
+
+  return `${date.toLocaleDateString()}  ${date.getHours()}:${date.getMinutes()}`;
 };

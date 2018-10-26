@@ -44,7 +44,7 @@ describe('User db utils', () => {
   });
 
   test('Create user', async () => {
-    const testPassword = 'test';
+    const testPassword = 'Dombo$1234';
 
     delete _user._id;
 
@@ -89,7 +89,7 @@ describe('User db utils', () => {
     const updateDoc = await userFactory();
     delete updateDoc._id;
 
-    const testPassword = 'updatedPass';
+    const testPassword = 'updatedPass$1234';
     const testEmail = 'test@gmail.com';
 
     // try with password ============
@@ -187,7 +187,7 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
-    expect.assertions(7);
+    expect.assertions(11);
 
     const updateDoc = await userFactory();
 
@@ -208,8 +208,14 @@ describe('User db utils', () => {
 
     const userObj = await Users.findOne({ _id: _user._id });
 
-    expect(userObj.username).toBe(updateDoc.username);
-    expect(userObj.email).toBe('test@gmail.com');
+    // do not update secure informations right away
+    expect(userObj.username).toBe(_user.username);
+    expect(userObj.email).toBe(_user.email);
+    expect(userObj.temporarySecureInformation.token).toBeDefined();
+    expect(userObj.temporarySecureInformation.expires).toBeDefined();
+    expect(userObj.temporarySecureInformation.username).toBe(updateDoc.username);
+    expect(userObj.temporarySecureInformation.email).toBe('test@gmail.com');
+
     expect(userObj.firstName).toBe(updateDoc.firstName);
     expect(userObj.lastName).toBe(updateDoc.lastName);
     expect(userObj.jobTitle).toBe(updateDoc.jobTitle);
@@ -250,12 +256,12 @@ describe('User db utils', () => {
     // valid
     const user = await Users.resetPassword({
       token: 'token',
-      newPassword: 'password',
+      newPassword: 'Password$123',
     });
 
     expect(user.resetPasswordToken).toBe(null);
     expect(user.resetPasswordExpires).toBe(null);
-    expect(bcrypt.compare('password', user.password)).toBeTruthy();
+    expect(bcrypt.compare('Password$123', user.password)).toBeTruthy();
   });
 
   test('Change password: incorrect current password', async () => {
@@ -400,6 +406,43 @@ describe('User db utils', () => {
     expect(userObj.role).toBe(undefined);
   });
 
+  test('Regenerate registration tokens', async () => {
+    expect.assertions(3);
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: undefined,
+          registrationTokenExpires: undefined,
+        },
+      },
+    );
+
+    const user = await Users.findOne({ _id: _user._id });
+
+    try {
+      await Users.regenerateRegistrationTokens(user.email);
+    } catch (e) {
+      expect(e.message).toBe('Invalid email');
+    }
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: Date.now() + 86400000,
+        },
+      },
+    );
+
+    const userObj = await Users.regenerateRegistrationTokens(user.email);
+
+    expect(userObj.registrationToken).toBeDefined();
+    expect(userObj.registrationTokenExpires).toBeDefined();
+  });
+
   test('Confirm registration', async () => {
     expect.assertions(5);
 
@@ -432,11 +475,47 @@ describe('User db utils', () => {
     }
 
     // valid
-    const user = await Users.confirmRegistration('token', 'password');
+    const user = await Users.confirmRegistration('token', 'Password$123');
 
     expect(user.registrationToken).toBe(null);
     expect(user.registrationTokenExpires).toBe(null);
-    expect(bcrypt.compare('password', user.password)).toBeTruthy();
+    expect(bcrypt.compare('Password$123', user.password)).toBeTruthy();
+  });
+
+  test('Confirm profile edit', async () => {
+    expect.assertions(4);
+
+    // token expired ==============
+    try {
+      await Users.confirmProfileEdit('token');
+    } catch (e) {
+      expect(e.message).toBe('Token is invalid or has expired.');
+    }
+
+    // valid token =================
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          temporarySecureInformation: {
+            token: 'token',
+            expires: tomorrow,
+            email: 'tempemail',
+            username: 'tempUsername',
+          },
+        },
+      },
+    );
+
+    const user = await Users.confirmProfileEdit('token');
+
+    expect(user.temporarySecureInformation).toBe(null);
+    expect(user.email).toBe('tempemail');
+    expect(user.username).toBe('tempUsername');
   });
 
   test('Refresh tokens', async () => {

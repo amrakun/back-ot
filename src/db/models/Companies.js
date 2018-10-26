@@ -186,7 +186,7 @@ export const FinancialInfoSchema = mongoose.Schema(
     recordsInfo: field({ type: [DateFileSchema], optional: true }),
 
     // Is your company up to date with Social Security payments?
-    isUpToDateSSP: field({ type: Boolean }),
+    isUpToDateSSP: field({ type: Boolean, optional: true }),
 
     // Is your company up to date with Corporation Tax payments?
     isUpToDateCTP: field({ type: Boolean }),
@@ -568,6 +568,11 @@ class Company {
     const company = await this.findOne({ _id });
 
     if (value) {
+      // is not existing supplier
+      if (key === 'basicInfo' && !value.isRegisteredOnSup) {
+        value.sapNumber = undefined;
+      }
+
       if (key === 'financialInfo') {
         // if canProvideAccountsInfo is false then below field values must
         // be reseted
@@ -581,6 +586,17 @@ class Company {
           value.recordsInfo = [];
         } else {
           value.reasonToCannotNotProvide = undefined;
+        }
+      }
+
+      // if hasEnvironmentalRegulatorInvestigated is false then below field
+      // values must be reseted
+      if (key === 'environmentalInfo') {
+        if (!value.hasEnvironmentalRegulatorInvestigated) {
+          value.dateOfInvestigation = undefined;
+          value.reasonForInvestigation = undefined;
+          value.actionStatus = undefined;
+          value.investigationDocumentation = undefined;
         }
       }
 

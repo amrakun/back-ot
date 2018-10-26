@@ -6,11 +6,19 @@ export default {
   },
 
   isAwarded(tender) {
-    return tender.winnerId;
+    return tender.winnerIds && tender.winnerIds.length > 0;
+  },
+
+  supplierIds(tender) {
+    return tender.getSupplierIds();
+  },
+
+  winnerIds(tender) {
+    return tender.getWinnerIds();
   },
 
   suppliers(tender) {
-    return Companies.find({ _id: { $in: tender.supplierIds } });
+    return Companies.find({ _id: { $in: tender.getSupplierIds() } });
   },
 
   requestedCount(tender) {

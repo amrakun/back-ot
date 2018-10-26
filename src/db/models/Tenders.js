@@ -1,6 +1,7 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
-import { field, isReached, StatusPublishClose } from './utils';
+import { fieldEncryption } from 'mongoose-field-encryption';
+import { field, isReached, encryptArray, decryptArray, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -42,10 +43,13 @@ const TenderSchema = mongoose.Schema({
   file: field({ type: FileSchema, optional: true }),
   sourcingOfficer: field({ type: String, optional: true }),
   reminderDay: field({ type: Number, optional: true }),
+
+  // encrypted supplier ids
   supplierIds: field({ type: [String] }),
+
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
-  // Awarded response ids
+  // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
@@ -61,13 +65,16 @@ class Tender extends StatusPublishClose {
    * @param {Object} userId - Creating user
    * @return {Promise} newly created tender object
    */
-  static createTender(doc, userId) {
-    return this.create({
+  static async createTender(doc, userId) {
+    const saved = await Tenders.create({
       ...doc,
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
+      supplierIds: encryptArray(doc.supplierIds),
     });
+
+    return this.findOne({ _id: saved._id });
   }
 
   /**
@@ -82,6 +89,8 @@ class Tender extends StatusPublishClose {
     if (tender.status === 'closed') {
       throw new Error('Can not update closed tender');
     }
+
+    doc.supplierIds = encryptArray(doc.supplierIds);
 
     await this.update({ _id }, { $set: doc }, { runValidators: true });
 
@@ -110,11 +119,13 @@ class Tender extends StatusPublishClose {
    * @return {Promise} - Updated tender object
    */
   static async award(_id, supplierIds) {
+    if (supplierIds.length === 0) {
+      throw new Error('Select some suppliers');
+    }
+
     for (const supplierId of supplierIds) {
-      const response = await TenderResponses.findOne({
-        tenderId: _id,
-        supplierId,
-      });
+      const responses = await TenderResponses.find({ tenderId: _id });
+      const response = (responses || []).find(res => res.supplierId === supplierId);
 
       if (!response) {
         throw new Error('Invalid supplier');
@@ -125,9 +136,20 @@ class Tender extends StatusPublishClose {
       }
     }
 
-    await this.update({ _id }, { $set: { status: 'awarded', winnerIds: supplierIds } });
+    await this.update(
+      { _id },
+      { $set: { status: 'awarded', winnerIds: encryptArray(supplierIds) } },
+    );
 
     return this.findOne({ _id });
+  }
+
+  getSupplierIds() {
+    return decryptArray(this.supplierIds);
+  }
+
+  getWinnerIds() {
+    return decryptArray(this.winnerIds);
   }
 
   /*
@@ -212,6 +234,14 @@ class Tender extends StatusPublishClose {
   }
 }
 
+const { ENCRYPTION_SECRET } = process.env;
+
+TenderSchema.plugin(fieldEncryption, {
+  fields: ['name', 'number', 'content'],
+  secret: ENCRYPTION_SECRET,
+  useAes256Ctr: true,
+});
+
 TenderSchema.loadClass(Tender);
 
 const Tenders = mongoose.model('tenders', TenderSchema);
@@ -258,7 +288,18 @@ const TenderResponseSchema = mongoose.Schema({
   isNotInterested: field({ type: Boolean, default: false }),
 });
 
+TenderResponseSchema.plugin(fieldEncryption, {
+  fields: ['supplierId'],
+  secret: ENCRYPTION_SECRET,
+  useAes256Ctr: true,
+});
+
 class TenderResponse {
+  static async findBySupplierId({ tenderId, supplierId }) {
+    const responses = await TenderResponses.find({ tenderId });
+    return (responses || []).find(res => res.supplierId === supplierId);
+  }
+
   /**
    * Create new tender response
    * @param {Object} doc - tender response fields
@@ -274,7 +315,7 @@ class TenderResponse {
       throw Error('This tender is not available');
     }
 
-    const previousEntry = await this.findOne({ tenderId, supplierId });
+    const previousEntry = await this.findBySupplierId({ tenderId, supplierId });
 
     // prevent duplications
     if (previousEntry) {
@@ -287,7 +328,9 @@ class TenderResponse {
       isSent = true;
     }
 
-    return this.create({ ...doc, isSent });
+    const saved = await this.create({ ...doc, isSent });
+
+    return this.findOne({ _id: saved._id });
   }
 
   /*
@@ -296,9 +339,7 @@ class TenderResponse {
    * @return - Updated tender response
    */
   static async updateTenderResponse(doc) {
-    const { tenderId, supplierId } = doc;
-    const selector = { tenderId, supplierId };
-    const response = await this.findOne(selector);
+    const response = await this.findBySupplierId(doc);
 
     if (!response) {
       throw new Error('Response not found');
@@ -310,9 +351,9 @@ class TenderResponse {
       throw Error('This tender is not available');
     }
 
-    await this.update(selector, { $set: doc });
+    await response.update(doc);
 
-    return this.findOne(selector);
+    return this.findBySupplierId(doc);
   }
 
   /**

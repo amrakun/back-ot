@@ -62,6 +62,30 @@ describe('User mutations', async () => {
     expect(user._id).toBeDefined();
   });
 
+  test('Resend confirmation link', async () => {
+    const user = await userFactory({});
+
+    await Users.update(
+      { _id: user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: new Date(),
+        },
+      },
+    );
+
+    const mutation = `
+      mutation resendConfirmationLink($email: String!) {
+        resendConfirmationLink(email: $email)
+      }
+    `;
+
+    const link = await graphqlRequest(mutation, 'resendConfirmationLink', { email: user.email });
+
+    expect(link).toBeDefined();
+  });
+
   const confirmMutation = `
     mutation confirmRegistration(
       $token: String!,
@@ -80,8 +104,8 @@ describe('User mutations', async () => {
 
   const args = {
     token: 'token',
-    password: 'pass',
-    passwordConfirmation: 'pass',
+    password: 'Password$123',
+    passwordConfirmation: 'Password$123',
   };
 
   // valid tokens =================
@@ -210,7 +234,7 @@ describe('User mutations', async () => {
   test('Reset password', async () => {
     Users.resetPassword = jest.fn(() => ({}));
 
-    const doc = { token: '2424920429402', newPassword: 'newPassword' };
+    const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
     await userMutations.resetPassword({}, doc);
 
@@ -222,7 +246,7 @@ describe('User mutations', async () => {
 
     const doc = {
       currentPassword: 'currentPassword',
-      newPassword: 'newPassword',
+      newPassword: 'Password$123',
     };
 
     const user = { _id: 'DFAFASD' };
@@ -431,7 +455,7 @@ describe('User mutations', async () => {
   });
 
   test('Users edit profile: successfull', async () => {
-    Users.editProfile = jest.fn();
+    Users.editProfile = jest.fn(() => ({ _id: Math.random() }));
 
     const mutation = `
       mutation usersEditProfile(

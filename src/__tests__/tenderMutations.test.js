@@ -1,11 +1,13 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
+import sinon from 'sinon';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Configs, Users, Tenders } from '../db/models';
 import {
   userFactory,
   configFactory,
+  tenderDoc,
   tenderFactory,
   tenderResponseFactory,
   companyFactory,
@@ -19,7 +21,6 @@ beforeAll(() => connect());
 afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
-  let _tender;
   let _user;
 
   const commonParams = `
@@ -54,7 +55,6 @@ describe('Tender mutations', () => {
 
   beforeEach(async () => {
     // Creating test data
-    _tender = await tenderFactory();
     _user = await userFactory();
 
     await configFactory();
@@ -87,9 +87,10 @@ describe('Tender mutations', () => {
     ];
 
     const user = await userFactory({ isSupplier: true });
+    const tender = await tenderFactory();
 
     for (let mutation of mutations) {
-      checkLogin(tenderMutations[mutation], { _id: _tender.id }, { user });
+      checkLogin(tenderMutations[mutation], { _id: tender.id }, { user });
     }
   });
 
@@ -106,17 +107,16 @@ describe('Tender mutations', () => {
 
     const mutations = ['tenderResponsesSend'];
 
+    const tender = await tenderFactory();
     const user = await userFactory({});
 
     for (let mutation of mutations) {
-      checkLogin(tenderResponseMutations[mutation], { _id: _tender.id }, { user });
+      checkLogin(tenderResponseMutations[mutation], { _id: tender.id }, { user });
     }
   });
 
   test('Create tender', async () => {
-    const supplier = await companyFactory();
-
-    Tenders.createTender = jest.fn(() => ({ _id: 'DFAFSFASDF', supplierIds: [supplier._id] }));
+    const mock = sinon.stub(Tenders, 'createTender').callsFake(() => ({ _id: Math.random() }));
 
     const mutation = `
       mutation tendersAdd($type: String!  ${commonParams}) {
@@ -126,24 +126,18 @@ describe('Tender mutations', () => {
       }
     `;
 
-    delete _tender._id;
-    delete _tender.status;
-    delete _tender.createdDate;
-    delete _tender.createdUserId;
-    delete _tender.winnerIds;
-    delete _tender.sentRegretLetter;
-    await graphqlRequest(mutation, 'tendersAdd', _tender, { user: _user });
+    const doc = await tenderDoc({ type: 'rfq' });
 
-    expect(Tenders.createTender.mock.calls.length).toBe(1);
+    await graphqlRequest(mutation, 'tendersAdd', doc, { user: _user });
 
-    _tender.publishDate = new Date(_tender.publishDate);
-    _tender.closeDate = new Date(_tender.closeDate);
+    expect(mock.called).toBe(true);
+    expect(mock.calledWith(doc, _user._id)).toBe(true);
 
-    expect(Tenders.createTender).toBeCalledWith(_tender, _user._id);
+    mock.restore();
   });
 
   test('Update tender', async () => {
-    Tenders.updateTender = jest.fn(() => _tender);
+    const mock = sinon.stub(Tenders, 'updateTender').callsFake(() => ({ _id: Math.random() }));
 
     const mutation = `
       mutation tendersEdit($_id: String!  ${commonParams}) {
@@ -153,26 +147,21 @@ describe('Tender mutations', () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'tendersEdit', _tender);
+    const tender = await tenderFactory();
+    const tenderId = tender._id.toString();
+    const doc = await tenderDoc();
+    const args = { _id: tenderId, ...doc };
 
-    expect(Tenders.updateTender.mock.calls.length).toBe(1);
+    await graphqlRequest(mutation, 'tendersEdit', args);
 
-    const { _id, ...restParams } = _tender;
+    expect(mock.calledOnce).toBe(true);
+    expect(mock.calledWith(tenderId, doc)).toBe(true);
 
-    delete restParams.type;
-    delete restParams.status;
-    delete restParams.createdDate;
-    delete restParams.createdUserId;
-    delete restParams.winnerIds;
-    delete restParams.sentRegretLetter;
-    restParams.publishDate = new Date(restParams.publishDate);
-    restParams.closeDate = new Date(restParams.closeDate);
-
-    expect(Tenders.updateTender).toBeCalledWith(_id, restParams);
+    mock.restore();
   });
 
   test('Delete tender', async () => {
-    Tenders.removeTender = jest.fn(() => ({}));
+    const mock = sinon.stub(Tenders, 'removeTender').callsFake(() => ({ _id: Math.random() }));
 
     const mutation = `
       mutation tendersRemove($_id: String!) {
@@ -180,10 +169,15 @@ describe('Tender mutations', () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'tendersRemove', { _id: _tender._id });
+    const tender = await tenderFactory();
+    const tenderId = tender._id.toString();
 
-    expect(Tenders.removeTender.mock.calls.length).toBe(1);
-    expect(Tenders.removeTender).toBeCalledWith(_tender._id);
+    await graphqlRequest(mutation, 'tendersRemove', { _id: tenderId });
+
+    expect(mock.calledOnce).toBe(true);
+    expect(mock.calledWith(tenderId)).toBe(true);
+
+    mock.restore();
   });
 
   test('Award', async () => {
@@ -195,14 +189,15 @@ describe('Tender mutations', () => {
       }
     `;
 
+    const tender = await tenderFactory({ status: 'open' });
     const supplier = await companyFactory({});
 
     await tenderResponseFactory({
-      tenderId: _tender._id,
+      tenderId: tender._id,
       supplierId: supplier._id,
     });
 
-    const args = { _id: _tender._id.toString(), supplierIds: [supplier._id] };
+    const args = { _id: tender._id.toString(), supplierIds: [supplier._id] };
 
     const response = await graphqlRequest(mutation, 'tendersAward', args);
 
@@ -212,7 +207,7 @@ describe('Tender mutations', () => {
   test('Send regret letter', async () => {
     const supplier = await companyFactory({});
     const supplierId = supplier._id;
-    const tender = await Tenders.findOne({ _id: _tender._id });
+    const tender = await tenderFactory({ status: 'open' });
     const tenderId = tender._id.toString();
 
     await tender.update({ winnerIds: [supplierId] });
@@ -235,6 +230,7 @@ describe('Tender mutations', () => {
 
     expect(response).toContain(notAwarded1.supplierId);
     expect(response).toContain(notAwarded2.supplierId);
+
     expect(updatedTender.sentRegretLetter).toBe(true);
   });
 
@@ -247,7 +243,8 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const args = { _id: _tender._id };
+    const tender = await tenderFactory();
+    const args = { _id: tender._id };
 
     const response = await graphqlRequest(mutation, 'tendersCancel', args);
 

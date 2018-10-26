@@ -1,5 +1,6 @@
 import Companies from './Companies';
 import Users from './Users';
+import Session from './Session';
 import { Tenders, TenderResponses } from './Tenders';
 import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
@@ -12,6 +13,7 @@ import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLog
 export {
   Companies,
   Users,
+  Session,
   Tenders,
   TenderResponses,
   Feedbacks,

@@ -1,11 +1,16 @@
 import cf from 'cellref';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
+import { encryptArray } from '../../../db/models/utils';
 import { readTemplate, generateXlsx } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const prepareReport = async ({ tenderId, supplierIds, template }) => {
   const tender = await Tenders.findOne({ _id: tenderId });
-  const responses = await TenderResponses.find({ tenderId, supplierId: { $in: supplierIds } });
+
+  const responses = await TenderResponses.find({
+    tenderId,
+    supplierId: { $in: encryptArray(supplierIds) },
+  });
 
   // read template
   const { workbook, sheet } = await readTemplate(template);

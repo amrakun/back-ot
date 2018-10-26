@@ -13,6 +13,7 @@ const isTest = NODE_ENV == 'test';
 const DB_URI = isTest ? TEST_MONGO_URL : MONGO_URL;
 
 mongoose.Promise = global.Promise;
+mongoose.set('useCreateIndex', true);
 
 if (!isTest) {
   mongoose.connection
@@ -28,16 +29,12 @@ if (!isTest) {
 }
 
 export function connect() {
-  return mongoose
-    .connect(DB_URI, {
-      useMongoClient: true,
-    })
-    .then(() => {
-      // empty (drop) database before running tests
-      if (isTest) {
-        return mongoose.connection.db.dropDatabase();
-      }
-    });
+  return mongoose.connect(DB_URI).then(() => {
+    // empty (drop) database before running tests
+    if (isTest) {
+      return mongoose.connection.db.dropDatabase();
+    }
+  });
 }
 
 export function disconnect() {
@@ -49,7 +46,11 @@ export const graphqlRequest = async (mutation, name, args, context) => {
 
   const rootValue = {};
 
-  const response = await graphql(schema, mutation, rootValue, context || { user }, args);
+  const res = {
+    cookie: () => {},
+  };
+
+  const response = await graphql(schema, mutation, rootValue, context || { res, user }, args);
 
   if (response.errors) {
     throw response.errors;
