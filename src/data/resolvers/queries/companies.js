@@ -258,7 +258,7 @@ const companyQueries = {
   async companyPrequalificationSupplierExport(root, args, { user }) {
     const supplier = await Companies.findOne({ _id: user.companyId });
 
-    return companyPrequalification(supplier);
+    return companyPrequalification(user, supplier);
   },
 
   /*
