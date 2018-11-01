@@ -823,6 +823,11 @@ export const configFactory = (params = {}) => {
       buyer__cancel: commonTemplate,
       supplier__cancel: commonTemplate,
     },
+    capacityBuildingTemplates: {
+      buyer__submit: commonTemplate,
+      supplier__submit: commonTemplate,
+      supplier__enable: commonTemplate,
+    },
     successFeedbackTemplates: {
       buyer__new: commonTemplate,
       supplier__new: commonTemplate,
