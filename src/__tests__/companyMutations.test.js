@@ -464,12 +464,13 @@ describe('Company mutations', () => {
   });
 
   test('enable prequalificationInfo to edit', async () => {
-    const supplier = await companyFactory({});
+    const supplier = await companyFactory({ isPrequalified: false });
 
     const response = await graphqlRequest(
       `mutation companiesTogglePrequalificationState($supplierId: String!) {
           companiesTogglePrequalificationState(supplierId: $supplierId) {
             _id
+            isPrequalified
             isPrequalificationInfoEditable
           }
         }
@@ -482,5 +483,6 @@ describe('Company mutations', () => {
     );
 
     expect(response.isPrequalificationInfoEditable).toBe(false);
+    expect(response.isPrequalified).toBe(null);
   });
 });

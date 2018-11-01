@@ -540,24 +540,6 @@ class Company {
   }
 
   /**
-   * Update basic info
-   * @param  {String} _id - company id
-   * @param  {Object} basicInfo - company basic info
-   * @return {Promise} Updated company object
-   */
-  static async updateBasicInfo(_id, basicInfo) {
-    const { enName, mnName } = basicInfo;
-
-    // validations
-    await this.checkNames({ _id, enName, mnName });
-
-    // update
-    await this.update({ _id }, { $set: { basicInfo } });
-
-    return this.findOne({ _id });
-  }
-
-  /**
    * Update sub section info
    * @param {String } _id - Company id
    * @param {String} key - basicInfo, contactInfo etc ...
@@ -797,7 +779,7 @@ class Company {
       updateQuery.isPrequalified = false;
     }
 
-    await Companies.update({ _id }, { $set: updateQuery });
+    await Companies.update({ _id }, { $set: updateQuery, $unset: { isPrequalified: 1 } });
 
     return Companies.findOne({ _id });
   }
