@@ -17,6 +17,11 @@ const companyMutations = {
       name: 'capacityBuildingTemplates',
       kind: 'supplier__submit',
       toEmails: [basicInfo.email],
+      replacer: text => {
+        return text
+          .replace('{supplier.name}', basicInfo.enName)
+          .replace('{supplier._id}', updatedCompany._id);
+      },
     });
 
     // send notification email to buyer
