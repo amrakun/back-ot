@@ -120,13 +120,12 @@ const companyMutations = {
     const updatedCompany = await Companies.togglePrequalificationState(supplierId);
 
     const basicInfo = updatedCompany.basicInfo || {};
-    const { PREQUALIFICATION_RECEIVER_EMAIL } = process.env;
 
     if (updatedCompany.isPrequalificationInfoEditable) {
       await sendConfigEmail({
         name: 'capacityBuildingTemplates',
         kind: 'supplier__enable',
-        toEmails: [PREQUALIFICATION_RECEIVER_EMAIL],
+        toEmails: [basicInfo.email],
         replacer: text => {
           return text
             .replace('{supplier.name}', basicInfo.enName)
