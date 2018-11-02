@@ -11,7 +11,7 @@ export const generateReplacer = async (supplier, qualified) => {
     let failedSectionsMn = '';
     let percentage = '';
 
-    if (supplier.tierType === 'national' || supplier.tierType === 'tier1') {
+    if (supplier.tierType === 'national') {
       percentage = '25%';
     }
 
