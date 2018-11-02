@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 
@@ -14,6 +15,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import formidable from 'formidable';
+import fileType from 'file-type';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
@@ -83,12 +85,18 @@ app.post('/upload-file', async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, response) => {
-    const { type, size } = response.file;
+    const { size } = response.file;
 
     // 20mb
     if (size > 20000000) {
       return res.status(500).send('Too large file');
     }
+
+    // read file
+    const buffer = await fs.readFileSync(response.file.path);
+
+    // determine file type using magic numbers
+    const { mime } = fileType(buffer);
 
     if (
       [
@@ -98,7 +106,7 @@ app.post('/upload-file', async (req, res) => {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/pdf',
-      ].includes(type)
+      ].includes(mime)
     ) {
       const url = await uploadFile(response.file);
       return res.end(url);
