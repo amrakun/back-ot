@@ -152,8 +152,12 @@ const userMutations = {
     return response;
   },
 
-  logout(root, args, { user }) {
-    return Users.logout(user);
+  async logout(root, args, { user, res }) {
+    const response = await Users.logout(user);
+
+    res.clearCookie('auth-token');
+
+    return response;
   },
 
   /*

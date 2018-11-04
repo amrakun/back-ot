@@ -160,8 +160,6 @@ describe('User mutations', async () => {
     mutation login($email: String!, $password: String!, $loginAs: String) {
       login(email: $email, password: $password, loginAs: $loginAs) {
         status
-        token
-        refreshToken
 
         delegatedUser {
           _id
@@ -185,8 +183,6 @@ describe('User mutations', async () => {
     const response = await graphqlRequest(loginMutation, 'login', args);
 
     expect(response.status).toBe('login');
-    expect(response.token).toBeDefined();
-    expect(response.refreshToken).toBeDefined();
   });
 
   test('Login: delegation', async () => {
@@ -216,8 +212,6 @@ describe('User mutations', async () => {
     response = await graphqlRequest(loginMutation, 'login', args);
 
     expect(response.status).toBe('login');
-    expect(response.token).toBeDefined();
-    expect(response.refreshToken).toBeDefined();
     expect(response.user._id.toString()).toBe(delegatedUser._id);
   });
 

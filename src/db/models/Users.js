@@ -81,7 +81,8 @@ class User {
 
     if (!schema.validate(password)) {
       throw new Error(
-        'Password must have uppercase letters, lowercase letters, digits and symbols. Minimum length is 8',
+        `Password must have uppercase letters, lowercase letters,
+          digits and symbols. Minimum length is 8`,
       );
     }
   }
@@ -537,10 +538,6 @@ class User {
     // checking wheter or not this delegation is active
     if (delegatedUserId && delegationStartDate <= now && delegationEndDate >= now) {
       const delegatedUser = await Users.findOne({ _id: user.delegatedUserId });
-
-      // remove secret infos
-      delete delegatedUser.password;
-      delete user.password;
 
       if (!loginAs) {
         return {

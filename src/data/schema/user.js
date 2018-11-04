@@ -22,8 +22,6 @@ export const types = `
 
   type AuthPayload {
     status: String
-    token: String
-    refreshToken: String
 
     user: User
     delegatedUser: User
