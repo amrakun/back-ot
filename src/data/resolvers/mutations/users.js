@@ -272,7 +272,7 @@ const userMutations = {
       }`;
 
       utils.sendEmail({
-        toEmails: [user.email],
+        toEmails: [userOnDb.email],
         title: 'Confirm profile edition',
         template: {
           name: 'profileEditConfirmation',
