@@ -339,7 +339,11 @@ class User {
    */
   static async forgotPassword(email) {
     // find user
-    const user = await this.findOne({ email });
+    const user = await this.findOne({
+      email,
+      registrationToken: null,
+      registrationTokenExpires: null,
+    });
 
     if (!user) {
       throw new Error('Invalid email');

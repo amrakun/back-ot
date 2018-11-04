@@ -289,7 +289,7 @@ describe('User db utils', () => {
   });
 
   test('Forgot password', async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     // invalid email ==============
     try {
@@ -298,7 +298,32 @@ describe('User db utils', () => {
       expect(e.message).toBe('Invalid email');
     }
 
-    // valid
+    // valid email but not confirmed
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: 'token',
+          registrationTokenExpires: new Date(),
+        },
+      },
+    );
+    try {
+      await Users.forgotPassword(_user.email);
+    } catch (e) {
+      expect(e.message).toBe('Invalid email');
+    }
+
+    // all valid
+    await Users.update(
+      { _id: _user._id },
+      {
+        $set: {
+          registrationToken: undefined,
+          registrationTokenExpires: undefined,
+        },
+      },
+    );
     await Users.forgotPassword(_user.email);
     const user = await Users.findOne({ email: _user.email });
 
