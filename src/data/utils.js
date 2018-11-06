@@ -232,6 +232,18 @@ export const readTemplate = async name => {
   return { workbook, sheet: workbook.sheet(0) };
 };
 
+export const tokenize = str => {
+  let result = '';
+
+  for (let i = 0, length = str.length; i < length; i++) {
+    const code = str.charCodeAt(i);
+
+    result = `${result}${code + 2}`;
+  }
+
+  return result;
+};
+
 /*
  * Generate xlsx
  */
@@ -240,7 +252,8 @@ export const generateXlsx = async (user, workbook, name) => {
     return '';
   }
 
-  const dir = `${__dirname}/../private/templateOutputs/${user._id}`;
+  const id = tokenize(user.username);
+  const dir = `${__dirname}/../private/templateOutputs/${id}`;
 
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -250,7 +263,7 @@ export const generateXlsx = async (user, workbook, name) => {
 
   await workbook.toFileAsync(`${dir}/${name}.xlsx`);
 
-  return `${DOMAIN}/static/templateOutputs/${user._id}/${name}.xlsx`;
+  return `${DOMAIN}/static/templateOutputs/${id}/${name}.xlsx`;
 };
 
 export default {

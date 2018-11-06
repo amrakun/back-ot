@@ -19,7 +19,7 @@ import fileType from 'file-type';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
-import { uploadFile, readS3File } from './data/utils';
+import { uploadFile, readS3File, tokenize } from './data/utils';
 import schema from './data';
 import './startup';
 
@@ -43,7 +43,7 @@ app.use(
 
     if (
       req.path.includes('templateOutputs') &&
-      !req.path.includes(`templateOutputs/${req.user._id}`)
+      !req.path.includes(`templateOutputs/${tokenize(req.user.username)}`)
     ) {
       return res.end('foribidden');
     }
