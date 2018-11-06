@@ -35,6 +35,7 @@ const feedbackQueries = {
 };
 
 requireBuyer(feedbackQueries, 'feedbacks');
+requireBuyer(feedbackQueries, 'feedbackDetail');
 requireBuyer(feedbackQueries, 'feedbackResponses');
 
 export default feedbackQueries;

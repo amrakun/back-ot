@@ -203,10 +203,12 @@ const auditQueries = {
 };
 
 requireBuyer(auditQueries, 'audits');
+requireBuyer(auditQueries, 'auditsSuppliers');
 requireBuyer(auditQueries, 'auditDetail');
 requireBuyer(auditQueries, 'auditResponses');
 requireBuyer(auditQueries, 'auditResponseDetail');
 requireBuyer(auditQueries, 'auditResponsesQualifiedStatus');
+requireBuyer(auditQueries, 'auditResponseTotalCounts');
 
 requireSupplier(auditQueries, 'auditResponseByUser');
 

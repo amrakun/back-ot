@@ -333,9 +333,12 @@ const userMutations = {
 requireBuyer(userMutations, 'registerViaBuyer');
 requireBuyer(userMutations, 'usersAdd');
 requireBuyer(userMutations, 'usersEdit');
+requireBuyer(userMutations, 'usersRemove');
+
+requireLogin(userMutations, 'logout');
+requireLogin(userMutations, 'confirmProfileEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
-requireBuyer(userMutations, 'usersRemove');
 requireLogin(userMutations, 'usersDelegate');
 
 export default userMutations;

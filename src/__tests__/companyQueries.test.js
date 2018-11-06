@@ -133,6 +133,30 @@ describe('Company queries', () => {
     }
   });
 
+  test('Supplier required', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Permission denied');
+      }
+    };
+
+    expect.assertions(3);
+
+    const user = await userFactory({ isSupplier: false });
+
+    const items = [
+      'companyByUser',
+      'companyRegistrationSupplierExport',
+      'companyPrequalificationSupplierExport',
+    ];
+
+    for (let query of items) {
+      checkLogin(queries[query], {}, { user });
+    }
+  });
+
   test('companies', async () => {
     const user = await userFactory();
 

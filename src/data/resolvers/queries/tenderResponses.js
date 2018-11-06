@@ -135,6 +135,7 @@ const tenderResponseQueries = {
 
 requireBuyer(tenderResponseQueries, 'tenderResponses');
 requireBuyer(tenderResponseQueries, 'tenderResponseDetail');
+requireBuyer(tenderResponseQueries, 'tenderResponseNotRespondedSuppliers');
 requireSupplier(tenderResponseQueries, 'tenderResponseByUser');
 
 export default tenderResponseQueries;

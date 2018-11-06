@@ -1,4 +1,5 @@
 import { Configs } from '../../../db/models';
+import { moduleRequireBuyer } from '../../permissions';
 
 const configQueries = {
   /**
@@ -8,5 +9,7 @@ const configQueries = {
     return Configs.findOne({});
   },
 };
+
+moduleRequireBuyer(configQueries);
 
 export default configQueries;

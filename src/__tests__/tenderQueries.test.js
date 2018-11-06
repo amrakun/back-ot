@@ -67,7 +67,7 @@ describe('Tender queries', () => {
       }
     };
 
-    expect.assertions(12);
+    expect.assertions(13);
 
     const user = await userFactory({ isSupplier: true });
 
@@ -85,7 +85,11 @@ describe('Tender queries', () => {
       checkLogin(tenderQueries[query], {}, { user });
     }
 
-    const responseQueries = ['tenderResponses', 'tenderResponseDetail'];
+    const responseQueries = [
+      'tenderResponses',
+      'tenderResponseDetail',
+      'tenderResponseNotRespondedSuppliers',
+    ];
 
     for (let query of responseQueries) {
       checkLogin(tenderResponseQueries[query], {}, { user });

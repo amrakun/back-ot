@@ -48,6 +48,30 @@ describe('User mutations', async () => {
     }
   });
 
+  test('Login required functions', async () => {
+    const checkLogin = async (fn, args, context) => {
+      try {
+        await fn({}, args, context);
+      } catch (e) {
+        expect(e.message).toEqual('Login required');
+      }
+    };
+
+    expect.assertions(5);
+
+    const mutations = [
+      'logout',
+      'confirmProfileEdit',
+      'usersChangePassword',
+      'usersEditProfile',
+      'usersDelegate',
+    ];
+
+    for (let mutation of mutations) {
+      checkLogin(userMutations[mutation], {}, {});
+    }
+  });
+
   test('Register', async () => {
     const mutation = `
       mutation register($email: String!) {

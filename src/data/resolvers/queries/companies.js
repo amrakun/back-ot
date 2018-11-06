@@ -484,6 +484,7 @@ requireBuyer(companyQueries, 'companiesGenerateDifotScoreList');
 requireBuyer(companyQueries, 'companiesGeneratePrequalificationList');
 requireBuyer(companyQueries, 'companiesPrequalifiedStatus');
 
+requireSupplier(companyQueries, 'companyByUser');
 requireSupplier(companyQueries, 'companyRegistrationSupplierExport');
 requireSupplier(companyQueries, 'companyPrequalificationSupplierExport');
 
