@@ -10,10 +10,12 @@ import { ROLES, PERMISSION_LIST } from './constants';
 const permissionWrapper = (cls, methodName, checker) => {
   const oldMethod = cls[methodName];
 
-  cls[methodName] = (root, args, { user }) => {
+  cls[methodName] = (root, args, context) => {
+    const { user } = context;
+
     checker(user);
 
-    return oldMethod(root, args, { user });
+    return oldMethod(root, args, context);
   };
 };
 
