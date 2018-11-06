@@ -43,7 +43,7 @@ app.use(
 
     if (
       req.path.includes('templateOutputs') &&
-      !req.path.includes(`templateOutputs/${req.user.username}`)
+      !req.path.includes(`templateOutputs/${req.user._id}`)
     ) {
       return res.end('foribidden');
     }

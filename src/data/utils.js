@@ -240,7 +240,7 @@ export const generateXlsx = async (user, workbook, name) => {
     return '';
   }
 
-  const dir = `${__dirname}/../private/templateOutputs/${user.username}`;
+  const dir = `${__dirname}/../private/templateOutputs/${user._id}`;
 
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -250,7 +250,7 @@ export const generateXlsx = async (user, workbook, name) => {
 
   await workbook.toFileAsync(`${dir}/${name}.xlsx`);
 
-  return `${DOMAIN}/static/templateOutputs/${user.username}/${name}.xlsx`;
+  return `${DOMAIN}/static/templateOutputs/${user._id}/${name}.xlsx`;
 };
 
 export default {
