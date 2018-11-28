@@ -153,6 +153,14 @@ class User {
 
     // changed secure information
     if (userOnDb.email !== doc.email || userOnDb.username !== doc.username) {
+      if (userOnDb.email !== doc.email && (await Users.findOne({ email: doc.email }))) {
+        throw new Error('Invalid email');
+      }
+
+      if (userOnDb.username !== doc.username && (await Users.findOne({ username: doc.username }))) {
+        throw new Error('Invalid username');
+      }
+
       const token = await this.generateRandomToken();
 
       doc.temporarySecureInformation = {

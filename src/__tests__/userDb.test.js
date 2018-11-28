@@ -187,7 +187,7 @@ describe('User db utils', () => {
   });
 
   test('Edit profile', async () => {
-    expect.assertions(11);
+    expect.assertions(13);
 
     const updateDoc = await userFactory();
 
@@ -197,9 +197,25 @@ describe('User db utils', () => {
       expect(e.message).toBe('Duplicated email');
     }
 
+    try {
+      await Users.editProfile(_user._id, {
+        email: updateDoc.email,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Invalid email');
+    }
+
+    try {
+      await Users.editProfile(_user._id, {
+        username: updateDoc.username,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Invalid username');
+    }
+
     await Users.editProfile(_user._id, {
       email: 'test@gmail.com',
-      username: updateDoc.username,
+      username: _user.username,
       firstName: updateDoc.firstName,
       lastName: updateDoc.lastName,
       jobTitle: updateDoc.jobTitle,
@@ -213,7 +229,7 @@ describe('User db utils', () => {
     expect(userObj.email).toBe(_user.email);
     expect(userObj.temporarySecureInformation.token).toBeDefined();
     expect(userObj.temporarySecureInformation.expires).toBeDefined();
-    expect(userObj.temporarySecureInformation.username).toBe(updateDoc.username);
+    expect(userObj.temporarySecureInformation.username).toBe(_user.username);
     expect(userObj.temporarySecureInformation.email).toBe('test@gmail.com');
 
     expect(userObj.firstName).toBe(updateDoc.firstName);
