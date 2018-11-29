@@ -427,7 +427,11 @@ const CompanySchema = mongoose.Schema({
   shareholderInfo: field({ type: ShareholderInfoSchema, optional: true }),
   groupInfo: field({ type: GroupInfoSchema, optional: true }),
 
-  tierType: field({ type: String, optional: true }),
+  tierType: field({
+    type: String,
+    enum: ['national', 'umnugobi', 'tier1', 'tier2', 'tier3'],
+    optional: true,
+  }),
 
   isSentRegistrationInfo: field({ type: Boolean, optional: true, default: false }),
 
