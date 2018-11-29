@@ -12,7 +12,7 @@ export const types = `
 
   input ConfigTierTypesDurationAmount {
     national: ConfigDurationAmount
-    umnugobi: ConfigDurationAmount
+    umnugovi: ConfigDurationAmount
     tier1: ConfigDurationAmount
     tier2: ConfigDurationAmount
     tier3: ConfigDurationAmount
@@ -21,7 +21,7 @@ export const types = `
   input ConfigSuppliersTierTypesDurationAmount {
     supplierIds: [String]!
     national: ConfigDurationAmount
-    umnugobi: ConfigDurationAmount
+    umnugovi: ConfigDurationAmount
     tier1: ConfigDurationAmount
     tier2: ConfigDurationAmount
     tier3: ConfigDurationAmount

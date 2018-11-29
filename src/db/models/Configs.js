@@ -21,7 +21,7 @@ const SuppliersDurationAmountSchema = mongoose.Schema(
 const TierTypesDurationAmountSchema = mongoose.Schema(
   {
     national: field({ type: DurationAmountSchema, optional: true }),
-    umnugobi: field({ type: DurationAmountSchema, optional: true }),
+    umnugovi: field({ type: DurationAmountSchema, optional: true }),
     tier1: field({ type: DurationAmountSchema, optional: true }),
     tier2: field({ type: DurationAmountSchema, optional: true }),
     tier3: field({ type: DurationAmountSchema, optional: true }),
@@ -33,7 +33,7 @@ const SuppliersTierTypesDurationAmountSchema = mongoose.Schema(
   {
     supplierIds: field({ type: [String] }),
     national: field({ type: DurationAmountSchema, optional: true }),
-    umnugobi: field({ type: DurationAmountSchema, optional: true }),
+    umnugovi: field({ type: DurationAmountSchema, optional: true }),
     tier1: field({ type: DurationAmountSchema, optional: true }),
     tier2: field({ type: DurationAmountSchema, optional: true }),
     tier3: field({ type: DurationAmountSchema, optional: true }),

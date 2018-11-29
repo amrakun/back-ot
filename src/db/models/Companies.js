@@ -429,7 +429,7 @@ const CompanySchema = mongoose.Schema({
 
   tierType: field({
     type: String,
-    enum: ['national', 'umnugobi', 'tier1', 'tier2', 'tier3'],
+    enum: ['national', 'umnugovi', 'tier1', 'tier2', 'tier3'],
     optional: true,
   }),
 

@@ -15,7 +15,7 @@ export const generateReplacer = async (supplier, qualified) => {
       percentage = '25%';
     }
 
-    if (supplier.tierType === 'umnugobi') {
+    if (supplier.tierType === 'umnugovi') {
       percentage = '50%';
     }
 

@@ -730,7 +730,7 @@ export const configDocs = {
         duration: 'year',
         amount: 2,
       },
-      umnugobi: {
+      umnugovi: {
         duration: 'year',
         amount: 2,
       },
@@ -754,7 +754,7 @@ export const configDocs = {
         duration: 'year',
         amount: 2,
       },
-      umnugobi: {
+      umnugovi: {
         duration: 'year',
         amount: 2,
       },
