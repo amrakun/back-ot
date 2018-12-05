@@ -14,7 +14,7 @@ export const types = `
 export const queries = `
   reportsSuppliersExport(
     productCodes: [String],
-    isPrequalified: Boolean,
+    state: String,
     tierType: String,
   ): String
 

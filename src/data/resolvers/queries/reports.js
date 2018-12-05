@@ -7,19 +7,23 @@ const reportsQuery = {
    * Supplier profile list
    * @param {Object} args - Query params
    * @param {String[]} args.productCodes - List of product codes that will be matched with
-   * @param {boolean} args.isPrequalified - Company isPrequalified field
+   * @param {String} args.state - Pre-qualified, not qualified, pending or all
    * @param {String} args.tierType - Tier type
    * @return {String} file url of the generated reports_suppliers.xlsx
    */
-  async reportsSuppliersExport(root, { productCodes, isPrequalified, tierType }, { user }) {
+  async reportsSuppliersExport(root, { productCodes, state, tierType }, { user }) {
     const query = {};
 
     if (productCodes && productCodes.length > 0) {
       query.validatedProductsInfo = { $all: productCodes };
     }
 
-    if (typeof isPrequalified === 'boolean') {
-      query.isPrequalified = isPrequalified;
+    if (state !== 'all') {
+      if (state === 'pending') {
+        query.isPrequalified = undefined;
+      } else {
+        query.isPrequalified = state === 'prequalified';
+      }
     }
 
     if (tierType) {
