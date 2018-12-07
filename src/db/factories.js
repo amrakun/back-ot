@@ -491,6 +491,7 @@ export const qualificationFactory = async (params = {}) => {
   }
 
   const qualification = new Qualifications({
+    createdDate: new Date(),
     supplierId: params.supplierId,
     financialInfo: params.financialInfo,
     businessInfo: params.businessInfo,
@@ -517,6 +518,7 @@ export const auditFactory = async (params = {}) => {
     supplierIds: params.supplierIds,
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
+    createdDate: new Date(),
     createdUserId: params.createdUserId,
   });
 
@@ -641,6 +643,7 @@ export const auditResponseFactory = async (params = {}) => {
   }
 
   const auditResponse = new AuditResponses({
+    createdDate: new Date(),
     auditId: params.auditId,
     supplierId: params.supplierId,
     isSent: params.isSent || false,

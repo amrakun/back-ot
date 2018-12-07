@@ -273,6 +273,7 @@ const RespondedDocumentSchema = mongoose.Schema(
 );
 
 const TenderResponseSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
@@ -284,6 +285,7 @@ const TenderResponseSchema = mongoose.Schema({
   status: field({ type: String, optional: true }),
 
   isSent: field({ type: Boolean, optional: true }),
+  sentDate: field({ type: Date, optional: true }),
 
   isNotInterested: field({ type: Boolean, default: false }),
 });
@@ -322,13 +324,15 @@ class TenderResponse {
       return previousEntry;
     }
 
-    let isSent = false;
+    doc.createdDate = new Date();
+    doc.isSent = false;
 
     if (doc.isNotInterested) {
-      isSent = true;
+      doc.isSent = true;
+      doc.sentDate = new Date();
     }
 
-    const saved = await this.create({ ...doc, isSent });
+    const saved = await this.create(doc);
 
     return this.findOne({ _id: saved._id });
   }
@@ -377,7 +381,7 @@ class TenderResponse {
       await this.update({ status: tender.status === 'closed' ? 'late' : 'onTime' });
     }
 
-    await this.update({ isSent: true });
+    await this.update({ isSent: true, sentDate: new Date() });
 
     return TenderResponses.findOne({ _id: this._id });
   }

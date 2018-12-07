@@ -25,6 +25,7 @@ const generateFields = schema => {
 };
 
 const QualificationSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
   supplierId: field({ type: String }),
   financialInfo: generateFields(FinancialInfoSchema),
   businessInfo: generateFields(BusinessInfoSchema),
@@ -100,7 +101,7 @@ class Qualification {
       await this.update({ supplierId }, { $set: { [section]: value } });
     } else {
       // create
-      await this.create({ supplierId, [section]: value });
+      await this.create({ supplierId, [section]: value, createdDate: new Date() });
     }
 
     return this.findOne({ supplierId });

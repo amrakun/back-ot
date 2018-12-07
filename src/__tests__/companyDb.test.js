@@ -372,6 +372,7 @@ describe('Companies model tests', () => {
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
     expect(updatedCompany.isSentRegistrationInfo).toBe(true);
+    expect(updatedCompany.registrationInfoSentDate).toBeDefined();
   });
 
   test('send prequalification info', async () => {
@@ -383,6 +384,7 @@ describe('Companies model tests', () => {
 
     expect(updatedCompany.isSentPrequalificationInfo).toBe(true);
     expect(updatedCompany.isPrequalificationInfoEditable).toBe(false);
+    expect(updatedCompany.prequalificationInfoSentDate).toBeDefined();
   });
 
   test('skip prequalification', async () => {

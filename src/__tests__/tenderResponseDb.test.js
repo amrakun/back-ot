@@ -63,6 +63,7 @@ describe('Tender response db', () => {
     });
 
     expect(tenderResponseObj).toBeDefined();
+    expect(tenderResponseObj.createdDate).toBeDefined();
     expect(tenderResponseObj.tenderId.toString()).toBe(_tender._id.toString());
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
     expect(tenderResponseObj.isNotInterested).toBe(false);
@@ -115,6 +116,7 @@ describe('Tender response db', () => {
 
     tenderResponse = await TenderResponses.findOne({ _id: tenderResponse._id });
 
+    expect(tenderResponse.sentDate).toBeDefined();
     expect(tenderResponse.isSent).toBe(true);
   });
 

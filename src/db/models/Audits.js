@@ -9,6 +9,8 @@ const AuditSchema = mongoose.Schema({
   publishDate: field({ type: Date }),
   closeDate: field({ type: Date }),
   supplierIds: field({ type: [String] }),
+
+  createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
 });
 
@@ -24,6 +26,7 @@ class Audit extends StatusPublishClose {
       ...doc,
       status: 'draft',
       createdUserId: userId,
+      createdDate: new Date(),
     });
   }
 }
@@ -370,6 +373,7 @@ const EvidenceInfoSchema = mongoose.Schema(
 );
 
 const AuditResponseSchema = mongoose.Schema({
+  createdDate: field({ type: Date }),
   auditId: field({ type: String }),
   supplierId: field({ type: String }),
 
@@ -602,6 +606,7 @@ class AuditResponse {
 
     return this.create({
       auditId,
+      createdDate: new Date(),
       isSent: false,
       isSupplierNotified: true,
       supplierId,

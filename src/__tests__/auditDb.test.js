@@ -50,6 +50,7 @@ describe('Audit response db', () => {
     );
 
     expect(auditObj.status).toBe('draft');
+    expect(auditObj.createdDate).toBeDefined();
     expect(auditObj.createdUserId).toEqual(user._id);
     expect(auditObj.supplierIds).toContain('id1');
     expect(auditObj.supplierIds).toContain('id2');
@@ -146,7 +147,7 @@ describe('Audit response db', () => {
   };
 
   test('Basic info', async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     const doc = {
       sotri: 'sotri',
@@ -160,6 +161,7 @@ describe('Audit response db', () => {
       doc,
     });
 
+    expect(response.createdDate).toBeDefined();
     expect(response.isSupplierNotified).toBe(true);
     expect(response.basicInfo.toJSON()).toEqual(doc);
 

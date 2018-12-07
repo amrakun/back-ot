@@ -48,6 +48,7 @@ describe('Qualification db', () => {
 
     const updatedCompany = await Companies.findOne({ _id: _company._id });
 
+    expect(savedObject.createdDate).toBeDefined();
     expect(savedObject.financialInfo.toJSON()).toEqual(doc);
     expect(updatedCompany.isPrequalified).not.toBeDefined();
   });

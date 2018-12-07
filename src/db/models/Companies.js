@@ -434,9 +434,12 @@ const CompanySchema = mongoose.Schema({
   }),
 
   isSentRegistrationInfo: field({ type: Boolean, optional: true, default: false }),
+  registrationInfoSentDate: field({ type: Date, optional: true }),
 
   isSentPrequalificationInfo: field({ type: Boolean, optional: true, default: false }),
   prequalificationSubmittedCount: field({ type: Number, optional: true }),
+  prequalificationInfoSentDate: field({ type: Date, optional: true }),
+
   isPrequalificationInfoEditable: field({
     type: Boolean,
     optional: true,
@@ -752,7 +755,7 @@ class Company {
    * Mark as sent registration info
    */
   async sendRegistrationInfo() {
-    await this.update({ isSentRegistrationInfo: true });
+    await this.update({ isSentRegistrationInfo: true, registrationInfoSentDate: new Date() });
 
     return Companies.findOne({ _id: this._id });
   }
@@ -765,6 +768,7 @@ class Company {
       isSentPrequalificationInfo: true,
       isPrequalificationInfoEditable: false,
       prequalificationSubmittedCount: (this.prequalificationSubmittedCount || 0) + 1,
+      prequalificationInfoSentDate: new Date(),
     });
 
     return Companies.findOne({ _id: this._id });
@@ -781,6 +785,7 @@ class Company {
     await this.update({
       isSkippedPrequalification: true,
       isSentPrequalificationInfo: true,
+      prequalificationInfoSentDate: new Date(),
       prequalificationSkippedReason: reason,
     });
 
