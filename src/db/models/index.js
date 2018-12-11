@@ -7,7 +7,7 @@ import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
-import MassMails from './MassMails';
+import MailDeliveries from './MailDeliveries';
 import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
 
 export {
@@ -24,9 +24,9 @@ export {
   AuditResponses,
   PhysicalAudits,
   Configs,
-  MassMails,
   SearchLogs,
   TenderResponseLogs,
   SuppliersByProductCodeLogs,
   ActivityLogs,
+  MailDeliveries,
 };

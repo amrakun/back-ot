@@ -1,22 +1,22 @@
 export const types = `
-  type MassMail {
+  type MailDelivery {
     _id: String!
-    supplierIds: [String]
+
+    from: String
+    to: String
     subject: String
-    content: String
-    status: JSON
-
-    suppliers: [Company]
-
+    html: String
+    attachments: [JSON] 
+    status: String
     createdDate: Date
-    createdUserId: String
   }
 `;
 
 export const mutations = `
-  massMailsSend(supplierIds: [String!]!  subject: String, content: String): MassMail
+  massMailsSend(supplierIds: [String!]!  subject: String, content: String): MailDelivery
 `;
 
 export const queries = `
-  massMails: [MassMail]
+  mailDeliveries(page: Int, perPage: Int, search: String): [MailDelivery]
+  mailDeliveriesTotalCount: Int
 `;

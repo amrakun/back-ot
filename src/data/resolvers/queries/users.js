@@ -45,7 +45,7 @@ const userQueries = {
    * @return {Promise} total count
    */
   usersTotalCount() {
-    return Users.find({}).count();
+    return Users.find({ isSupplier: false }).count();
   },
 
   /**

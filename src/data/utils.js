@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
-import { Configs } from '../db/models';
+import { Configs, MailDeliveries } from '../db/models';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -141,7 +141,7 @@ export const createTransporter = async () => {
  */
 export const sendEmail = async args => {
   const { toEmails, fromEmail, title, content = '', template, attachments = [] } = args;
-  const { COMPANY_EMAIL_FROM, NODE_ENV } = process.env;
+  const { COMPANY_EMAIL_FROM, NODE_ENV, AWS_SES_CONFIG_SET } = process.env;
 
   // do not send email it is running in test mode
   if (NODE_ENV == 'test') {
@@ -163,14 +163,31 @@ export const sendEmail = async args => {
     }
   }
 
+  const mailId = Math.random();
+
   return toEmails.map(toEmail => {
-    const mailOptions = {
+    const options = {
       from: fromEmail || COMPANY_EMAIL_FROM,
       to: toEmail,
       subject: title,
       html,
       attachments,
     };
+
+    const mailOptions = {
+      ...options,
+      headers: {
+        'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
+        Mailid: mailId,
+      },
+    };
+
+    // create mail delivery entry
+    MailDeliveries.createStatus({
+      ...options,
+      mailId,
+      status: 'pending',
+    });
 
     return transporter.sendMail(mailOptions, (error, info) => {
       console.log(error); // eslint-disable-line

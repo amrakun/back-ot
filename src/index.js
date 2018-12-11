@@ -21,7 +21,7 @@ import { connect } from './db/connection';
 import { userMiddleware } from './auth';
 import { uploadFile, readS3File, tokenize } from './data/utils';
 import schema from './data';
-import './startup';
+import { init } from './startup';
 
 // connect to mongo database
 connect();
@@ -126,6 +126,9 @@ const { PORT } = process.env;
 
 server.listen(PORT, () => {
   console.log(`GraphQL Server is now running on ${PORT}`);
+
+  // execute startup actions
+  init(app);
 });
 
 if (process.env.NODE_ENV === 'development') {

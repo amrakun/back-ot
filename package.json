@@ -20,7 +20,8 @@
     "loadInitialData": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/initialData.js",
     "generateSecret": "openssl rand -base64 32",
     "customCommand": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/customCommand.js",
-    "s3UrlFixer": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/s3UrlFixer.js"
+    "s3UrlFixer": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/s3UrlFixer.js",
+    "ses-subscriptions": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/sesSubscriptions.js"
   },
   "lint-staged": {
     "*.js": [
@@ -29,7 +30,7 @@
     ]
   },
   "dependencies": {
-    "aws-sdk": "^2.168.0",
+    "aws-sdk": "^2.373.0",
     "bcrypt": "^3.0.2",
     "body-parser": "^1.17.1",
     "cellref": "^3.0.0",
