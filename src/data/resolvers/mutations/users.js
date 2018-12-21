@@ -334,11 +334,11 @@ requireBuyer(userMutations, 'registerViaBuyer');
 requireBuyer(userMutations, 'usersAdd');
 requireBuyer(userMutations, 'usersEdit');
 requireBuyer(userMutations, 'usersRemove');
+requireBuyer(userMutations, 'usersDelegate');
 
 requireLogin(userMutations, 'logout');
 requireLogin(userMutations, 'confirmProfileEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
-requireLogin(userMutations, 'usersDelegate');
 
 export default userMutations;
