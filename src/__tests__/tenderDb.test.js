@@ -288,7 +288,7 @@ describe('Tender db', () => {
 
     const buyer = await userFactory({});
 
-    const tender = await tenderFactory({
+    await tenderFactory({
       supplierIds: [supplier1.companyId, supplier2.companyId],
       file: { name: 'f1.png', url: '/f1' },
       attachments: [

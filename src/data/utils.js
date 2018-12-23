@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
-import { Companies, Tenders, Configs, MailDeliveries } from '../db/models';
+import { Companies, Tenders, TenderResponses, Configs, MailDeliveries } from '../db/models';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -28,7 +28,8 @@ export const createAWS = () => {
 export const readS3File = async (key, user) => {
   if (
     !(await Companies.isAuthorizedToDownload(key, user)) ||
-    !(await Tenders.isAuthorizedToDownload(key, user))
+    !(await Tenders.isAuthorizedToDownload(key, user)) ||
+    !(await TenderResponses.isAuthorizedToDownload(key, user))
   ) {
     throw new Error('Forbidden');
   }

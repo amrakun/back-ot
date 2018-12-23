@@ -417,6 +417,7 @@ export const tenderResponseDoc = async (params = {}) => {
     supplierId: params.supplierId,
     respondedProducts: params.respondedProducts,
     respondedDocuments: params.respondedDocuments,
+    respondedServiceFiles: params.respondedServiceFiles,
     isNotInterested: params.isNotInterested || false,
   };
 };
