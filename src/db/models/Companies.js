@@ -859,6 +859,71 @@ class Company {
 
     return isBlocked ? 'Blocked' : 'n/a';
   }
+
+  /*
+   * Check whether given user is authorized to download given file or not
+   * if given is stored in companies collection
+   */
+  static async isAuthorizedToDownload(key, user) {
+    // buyer can download all files
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const check = extraSelector => Companies.findOne({ _id: user.companyId, ...extraSelector });
+
+    if (await check({ 'basicInfo.certificateOfRegistration.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'shareholderInfo.attachments.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'groupInfo.attachments.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'certificateInfo.file.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'financialInfo.recordsInfo.file.name': key })) {
+      return true;
+    }
+
+    if (
+      (await check({ 'businessInfo.doesMeetMinimumStandartsFile.name': key })) ||
+      (await check({ 'businessInfo.doesHaveJobDescriptionFile.name': key })) ||
+      (await check({ 'businessInfo.doesHaveLiabilityInsuranceFile.name': key })) ||
+      (await check({ 'businessInfo.doesHaveCodeEthicsFile.name': key })) ||
+      (await check({ 'businessInfo.doesHaveResponsiblityPolicyFile.name': key })) ||
+      (await check({ 'businessInfo.organizationChartFile.name': key }))
+    ) {
+      return true;
+    }
+
+    if (
+      (await check({ 'environmentalInfo.doesHavePlanFile.name': key })) ||
+      (await check({ 'environmentalInfo.investigationDocumentation.name': key }))
+    ) {
+      return true;
+    }
+
+    if (
+      (await check({ 'healthInfo.doesHaveHealthSafetyFile.name': key })) ||
+      (await check({ 'healthInfo.areHSEResourcesClearlyIdentifiedFile.name': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentedProcessToEnsureFile.name': key })) ||
+      (await check({ 'healthInfo.areEmployeesUnderYourControlFile.name': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentForRiskAssesmentFile.name': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentForIncidentInvestigationFile.name': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentedFitnessFile.name': key }))
+    ) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 CompanySchema.loadClass(Company);

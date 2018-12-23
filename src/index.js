@@ -63,13 +63,17 @@ app.use(
 
 // read file from amazon s3
 app.get('/read-file', async (req, res) => {
+  const key = req.query.key;
+
+  if (!key) {
+    return res.end('invalid key');
+  }
+
   if (!req.user) {
     return res.end('foribidden');
   }
 
-  const key = req.query.key;
-
-  const response = await readS3File(key);
+  const response = await readS3File(key, req.user);
 
   res.attachment(key);
 
