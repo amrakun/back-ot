@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
-import { Configs, MailDeliveries } from '../db/models';
+import { Companies, Configs, MailDeliveries } from '../db/models';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -25,7 +25,11 @@ export const createAWS = () => {
  * @param {String} key - File name
  * @return {String} - file
  */
-export const readS3File = key => {
+export const readS3File = async (key, user) => {
+  if (!(await Companies.isAuthorizedToDownload(key, user))) {
+    throw new Error('Forbidden');
+  }
+
   const { AWS_BUCKET } = process.env;
 
   const s3 = createAWS();

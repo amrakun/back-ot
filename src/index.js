@@ -73,11 +73,15 @@ app.get('/read-file', async (req, res) => {
     return res.end('foribidden');
   }
 
-  const response = await readS3File(key, req.user);
+  try {
+    const response = await readS3File(key, req.user);
 
-  res.attachment(key);
+    res.attachment(key);
 
-  return res.send(response.Body);
+    return res.send(response.Body);
+  } catch (e) {
+    return res.end(e.message);
+  }
 });
 
 // file upload
