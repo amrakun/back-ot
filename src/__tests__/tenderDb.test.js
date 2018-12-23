@@ -290,11 +290,11 @@ describe('Tender db', () => {
 
     await tenderFactory({
       supplierIds: [supplier1.companyId, supplier2.companyId],
-      file: { name: 'f1.png', url: '/f1' },
+      file: { url: 'f1.png', name: '/f1' },
       attachments: [
-        { name: 'attach10.png', url: '/attach10' },
-        { name: 'attach2.png', url: '/attach2' },
-        { name: 'attach4.png', url: '/attach4' },
+        { url: 'attach10.png', name: '/attach10' },
+        { url: 'attach2.png', name: '/attach2' },
+        { url: 'attach4.png', name: '/attach4' },
       ],
     });
 

@@ -872,52 +872,52 @@ class Company {
 
     const check = extraSelector => Companies.findOne({ _id: user.companyId, ...extraSelector });
 
-    if (await check({ 'basicInfo.certificateOfRegistration.name': key })) {
+    if (await check({ 'basicInfo.certificateOfRegistration.url': key })) {
       return true;
     }
 
-    if (await check({ 'shareholderInfo.attachments.name': key })) {
+    if (await check({ 'shareholderInfo.attachments.url': key })) {
       return true;
     }
 
-    if (await check({ 'groupInfo.attachments.name': key })) {
+    if (await check({ 'groupInfo.attachments.url': key })) {
       return true;
     }
 
-    if (await check({ 'certificateInfo.file.name': key })) {
+    if (await check({ 'certificateInfo.file.url': key })) {
       return true;
     }
 
-    if (await check({ 'financialInfo.recordsInfo.file.name': key })) {
+    if (await check({ 'financialInfo.recordsInfo.file.url': key })) {
       return true;
     }
 
     if (
-      (await check({ 'businessInfo.doesMeetMinimumStandartsFile.name': key })) ||
-      (await check({ 'businessInfo.doesHaveJobDescriptionFile.name': key })) ||
-      (await check({ 'businessInfo.doesHaveLiabilityInsuranceFile.name': key })) ||
-      (await check({ 'businessInfo.doesHaveCodeEthicsFile.name': key })) ||
-      (await check({ 'businessInfo.doesHaveResponsiblityPolicyFile.name': key })) ||
-      (await check({ 'businessInfo.organizationChartFile.name': key }))
+      (await check({ 'businessInfo.doesMeetMinimumStandartsFile.url': key })) ||
+      (await check({ 'businessInfo.doesHaveJobDescriptionFile.url': key })) ||
+      (await check({ 'businessInfo.doesHaveLiabilityInsuranceFile.url': key })) ||
+      (await check({ 'businessInfo.doesHaveCodeEthicsFile.url': key })) ||
+      (await check({ 'businessInfo.doesHaveResponsiblityPolicyFile.url': key })) ||
+      (await check({ 'businessInfo.organizationChartFile.url': key }))
     ) {
       return true;
     }
 
     if (
-      (await check({ 'environmentalInfo.doesHavePlanFile.name': key })) ||
-      (await check({ 'environmentalInfo.investigationDocumentation.name': key }))
+      (await check({ 'environmentalInfo.doesHavePlanFile.url': key })) ||
+      (await check({ 'environmentalInfo.investigationDocumentation.url': key }))
     ) {
       return true;
     }
 
     if (
-      (await check({ 'healthInfo.doesHaveHealthSafetyFile.name': key })) ||
-      (await check({ 'healthInfo.areHSEResourcesClearlyIdentifiedFile.name': key })) ||
-      (await check({ 'healthInfo.doesHaveDocumentedProcessToEnsureFile.name': key })) ||
-      (await check({ 'healthInfo.areEmployeesUnderYourControlFile.name': key })) ||
-      (await check({ 'healthInfo.doesHaveDocumentForRiskAssesmentFile.name': key })) ||
-      (await check({ 'healthInfo.doesHaveDocumentForIncidentInvestigationFile.name': key })) ||
-      (await check({ 'healthInfo.doesHaveDocumentedFitnessFile.name': key }))
+      (await check({ 'healthInfo.doesHaveHealthSafetyFile.url': key })) ||
+      (await check({ 'healthInfo.areHSEResourcesClearlyIdentifiedFile.url': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentedProcessToEnsureFile.url': key })) ||
+      (await check({ 'healthInfo.areEmployeesUnderYourControlFile.url': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentForRiskAssesmentFile.url': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentForIncidentInvestigationFile.url': key })) ||
+      (await check({ 'healthInfo.doesHaveDocumentedFitnessFile.url': key }))
     ) {
       return true;
     }

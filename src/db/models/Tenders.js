@@ -246,11 +246,11 @@ class Tender extends StatusPublishClose {
     const check = extraSelector =>
       Tenders.findOne({ supplierIds: { $in: encryptArray([user.companyId]) }, ...extraSelector });
 
-    if (await check({ 'file.name': key })) {
+    if (await check({ 'file.url': key })) {
       return true;
     }
 
-    if (await check({ 'attachments.name': key })) {
+    if (await check({ 'attachments.url': key })) {
       return true;
     }
 
@@ -423,15 +423,15 @@ class TenderResponse {
     const check = extraSelector =>
       TenderResponses.findOne({ supplierId: encrypt(user.companyId), ...extraSelector });
 
-    if (await check({ 'respondedProducts.file.name': key })) {
+    if (await check({ 'respondedProducts.file.url': key })) {
       return true;
     }
 
-    if (await check({ 'respondedDocuments.file.name': key })) {
+    if (await check({ 'respondedDocuments.file.url': key })) {
       return true;
     }
 
-    if (await check({ 'respondedServiceFiles.name': key })) {
+    if (await check({ 'respondedServiceFiles.url': key })) {
       return true;
     }
 

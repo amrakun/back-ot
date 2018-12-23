@@ -400,26 +400,26 @@ describe('Companies model tests', () => {
 
   test('Check file permission', async () => {
     const company = await companyFactory({
-      certificateOfRegistration: { name: 'name.png', url: '/url' },
+      certificateOfRegistration: { url: 'name.png', name: '/url' },
       shareholderInfo: {
         attachments: [
-          { name: 'sh_attach10.png', url: '/attach10' },
-          { name: 'sh_attach2.png', url: '/attach2' },
-          { name: 'sh_attach4.png', url: '/attach4' },
+          { url: 'sh_attach10.png', name: '/attach10' },
+          { url: 'sh_attach2.png', name: '/attach2' },
+          { url: 'sh_attach4.png', name: '/attach4' },
         ],
         shareholders: [],
       },
       groupInfo: {
         role: 'manufacturer',
         attachments: [
-          { name: 'gr_attach10.png', url: '/attach10' },
-          { name: 'gr_attach2.png', url: '/attach2' },
-          { name: 'gr_attach4.png', url: '/attach4' },
+          { url: 'gr_attach10.png', name: '/attach10' },
+          { url: 'gr_attach2.png', name: '/attach2' },
+          { url: 'gr_attach4.png', name: '/attach4' },
         ],
       },
       certificateInfo: {
         description: 'description',
-        file: { name: 'cer_attach.png', url: '/cer_attach' },
+        file: { url: 'cer_attach.png', name: '/cer_attach' },
       },
       financialInfo: {
         isUpToDateCTP: false,
@@ -428,37 +428,37 @@ describe('Companies model tests', () => {
         recordsInfo: [
           {
             date: new Date(),
-            file: { name: 'fin_attach1.png', url: '/fin_attach1' },
+            file: { url: 'fin_attach1.png', name: '/fin_attach1' },
           },
           {
             date: new Date(),
-            file: { name: 'fin_attach2.png', url: '/fin_attach2' },
+            file: { url: 'fin_attach2.png', name: '/fin_attach2' },
           },
         ],
       },
       businessInfo: {
         ...companyDocs.business(),
-        doesMeetMinimumStandartsFile: { name: 'busi1.png', url: '/busi1' },
-        doesHaveJobDescriptionFile: { name: 'busi2.png', url: '/busi2' },
-        doesHaveLiabilityInsuranceFile: { name: 'busi3.png', url: '/busi3' },
-        doesHaveCodeEthicsFile: { name: 'busi4.png', url: '/busi4' },
-        doesHaveResponsiblityPolicyFile: { name: 'busi5.png', url: '/busi5' },
-        organizationChartFile: { name: 'busi6.png', url: '/busi6' },
+        doesMeetMinimumStandartsFile: { url: 'busi1.png', name: '/busi1' },
+        doesHaveJobDescriptionFile: { url: 'busi2.png', name: '/busi2' },
+        doesHaveLiabilityInsuranceFile: { url: 'busi3.png', name: '/busi3' },
+        doesHaveCodeEthicsFile: { url: 'busi4.png', name: '/busi4' },
+        doesHaveResponsiblityPolicyFile: { url: 'busi5.png', name: '/busi5' },
+        organizationChartFile: { url: 'busi6.png', name: '/busi6' },
       },
       environmentalInfo: {
         ...companyDocs.environmental(),
-        doesHavePlanFile: { name: 'env1.png', url: '/env1' },
-        investigationDocumentation: { name: 'env2.png', url: '/env2' },
+        doesHavePlanFile: { url: 'env1.png', name: '/env1' },
+        investigationDocumentation: { url: 'env2.png', name: '/env2' },
       },
       healthInfo: {
         ...companyDocs.health(),
-        doesHaveHealthSafetyFile: { name: 'health1.png', url: '/health1' },
-        areHSEResourcesClearlyIdentifiedFile: { name: 'health2.png', url: '/health2' },
-        doesHaveDocumentedProcessToEnsureFile: { name: 'health3.png', url: '/health3' },
-        areEmployeesUnderYourControlFile: { name: 'health4.png', url: '/health4' },
-        doesHaveDocumentForRiskAssesmentFile: { name: 'health5.png', url: '/health5' },
-        doesHaveDocumentForIncidentInvestigationFile: { name: 'health6.png', url: '/health6' },
-        doesHaveDocumentedFitnessFile: { name: 'health7.png', url: '/health87' },
+        doesHaveHealthSafetyFile: { url: 'health1.png', name: '/health1' },
+        areHSEResourcesClearlyIdentifiedFile: { url: 'health2.png', name: '/health2' },
+        doesHaveDocumentedProcessToEnsureFile: { url: 'health3.png', name: '/health3' },
+        areEmployeesUnderYourControlFile: { url: 'health4.png', name: '/health4' },
+        doesHaveDocumentForRiskAssesmentFile: { url: 'health5.png', name: '/health5' },
+        doesHaveDocumentForIncidentInvestigationFile: { url: 'health6.png', name: '/health6' },
+        doesHaveDocumentedFitnessFile: { url: 'health7.png', name: '/health87' },
       },
     });
 
