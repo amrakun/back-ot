@@ -397,4 +397,121 @@ describe('Companies model tests', () => {
     expect(updatedCompany.isSkippedPrequalification).toBe(true);
     expect(updatedCompany.prequalificationSkippedReason).toBe('reason');
   });
+
+  test('Check file permission', async () => {
+    const company = await companyFactory({
+      certificateOfRegistration: { name: 'name.png', url: '/url' },
+      shareholderInfo: {
+        attachments: [
+          { name: 'sh_attach10.png', url: '/attach10' },
+          { name: 'sh_attach2.png', url: '/attach2' },
+          { name: 'sh_attach4.png', url: '/attach4' },
+        ],
+        shareholders: [],
+      },
+      groupInfo: {
+        role: 'manufacturer',
+        attachments: [
+          { name: 'gr_attach10.png', url: '/attach10' },
+          { name: 'gr_attach2.png', url: '/attach2' },
+          { name: 'gr_attach4.png', url: '/attach4' },
+        ],
+      },
+      certificateInfo: {
+        description: 'description',
+        file: { name: 'cer_attach.png', url: '/cer_attach' },
+      },
+      financialInfo: {
+        isUpToDateCTP: false,
+        canProvideAccountsInfo: false,
+
+        recordsInfo: [
+          {
+            date: new Date(),
+            file: { name: 'fin_attach1.png', url: '/fin_attach1' },
+          },
+          {
+            date: new Date(),
+            file: { name: 'fin_attach2.png', url: '/fin_attach2' },
+          },
+        ],
+      },
+      businessInfo: {
+        ...companyDocs.business(),
+        doesMeetMinimumStandartsFile: { name: 'busi1.png', url: '/busi1' },
+        doesHaveJobDescriptionFile: { name: 'busi2.png', url: '/busi2' },
+        doesHaveLiabilityInsuranceFile: { name: 'busi3.png', url: '/busi3' },
+        doesHaveCodeEthicsFile: { name: 'busi4.png', url: '/busi4' },
+        doesHaveResponsiblityPolicyFile: { name: 'busi5.png', url: '/busi5' },
+        organizationChartFile: { name: 'busi6.png', url: '/busi6' },
+      },
+      environmentalInfo: {
+        ...companyDocs.environmental(),
+        doesHavePlanFile: { name: 'env1.png', url: '/env1' },
+        investigationDocumentation: { name: 'env2.png', url: '/env2' },
+      },
+      healthInfo: {
+        ...companyDocs.health(),
+        doesHaveHealthSafetyFile: { name: 'health1.png', url: '/health1' },
+        areHSEResourcesClearlyIdentifiedFile: { name: 'health2.png', url: '/health2' },
+        doesHaveDocumentedProcessToEnsureFile: { name: 'health3.png', url: '/health3' },
+        areEmployeesUnderYourControlFile: { name: 'health4.png', url: '/health4' },
+        doesHaveDocumentForRiskAssesmentFile: { name: 'health5.png', url: '/health5' },
+        doesHaveDocumentForIncidentInvestigationFile: { name: 'health6.png', url: '/health6' },
+        doesHaveDocumentedFitnessFile: { name: 'health7.png', url: '/health87' },
+      },
+    });
+
+    const user = await userFactory({ isSupplier: true, companyId: company._id });
+    const buyer = await userFactory({});
+
+    // buyer can download all files
+    expect(await Companies.isAuthorizedToDownload('test.png', buyer)).toBe(true);
+
+    // certificate of registration
+    expect(await Companies.isAuthorizedToDownload('test.png', user)).toBe(false);
+    expect(await Companies.isAuthorizedToDownload('name.png', user)).toBe(true);
+
+    // shareholders
+    expect(await Companies.isAuthorizedToDownload('sh_attach2.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('sh_attach10.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('sh_attach3.png', user)).toBe(false);
+
+    // group info
+    expect(await Companies.isAuthorizedToDownload('gr_attach2.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('gr_attach10.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('gr_attach3.png', user)).toBe(false);
+
+    // certificate info
+    expect(await Companies.isAuthorizedToDownload('cer_attach.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('cer_attach1.png', user)).toBe(false);
+
+    // financialInfo info
+    expect(await Companies.isAuthorizedToDownload('fin_attach1.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('fin_attach3.png', user)).toBe(false);
+
+    // businessInfo info
+    expect(await Companies.isAuthorizedToDownload('busi1.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi2.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi3.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi4.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi5.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi6.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('busi7.png', user)).toBe(false);
+
+    // environmental info
+    expect(await Companies.isAuthorizedToDownload('env1.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('env2.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('env3.png', user)).toBe(false);
+
+    // health info
+    expect(await Companies.isAuthorizedToDownload('health1.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health2.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health3.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health4.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health5.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health6.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health7.png', user)).toBe(true);
+    expect(await Companies.isAuthorizedToDownload('health8.png', user)).toBe(false);
+  });
 });

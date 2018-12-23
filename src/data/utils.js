@@ -3,7 +3,15 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
-import { Configs, MailDeliveries } from '../db/models';
+import {
+  Companies,
+  Tenders,
+  TenderResponses,
+  Configs,
+  MailDeliveries,
+  AuditResponses,
+  PhysicalAudits,
+} from '../db/models';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -25,7 +33,26 @@ export const createAWS = () => {
  * @param {String} key - File name
  * @return {String} - file
  */
-export const readS3File = key => {
+export const readS3File = async (key, user) => {
+  const { NODE_ENV } = process.env;
+
+  // do not read file in test mode
+  if (NODE_ENV == 'test') {
+    return { Body: '' };
+  }
+
+  if (
+    !(
+      (await Companies.isAuthorizedToDownload(key, user)) ||
+      (await Tenders.isAuthorizedToDownload(key, user)) ||
+      (await TenderResponses.isAuthorizedToDownload(key, user)) ||
+      (await AuditResponses.isAuthorizedToDownload(key, user)) ||
+      (await PhysicalAudits.isAuthorizedToDownload(key, user))
+    )
+  ) {
+    throw new Error('Forbidden');
+  }
+
   const { AWS_BUCKET } = process.env;
 
   const s3 = createAWS();
@@ -171,11 +198,11 @@ export const sendEmail = async args => {
       to: toEmail,
       subject: title,
       html,
-      attachments,
     };
 
     const mailOptions = {
       ...options,
+      attachments,
       headers: {
         'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
         Mailid: mailId,

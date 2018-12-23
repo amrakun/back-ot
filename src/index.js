@@ -63,17 +63,25 @@ app.use(
 
 // read file from amazon s3
 app.get('/read-file', async (req, res) => {
+  const key = req.query.key;
+
+  if (!key) {
+    return res.end('invalid key');
+  }
+
   if (!req.user) {
     return res.end('foribidden');
   }
 
-  const key = req.query.key;
+  try {
+    const response = await readS3File(key, req.user);
 
-  const response = await readS3File(key);
+    res.attachment(key);
 
-  res.attachment(key);
-
-  return res.send(response.Body);
+    return res.send(response.Body);
+  } catch (e) {
+    return res.end(e.message);
+  }
 });
 
 // file upload

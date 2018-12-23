@@ -53,6 +53,7 @@ export const companyFactory = (params = {}) => {
       province: params.province || faker.random.word(),
       zipCode: params.zipCode || 976,
       country: params.country || 'Mongolia',
+      certificateOfRegistration: params.certificateOfRegistration || { name: 'name', url: 'url' },
       registeredInCountry: params.registeredInCountry || 'Mongolia',
       corporateStructure: params.corporateStructure || faker.random.word(),
       registrationNumber: params.registrationNumber || faker.random.word(),
@@ -61,6 +62,15 @@ export const companyFactory = (params = {}) => {
       totalNumberOfMongolianEmployees: faker.random.number(),
       totalNumberOfUmnugoviEmployees: faker.random.number(),
     },
+
+    shareholderInfo: params.shareholderInfo,
+    groupInfo: params.groupInfo,
+    certificateInfo: params.certificateInfo,
+    financialInfo: params.financialInfo,
+    businessInfo: params.businessInfo,
+    businessInfo: params.businessInfo,
+    environmentalInfo: params.environmentalInfo,
+    healthInfo: params.healthInfo,
 
     tierType: params.tierType,
 
@@ -407,6 +417,7 @@ export const tenderResponseDoc = async (params = {}) => {
     supplierId: params.supplierId,
     respondedProducts: params.respondedProducts,
     respondedDocuments: params.respondedDocuments,
+    respondedServiceFiles: params.respondedServiceFiles,
     isNotInterested: params.isNotInterested || false,
   };
 };

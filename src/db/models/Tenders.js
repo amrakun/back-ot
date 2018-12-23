@@ -1,7 +1,7 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
-import { field, isReached, encryptArray, decryptArray, StatusPublishClose } from './utils';
+import { field, isReached, encrypt, encryptArray, decryptArray, StatusPublishClose } from './utils';
 
 const FileSchema = mongoose.Schema(
   {
@@ -232,6 +232,30 @@ class Tender extends StatusPublishClose {
 
     return results;
   }
+
+  /*
+   * Check whether given user is authorized to download given file or not
+   * if given file is stored in tenders collection
+   */
+  static async isAuthorizedToDownload(key, user) {
+    // buyer can download all files
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const check = extraSelector =>
+      Tenders.findOne({ supplierIds: { $in: encryptArray([user.companyId]) }, ...extraSelector });
+
+    if (await check({ 'file.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'attachments.name': key })) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 const { ENCRYPTION_SECRET } = process.env;
@@ -384,6 +408,34 @@ class TenderResponse {
     await this.update({ isSent: true, sentDate: new Date() });
 
     return TenderResponses.findOne({ _id: this._id });
+  }
+
+  /*
+   * Check whether given user is authorized to download given file or not
+   * if given file is stored in tender_responses collection
+   */
+  static async isAuthorizedToDownload(key, user) {
+    // buyer can download all files
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const check = extraSelector =>
+      TenderResponses.findOne({ supplierId: encrypt(user.companyId), ...extraSelector });
+
+    if (await check({ 'respondedProducts.file.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'respondedDocuments.file.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'respondedServiceFiles.name': key })) {
+      return true;
+    }
+
+    return false;
   }
 }
 

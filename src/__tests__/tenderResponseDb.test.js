@@ -3,7 +3,7 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Tenders, TenderResponses, Companies } from '../db/models';
-import { tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
+import { tenderFactory, tenderResponseFactory, companyFactory, userFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -186,5 +186,57 @@ describe('Tender response db', () => {
     expect(updatedResponse.supplierId).toEqual(doc.supplierId);
     expect(toObject(updatedResponse.respondedProducts)).toEqual(doc.respondedProducts);
     expect(toObject(updatedResponse.respondedDocuments)).toEqual(doc.respondedDocuments);
+  });
+
+  test('Check file permission', async () => {
+    const supplier1 = await userFactory({ isSupplier: true });
+    const supplier2 = await userFactory({ isSupplier: true });
+    const buyer = await userFactory({});
+
+    const tender = await tenderFactory({});
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'open' } });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier1.companyId,
+      respondedDocuments: [
+        { file: { name: 's1_rd1.png', url: '/s1_rd1' } },
+        { file: { name: 's1_rd2.png', url: '/s1_rd2' } },
+      ],
+      respondedProducts: [
+        { file: { name: 's1_rp1.png', url: '/s1_rp1' } },
+        { file: { name: 's1_rp2.png', url: '/s1_rp2' } },
+      ],
+      respondedServiceFiles: [
+        { name: 's1_rs1.png', url: '/s1_rs1' },
+        { name: 's1_rs2.png', url: '/s1_rs2' },
+      ],
+    });
+
+    // buyer can download all files
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rd1.png', buyer)).toBe(true);
+
+    // responded documents ============================
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rd1.png', supplier1)).toBe(true);
+
+    // not existing file
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rd3.png', supplier1)).toBe(false);
+
+    // second supplier can not download
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rd1.png', supplier2)).toBe(false);
+
+    // responded products ============================
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rp1.png', supplier1)).toBe(true);
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rp2.png', supplier1)).toBe(true);
+
+    // second supplier can not download
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rp1.png', supplier2)).toBe(false);
+
+    // responded service files ============================
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rs1.png', supplier1)).toBe(true);
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rs2.png', supplier1)).toBe(true);
+
+    // second supplier can not download
+    expect(await TenderResponses.isAuthorizedToDownload('s1_rs1.png', supplier2)).toBe(false);
   });
 });

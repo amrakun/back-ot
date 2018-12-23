@@ -9,7 +9,6 @@ const MailDeliverySchema = mongoose.Schema({
   to: field({ type: String }),
   subject: field({ type: String }),
   html: field({ type: String }),
-  attachments: field({ type: [Object], optional: true }),
   status: field({ type: String }),
 });
 

@@ -236,7 +236,6 @@ export const types = `
 
 const responsesParams = `
   supplierSearch: String
-  isFileGenerated: Boolean
   publishDate: Date
   closeDate: Date
   status: String

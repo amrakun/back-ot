@@ -295,7 +295,6 @@ describe('Company queries', () => {
   const auditResponsesQuery = `
     query auditResponses(
       $supplierSearch: String
-      $isFileGenerated: Boolean
       $publishDate: Date
       $closeDate: Date
       $status: String
@@ -305,7 +304,6 @@ describe('Company queries', () => {
     ) {
       auditResponses(
         supplierSearch: $supplierSearch
-        isFileGenerated: $isFileGenerated
         publishDate: $publishDate
         closeDate: $closeDate
         status: $status
@@ -409,12 +407,6 @@ describe('Company queries', () => {
       closeDate: moment().add(2, 'days'),
     };
 
-    response = await doResponsesQuery(args);
-
-    expect(response.length).toBe(1);
-
-    // isFileGenerated search ===================
-    args = { isFileGenerated: true };
     response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);
