@@ -9,6 +9,7 @@ import {
   TenderResponses,
   Configs,
   MailDeliveries,
+  AuditResponses,
   PhysicalAudits,
 } from '../db/models';
 
@@ -45,6 +46,7 @@ export const readS3File = async (key, user) => {
       (await Companies.isAuthorizedToDownload(key, user)) ||
       (await Tenders.isAuthorizedToDownload(key, user)) ||
       (await TenderResponses.isAuthorizedToDownload(key, user)) ||
+      (await AuditResponses.isAuthorizedToDownload(key, user)) ||
       (await PhysicalAudits.isAuthorizedToDownload(key, user))
     )
   ) {
