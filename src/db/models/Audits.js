@@ -855,6 +855,14 @@ class PhysicalAudit {
   static removePhysicalAudit(_id) {
     return this.remove({ _id });
   }
+
+  /*
+   * Check whether given user is authorized to download given file or not
+   * if given file is stored in physical_audits collection
+   */
+  static async isAuthorizedToDownload(key, user) {
+    return !user.isSupplier;
+  }
 }
 
 PhysicalAuditSchema.loadClass(PhysicalAudit);
