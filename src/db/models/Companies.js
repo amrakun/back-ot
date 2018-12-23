@@ -799,14 +799,18 @@ class Company {
     const company = await Companies.findOne({ _id });
 
     const updateQuery = {
-      isPrequalificationInfoEditable: !company.isPrequalificationInfoEditable,
+      $set: {
+        isPrequalificationInfoEditable: !company.isPrequalificationInfoEditable,
+      },
     };
 
     if (company.isPrequalified) {
-      updateQuery.isPrequalified = false;
+      updateQuery.$set.isPrequalified = false;
+    } else {
+      updateQuery.$unset = { isPrequalified: 1 };
     }
 
-    await Companies.update({ _id }, { $set: updateQuery, $unset: { isPrequalified: 1 } });
+    await Companies.update({ _id }, updateQuery);
 
     return Companies.findOne({ _id });
   }
