@@ -54,13 +54,6 @@ const responsesFilter = async args => {
     query.$and.push({ auditId: { $in: auditIds } });
   }
 
-  // is file generated
-  if (isFileGenerated) {
-    query.$and.push({
-      $or: [{ improvementPlanFile: { $ne: null } }, { reportFile: { $ne: null } }],
-    });
-  }
-
   return AuditResponses.find(query).sort({ sentDate: -1 });
 };
 

@@ -33,6 +33,13 @@ export const createAWS = () => {
  * @return {String} - file
  */
 export const readS3File = async (key, user) => {
+  const { NODE_ENV } = process.env;
+
+  // do not read file in test mode
+  if (NODE_ENV == 'test') {
+    return { Body: '' };
+  }
+
   if (
     !(
       (await Companies.isAuthorizedToDownload(key, user)) ||
@@ -189,11 +196,11 @@ export const sendEmail = async args => {
       to: toEmail,
       subject: title,
       html,
-      attachments,
     };
 
     const mailOptions = {
       ...options,
+      attachments,
       headers: {
         'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
         Mailid: mailId,

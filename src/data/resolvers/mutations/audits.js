@@ -1,6 +1,7 @@
 import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmail } from '../../../data/auditUtils';
+import { readS3File } from '../../../data/utils';
 
 const auditMutations = {
   // create new audit
@@ -88,7 +89,7 @@ const auditMutations = {
    * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
-  async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }) {
+  async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }, { user }) {
     for (const responseId of responseIds) {
       const response = await AuditResponses.findOne({ _id: responseId });
       const audit = await Audits.findOne({ _id: response.auditId });
@@ -98,16 +99,20 @@ const auditMutations = {
       const attachments = [];
 
       if (improvementPlan) {
+        const file = await readS3File(response.improvementPlanFile, user);
+
         attachments.push({
           filename: 'improvement_plan.xlsx',
-          path: response.improvementPlanFile,
+          content: file.Body,
         });
       }
 
       if (report) {
+        const file = await readS3File(response.reportFile, user);
+
         attachments.push({
           filename: 'report.xlsx',
-          path: response.reportFile,
+          content: file.Body,
         });
       }
 

@@ -113,9 +113,6 @@ const auditResponseQueries = {
       `auditor_improvement_plan_${auditId}_${supplierId}`,
     );
 
-    // save file url to response for later use
-    await auditResponse.update({ improvementPlanFile: path });
-
     return path;
   },
 
@@ -307,9 +304,6 @@ const auditResponseQueries = {
 
     // generate file
     const path = await generateXlsx(user, workbook, `auditor_report_${auditId}_${supplierId}`);
-
-    // save file url to response for later use
-    await auditResponse.update({ reportFile: path });
 
     return path;
   },
