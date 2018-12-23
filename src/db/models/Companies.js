@@ -862,7 +862,7 @@ class Company {
 
   /*
    * Check whether given user is authorized to download given file or not
-   * if given is stored in companies collection
+   * if given file is stored in companies collection
    */
   static async isAuthorizedToDownload(key, user) {
     // buyer can download all files

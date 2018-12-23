@@ -280,4 +280,36 @@ describe('Tender db', () => {
 
     expect(updatedTender.status).toBe('canceled');
   });
+
+  test('Check file permission', async () => {
+    const supplier1 = await userFactory({ isSupplier: true });
+    const supplier2 = await userFactory({ isSupplier: true });
+    const supplier3 = await userFactory({ isSupplier: true });
+
+    const buyer = await userFactory({});
+
+    const tender = await tenderFactory({
+      supplierIds: [supplier1.companyId, supplier2.companyId],
+      file: { name: 'f1.png', url: '/f1' },
+      attachments: [
+        { name: 'attach10.png', url: '/attach10' },
+        { name: 'attach2.png', url: '/attach2' },
+        { name: 'attach4.png', url: '/attach4' },
+      ],
+    });
+
+    // buyer can download all files
+    expect(await Tenders.isAuthorizedToDownload('f1.png', buyer)).toBe(true);
+
+    // Only invited suppliers can download
+    expect(await Tenders.isAuthorizedToDownload('f1.png', supplier3)).toBe(false);
+
+    expect(await Tenders.isAuthorizedToDownload('f1.png', supplier1)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('f1.png', supplier2)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('f2.png', supplier2)).toBe(false);
+
+    expect(await Tenders.isAuthorizedToDownload('attach10.png', supplier1)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('attach2.png', supplier2)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('attach4.png', supplier2)).toBe(true);
+  });
 });

@@ -232,6 +232,30 @@ class Tender extends StatusPublishClose {
 
     return results;
   }
+
+  /*
+   * Check whether given user is authorized to download given file or not
+   * if given file is stored in tenders collection
+   */
+  static async isAuthorizedToDownload(key, user) {
+    // buyer can download all files
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const check = extraSelector =>
+      Tenders.findOne({ supplierIds: { $in: encryptArray([user.companyId]) }, ...extraSelector });
+
+    if (await check({ 'file.name': key })) {
+      return true;
+    }
+
+    if (await check({ 'attachments.name': key })) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 const { ENCRYPTION_SECRET } = process.env;
