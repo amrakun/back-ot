@@ -165,7 +165,7 @@ describe('Company queries', () => {
 
     const company1 = await companyFactory({
       mnName: 'mn name',
-      validatedProductsInfo: ['code1', 'code2'],
+      productsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
     });
 
@@ -221,14 +221,14 @@ describe('Company queries', () => {
     response = await graphqlRequest(query, 'companies', { productCodes: 'code1' });
 
     expect(response.length).toBe(1);
-    expect(response[0].validatedProductsInfo).toContain('code1');
+    expect(response[0].productsInfo).toContain('code1');
 
     // two values
     response = await graphqlRequest(query, 'companies', { productCodes: 'code1,code2' });
 
     expect(response.length).toBe(1);
-    expect(response[0].validatedProductsInfo).toContain('code1');
-    expect(response[0].validatedProductsInfo).toContain('code2');
+    expect(response[0].productsInfo).toContain('code1');
+    expect(response[0].productsInfo).toContain('code2');
 
     // no result
     response = await graphqlRequest(query, 'companies', { productCodes: 'code3' });

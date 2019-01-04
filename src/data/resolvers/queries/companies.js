@@ -49,7 +49,7 @@ const companiesFilter = async args => {
 
   // product & services filter
   if (productCodes) {
-    selector.validatedProductsInfo = { $in: productCodes.split(',') };
+    selector.productsInfo = { $in: productCodes.split(',') };
   }
 
   // tier types
