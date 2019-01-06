@@ -79,7 +79,7 @@ describe('User mutations', async () => {
       }
     `;
 
-    await graphqlRequest(mutation, 'register', { email: 'test@erxes.io' });
+    await graphqlRequest(mutation, 'register', { email: 'test@erxes.io' }, {});
 
     const user = await Users.findOne({ email: 'test@erxes.io' });
 
@@ -105,7 +105,12 @@ describe('User mutations', async () => {
       }
     `;
 
-    const link = await graphqlRequest(mutation, 'resendConfirmationLink', { email: user.email });
+    const link = await graphqlRequest(
+      mutation,
+      'resendConfirmationLink',
+      { email: user.email },
+      {},
+    );
 
     expect(link).toBeDefined();
   });
@@ -151,7 +156,7 @@ describe('User mutations', async () => {
       },
     );
 
-    await graphqlRequest(confirmMutation, 'confirmRegistration', args, { user });
+    await graphqlRequest(confirmMutation, 'confirmRegistration', args, {});
 
     const updatedUser = await Users.findOne({ _id: user._id });
 
@@ -173,7 +178,7 @@ describe('User mutations', async () => {
       },
     );
 
-    await graphqlRequest(confirmMutation, 'confirmRegistration', args, { user });
+    await graphqlRequest(confirmMutation, 'confirmRegistration', args, {});
 
     const updatedUser = await Users.findOne({ _id: user._id });
 
@@ -204,7 +209,9 @@ describe('User mutations', async () => {
       password: 'pass',
     };
 
-    const response = await graphqlRequest(loginMutation, 'login', args);
+    const response = await graphqlRequest(loginMutation, 'login', args, {
+      res: { cookie: () => {} },
+    });
 
     expect(response.status).toBe('login');
   });
@@ -224,7 +231,9 @@ describe('User mutations', async () => {
       password: 'pass',
     };
 
-    let response = await graphqlRequest(loginMutation, 'login', args);
+    let response = await graphqlRequest(loginMutation, 'login', args, {
+      res: { cookie: () => {} },
+    });
 
     expect(response.status).toBe('chooseLoginAs');
     expect(response.delegatedUser._id.toString()).toBe(delegatedUser._id);
@@ -233,7 +242,7 @@ describe('User mutations', async () => {
     // with loginAs ====================
     args.loginAs = delegatedUser._id;
 
-    response = await graphqlRequest(loginMutation, 'login', args);
+    response = await graphqlRequest(loginMutation, 'login', args, { res: { cookie: () => {} } });
 
     expect(response.status).toBe('login');
     expect(response.user._id.toString()).toBe(delegatedUser._id);
@@ -244,7 +253,7 @@ describe('User mutations', async () => {
 
     const doc = { email: 'test@erxes.io' };
 
-    await userMutations.forgotPassword({}, doc);
+    await userMutations.forgotPassword({}, doc, {});
 
     expect(Users.forgotPassword).toBeCalledWith(doc.email);
   });
@@ -254,7 +263,7 @@ describe('User mutations', async () => {
 
     const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
-    await userMutations.resetPassword({}, doc);
+    await userMutations.resetPassword({}, doc, {});
 
     expect(Users.resetPassword).toBeCalledWith(doc);
   });
