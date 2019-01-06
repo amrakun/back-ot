@@ -248,6 +248,7 @@ describe('Company queries', () => {
 
     const user = await userFactory({ companyId: _company._id, isSupplier: true });
     const auditResponse = await auditResponseFactory({ supplierId: user.companyId });
+    await Audits.update({ _id: auditResponse.auditId }, { $set: { supplierIds: user.companyId } });
 
     const args = { auditId: auditResponse.auditId };
     const context = { user };
@@ -522,7 +523,7 @@ describe('Company queries', () => {
     `;
 
     const user = await userFactory({ isSupplier: true });
-    const audit = await auditFactory({});
+    const audit = await auditFactory({ supplierIds: [user.companyId] });
 
     await auditResponseFactory({
       supplierId: user.companyId,

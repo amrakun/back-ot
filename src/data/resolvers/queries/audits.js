@@ -190,7 +190,13 @@ const auditQueries = {
   /**
    * Audit response by logged in user
    */
-  auditResponseByUser(root, { auditId }, { user }) {
+  async auditResponseByUser(root, { auditId }, { user }) {
+    const audit = await Audits.findOne({ _id: auditId });
+
+    if (audit && !audit.supplierIds.includes(user.companyId)) {
+      throw new Error('Not found');
+    }
+
     return AuditResponses.findOne({ auditId, supplierId: user.companyId });
   },
 };

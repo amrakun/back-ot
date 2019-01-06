@@ -214,6 +214,12 @@ const tenderQueries = {
    * @return {Promise} found tender
    */
   async tenderDetailSupplier(root, { _id }, { user }) {
+    const tender = await Tenders.findOne({ _id });
+
+    if (tender && !tender.supplierIds.includes(encrypt(user.companyId))) {
+      throw new Error('Not found');
+    }
+
     return Tenders.findOne({ _id, supplierIds: { $in: [encrypt(user.companyId)] } });
   },
 
