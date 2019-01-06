@@ -42,6 +42,16 @@ export const requireLogin = (cls, methodName) =>
   });
 
 /**
+ * Require logout
+ */
+export const requireLogout = (cls, methodName) =>
+  permissionWrapper(cls, methodName, user => {
+    if (user) {
+      throw new Error('Logged in');
+    }
+  });
+
+/**
  * Require admin
  */
 export const requireAdmin = (cls, methodName) =>

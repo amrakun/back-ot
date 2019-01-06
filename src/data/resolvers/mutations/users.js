@@ -1,6 +1,6 @@
 import { Users, Companies } from '../../../db/models';
 import utils from '../../../data/utils';
-import { requireLogin, requireBuyer } from '../../permissions';
+import { requireLogin, requireLogout, requireBuyer } from '../../permissions';
 
 const registrationEmail = async user => {
   // send email ==============
@@ -340,5 +340,12 @@ requireLogin(userMutations, 'logout');
 requireLogin(userMutations, 'confirmProfileEdit');
 requireLogin(userMutations, 'usersChangePassword');
 requireLogin(userMutations, 'usersEditProfile');
+
+requireLogout(userMutations, 'register');
+requireLogout(userMutations, 'resendConfirmationLink');
+requireLogout(userMutations, 'confirmRegistration');
+requireLogout(userMutations, 'login');
+requireLogout(userMutations, 'forgotPassword');
+requireLogout(userMutations, 'resetPassword');
 
 export default userMutations;
