@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Tenders, TenderResponses } from '../../../db/models';
 import { encrypt } from '../../../db/models/utils';
-import { requireSupplier, requireBuyer } from '../../permissions';
+import { requireSupplier, requireBuyer, requireLogin } from '../../permissions';
 import { paginate } from './utils';
 import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
 
@@ -190,6 +190,10 @@ const tenderQueries = {
   async tenderGenerateMaterialsTemplate(root, { tenderId }, { user }) {
     const tender = await Tenders.findOne({ _id: tenderId });
 
+    if (user.isSupplier && !(tender && tender.supplierIds.includes(encrypt(user.companyId)))) {
+      return null;
+    }
+
     return tenderGenerateMaterialsTemplate(user, tender);
   },
 
@@ -321,6 +325,8 @@ const tenderQueries = {
     return sum / durations.length;
   },
 };
+
+requireLogin(tenderQueries, 'tenderGenerateMaterialsTemplate');
 
 requireSupplier(tenderQueries, 'tendersSupplier');
 requireSupplier(tenderQueries, 'tendersSupplierTotalCount');
