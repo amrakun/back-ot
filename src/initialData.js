@@ -16,14 +16,19 @@ dotenv.config();
 mongoose.Promise = global.Promise;
 
 export const importData = async () => {
-  mongoose.connect(process.env.MONGO_URL, { useMongoClient: true }).then(() => {
-    mongoose.connection.db.dropDatabase();
-  });
+  mongoose
+    .connect(
+      process.env.MONGO_URL,
+      { useMongoClient: true },
+    )
+    .then(() => {
+      mongoose.connection.db.dropDatabase();
+    });
 
   // create admin
   await Users.createUser({
     username: 'admin',
-    password: 'admin123',
+    password: 'Admin$123',
     isSupplier: false,
     role: 'admin',
     email: 'admin@ot.mn',
