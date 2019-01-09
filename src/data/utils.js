@@ -311,6 +311,10 @@ export const generateXlsx = async (user, workbook, name) => {
   return `${DOMAIN}/static/templateOutputs/${id}/${name}.xlsx`;
 };
 
+/*
+ * First install clamav service https://www.clamav.net/documents/installation-on-macos-mac-os-x
+ * And using clamav.js connector for clamav service
+ */
 export const virusDetector = stream =>
   new Promise((resolve, reject) => {
     const { CLAMAV_PORT = 3310, CLAMAV_HOST = '127.0.0.1' } = process.env;
