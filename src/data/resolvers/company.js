@@ -5,11 +5,16 @@ import {
   Qualifications,
   Audits,
   AuditResponses,
+  Users,
 } from '../../db/models';
 
 import { encrypt } from '../../db/models/utils';
 
 export default {
+  owner(company) {
+    return Users.findOne({ companyId: company._id });
+  },
+
   lastProductsInfoValidation(company) {
     return company.getLastProductsInfoValidation();
   },

@@ -384,6 +384,7 @@ export const types = `
     dueDiligences: [CompanyDueDiligence]
     feedbacks: [Feedback]
 
+    owner: User
     lastFeedback: Feedback
     lastProductsInfoValidation: JSON
     lastDifotScore: JSON
