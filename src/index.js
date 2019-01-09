@@ -19,7 +19,7 @@ import fileType from 'file-type';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
-import { uploadFile, readS3File, tokenize } from './data/utils';
+import { uploadFile, readS3File, tokenize, virusDetector } from './data/utils';
 import schema from './data';
 import { init } from './startup';
 
@@ -111,11 +111,20 @@ app.post('/upload-file', async (req, res) => {
         'image/png',
         'image/jpeg',
         'image/jpg',
+        'image/gif',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/pdf',
       ].includes(mime)
     ) {
+      // check for virus
+      try {
+        const stream = await fs.createReadStream(response.file.path);
+        await virusDetector(stream);
+      } catch (e) {
+        return res.status(500).send('Infected file');
+      }
+
       const url = await uploadFile(response.file);
       return res.end(url);
     }

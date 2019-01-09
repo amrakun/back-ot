@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
+import clamav from 'clamav.js';
 import {
   Companies,
   Tenders,
@@ -309,6 +310,21 @@ export const generateXlsx = async (user, workbook, name) => {
 
   return `${DOMAIN}/static/templateOutputs/${id}/${name}.xlsx`;
 };
+
+export const virusDetector = stream =>
+  new Promise((resolve, reject) => {
+    const { CLAMAV_PORT = 3310, CLAMAV_HOST = '127.0.0.1' } = process.env;
+
+    clamav.createScanner(CLAMAV_PORT, CLAMAV_HOST).scan(stream, (err, object, malicious) => {
+      if (err) {
+        reject(err);
+      } else if (malicious) {
+        reject(malicious);
+      } else {
+        resolve('ok');
+      }
+    });
+  });
 
 export default {
   sendEmail,
