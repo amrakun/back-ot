@@ -86,11 +86,12 @@ class Tender extends StatusPublishClose {
   static async updateTender(_id, doc) {
     const tender = await this.findOne({ _id });
 
-    if (tender.status === 'closed') {
-      throw new Error('Can not update closed tender');
+    if (['awarded', 'open'].includes(tender.status)) {
+      throw new Error(`Can not update ${tender.status} tender`);
     }
 
     doc.supplierIds = encryptArray(doc.supplierIds);
+    doc.status = 'draft';
 
     await this.update({ _id }, { $set: doc }, { runValidators: true });
 

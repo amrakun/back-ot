@@ -80,8 +80,8 @@ describe('Tender db', () => {
     expect(updated.getSupplierIds()).toEqual(doc.supplierIds);
   });
 
-  test('Update tender: with closed status', async () => {
-    const tender = await tenderFactory({ status: 'closed' });
+  test('Update tender: with awarded status', async () => {
+    const tender = await tenderFactory({ status: 'awarded' });
     const doc = await tenderDoc();
 
     expect.assertions(1);
@@ -89,8 +89,43 @@ describe('Tender db', () => {
     try {
       await Tenders.updateTender(tender._id, doc);
     } catch (e) {
-      expect(e.message).toBe('Can not update closed tender');
+      expect(e.message).toBe('Can not update awarded tender');
     }
+  });
+
+  test('Update tender: with open status', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+    const doc = await tenderDoc();
+
+    expect.assertions(1);
+
+    try {
+      await Tenders.updateTender(tender._id, doc);
+    } catch (e) {
+      expect(e.message).toBe('Can not update open tender');
+    }
+  });
+
+  test('Update tender: with closed status', async () => {
+    const tender = await tenderFactory({ status: 'closed' });
+    const doc = await tenderDoc();
+
+    expect.assertions(1);
+
+    const updated = await Tenders.updateTender(tender._id, doc);
+
+    expect(updated.status).toBe('draft');
+  });
+
+  test('Update tender: with canceled status', async () => {
+    const tender = await tenderFactory({ status: 'canceled' });
+    const doc = await tenderDoc();
+
+    expect.assertions(1);
+
+    const updated = await Tenders.updateTender(tender._id, doc);
+
+    expect(updated.status).toBe('draft');
   });
 
   test('Delete tender', async () => {
