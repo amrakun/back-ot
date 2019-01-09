@@ -201,7 +201,7 @@ const difotScoreFields = `
 
 export const types = `
   #  basic info ========================
-  type CompanyBasicInfo { ${basicInfoFields} }
+  type CompanyBasicInfo { ${basicInfoFields.replace(/!/g, '')} }
   input CompanyBasicInfoInput { ${basicInfoFields} }
 
   #  contact info ======================
