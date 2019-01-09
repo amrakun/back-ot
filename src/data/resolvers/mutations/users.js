@@ -344,7 +344,6 @@ requireLogin(userMutations, 'usersEditProfile');
 requireLogout(userMutations, 'register');
 requireLogout(userMutations, 'resendConfirmationLink');
 requireLogout(userMutations, 'confirmRegistration');
-requireLogout(userMutations, 'login');
 requireLogout(userMutations, 'forgotPassword');
 requireLogout(userMutations, 'resetPassword');
 
