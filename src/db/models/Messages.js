@@ -6,7 +6,9 @@ const MessageSchema = new Schema(
   {
     tenderId: { type: ObjectId, ref: 'tenders' },
     senderId: { type: ObjectId, ref: 'users' },
+    /** @todo check if recipientId field is unnecessary */
     recipientId: { type: ObjectId, ref: 'users' },
+    didRead: { type: Boolean, default: false },
     title: String,
     body: Object,
   },
