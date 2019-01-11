@@ -1,12 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+const ObjectId = Schema.Types.ObjectId;
 
 const MessageSchema = new Schema(
   {
-    tenderId: ObjectId,
-    sender: ObjectId,
-    recipient: ObjectId,
+    tenderId: { type: ObjectId, ref: 'tenders' },
+    senderId: { type: ObjectId, ref: 'users' },
+    recipientId: { type: ObjectId, ref: 'users' },
     title: String,
     body: Object,
   },
