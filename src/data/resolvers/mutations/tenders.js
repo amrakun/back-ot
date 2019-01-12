@@ -24,8 +24,23 @@ const tenderMutations = {
    * @param {Object} fields - tenders fields
    * @return {Promise} updated tender object
    */
-  tendersEdit(root, { _id, ...fields }) {
-    return Tenders.updateTender(_id, fields);
+  async tendersEdit(root, { _id, ...fields }) {
+    const oldTender = await Tenders.findById(_id);
+    const updatedTender = await Tenders.updateTender(_id, fields);
+
+    if (['closed', 'canceled'].includes(oldTender.status)) {
+      const updatedTenderIds = new Set(updatedTender.getSupplierIds());
+      const oldSupplierIds = oldTender.getSupplierIds();
+      const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
+
+      sendEmailToSuppliers({
+        kind: 'supplier__reopen',
+        tender: updatedTender,
+        supplierIds: intersectionIds,
+      });
+    }
+
+    return updatedTender;
   },
 
   /**
