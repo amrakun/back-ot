@@ -31,6 +31,7 @@ const commonTenderFields = `
   _id: String!
   status: String!
   type: String!
+  rfqType: String
   createdDate: Date
   number: String!
   name: String!
@@ -204,7 +205,7 @@ const responseCommonParams = `
 `;
 
 export const mutations = `
-  tendersAdd(type: String!, ${commonParams}): Tender
+  tendersAdd(type: String!, rfqType: String, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
 

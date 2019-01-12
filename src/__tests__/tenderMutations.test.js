@@ -119,8 +119,8 @@ describe('Tender mutations', () => {
     const mock = sinon.stub(Tenders, 'createTender').callsFake(() => ({ _id: Math.random() }));
 
     const mutation = `
-      mutation tendersAdd($type: String!  ${commonParams}) {
-        tendersAdd(type: $type, ${commonValues}) {
+      mutation tendersAdd($type: String!, $rfqType: String ${commonParams}) {
+        tendersAdd(type: $type, rfqType: $rfqType, ${commonValues}) {
           _id
         }
       }

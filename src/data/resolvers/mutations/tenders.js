@@ -33,7 +33,7 @@ const tenderMutations = {
       const oldSupplierIds = oldTender.getSupplierIds();
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
-      sendEmailToSuppliers({
+      await sendEmailToSuppliers({
         kind: 'supplier__reopen',
         tender: updatedTender,
         supplierIds: intersectionIds,

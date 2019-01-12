@@ -29,6 +29,9 @@ const TenderSchema = mongoose.Schema({
   // rfq, eoi, trfq(travel rfq)
   type: field({ type: String }),
 
+  // goods, service
+  rfqType: field({ type: String, optional: true }),
+
   status: field({ type: String }),
 
   createdDate: field({ type: Date }),
@@ -66,13 +69,19 @@ class Tender extends StatusPublishClose {
    * @return {Promise} newly created tender object
    */
   static async createTender(doc, userId) {
-    const saved = await Tenders.create({
+    const extendedDoc = {
       ...doc,
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
       supplierIds: encryptArray(doc.supplierIds),
-    });
+    };
+
+    if (doc.type === 'rfq' && !['goods', 'service'].includes(doc.rfqType)) {
+      throw new Error('Invalid rfq type');
+    }
+
+    const saved = await Tenders.create(extendedDoc);
 
     return this.findOne({ _id: saved._id });
   }
