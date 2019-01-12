@@ -1,16 +1,26 @@
 import mongoose, { Schema } from 'mongoose';
+import { field } from './utils';
 
-const ObjectId = Schema.Types.ObjectId;
+const attachmentSchema = new Schema(
+  {
+    name: field({ type: String }),
+    url: field({ type: String }),
+  },
+  { _id: false },
+);
 
 const MessageSchema = new Schema(
   {
-    tenderId: { type: ObjectId, ref: 'tenders' },
-    senderId: { type: ObjectId, ref: 'users' },
-    /** @todo check if recipientId field is unnecessary */
-    recipientId: { type: ObjectId, ref: 'users' },
-    didRead: { type: Boolean, default: false },
-    title: String,
-    body: Object,
+    tenderId: field({ type: String }),
+    fromBuyerId: field({ type: String, optional: true }),
+    toSupplierIds: [String],
+    fromSupplierId: field({ type: String, optional: true }),
+    subject: field({ type: String }),
+    body: field({ type: String }),
+    attachment: attachmentSchema,
+    isAuto: field({ type: Boolean, default: false }),
+    isRead: field({ type: Boolean, default: false }),
+    isReplySent: field({ type: Boolean, default: false }),
   },
   {
     timestamps: true,
@@ -18,11 +28,19 @@ const MessageSchema = new Schema(
 );
 
 class Message {
-  async send({ tenderId, from, to, title, body }) {}
+  static async getAllForTender({ tenderId }) {
+    return this.find({ tenderId });
+  }
+  static async getTenderToSupplier({ tenderId, toSupplierId }) {
+    return this.find({
+      tenderId,
+      toSupplierIds: toSupplierId,
+    });
+  }
 }
 
 MessageSchema.loadClass(Message);
 
-const Messages = mongoose.model('messages', MessageSchema);
+const MessageModel = mongoose.model('messages', MessageSchema);
 
-export default Messages;
+export default MessageModel;
