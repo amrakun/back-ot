@@ -1,7 +1,7 @@
 export const types = `
   enum ReportsTendersType {
     rfq
-    srfq
+    trfq
     eoi
   }
 

@@ -26,7 +26,7 @@ const ProductSchema = mongoose.Schema(
 
 // Tender schema
 const TenderSchema = mongoose.Schema({
-  // rfq, eoi
+  // rfq, eoi, trfq(travel rfq)
   type: field({ type: String }),
 
   status: field({ type: String }),
