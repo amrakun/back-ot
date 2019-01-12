@@ -35,7 +35,7 @@ messageSchema.pre('save', () => {
   }
 });
 
-class Message {
+class Messages {
   static async getAllForTender({ tenderId }) {
     return this.find({ tenderId });
   }
@@ -47,7 +47,7 @@ class Message {
   }
 }
 
-messageSchema.loadClass(Message);
+messageSchema.loadClass(Messages);
 
 const MessageModel = mongoose.model('messages', messageSchema);
 
