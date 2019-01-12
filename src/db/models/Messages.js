@@ -9,12 +9,12 @@ const attachmentSchema = new Schema(
   { _id: false },
 );
 
-const MessageSchema = new Schema(
+const messageSchema = new Schema(
   {
     tenderId: field({ type: String }),
-    fromBuyerId: field({ type: String, optional: true }),
-    toSupplierIds: [String],
-    fromSupplierId: field({ type: String, optional: true }),
+    senderBuyerId: field({ type: String, optional: true }),
+    recipientSupplierIds: [String],
+    senderSupplierId: field({ type: String, optional: true }),
     subject: field({ type: String }),
     body: field({ type: String }),
     attachment: attachmentSchema,
@@ -26,6 +26,14 @@ const MessageSchema = new Schema(
     timestamps: true,
   },
 );
+
+messageSchema.pre('save', () => {
+  if (!this.isAuto) {
+    if (!this.senderBuyerId && !this.senderSupplierId) {
+      throw new Error('Must have sender');
+    }
+  }
+});
 
 class Message {
   static async getAllForTender({ tenderId }) {
@@ -39,8 +47,8 @@ class Message {
   }
 }
 
-MessageSchema.loadClass(Message);
+messageSchema.loadClass(Message);
 
-const MessageModel = mongoose.model('messages', MessageSchema);
+const MessageModel = mongoose.model('messages', messageSchema);
 
 export default MessageModel;
