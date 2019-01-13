@@ -207,7 +207,7 @@ describe('Tender response db', () => {
         { file: { url: 's1_rp1.png', name: '/s1_rp1' } },
         { file: { url: 's1_rp2.png', name: '/s1_rp2' } },
       ],
-      respondedServiceFiles: [
+      respondedFiles: [
         { url: 's1_rs1.png', name: '/s1_rs1' },
         { url: 's1_rs2.png', name: '/s1_rs2' },
       ],

@@ -134,7 +134,7 @@ export const customCommand = async () => {
   }
 
   for (const response of responses) {
-    await replaceTender(response, 'respondedServiceFiles', 'response');
+    await replaceTender(response, 'respondedFiles', 'response');
     await replaceTender(response, 'respondedDocuments', 'response');
     await replaceTender(response, 'respondedProducts', 'response');
   }
