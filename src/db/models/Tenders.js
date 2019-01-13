@@ -311,7 +311,13 @@ const TenderResponseSchema = mongoose.Schema({
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
+
+  // TODO: remove
   respondedServiceFiles: [FileSchema],
+
+  // used both in service, travel rfq
+  respondedFiles: [FileSchema],
+
   respondedDocuments: [RespondedDocumentSchema],
 
   // when tender type is eoi, we can still receive responses after closedDate
@@ -441,7 +447,7 @@ class TenderResponse {
       return true;
     }
 
-    if (await check({ 'respondedServiceFiles.url': key })) {
+    if (await check({ 'respondedFiles.url': key })) {
       return true;
     }
 
