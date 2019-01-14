@@ -10,7 +10,7 @@ export default {
   },
 
   recipientSuppliers({ recipientSupplierIds }) {
-    return Users.findOne({ _id: { $in: recipientSupplierIds } });
+    return Users.find({ _id: { $in: recipientSupplierIds } });
   },
 
   senderSupplier({ senderSupplierId }) {
