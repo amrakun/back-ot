@@ -4,6 +4,11 @@ export const types = `
     url:  String!
   }
 
+  input TenderMessageAttachmentInput {
+    name: String!
+    url:  String!
+  }
+
   type TenderMessage {
     tender:              Tender!
     senderBuyer:         User
@@ -34,13 +39,13 @@ export const mutations = `
     recipientSupplierIds: [String!],
     subject:               String,
     body:                  String,
-    attachment:            Attachment
+    attachment:            TenderMessageAttachmentInput
   ): [TenderMessage]
 
   tenderMessageSupplierSend(
     tenderId:              String!,
     subject:               String!,
     body:                  String!,
-    attachment:            Attachment
+    attachment:            TenderMessageAttachmentInput
   ): [TenderMessage]
 `;

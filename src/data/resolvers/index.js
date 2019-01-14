@@ -11,13 +11,12 @@ import Qualification from './qualification';
 import Audit from './audit';
 import AuditResponse from './auditResponse';
 import PhysicalAudit from './physicalAudit';
-import Messages from './messages';
+import TenderMessage from './TenderMessage';
 import Mutation from './mutations';
 import Query from './queries';
 
 export default {
   ...customScalars,
-
   Company,
   CompanyDueDiligence,
   SupplierTender,
@@ -30,7 +29,7 @@ export default {
   Audit,
   AuditResponse,
   PhysicalAudit,
-  Messages,
+  TenderMessage,
 
   Mutation,
   Query,

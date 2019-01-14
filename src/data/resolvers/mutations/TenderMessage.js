@@ -1,24 +1,24 @@
-import { Messages } from '../../../db/models';
+import { TenderMessages } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
 
-const tenderMessageMutations = {
+const TenderMessage = {
   async tenderMessageBuyerSend(parent, args, { user }) {
-    return Messages.create({
+    return TenderMessages.create({
       ...args,
       senderBuyerId: user._id,
     });
   },
 
   async tenderMessageSupplierSend(parent, args, { user }) {
-    return Messages.create({
+    return TenderMessages.create({
       ...args,
       senderSupplierId: user._id,
     });
   },
 };
 
-requireBuyer(tenderMessageMutations, 'tenderMessageBuyerSend');
-requireSupplier(tenderMessageMutations, 'tenderMessageSupplierSend');
+requireBuyer(TenderMessage, 'tenderMessageBuyerSend');
+requireSupplier(TenderMessage, 'tenderMessageSupplierSend');
 
-export default tenderMessageMutations;
+export default TenderMessage;

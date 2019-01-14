@@ -57,10 +57,10 @@ import {
 import { queries as LogQueries, mutations as LogMutations } from './log';
 
 import {
-  types as MessageTypes,
-  queries as MessageQueries,
-  mutations as MessageMutations,
-} from './message';
+  types as TenderMessageTypes,
+  queries as TenderMessageQueries,
+  mutations as TenderMessageMutations,
+} from './TenderMessage';
 
 export const types = `
   scalar JSON
@@ -78,7 +78,7 @@ export const types = `
   ${ConfigTypes}
   ${MassMailTypes}
   ${PermissionTypes}
-  ${MessageTypes}
+  ${TenderMessageTypes}
 `;
 
 export const queries = `
@@ -96,7 +96,7 @@ export const queries = `
     ${MassMailQueries}
     ${PermissionQueries}
     ${LogQueries}
-    ${MessageQueries}
+    ${TenderMessageQueries}
   }
 `;
 
@@ -113,6 +113,6 @@ export const mutations = `
     ${ConfigMutations}
     ${MassMailMutations}
     ${LogMutations}
-    ${MessageMutations}
+    ${TenderMessageMutations}
   }
 `;

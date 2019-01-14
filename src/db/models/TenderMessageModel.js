@@ -39,6 +39,6 @@ class TenderMessageModelClass {}
 
 tenderMessageSchema.loadClass(TenderMessageModelClass);
 
-const TenderMessageModel = mongoose.model('messages', tenderMessageSchema);
+const TenderMessageModel = mongoose.model('tender_messages', tenderMessageSchema);
 
 export default TenderMessageModel;

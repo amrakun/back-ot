@@ -15,7 +15,7 @@ import configs from './configs';
 import mailDeliveries from './mailDeliveries';
 import permissions from './permissions';
 import logs from './logs';
-import messages from './messages';
+import TenderMessage from './TenderMessage';
 
 export default {
   ...users,
@@ -35,5 +35,5 @@ export default {
   ...mailDeliveries,
   ...permissions,
   ...logs,
-  ...messages,
+  ...TenderMessage,
 };
