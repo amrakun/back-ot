@@ -11,7 +11,7 @@ import Qualification from './qualification';
 import Audit from './audit';
 import AuditResponse from './auditResponse';
 import PhysicalAudit from './physicalAudit';
-
+import Messages from './messages';
 import Mutation from './mutations';
 import Query from './queries';
 
@@ -30,6 +30,7 @@ export default {
   Audit,
   AuditResponse,
   PhysicalAudit,
+  Messages,
 
   Mutation,
   Query,

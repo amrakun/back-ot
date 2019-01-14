@@ -11,6 +11,7 @@ import physicalAudits from './physicalAudits';
 import configs from './configs';
 import massMails from './massMails';
 import logs from './logs';
+import messages from './messages';
 
 export default {
   ...companies,
@@ -26,4 +27,5 @@ export default {
   ...configs,
   ...massMails,
   ...logs,
+  ...messages,
 };

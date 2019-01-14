@@ -9,7 +9,7 @@ const attachmentSchema = new Schema(
   { _id: false },
 );
 
-const messageSchema = new Schema(
+const tenderMessageSchema = new Schema(
   {
     tenderId: field({ type: String }),
     senderBuyerId: field({ type: String, optional: true }),
@@ -27,7 +27,7 @@ const messageSchema = new Schema(
   },
 );
 
-messageSchema.pre('save', () => {
+tenderMessageSchema.pre('save', () => {
   if (!this.isAuto) {
     if (!this.senderBuyerId && !this.senderSupplierId) {
       throw new Error('Must have sender');
@@ -35,20 +35,10 @@ messageSchema.pre('save', () => {
   }
 });
 
-class Messages {
-  static async getAllForTender({ tenderId }) {
-    return this.find({ tenderId });
-  }
-  static async getTenderToSupplier({ tenderId, toSupplierId }) {
-    return this.find({
-      tenderId,
-      toSupplierIds: toSupplierId,
-    });
-  }
-}
+class TenderMessageModelClass {}
 
-messageSchema.loadClass(Messages);
+tenderMessageSchema.loadClass(TenderMessageModelClass);
 
-const MessageModel = mongoose.model('messages', messageSchema);
+const TenderMessageModel = mongoose.model('messages', tenderMessageSchema);
 
-export default MessageModel;
+export default TenderMessageModel;

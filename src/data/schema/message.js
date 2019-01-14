@@ -29,7 +29,7 @@ export const queries = `
 `;
 
 export const mutations = `
-  tenderMessagesBuyerSend(
+  tenderMessageBuyerSend(
     tenderId:              String!,
     recipientSupplierIds: [String!],
     subject:               String,
@@ -37,7 +37,7 @@ export const mutations = `
     attachment:            Attachment
   ): [TenderMessage]
 
-  tenderMessagesSupplierSend(
+  tenderMessageSupplierSend(
     tenderId:              String!,
     subject:               String!,
     body:                  String!,
