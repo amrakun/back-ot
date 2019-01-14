@@ -17,6 +17,7 @@ const respondedProductFields = `
   leadTime: Float
   shippingTerms: String
   comment: String
+  alternative: String
   file: JSON
 `;
 
