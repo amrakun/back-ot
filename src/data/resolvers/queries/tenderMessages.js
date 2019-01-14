@@ -1,9 +1,9 @@
-import { TenderMessageModel } from '../../../db/models';
+import { TenderMessage } from '../../../db/models';
 import { moduleRequireLogin } from '../../permissions';
 
-const TenderMessage = {
+const TenderMessageQuery = {
   async tenderMessages(root, { tenderId, page = 1, perPage = 20 }, { user }) {
-    const docs = TenderMessageModel.find({
+    const docs = TenderMessage.find({
       tenderId,
       $or: [
         { senderBuyerId: user._id },
@@ -18,7 +18,7 @@ const TenderMessage = {
     return docs;
   },
   async tenderMessageDetail(root, { _id }, { user }) {
-    return TenderMessageModel.findOne({
+    return TenderMessage.findOne({
       _id,
       $or: [
         { senderBuyerId: user._id },
@@ -29,6 +29,6 @@ const TenderMessage = {
   },
 };
 
-moduleRequireLogin(TenderMessage);
+moduleRequireLogin(TenderMessageQuery);
 
-export default TenderMessage;
+export default TenderMessageQuery;

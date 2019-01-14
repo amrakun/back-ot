@@ -2,7 +2,7 @@ import { TenderMessages } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
 
-const TenderMessage = {
+const TenderMessageMutations = {
   async tenderMessageBuyerSend(parent, args, { user }) {
     return TenderMessages.create({
       ...args,
@@ -18,7 +18,7 @@ const TenderMessage = {
   },
 };
 
-requireBuyer(TenderMessage, 'tenderMessageBuyerSend');
-requireSupplier(TenderMessage, 'tenderMessageSupplierSend');
+requireBuyer(TenderMessageMutations, 'tenderMessageBuyerSend');
+requireSupplier(TenderMessageMutations, 'tenderMessageSupplierSend');
 
-export default TenderMessage;
+export default TenderMessageMutations;

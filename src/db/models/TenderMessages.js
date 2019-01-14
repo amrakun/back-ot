@@ -35,9 +35,9 @@ tenderMessageSchema.pre('save', () => {
   }
 });
 
-class TenderMessageModelClass {}
+class TenderMessage {}
 
-tenderMessageSchema.loadClass(TenderMessageModelClass);
+tenderMessageSchema.loadClass(TenderMessage);
 
 const TenderMessageModel = mongoose.model('tender_messages', tenderMessageSchema);
 

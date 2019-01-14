@@ -60,7 +60,7 @@ import {
   types as TenderMessageTypes,
   queries as TenderMessageQueries,
   mutations as TenderMessageMutations,
-} from './TenderMessage';
+} from './tenderMessage';
 
 export const types = `
   scalar JSON

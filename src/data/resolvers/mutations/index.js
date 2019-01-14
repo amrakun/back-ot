@@ -11,7 +11,7 @@ import physicalAudits from './physicalAudits';
 import configs from './configs';
 import massMails from './massMails';
 import logs from './logs';
-import TenderMessage from './TenderMessage';
+import TenderMessage from './tenderMessages';
 
 export default {
   ...companies,

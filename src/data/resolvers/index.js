@@ -11,7 +11,7 @@ import Qualification from './qualification';
 import Audit from './audit';
 import AuditResponse from './auditResponse';
 import PhysicalAudit from './physicalAudit';
-import TenderMessage from './TenderMessage';
+import TenderMessage from './tenderMessage';
 import Mutation from './mutations';
 import Query from './queries';
 
