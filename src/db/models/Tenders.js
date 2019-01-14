@@ -290,6 +290,7 @@ const RespondedProductSchema = mongoose.Schema(
     totalPrice: field({ type: Number, optional: true }),
     leadTime: field({ type: Number, optional: true }),
     shippingTerms: field({ type: String, optional: true }),
+    alternative: field({ type: String, optional: true }),
     comment: field({ type: String, optional: true }),
     file: field({ type: FileSchema, optional: true }),
   },
