@@ -367,6 +367,10 @@ export const tenderDoc = async (params = {}) => {
     doc.type = params.type;
   }
 
+  if (doc.type === 'rfq' && !doc.rfqType) {
+    doc.rfqType = 'goods';
+  }
+
   return doc;
 };
 
@@ -378,6 +382,10 @@ export const tenderFactory = async (params = {}) => {
 
   if (!params.type) {
     doc.type = 'rfq';
+  }
+
+  if (doc.type === 'rfq' && !doc.rfqType) {
+    doc.rfqType = 'goods';
   }
 
   let createdUserId = params.createdUserId;
@@ -417,7 +425,7 @@ export const tenderResponseDoc = async (params = {}) => {
     supplierId: params.supplierId,
     respondedProducts: params.respondedProducts,
     respondedDocuments: params.respondedDocuments,
-    respondedServiceFiles: params.respondedServiceFiles,
+    respondedFiles: params.respondedFiles,
     isNotInterested: params.isNotInterested || false,
   };
 };

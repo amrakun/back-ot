@@ -314,9 +314,16 @@ export const generateXlsx = async (user, workbook, name) => {
 /*
  * First install clamav service https://www.clamav.net/documents/installation-on-macos-mac-os-x
  * And using clamav.js connector for clamav service
+ * For mac install clamav from source and use call clamd command from this folder
  */
-export const virusDetector = stream =>
-  new Promise((resolve, reject) => {
+export const virusDetector = stream => {
+  const { NODE_ENV } = process.env;
+
+  return new Promise((resolve, reject) => {
+    if (NODE_ENV === 'development') {
+      return resolve('ok');
+    }
+
     const { CLAMAV_PORT = 3310, CLAMAV_HOST = '127.0.0.1' } = process.env;
 
     clamav.createScanner(CLAMAV_PORT, CLAMAV_HOST).scan(stream, (err, object, malicious) => {
@@ -329,6 +336,7 @@ export const virusDetector = stream =>
       }
     });
   });
+};
 
 export default {
   sendEmail,

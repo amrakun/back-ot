@@ -70,6 +70,19 @@ describe('Tender db', () => {
     expect(status).toEqual('draft');
   });
 
+  test('Create tender: rfq type', async () => {
+    expect.assertions(1);
+
+    try {
+      await Tenders.createTender({
+        type: 'rfq',
+        rfqType: 'invalid',
+      });
+    } catch (e) {
+      expect(e.message).toBe('Invalid rfq type');
+    }
+  });
+
   test('Update tender', async () => {
     const doc = await tenderDoc();
 

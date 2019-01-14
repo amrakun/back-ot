@@ -31,6 +31,7 @@ const commonTenderFields = `
   _id: String!
   status: String!
   type: String!
+  rfqType: String
   createdDate: Date
   number: String!
   name: String!
@@ -100,7 +101,7 @@ export const types = `
     supplierId: String!
     respondedProducts: [TenderRespondedProduct]
     respondedDocuments: [TenderRespondedDocument]
-    respondedServiceFiles: [JSON]
+    respondedFiles: [JSON]
 
     supplier: Company
 
@@ -200,11 +201,11 @@ const responseCommonParams = `
   isNotInterested: Boolean
   respondedProducts: [TenderRespondedProductInput]
   respondedDocuments: [TenderRespondedDocumentInput]
-  respondedServiceFiles: [JSON]
+  respondedFiles: [JSON]
 `;
 
 export const mutations = `
-  tendersAdd(type: String!, ${commonParams}): Tender
+  tendersAdd(type: String!, rfqType: String, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
 
