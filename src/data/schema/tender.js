@@ -69,6 +69,8 @@ export const types = `
     supplierIds: [String]!
     createdUserId: String!
     winnerIds: [String]
+    awardNote: String
+    awardAttachments: [JSON]
     sentRegretLetter: Boolean
     isAwarded: Boolean
     suppliers: [Company]!
@@ -211,7 +213,12 @@ export const mutations = `
   tendersEdit(_id: String!, ${commonParams}): Tender
   tendersRemove(_id: String!): String
 
-  tendersAward(_id: String!  supplierIds: [String!]!): Tender
+  tendersAward(
+    _id: String!
+    supplierIds: [String!]!
+    note: String
+    attachments: [JSON]
+  ): Tender
 
   tendersSendRegretLetter(
     _id: String!

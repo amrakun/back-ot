@@ -54,6 +54,8 @@ const TenderSchema = mongoose.Schema({
 
   // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
+  awardNote: field({ type: String, optional: true }),
+  awardAttachments: field({ type: [FileSchema], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
 
@@ -128,7 +130,7 @@ class Tender extends StatusPublishClose {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - Updated tender object
    */
-  static async award(_id, supplierIds) {
+  static async award({ _id, supplierIds, note, attachments }) {
     if (supplierIds.length === 0) {
       throw new Error('Select some suppliers');
     }
@@ -148,7 +150,14 @@ class Tender extends StatusPublishClose {
 
     await this.update(
       { _id },
-      { $set: { status: 'awarded', winnerIds: encryptArray(supplierIds) } },
+      {
+        $set: {
+          status: 'awarded',
+          awardNote: note,
+          awardAttachments: attachments,
+          winnerIds: encryptArray(supplierIds),
+        },
+      },
     );
 
     return this.findOne({ _id });

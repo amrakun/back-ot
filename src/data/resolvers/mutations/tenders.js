@@ -58,8 +58,8 @@ const tenderMutations = {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - updated tender
    */
-  async tendersAward(root, { _id, supplierIds }) {
-    const tender = await Tenders.award(_id, supplierIds);
+  async tendersAward(root, { _id, supplierIds, note, attachments }) {
+    const tender = await Tenders.award({ _id, supplierIds, note, attachments });
 
     await sendEmailToBuyer({ kind: 'buyer__award', tender });
     await sendEmailToSuppliers({ kind: 'supplier__award', tender, supplierIds });
