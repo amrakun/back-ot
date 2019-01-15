@@ -182,11 +182,10 @@ describe('Tender mutations', () => {
 
   test('Award', async () => {
     const mutation = `
-      mutation tendersAward($_id: String!, $supplierIds: [String!]!, $note: String, $attachments: [JSON]) {
+      mutation tendersAward($_id: String!, $supplierIds: [String!]!, $note: String, $attachments: [TenderAwardAttachment]) {
         tendersAward(_id: $_id, supplierIds: $supplierIds, note: $note, attachments: $attachments) {
           winnerIds
           awardNote
-          awardAttachments
         }
       }
     `;
@@ -203,7 +202,12 @@ describe('Tender mutations', () => {
       _id: tender._id.toString(),
       supplierIds: [supplier._id],
       note: 'note',
-      attachments: [{ name: 'name', url: '/url' }],
+      attachments: [
+        {
+          supplierId: supplier._id,
+          attachment: { name: 'name', url: '/url' },
+        },
+      ],
     };
 
     const response = await graphqlRequest(mutation, 'tendersAward', args);

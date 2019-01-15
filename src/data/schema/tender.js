@@ -70,7 +70,6 @@ export const types = `
     createdUserId: String!
     winnerIds: [String]
     awardNote: String
-    awardAttachments: [JSON]
     sentRegretLetter: Boolean
     isAwarded: Boolean
     suppliers: [Company]!
@@ -97,6 +96,11 @@ export const types = `
 
   input TenderRespondedDocumentInput {
     ${respondedDocumentFields}
+  }
+
+  input TenderAwardAttachment {
+    supplierId: String!
+    attachment: JSON!
   }
 
   type TenderResponse {
@@ -217,7 +221,7 @@ export const mutations = `
     _id: String!
     supplierIds: [String!]!
     note: String
-    attachments: [JSON]
+    attachments: [TenderAwardAttachment]
   ): Tender
 
   tendersSendRegretLetter(
