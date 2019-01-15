@@ -19,7 +19,7 @@ const ProductSchema = mongoose.Schema(
     quantity: field({ type: Number }),
     uom: field({ type: String }),
     manufacturer: field({ type: String }),
-    manufacturerPartNumber: field({ type: Number, max: 99999999 }),
+    manufacturerPartNumber: field({ type: String }),
   },
   { _id: false },
 );
@@ -54,6 +54,8 @@ const TenderSchema = mongoose.Schema({
 
   // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
+  awardNote: field({ type: String, optional: true }),
+  awardAttachments: field({ type: [FileSchema], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
 
@@ -128,7 +130,7 @@ class Tender extends StatusPublishClose {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - Updated tender object
    */
-  static async award(_id, supplierIds) {
+  static async award({ _id, supplierIds, note, attachments }) {
     if (supplierIds.length === 0) {
       throw new Error('Select some suppliers');
     }
@@ -148,7 +150,14 @@ class Tender extends StatusPublishClose {
 
     await this.update(
       { _id },
-      { $set: { status: 'awarded', winnerIds: encryptArray(supplierIds) } },
+      {
+        $set: {
+          status: 'awarded',
+          awardNote: note,
+          awardAttachments: attachments,
+          winnerIds: encryptArray(supplierIds),
+        },
+      },
     );
 
     return this.findOne({ _id });
@@ -285,13 +294,17 @@ const RespondedProductSchema = mongoose.Schema(
   {
     code: field({ type: String, optional: true }),
     suggestedManufacturer: field({ type: String, optional: true }),
-    suggestedManufacturerPartNumber: field({ type: Number, optional: true }),
+    suggestedManufacturerPartNumber: field({ type: String, optional: true }),
     unitPrice: field({ type: Number, optional: true }),
     totalPrice: field({ type: Number, optional: true }),
-    currency: field({ type: String, optional: true }),
+    currency: field({ type: String, optional: true, enum: ['MNT', 'USD'] }),
     leadTime: field({ type: Number, optional: true }),
-    shippingTerms: field({ type: String, optional: true }),
-    alternative: field({ type: String, optional: true }),
+    shippingTerms: field({
+      type: String,
+      optional: true,
+      enum: ['DDP - OT UB warehouse', 'DDP - OT site', 'FCA - Supplier Facility', 'EXW'],
+    }),
+    alternative: field({ type: String, optional: true, enum: ['Yes', 'No'] }),
     comment: field({ type: String, optional: true }),
     file: field({ type: FileSchema, optional: true }),
   },
@@ -313,9 +326,6 @@ const TenderResponseSchema = mongoose.Schema({
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
-
-  // TODO: remove
-  respondedServiceFiles: [FileSchema],
 
   // used both in service, travel rfq
   respondedFiles: [FileSchema],

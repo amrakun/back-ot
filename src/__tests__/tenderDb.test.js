@@ -164,7 +164,7 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect.assertions(7);
+    expect.assertions(9);
 
     const tender = await tenderFactory({ status: 'open' });
 
@@ -172,14 +172,14 @@ describe('Tender db', () => {
 
     // select at least one supplier ===============
     try {
-      await Tenders.award(tender._id, []);
+      await Tenders.award({ _id: tender._id, supplierIds: [] });
     } catch (e) {
       expect(e.message).toBe('Select some suppliers');
     }
 
     // can not award not responded supplier ===============
     try {
-      await Tenders.award(tender._id, ['DFAFDSFDSF']);
+      await Tenders.award({ _id: tender._id, supplierIds: ['DFAFDSFDSF'] });
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
@@ -194,7 +194,7 @@ describe('Tender db', () => {
     });
 
     try {
-      await Tenders.award(tender._id, [supplier._id]);
+      await Tenders.award({ _id: tender._id, supplierIds: [supplier._id] });
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
@@ -207,9 +207,16 @@ describe('Tender db', () => {
       isNotInterested: false,
     });
 
-    const updatedTender = await Tenders.award(tender._id, [supplier._id]);
+    const updatedTender = await Tenders.award({
+      _id: tender._id,
+      supplierIds: [supplier._id],
+      note: 'note',
+      attachments: [{ name: 'name1', url: '/url1' }],
+    });
 
     expect(updatedTender.status).toBe('awarded');
+    expect(updatedTender.awardNote).toBe('note');
+    expect(updatedTender.awardAttachments.toObject()).toEqual([{ name: 'name1', url: '/url1' }]);
     expect(updatedTender.winnerIds.length).toBe(1);
     expect(updatedTender.getWinnerIds()).toContain(supplier._id);
   });

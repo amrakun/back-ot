@@ -338,7 +338,7 @@ export const tenderDoc = async (params = {}) => {
     quantity: faker.random.number(),
     uom: faker.random.word(),
     manufacturer: faker.random.word(),
-    manufacturerPartNumber: faker.random.number(),
+    manufacturerPartNumber: faker.random.word(),
   };
 
   if (!params.supplierIds) {

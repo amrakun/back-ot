@@ -34,7 +34,7 @@ describe('Tender response db', () => {
     {
       code: 'code',
       suggestedManufacturer: 'suggestedManufacturer',
-      suggestedManufacturerPartNumber: 10,
+      suggestedManufacturerPartNumber: '10',
       unitPrice: 10000,
       totalPrice: 10000,
       leadTime: 10,
@@ -162,7 +162,7 @@ describe('Tender response db', () => {
         {
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
-          suggestedManufacturerPartNumber: 10,
+          suggestedManufacturerPartNumber: '10',
           unitPrice: 10000,
           totalPrice: 10000,
           leadTime: 10,

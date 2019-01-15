@@ -182,9 +182,11 @@ describe('Tender mutations', () => {
 
   test('Award', async () => {
     const mutation = `
-      mutation tendersAward($_id: String!, $supplierIds: [String!]!) {
-        tendersAward(_id: $_id, supplierIds: $supplierIds) {
+      mutation tendersAward($_id: String!, $supplierIds: [String!]!, $note: String, $attachments: [JSON]) {
+        tendersAward(_id: $_id, supplierIds: $supplierIds, note: $note, attachments: $attachments) {
           winnerIds
+          awardNote
+          awardAttachments
         }
       }
     `;
@@ -197,11 +199,17 @@ describe('Tender mutations', () => {
       supplierId: supplier._id,
     });
 
-    const args = { _id: tender._id.toString(), supplierIds: [supplier._id] };
+    const args = {
+      _id: tender._id.toString(),
+      supplierIds: [supplier._id],
+      note: 'note',
+      attachments: [{ name: 'name', url: '/url' }],
+    };
 
     const response = await graphqlRequest(mutation, 'tendersAward', args);
 
     expect(response.winnerIds.length).toBe(1);
+    expect(response.awardNote).toBe('note');
   });
 
   test('Send regret letter', async () => {

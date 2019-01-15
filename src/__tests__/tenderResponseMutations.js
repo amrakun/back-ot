@@ -81,7 +81,7 @@ describe('Tender mutations', () => {
         {
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
-          suggestedManufacturerPartNumber: 1,
+          suggestedManufacturerPartNumber: '1',
           unitPrice: 1000,
           totalPrice: 20000,
           leadTime: 1,
@@ -147,7 +147,7 @@ describe('Tender mutations', () => {
         {
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
-          suggestedManufacturerPartNumber: 1,
+          suggestedManufacturerPartNumber: '1',
           unitPrice: 1000,
           totalPrice: 20000,
           leadTime: 1,
