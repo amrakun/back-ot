@@ -27,7 +27,7 @@ export const queries = `
   tenderMessages(
     page:     Int,
     perPage:  Int,
-    tenderId: Int!
+    tenderId: String!
   ): [TenderMessage]
 
   tenderMessageDetail(_id: String): TenderMessage
