@@ -290,8 +290,12 @@ const RespondedProductSchema = mongoose.Schema(
     totalPrice: field({ type: Number, optional: true }),
     currency: field({ type: String, optional: true }),
     leadTime: field({ type: Number, optional: true }),
-    shippingTerms: field({ type: String, optional: true }),
-    alternative: field({ type: String, optional: true }),
+    shippingTerms: field({
+      type: String,
+      optional: true,
+      enum: ['DDP - OT UB warehouse', 'DDP - OT site', 'FCA - Supplier Facility', 'EXW'],
+    }),
+    alternative: field({ type: String, optional: true, enum: ['Yes', 'No'] }),
     comment: field({ type: String, optional: true }),
     file: field({ type: FileSchema, optional: true }),
   },
@@ -313,9 +317,6 @@ const TenderResponseSchema = mongoose.Schema({
   tenderId: field({ type: String }),
   supplierId: field({ type: String }),
   respondedProducts: [RespondedProductSchema],
-
-  // TODO: remove
-  respondedServiceFiles: [FileSchema],
 
   // used both in service, travel rfq
   respondedFiles: [FileSchema],
