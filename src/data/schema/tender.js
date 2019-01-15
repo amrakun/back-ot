@@ -14,6 +14,7 @@ const respondedProductFields = `
   suggestedManufacturerPartNumber: Float
   unitPrice: Float
   totalPrice: Float
+  currency: String
   leadTime: Float
   shippingTerms: String
   comment: String

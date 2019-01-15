@@ -288,6 +288,7 @@ const RespondedProductSchema = mongoose.Schema(
     suggestedManufacturerPartNumber: field({ type: Number, optional: true }),
     unitPrice: field({ type: Number, optional: true }),
     totalPrice: field({ type: Number, optional: true }),
+    currency: field({ type: String, optional: true }),
     leadTime: field({ type: Number, optional: true }),
     shippingTerms: field({ type: String, optional: true }),
     alternative: field({ type: String, optional: true }),
