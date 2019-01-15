@@ -19,7 +19,7 @@ const ProductSchema = mongoose.Schema(
     quantity: field({ type: Number }),
     uom: field({ type: String }),
     manufacturer: field({ type: String }),
-    manufacturerPartNumber: field({ type: Number, max: 99999999 }),
+    manufacturerPartNumber: field({ type: String }),
   },
   { _id: false },
 );
@@ -285,7 +285,7 @@ const RespondedProductSchema = mongoose.Schema(
   {
     code: field({ type: String, optional: true }),
     suggestedManufacturer: field({ type: String, optional: true }),
-    suggestedManufacturerPartNumber: field({ type: Number, optional: true }),
+    suggestedManufacturerPartNumber: field({ type: String, optional: true }),
     unitPrice: field({ type: Number, optional: true }),
     totalPrice: field({ type: Number, optional: true }),
     currency: field({ type: String, optional: true }),
