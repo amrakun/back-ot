@@ -109,6 +109,15 @@ class Tender extends StatusPublishClose {
       throw new Error(`Can not update ${tender.status} tender`);
     }
 
+    // reset responses's sent status
+    if (['closed', 'canceled'].includes(tender.status)) {
+      await TenderResponses.update(
+        { tenderId: tender._id },
+        { $set: { isSent: false } },
+        { multi: true },
+      );
+    }
+
     doc.supplierIds = encryptArray(doc.supplierIds);
     doc.status = 'draft';
 
