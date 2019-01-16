@@ -3,6 +3,7 @@ dump
 dist
 static
 .DS_Store
+~$*
 npm-debug.log*
 .env
 .migrate

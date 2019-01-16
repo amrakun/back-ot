@@ -33,7 +33,7 @@ const tenderResponseQueries = {
     });
 
     for (const [index, product] of tender.requestedProducts.entries()) {
-      const rowIndex = 12 + index;
+      const rowIndex = 13 + index;
 
       // fill requested products section
       sheet.cell(rowIndex, 2).value(product.code);
