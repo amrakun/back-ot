@@ -32,6 +32,12 @@ const tenderResponseQueries = {
       template: 'rfq_bid',
     });
 
+    // date
+    sheet.cell(1, 6).value(new Date().toLocaleDateString());
+
+    // rfq number
+    sheet.cell(2, 7).value(`RFQ ${tender.number}`);
+
     for (const [index, product] of tender.requestedProducts.entries()) {
       const rowIndex = 13 + index;
 
