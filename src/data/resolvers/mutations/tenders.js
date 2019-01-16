@@ -1,10 +1,12 @@
 import { Tenders, TenderResponses, Companies } from '../../../db/models';
 import {
   sendConfigEmail,
-  sendEmailToBuyer,
   sendEmailToSuppliers,
+  sendEmailToBuyer,
   sendEmail,
 } from '../../../data/tenderUtils';
+
+import { readS3File } from '../../../data/utils';
 
 import { moduleRequireBuyer } from '../../permissions';
 
@@ -58,11 +60,39 @@ const tenderMutations = {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - updated tender
    */
-  async tendersAward(root, { _id, supplierIds, note, attachments }) {
+  async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments });
 
     await sendEmailToBuyer({ kind: 'buyer__award', tender });
-    await sendEmailToSuppliers({ kind: 'supplier__award', tender, supplierIds });
+
+    const suppliers = await Companies.find({ _id: { $in: supplierIds } });
+
+    // Send email with corresponding attachment to ever supplier
+    for (const supplier of suppliers) {
+      const attachmentBySupplier = (attachments || []).find(
+        a => a.supplierId === supplier._id.toString(),
+      );
+
+      if (!attachmentBySupplier) {
+        continue;
+      }
+
+      const { attachment } = attachmentBySupplier;
+
+      const file = await readS3File(attachment.url, user);
+
+      await sendConfigEmail({
+        kind: 'supplier__award',
+        tender,
+        toEmails: [supplier.basicInfo.email],
+        attachments: [
+          {
+            filename: attachment.name,
+            content: file.Body,
+          },
+        ],
+      });
+    }
 
     return tender;
   },

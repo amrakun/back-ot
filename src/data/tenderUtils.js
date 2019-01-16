@@ -14,15 +14,10 @@ export const replacer = ({ text, tender }) => {
   return result;
 };
 
-export const sendEmailToSuppliers = async ({ kind, tender, supplierIds }) => {
+export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
   const filterIds = supplierIds || tender.getSupplierIds();
 
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
-
-  const attachments = (tender.attachments || []).map(attachment => ({
-    filename: attachment.name,
-    path: attachment.url,
-  }));
 
   for (const supplier of suppliers) {
     await utils.sendConfigEmail({
@@ -50,7 +45,7 @@ export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) 
   });
 };
 
-export const sendEmail = async ({ kind, tender, extraBuyerEmails = [] }) => {
+export const sendEmail = async ({ kind, tender, attachments = [], extraBuyerEmails = [] }) => {
   try {
     await sendEmailToBuyer({
       kind: `buyer__${kind}`,
@@ -64,6 +59,7 @@ export const sendEmail = async ({ kind, tender, extraBuyerEmails = [] }) => {
   try {
     await sendEmailToSuppliers({
       kind: `supplier__${kind}`,
+      attachments,
       tender,
     });
   } catch (e) {
@@ -71,11 +67,12 @@ export const sendEmail = async ({ kind, tender, extraBuyerEmails = [] }) => {
   }
 };
 
-export const sendConfigEmail = async ({ kind, tender, toEmails }) => {
+export const sendConfigEmail = async ({ kind, tender, toEmails, attachments }) => {
   return utils.sendConfigEmail({
     name: `${tender.type}Templates`,
     kind,
     toEmails,
+    attachments,
     replacer: text => {
       return replacer({ text, tender });
     },
