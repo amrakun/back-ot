@@ -24,6 +24,14 @@ const ProductSchema = mongoose.Schema(
   { _id: false },
 );
 
+const AwardAttachmentSchema = mongoose.Schema(
+  {
+    supplierId: field({ type: String }),
+    attachment: field({ type: FileSchema }),
+  },
+  { _id: false },
+);
+
 // Tender schema
 const TenderSchema = mongoose.Schema({
   // rfq, eoi, trfq(travel rfq)
@@ -55,7 +63,7 @@ const TenderSchema = mongoose.Schema({
   // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
   awardNote: field({ type: String, optional: true }),
-  awardAttachments: field({ type: [FileSchema], optional: true }),
+  awardAttachments: field({ type: [AwardAttachmentSchema], optional: true }),
 
   sentRegretLetter: field({ type: Boolean, default: false }),
 
@@ -99,6 +107,15 @@ class Tender extends StatusPublishClose {
 
     if (['awarded', 'open'].includes(tender.status)) {
       throw new Error(`Can not update ${tender.status} tender`);
+    }
+
+    // reset responses's sent status
+    if (['closed', 'canceled'].includes(tender.status)) {
+      await TenderResponses.update(
+        { tenderId: tender._id },
+        { $set: { isSent: false } },
+        { multi: true },
+      );
     }
 
     doc.supplierIds = encryptArray(doc.supplierIds);

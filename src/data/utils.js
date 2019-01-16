@@ -43,6 +43,7 @@ export const readS3File = async (key, user) => {
   }
 
   if (
+    !user === 'system' &&
     !(
       (await Companies.isAuthorizedToDownload(key, user)) ||
       (await Tenders.isAuthorizedToDownload(key, user)) ||

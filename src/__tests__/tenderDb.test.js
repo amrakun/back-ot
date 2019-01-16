@@ -120,21 +120,27 @@ describe('Tender db', () => {
   });
 
   test('Update tender: with closed status', async () => {
-    const tender = await tenderFactory({ status: 'closed' });
+    const tender = await tenderFactory({ status: 'open' });
+
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
+
     const doc = await tenderDoc();
-
-    expect.assertions(1);
-
     const updated = await Tenders.updateTender(tender._id, doc);
 
     expect(updated.status).toBe('draft');
+
+    // responses's sent status must be resetted
+    const [response1, response2] = await TenderResponses.find({ tenderId: tender._id });
+
+    expect(response1.isSent).toBe(false);
+    expect(response2.isSent).toBe(false);
   });
 
   test('Update tender: with canceled status', async () => {
     const tender = await tenderFactory({ status: 'canceled' });
     const doc = await tenderDoc();
-
-    expect.assertions(1);
 
     const updated = await Tenders.updateTender(tender._id, doc);
 
@@ -207,16 +213,23 @@ describe('Tender db', () => {
       isNotInterested: false,
     });
 
+    const attachments = [
+      {
+        supplierId: supplier._id,
+        attachment: { name: 'name1', url: '/url1' },
+      },
+    ];
+
     const updatedTender = await Tenders.award({
       _id: tender._id,
       supplierIds: [supplier._id],
       note: 'note',
-      attachments: [{ name: 'name1', url: '/url1' }],
+      attachments,
     });
 
     expect(updatedTender.status).toBe('awarded');
     expect(updatedTender.awardNote).toBe('note');
-    expect(updatedTender.awardAttachments.toObject()).toEqual([{ name: 'name1', url: '/url1' }]);
+    expect(updatedTender.awardAttachments.toObject()).toEqual(attachments);
     expect(updatedTender.winnerIds.length).toBe(1);
     expect(updatedTender.getWinnerIds()).toContain(supplier._id);
   });

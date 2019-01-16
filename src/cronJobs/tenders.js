@@ -1,6 +1,7 @@
 import schedule from 'node-schedule';
 import { Tenders } from '../db/models';
 import { sendEmail, sendEmailToSuppliers } from '../data/tenderUtils';
+import { readS3File } from '../data/utils';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
@@ -11,7 +12,23 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   const publishedTenders = await Tenders.find({ _id: { $in: publishedTenderIds } });
 
   for (const tender of publishedTenders) {
-    await sendEmail({ kind: 'publish', tender, extraBuyerEmails });
+    const attachments = [];
+
+    for (const attachment of tender.attachments || []) {
+      const file = await readS3File(attachment.url, 'system');
+
+      attachments.push({
+        filename: attachment.name,
+        content: file.Body,
+      });
+    }
+
+    await sendEmail({
+      kind: 'publish',
+      tender,
+      attachments,
+      extraBuyerEmails,
+    });
   }
 
   // send closed email to suppliers ================
