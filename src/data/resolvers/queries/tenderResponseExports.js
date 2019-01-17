@@ -146,6 +146,15 @@ const tenderResponseQueries = {
       template: 'eoi_bidder_list',
     });
 
+    // WS/CW NUMBER
+    sheet.cell(8, 1).value(tender.number);
+
+    // SOURCING ANALYST
+    sheet.cell(8, 3).value(tender.sourcingOfficer);
+
+    // PROJECT TITLE
+    sheet.cell(8, 7).value(tender.name);
+
     let rowIndex = 21;
 
     // identified potential suppliers information ============
