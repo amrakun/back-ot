@@ -95,6 +95,11 @@ const tenderResponseQueries = {
     sheet.range(`${cf('R16C1')}:${cf(`R16C${maxColumns}`)}`).merged(true);
     sheet.range(`${cf('R18C2')}:${cf(`R18C${maxColumns}`)}`).merged(true);
 
+    sheet
+      .range(`${cf('R2C3')}:${cf(`R2C${maxColumns}`)}`)
+      .merged(true)
+      .value(tender.number);
+
     for (let [index, response] of responses.entries()) {
       const supplier = await Companies.findOne({ _id: response.supplierId });
 
@@ -111,6 +116,7 @@ const tenderResponseQueries = {
       sheet.cell(7, 3 + index).value(basicInfo.totalNumberOfEmployees);
       sheet.cell(8, 3 + index).value(basicInfo.totalNumberOfMongolianEmployees);
       sheet.cell(9, 3 + index).value(basicInfo.totalNumberOfUmnugoviEmployees);
+      sheet.cell(10, 3 + index).value(supplier.tierType);
 
       let score = 0;
 
@@ -145,6 +151,15 @@ const tenderResponseQueries = {
       supplierIds,
       template: 'eoi_bidder_list',
     });
+
+    // WS/CW NUMBER
+    sheet.cell(8, 1).value(tender.number);
+
+    // SOURCING ANALYST
+    sheet.cell(8, 3).value(tender.sourcingOfficer);
+
+    // PROJECT TITLE
+    sheet.cell(8, 7).value(tender.name);
 
     let rowIndex = 21;
 
