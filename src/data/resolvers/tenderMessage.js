@@ -1,4 +1,4 @@
-import { Users, Tenders } from '../../db/models';
+import { Users, Tenders, Companies } from '../../db/models';
 
 export default {
   tender({ tenderId }) {
@@ -10,10 +10,10 @@ export default {
   },
 
   recipientSuppliers({ recipientSupplierIds }) {
-    return Users.find({ _id: { $in: recipientSupplierIds } });
+    return Companies.find({ _id: { $in: recipientSupplierIds } });
   },
 
   senderSupplier({ senderSupplierId }) {
-    return Users.findOne({ _id: senderSupplierId });
+    return Companies.findOne({ _id: senderSupplierId });
   },
 };

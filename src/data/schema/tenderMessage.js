@@ -13,8 +13,8 @@ export const types = `
     _id:                 String
     tender:              Tender!
     senderBuyer:         User
-    recipientSuppliers: [User]
-    senderSupplier:      User
+    recipientSuppliers: [Company]
+    senderSupplier:      Company
     subject:             String!
     body:                String!
     attachment:          TenderMessageAttachment
@@ -37,16 +37,16 @@ export const queries = `
 export const mutations = `
   tenderMessageBuyerSend(
     tenderId:              String!,
-    recipientSupplierIds: [String!],
-    subject:               String,
-    body:                  String,
+    recipientSupplierIds: [String!]!,
+    subject:               String!,
+    body:                  String!,
     attachment:            TenderMessageAttachmentInput
-  ): [TenderMessage]
+  ): TenderMessage
 
   tenderMessageSupplierSend(
     tenderId:              String!,
     subject:               String!,
     body:                  String!,
     attachment:            TenderMessageAttachmentInput
-  ): [TenderMessage]
+  ): TenderMessage
 `;
