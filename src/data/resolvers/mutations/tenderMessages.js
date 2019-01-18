@@ -13,7 +13,7 @@ const TenderMessageMutations = {
   async tenderMessageSupplierSend(parent, args, { user }) {
     return TenderMessages.create({
       ...args,
-      senderSupplierId: user._id,
+      senderSupplierId: user.companyId,
     });
   },
 };

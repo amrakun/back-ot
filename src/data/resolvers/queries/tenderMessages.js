@@ -11,8 +11,10 @@ const TenderMessageQuery = {
       }
       query.$or = [
         {
-          recipientSupplierIds: user._id,
-          senderSupplierId: user._id,
+          recipientSupplierIds: user.companyId,
+        },
+        {
+          senderSupplierId: user.companyId,
         },
       ];
     }
@@ -21,11 +23,12 @@ const TenderMessageQuery = {
       query.tenderId = tenderId;
     }
 
-    const docs = TenderMessages.find(query)
+    const docs = await TenderMessages.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
       .limit(perPage);
 
+    console.log(query);
     return docs;
   },
   async tenderMessageDetail(root, { _id }, { user }) {
