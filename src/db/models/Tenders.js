@@ -119,7 +119,10 @@ class Tender extends StatusPublishClose {
     }
 
     doc.supplierIds = encryptArray(doc.supplierIds);
-    doc.status = 'draft';
+
+    if (tender.status !== 'open') {
+      doc.status = 'draft';
+    }
 
     await this.update({ _id }, { $set: doc }, { runValidators: true });
 
