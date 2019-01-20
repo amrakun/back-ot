@@ -105,7 +105,7 @@ class Tender extends StatusPublishClose {
   static async updateTender(_id, doc) {
     const tender = await this.findOne({ _id });
 
-    if (['awarded', 'open'].includes(tender.status)) {
+    if (tender.status === 'awarded') {
       throw new Error(`Can not update ${tender.status} tender`);
     }
 
