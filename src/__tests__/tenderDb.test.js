@@ -106,19 +106,6 @@ describe('Tender db', () => {
     }
   });
 
-  test('Update tender: with open status', async () => {
-    const tender = await tenderFactory({ status: 'open' });
-    const doc = await tenderDoc();
-
-    expect.assertions(1);
-
-    try {
-      await Tenders.updateTender(tender._id, doc);
-    } catch (e) {
-      expect(e.message).toBe('Can not update open tender');
-    }
-  });
-
   test('Update tender: with closed status', async () => {
     const tender = await tenderFactory({ status: 'open' });
 
