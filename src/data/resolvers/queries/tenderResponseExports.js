@@ -66,7 +66,7 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
         sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
         sheet.cell(rowIndex, columnIndex + 2).value(product.quantity * rp.unitPrice);
-        sheet.cell(rowIndex, columnIndex + 3).value(rp.suggestedManufacturer);
+        sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
         sheet.cell(rowIndex, columnIndex + 4).value(rp.shippingTerms);
       }
     }
