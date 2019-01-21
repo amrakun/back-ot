@@ -49,4 +49,8 @@ export const mutations = `
     body:                  String!,
     attachment:            TenderMessageAttachmentInput
   ): TenderMessage
+
+  tenderMessageSetAsRead(
+    _id: String!
+  ): TenderMessage
 `;

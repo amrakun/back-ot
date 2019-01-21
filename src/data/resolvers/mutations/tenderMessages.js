@@ -16,6 +16,16 @@ const TenderMessageMutations = {
       senderSupplierId: user.companyId,
     });
   },
+
+  async tenderMessageSetAsRead(parent, { _id }, { user }) {
+    const query = { _id };
+
+    if (user.isSupplier) {
+      query.recipientSupplierIds = user.companyId;
+    }
+    await TenderMessages.update(query, { $set: { isRead: true } });
+    return TenderMessages.findOne(query);
+  },
 };
 
 requireBuyer(TenderMessageMutations, 'tenderMessageBuyerSend');
