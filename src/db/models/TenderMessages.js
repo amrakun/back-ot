@@ -35,7 +35,20 @@ tenderMessageSchema.pre('save', () => {
   }
 });
 
-class TenderMessage {}
+class TenderMessage {
+  static async isAuthorizedToDownload(key, user) {
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const message = await this.findOne({
+      recipientSupplierIds: user.companyId,
+      'attachment.url': key,
+    });
+
+    return !!message;
+  }
+}
 
 tenderMessageSchema.loadClass(TenderMessage);
 

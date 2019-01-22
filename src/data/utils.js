@@ -12,6 +12,7 @@ import {
   MailDeliveries,
   AuditResponses,
   PhysicalAudits,
+  TenderMessages,
 } from '../db/models';
 
 export const createAWS = () => {
@@ -49,7 +50,8 @@ export const readS3File = async (key, user) => {
       (await Tenders.isAuthorizedToDownload(key, user)) ||
       (await TenderResponses.isAuthorizedToDownload(key, user)) ||
       (await AuditResponses.isAuthorizedToDownload(key, user)) ||
-      (await PhysicalAudits.isAuthorizedToDownload(key, user))
+      (await PhysicalAudits.isAuthorizedToDownload(key, user)) ||
+      (await TenderMessages.isAuthorizedToDownload(key, user))
     )
   ) {
     throw new Error('Forbidden');
