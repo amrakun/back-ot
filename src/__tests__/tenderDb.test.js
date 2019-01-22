@@ -321,7 +321,7 @@ describe('Tender db', () => {
     try {
       await tender.cancel();
     } catch (e) {
-      expect(e.message).toBe('This tender is closed');
+      expect(e.message).toBe('Can not cancel awarded or closed tender');
     }
 
     // successfull ===========================

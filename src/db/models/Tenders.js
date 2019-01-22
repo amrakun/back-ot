@@ -210,8 +210,8 @@ class Tender extends StatusPublishClose {
    * Mark as canceled
    */
   async cancel() {
-    if (this.status === 'closed') {
-      throw new Error('This tender is closed');
+    if (['closed', 'awarded'].includes(this.status)) {
+      throw new Error('Can not cancel awarded or closed tender');
     }
 
     await this.update({ status: 'canceled' });
