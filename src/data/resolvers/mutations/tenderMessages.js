@@ -4,6 +4,11 @@ import { requireSupplier, requireBuyer } from '../../permissions';
 
 const TenderMessageMutations = {
   async tenderMessageBuyerSend(parent, args, { user }) {
+    if (user.isSupplier) {
+      throw new Error('Forbidden');
+    }
+    console.log(args);
+    // return;
     return TenderMessages.create({
       ...args,
       senderBuyerId: user._id,
@@ -11,6 +16,11 @@ const TenderMessageMutations = {
   },
 
   async tenderMessageSupplierSend(parent, args, { user }) {
+    if (!user.isSupplier) {
+      throw new Error('Forbidden');
+    }
+    console.log(args);
+    // return;
     return TenderMessages.create({
       ...args,
       senderSupplierId: user.companyId,

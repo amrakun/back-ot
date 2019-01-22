@@ -15,6 +15,7 @@ export const types = `
     senderBuyer:         User
     recipientSuppliers: [Company]
     senderSupplier:      Company
+    replyTo:             TenderMessage
     subject:             String!
     body:                String!
     attachment:          TenderMessageAttachment
@@ -43,6 +44,7 @@ export const mutations = `
     subject:               String!,
     body:                  String!,
     attachment:            TenderMessageAttachmentInput
+    replyToId:             String
   ): TenderMessage
 
   tenderMessageSupplierSend(
@@ -50,6 +52,7 @@ export const mutations = `
     subject:               String!,
     body:                  String!,
     attachment:            TenderMessageAttachmentInput
+    replyToId:             String
   ): TenderMessage
 
   tenderMessageSetAsRead(

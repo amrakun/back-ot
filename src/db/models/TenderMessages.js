@@ -15,6 +15,7 @@ const tenderMessageSchema = new Schema(
     senderBuyerId: field({ type: String, optional: true }),
     recipientSupplierIds: [String],
     senderSupplierId: field({ type: String, optional: true }),
+    replyToId: field({ type: String, optional: true }),
     subject: field({ type: String }),
     body: field({ type: String }),
     attachment: attachmentSchema,

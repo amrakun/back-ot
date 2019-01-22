@@ -1,4 +1,4 @@
-import { Users, Tenders, Companies } from '../../db/models';
+import { Users, Tenders, Companies, TenderMessages } from '../../db/models';
 
 export default {
   tender({ tenderId }) {
@@ -15,5 +15,8 @@ export default {
 
   senderSupplier({ senderSupplierId }) {
     return Companies.findOne({ _id: senderSupplierId });
+  },
+  replyTo({ replyToId }) {
+    return TenderMessages.findOne({ _id: replyToId });
   },
 };
