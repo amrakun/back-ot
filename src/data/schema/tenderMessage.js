@@ -32,6 +32,8 @@ export const queries = `
   ): [TenderMessage]
 
   tenderMessageDetail(_id: String): TenderMessage
+
+  tenderMessageTotalCount(tenderId: String): Int
 `;
 
 export const mutations = `

@@ -28,7 +28,6 @@ const TenderMessageQuery = {
       .skip((page - 1) * perPage)
       .limit(perPage);
 
-    console.log(query);
     return docs;
   },
   async tenderMessageDetail(root, { _id }, { user }) {
@@ -40,6 +39,13 @@ const TenderMessageQuery = {
         { senderSupplierId: user._id },
       ],
     });
+  },
+
+  async tenderMessageTotalCount(root, { tenderId }) {
+    const query = {};
+    if (tenderId) query.tenderId = tenderId;
+
+    return TenderMessages.find(query).count();
   },
 };
 
