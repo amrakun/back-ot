@@ -120,7 +120,7 @@ class Tender extends StatusPublishClose {
     }
 
     // reset responses's sent status
-    if (['closed', 'canceled'].includes(tender.status)) {
+    if (['open', 'closed', 'canceled'].includes(tender.status)) {
       await TenderResponses.update(
         { tenderId: tender._id },
         { $set: { isSent: false } },

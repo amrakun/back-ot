@@ -35,6 +35,7 @@ const tenderMutations = {
     if (oldTender.status === 'open') {
       const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
 
+      // send publish emails to new suppliers
       await sendEmailToSuppliers({
         kind: 'supplier__publish',
         tender: updatedTender,

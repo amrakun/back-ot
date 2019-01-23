@@ -135,7 +135,7 @@ describe('Tender db', () => {
   });
 
   test('Update tender: open tender supplierIds update', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
 
     const supplier1 = await companyFactory({});
     const supplier2 = await companyFactory({});
@@ -145,6 +145,9 @@ describe('Tender db', () => {
       status: 'open',
       supplierIds: [supplier1._id, supplier2._id],
     });
+
+    const response1 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    const response2 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
 
     try {
       const doc = await tenderDoc({ supplierIds: [supplier1._id] });
@@ -157,6 +160,13 @@ describe('Tender db', () => {
     const updated = await Tenders.updateTender(tender._id, doc);
 
     expect(updated.getSupplierIds()).toEqual([supplier1._id, supplier2._id, supplier3._id]);
+
+    // sent responses must be resetted to not send =====
+    const updatedResponse1 = await TenderResponses.findOne({ _id: response1._id });
+    const updatedResponse2 = await TenderResponses.findOne({ _id: response2._id });
+
+    expect(updatedResponse1.isSent).toBe(false);
+    expect(updatedResponse2.isSent).toBe(false);
   });
 
   test('Delete tender', async () => {
