@@ -134,6 +134,31 @@ describe('Tender db', () => {
     expect(updated.status).toBe('draft');
   });
 
+  test('Update tender: open tender supplierIds update', async () => {
+    expect.assertions(2);
+
+    const supplier1 = await companyFactory({});
+    const supplier2 = await companyFactory({});
+    const supplier3 = await companyFactory({});
+
+    const tender = await tenderFactory({
+      status: 'open',
+      supplierIds: [supplier1._id, supplier2._id],
+    });
+
+    try {
+      const doc = await tenderDoc({ supplierIds: [supplier1._id] });
+      await Tenders.updateTender(tender._id, doc);
+    } catch (e) {
+      expect(e.message).toBe('Can not remove previously added supplier');
+    }
+
+    const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
+    const updated = await Tenders.updateTender(tender._id, doc);
+
+    expect(updated.getSupplierIds()).toEqual([supplier1._id, supplier2._id, supplier3._id]);
+  });
+
   test('Delete tender', async () => {
     await Tenders.removeTender(_tender._id);
 
