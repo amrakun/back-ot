@@ -82,12 +82,19 @@ describe('Tender mutations', () => {
   test('Supplier can send', async () => {
     const result = await mutations.tenderMessageSupplierSend(
       {},
-      { tenderId: _tender._id, subject: 'test', body: 'test' },
+      {
+        tenderId: _tender._id,
+        subject: 'test',
+        body: 'test',
+        attachment: { name: 'name', url: 'url' },
+      },
       { user: _supplier },
     );
     expect(result._id).toBeDefined();
     expect(result.senderSupplierId).toBe(_supplier.companyId);
     expect(result.recipientSupplierIds).toHaveLength(0);
+    expect(result.subject).toBeTruthy();
+    expect(result.body).toBeTruthy();
   });
 
   test('Buyer can send', async () => {
@@ -98,12 +105,16 @@ describe('Tender mutations', () => {
         subject: 'test',
         body: 'test',
         recipientSupplierIds: [_supplier._id],
+        attachment: { name: 'name', url: 'url' },
       },
       { user: _admin },
     );
     expect(result._id).toBeDefined();
     expect(result.senderBuyerId).toBe(_admin._id);
     expect(result.recipientSupplierIds).toHaveLength(1);
+    expect(result.subject).toBeTruthy();
+    expect(result.body).toBeTruthy();
+    expect(result.senderBuyerId).toBe(_admin._id);
   });
 
   test('Supplier can set as read', async () => {
