@@ -33,7 +33,7 @@ const tenderMutations = {
     const updatedTender = await Tenders.updateTender(_id, { ...fields });
 
     if (oldTender.status === 'open') {
-      const newSupplierIds = fields.supplierIds.filter(s => !oldSupplierIds.includes(s._id));
+      const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
 
       await sendEmailToSuppliers({
         kind: 'supplier__publish',
