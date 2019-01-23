@@ -343,5 +343,6 @@ export default {
   sendEmail,
   sendConfigEmail,
   readFile,
+  readS3File,
   createTransporter,
 };
