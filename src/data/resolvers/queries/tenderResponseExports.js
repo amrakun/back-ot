@@ -55,7 +55,7 @@ const tenderResponseQueries = {
         const supplier = await Companies.findOne({ _id: response.supplierId });
 
         // find response by product code
-        const rp = response.respondedProducts.find(p => p.code === product.code) || {};
+        const rp = response.respondedProducts[index] || {};
 
         columnIndex += 5;
 
