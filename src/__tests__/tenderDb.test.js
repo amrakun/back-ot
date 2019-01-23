@@ -134,6 +134,41 @@ describe('Tender db', () => {
     expect(updated.status).toBe('draft');
   });
 
+  test('Update tender: open tender supplierIds update', async () => {
+    expect.assertions(4);
+
+    const supplier1 = await companyFactory({});
+    const supplier2 = await companyFactory({});
+    const supplier3 = await companyFactory({});
+
+    const tender = await tenderFactory({
+      status: 'open',
+      supplierIds: [supplier1._id, supplier2._id],
+    });
+
+    const response1 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    const response2 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+
+    try {
+      const doc = await tenderDoc({ supplierIds: [supplier1._id] });
+      await Tenders.updateTender(tender._id, doc);
+    } catch (e) {
+      expect(e.message).toBe('Can not remove previously added supplier');
+    }
+
+    const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
+    const updated = await Tenders.updateTender(tender._id, doc);
+
+    expect(updated.getSupplierIds()).toEqual([supplier1._id, supplier2._id, supplier3._id]);
+
+    // sent responses must be resetted to not send =====
+    const updatedResponse1 = await TenderResponses.findOne({ _id: response1._id });
+    const updatedResponse2 = await TenderResponses.findOne({ _id: response2._id });
+
+    expect(updatedResponse1.isSent).toBe(false);
+    expect(updatedResponse2.isSent).toBe(false);
+  });
+
   test('Delete tender', async () => {
     await Tenders.removeTender(_tender._id);
 
@@ -321,7 +356,7 @@ describe('Tender db', () => {
     try {
       await tender.cancel();
     } catch (e) {
-      expect(e.message).toBe('This tender is closed');
+      expect(e.message).toBe('Can not cancel awarded or closed tender');
     }
 
     // successfull ===========================

@@ -4,6 +4,7 @@ import {
   sendEmailToSuppliers,
   sendEmailToBuyer,
   sendEmail,
+  getAttachments,
 } from '../../../data/tenderUtils';
 
 import { readS3File } from '../../../data/utils';
@@ -28,11 +29,23 @@ const tenderMutations = {
    */
   async tendersEdit(root, { _id, ...fields }) {
     const oldTender = await Tenders.findById(_id);
-    const updatedTender = await Tenders.updateTender(_id, fields);
+    const oldSupplierIds = oldTender.getSupplierIds();
+    const updatedTender = await Tenders.updateTender(_id, { ...fields });
+
+    if (oldTender.status === 'open') {
+      const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
+
+      // send publish emails to new suppliers
+      await sendEmailToSuppliers({
+        kind: 'supplier__publish',
+        tender: updatedTender,
+        attachments: await getAttachments(updatedTender),
+        supplierIds: newSupplierIds,
+      });
+    }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
       const updatedTenderIds = new Set(updatedTender.getSupplierIds());
-      const oldSupplierIds = oldTender.getSupplierIds();
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
       await sendEmailToSuppliers({

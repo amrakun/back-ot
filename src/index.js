@@ -115,6 +115,7 @@ app.post('/upload-file', async (req, res) => {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/pdf',
+        'application/zip',
       ].includes(mime)
     ) {
       // check for virus

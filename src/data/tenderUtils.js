@@ -78,3 +78,18 @@ export const sendConfigEmail = async ({ kind, tender, toEmails, attachments }) =
     },
   });
 };
+
+export const getAttachments = async tender => {
+  const attachments = [];
+
+  for (const attachment of tender.attachments || []) {
+    const file = await utils.readS3File(attachment.url, 'system');
+
+    attachments.push({
+      filename: attachment.name,
+      content: file.Body,
+    });
+  }
+
+  return attachments;
+};

@@ -109,8 +109,18 @@ class Tender extends StatusPublishClose {
       throw new Error(`Can not update ${tender.status} tender`);
     }
 
+    if (tender.status === 'open') {
+      const supplierIds = tender.getSupplierIds();
+
+      for (const supplierId of supplierIds) {
+        if (!doc.supplierIds.includes(supplierId)) {
+          throw new Error('Can not remove previously added supplier');
+        }
+      }
+    }
+
     // reset responses's sent status
-    if (['closed', 'canceled'].includes(tender.status)) {
+    if (['open', 'closed', 'canceled'].includes(tender.status)) {
       await TenderResponses.update(
         { tenderId: tender._id },
         { $set: { isSent: false } },
@@ -210,8 +220,8 @@ class Tender extends StatusPublishClose {
    * Mark as canceled
    */
   async cancel() {
-    if (this.status === 'closed') {
-      throw new Error('This tender is closed');
+    if (['closed', 'awarded'].includes(this.status)) {
+      throw new Error('Can not cancel awarded or closed tender');
     }
 
     await this.update({ status: 'canceled' });

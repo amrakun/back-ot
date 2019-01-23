@@ -58,5 +58,5 @@ export const tenderGenerateMaterialsTemplate = async (user, tender) => {
   }
 
   // Write to file.
-  return generateXlsx(user, workbook, 'rfq_responded_products');
+  return generateXlsx(user, workbook, `${tender.number}__rfq_responded_products`);
 };
