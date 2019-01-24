@@ -134,6 +134,21 @@ describe('Tender db', () => {
     expect(updated.status).toBe('draft');
   });
 
+  test('Update open tender & no requirements changed', async () => {
+    const tender = await tenderFactory({ status: 'open' });
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    const doc = { ...tender.toJSON(), supplierIds: tender.getSupplierIds() };
+
+    await Tenders.updateTender(tender._id, doc);
+
+    // responses's sent status must be intact
+    const [response1, response2] = await TenderResponses.find({ tenderId: tender._id });
+
+    expect(response1.isSent).toBe(true);
+    expect(response2.isSent).toBe(true);
+  });
+
   test('Update tender: open tender supplierIds update', async () => {
     expect.assertions(4);
 
