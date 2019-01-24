@@ -139,26 +139,3 @@ ActivityLogSchema.loadClass(
 // Action	Date Created	User	Details
 
 export const ActivityLogs = mongoose.model('activity_logs', ActivityLogSchema);
-
-const TenderLogSchema = mongoose.Schema(
-  {
-    tenderId: field({ type: String }),
-    isAuto: field({ type: Boolean, default: true }),
-    userId: field({ type: String, optional: true }),
-    action: field({ type: String }),
-    description: field({ type: String }),
-  },
-  {
-    timestamps: true,
-  },
-);
-
-TenderLogSchema.loadClass(
-  class {
-    static write(doc) {
-      this.create(doc);
-    }
-  },
-);
-
-export const TenderLog = mongoose.model('tender_logs', TenderLogSchema);

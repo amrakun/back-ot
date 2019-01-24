@@ -10,6 +10,7 @@ import Configs from './Configs';
 import MailDeliveries from './MailDeliveries';
 import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
 import TenderMessages from './TenderMessages';
+import TenderLog from './TenderLog';
 
 export {
   Companies,
@@ -31,4 +32,5 @@ export {
   ActivityLogs,
   MailDeliveries,
   TenderMessages,
+  TenderLog,
 };

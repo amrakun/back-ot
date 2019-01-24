@@ -11,7 +11,7 @@ export const types = `
 `;
 
 export const queries = `
-  tenderLogs(
+  tenderLog(
     page:     Int,
     perPage:  Int,
     tenderId: String
