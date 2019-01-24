@@ -252,7 +252,11 @@ class Tender extends StatusPublishClose {
    * Suppliers that are filled form. Excluded not interested
    */
   submittedCount() {
-    return TenderResponses.find({ tenderId: this._id, isNotInterested: false }).count();
+    return TenderResponses.find({
+      tenderId: this._id,
+      isNotInterested: false,
+      isSent: true,
+    }).count();
   }
 
   /*
