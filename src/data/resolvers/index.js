@@ -12,7 +12,7 @@ import Audit from './audit';
 import AuditResponse from './auditResponse';
 import PhysicalAudit from './physicalAudit';
 import TenderMessage from './tenderMessage';
-import TenderLog from './tenderLog';
+import TenderLog from './TenderLog';
 import Mutation from './mutations';
 import Query from './queries';
 
