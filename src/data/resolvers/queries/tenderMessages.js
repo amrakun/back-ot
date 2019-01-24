@@ -1,7 +1,7 @@
 import { TenderMessages } from '../../../db/models';
 import { moduleRequireLogin } from '../../permissions';
 
-const TenderMessageQuery = {
+const tenderMessageQuery = {
   async tenderMessages(root, { tenderId = false, page = 1, perPage = 20 }, { user }) {
     const query = {};
 
@@ -49,6 +49,6 @@ const TenderMessageQuery = {
   },
 };
 
-moduleRequireLogin(TenderMessageQuery);
+moduleRequireLogin(tenderMessageQuery);
 
-export default TenderMessageQuery;
+export default tenderMessageQuery;
