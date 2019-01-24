@@ -9,6 +9,7 @@ import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
 import MailDeliveries from './MailDeliveries';
 import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
+import TenderMessages from './TenderMessages';
 
 export {
   Companies,
@@ -29,4 +30,5 @@ export {
   SuppliersByProductCodeLogs,
   ActivityLogs,
   MailDeliveries,
+  TenderMessages,
 };
