@@ -49,6 +49,30 @@ class TenderMessage {
 
     return !!message;
   }
+
+  static async tenderMessageBuyerSend(args, user) {
+    return this.create({
+      ...args,
+      senderBuyerId: user._id,
+    });
+  }
+
+  static async tenderMessageSupplierSend(args, user) {
+    return this.create({
+      ...args,
+      senderSupplierId: user.companyId,
+    });
+  }
+
+  static async tenderMessageSetAsRead({ _id }, user) {
+    const query = { _id };
+
+    if (user.isSupplier) {
+      query.recipientSupplierIds = user.companyId;
+    }
+    await this.update(query, { $set: { isRead: true } });
+    return this.findOne(query);
+  }
 }
 
 tenderMessageSchema.loadClass(TenderMessage);

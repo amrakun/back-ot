@@ -2,33 +2,21 @@ import { TenderMessages } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
 
-const TenderMessageMutations = {
+const tenderMessageMutations = {
   async tenderMessageBuyerSend(parent, args, { user }) {
-    return TenderMessages.create({
-      ...args,
-      senderBuyerId: user._id,
-    });
+    return TenderMessages.tenderMessageBuyerSend(args, user);
   },
 
   async tenderMessageSupplierSend(parent, args, { user }) {
-    return TenderMessages.create({
-      ...args,
-      senderSupplierId: user.companyId,
-    });
+    return TenderMessages.tenderMessageSupplierSend(args, user);
   },
 
-  async tenderMessageSetAsRead(parent, { _id }, { user }) {
-    const query = { _id };
-
-    if (user.isSupplier) {
-      query.recipientSupplierIds = user.companyId;
-    }
-    await TenderMessages.update(query, { $set: { isRead: true } });
-    return TenderMessages.findOne(query);
+  async tenderMessageSetAsRead(parent, args, { user }) {
+    return TenderMessages.tenderMessageSetAsRead(args, user);
   },
 };
 
-requireBuyer(TenderMessageMutations, 'tenderMessageBuyerSend');
-requireSupplier(TenderMessageMutations, 'tenderMessageSupplierSend');
+requireBuyer(tenderMessageMutations, 'tenderMessageBuyerSend');
+requireSupplier(tenderMessageMutations, 'tenderMessageSupplierSend');
 
-export default TenderMessageMutations;
+export default tenderMessageMutations;
