@@ -42,7 +42,7 @@ const tenderMessageQuery = {
     return TenderMessages.findOne(query);
   },
 
-  async tenderMessageTotalCount(root, { tenderId, user }) {
+  async tenderMessageTotalCount(root, { tenderId }, { user }) {
     const tender = await Tenders.findOne({ _id: tenderId });
 
     if (!tender.getSupplierIds().includes(user.companyId)) {
