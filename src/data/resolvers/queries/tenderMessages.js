@@ -1,4 +1,4 @@
-import { TenderMessages } from '../../../db/models';
+import { TenderMessages, Tenders } from '../../../db/models';
 import { moduleRequireLogin } from '../../permissions';
 
 const tenderMessageQuery = {
@@ -9,6 +9,7 @@ const tenderMessageQuery = {
       if (!tenderId) {
         throw new Error('Please choose tender');
       }
+
       query.$or = [
         {
           recipientSupplierIds: user.companyId,
@@ -30,20 +31,31 @@ const tenderMessageQuery = {
 
     return docs;
   },
+
   async tenderMessageDetail(root, { _id }, { user }) {
-    return TenderMessages.findOne({
-      _id,
-      $or: [
-        { senderBuyerId: user._id },
-        { recipientSupplierIds: user._id },
-        { senderSupplierId: user._id },
-      ],
-    });
+    const query = { _id };
+
+    if (user.isSupplier) {
+      query.$or = [{ recipientSupplierIds: user.companyId }, { senderSupplierId: user.companyId }];
+    }
+
+    return TenderMessages.findOne(query);
   },
 
-  async tenderMessageTotalCount(root, { tenderId }) {
+  async tenderMessageTotalCount(root, { tenderId, user }) {
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    if (!tender.getSupplierIds().includes(user.companyId)) {
+      throw new Error('Permission denied');
+    }
+
     const query = {};
+
     if (tenderId) query.tenderId = tenderId;
+
+    if (user.isSupplier) {
+      query.$or = [];
+    }
 
     return TenderMessages.find(query).count();
   },
