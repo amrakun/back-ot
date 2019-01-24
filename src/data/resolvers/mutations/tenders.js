@@ -42,6 +42,16 @@ const tenderMutations = {
         attachments: await getAttachments(updatedTender),
         supplierIds: newSupplierIds,
       });
+
+      // if tender is changed than send edit email to old suppliers
+      if (await oldTender.isChanged(fields)) {
+        await sendEmailToSuppliers({
+          kind: 'supplier__edit',
+          tender: updatedTender,
+          attachments: await getAttachments(updatedTender),
+          supplierIds: oldSupplierIds,
+        });
+      }
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {

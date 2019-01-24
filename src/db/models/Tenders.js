@@ -305,6 +305,27 @@ class Tender extends StatusPublishClose {
 
     return false;
   }
+
+  /*
+   * Current document is different that old tender
+   */
+  async isChanged(doc) {
+    if (
+      this.content !== doc.content ||
+      this.number !== doc.number ||
+      this.name !== doc.name ||
+      this.sourcingOfficer !== doc.sourcingOfficer ||
+      this.publishDate.toString() !== doc.publishDate.toString() ||
+      this.closeDate.toString() !== doc.closeDate.toString() ||
+      JSON.stringify(this.requestedDocuments || []) !==
+        JSON.stringify(doc.requestedDocuments || []) ||
+      JSON.stringify(this.requestedProducts || []) !== JSON.stringify(doc.requestedProducts || [])
+    ) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 const { ENCRYPTION_SECRET } = process.env;

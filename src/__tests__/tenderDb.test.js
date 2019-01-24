@@ -402,4 +402,32 @@ describe('Tender db', () => {
     expect(await Tenders.isAuthorizedToDownload('attach2.png', supplier2)).toBe(true);
     expect(await Tenders.isAuthorizedToDownload('attach4.png', supplier2)).toBe(true);
   });
+
+  test('isChanged', async () => {
+    const tender = await tenderFactory({
+      requestedProducts: [
+        {
+          code: 'code',
+          purchaseRequestNumber: 10000,
+          shortText: 'desc',
+          quantity: 1,
+          uom: 'mnt',
+          manufacturer: 'man',
+          manufacturerPartNumber: 'number',
+        },
+      ],
+    });
+
+    const doc = tender.toJSON();
+
+    expect(await tender.isChanged(doc)).toBe(false);
+    expect(await tender.isChanged({ ...doc, content: 'content' })).toBe(true);
+    expect(await tender.isChanged({ ...doc, number: 'number' })).toBe(true);
+    expect(await tender.isChanged({ ...doc, name: 'name' })).toBe(true);
+    expect(await tender.isChanged({ ...doc, sourcingOfficer: 'sourcingOfficer' })).toBe(true);
+    expect(await tender.isChanged({ ...doc, publishDate: new Date('2000-01-01') })).toBe(true);
+    expect(await tender.isChanged({ ...doc, closeDate: new Date('2000-01-01') })).toBe(true);
+    expect(await tender.isChanged({ ...doc, requestedDocuments: ['d1', 'd2'] })).toBe(true);
+    expect(await tender.isChanged({ ...doc, requestedProducts: [{ code: '1' }] })).toBe(true);
+  });
 });
