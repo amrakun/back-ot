@@ -18,8 +18,16 @@ const tenderLogQuery = {
 
     return docs;
   },
+
+  async tenderLogDetail(parent, { _id }) {
+    return TenderLog.findOne({ _id });
+  },
+
+  async tenderLogCount(parent, { tenderId }) {
+    return TenderLog.find({ tenderId }).count();
+  },
 };
 
-requireBuyer(tenderLogQuery, 'tenderLog');
+requireBuyer(tenderLogQuery, 'tenderLog', 'tenderLogDetail', 'tenderLogCount');
 
 export default tenderLogQuery;

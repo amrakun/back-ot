@@ -19,5 +19,5 @@ export const queries = `
 
   tenderLogDetail(_id: String!): TenderLog
 
-  tenderLogCount(tenderId: String!): Int
+  tenderLogCount(tenderId: String): Int
 `;
