@@ -7,7 +7,7 @@ const tenderLogSchema = new mongoose.Schema(
     isAuto: field({ type: Boolean, default: false }),
     userId: field({ type: String, optional: true }),
     action: field({ type: String }),
-    description: field({ type: String }),
+    description: field({ type: String, optional: true }),
   },
   {
     timestamps: true,
@@ -16,6 +16,7 @@ const tenderLogSchema = new mongoose.Schema(
 
 class TenderLog {
   static async write(doc) {
+    console.log(doc);
     return this.create(doc);
   }
 }

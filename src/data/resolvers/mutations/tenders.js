@@ -21,8 +21,8 @@ const tenderMutations = {
     const tender = await Tenders.createTender(doc, user._id);
 
     TenderLog.write({
-      tenderId: tender._id,
-      userId: user._id,
+      tenderId: tender._id.toString(),
+      userId: user._id.toString(),
       action: 'create',
       description: '',
     });
@@ -43,7 +43,7 @@ const tenderMutations = {
 
     TenderLog.write({
       tenderId: oldTender._id.toString(),
-      userId: user._id,
+      userId: user._id.toString(),
       action: 'edit',
       description: '',
     });
@@ -76,7 +76,7 @@ const tenderMutations = {
 
       TenderLog.write({
         tenderId: oldTender._id.toString(),
-        userId: user._id,
+        userId: user._id.toString(),
         action: 'reopen',
         description: '',
       });
@@ -99,8 +99,8 @@ const tenderMutations = {
   async tendersRemove(root, { _id }, { user }) {
     const result = await Tenders.removeTender(_id);
     TenderLog.write({
-      tenderId: _id,
-      userId: user._id,
+      tenderId: _id.toString(),
+      userId: user._id.toString(),
       action: 'reopen',
       description: '',
     });
@@ -117,8 +117,8 @@ const tenderMutations = {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments });
 
     TenderLog.write({
-      tenderId: _id,
-      userId: user._id,
+      tenderId: _id.toString(),
+      userId: user._id.toString(),
       action: 'award',
       description: '',
     });
@@ -205,8 +205,8 @@ const tenderMutations = {
       const canceledTender = await tender.cancel();
 
       TenderLog.write({
-        tenderId: tender._id,
-        userId: user._id,
+        tenderId: tender._id.toString(),
+        userId: user._id.toString(),
         action: 'cancel',
         description: '',
       });
