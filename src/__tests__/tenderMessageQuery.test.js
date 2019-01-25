@@ -1,16 +1,9 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import sinon from 'sinon';
-import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Configs, Users, Tenders, TenderMessages } from '../db/models';
-import {
-  userFactory,
-  tenderDoc,
-  tenderFactory,
-  tenderResponseFactory,
-  companyFactory,
-} from '../db/factories';
+import { connect, disconnect } from '../db/connection';
+import { Users, Tenders, TenderMessages } from '../db/models';
+import { userFactory, tenderFactory } from '../db/factories';
 
 import mutations from '../data/resolvers/mutations/tenderMessages';
 import queries from '../data/resolvers/queries/tenderMessages';
@@ -18,10 +11,6 @@ import queries from '../data/resolvers/queries/tenderMessages';
 beforeAll(() => connect());
 
 afterAll(() => disconnect());
-
-// tenderMessages
-// tenderMessageDetail
-// tenderMessageTotalCount
 
 describe('Tender message queries', () => {
   let _admin;

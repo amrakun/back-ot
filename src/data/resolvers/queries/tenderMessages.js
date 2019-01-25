@@ -45,7 +45,7 @@ const tenderMessageQuery = {
   async tenderMessageTotalCount(root, { tenderId }, { user }) {
     const tender = await Tenders.findOne({ _id: tenderId });
 
-    if (!tender.getSupplierIds().includes(user.companyId)) {
+    if (user.isSupplier && !tender.getSupplierIds().includes(user.companyId)) {
       throw new Error('Permission denied');
     }
 

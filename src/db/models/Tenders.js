@@ -120,7 +120,19 @@ class Tender extends StatusPublishClose {
     }
 
     // reset responses's sent status
-    if (['open', 'closed', 'canceled'].includes(tender.status)) {
+    if (['closed', 'canceled'].includes(tender.status)) {
+      await TenderResponses.update(
+        { tenderId: tender._id },
+        { $set: { isSent: false } },
+        { multi: true },
+      );
+    }
+
+    // if tender is open and requirements are changed then reset
+    // previously sent responses
+    const isChanged = await tender.isChanged(doc);
+
+    if (tender.status === 'open' && isChanged) {
       await TenderResponses.update(
         { tenderId: tender._id },
         { $set: { isSent: false } },
@@ -240,7 +252,11 @@ class Tender extends StatusPublishClose {
    * Suppliers that are filled form. Excluded not interested
    */
   submittedCount() {
-    return TenderResponses.find({ tenderId: this._id, isNotInterested: false }).count();
+    return TenderResponses.find({
+      tenderId: this._id,
+      isNotInterested: false,
+      isSent: true,
+    }).count();
   }
 
   /*
@@ -348,14 +364,14 @@ const RespondedProductSchema = mongoose.Schema(
     suggestedManufacturerPartNumber: field({ type: String, optional: true }),
     unitPrice: field({ type: Number, optional: true }),
     totalPrice: field({ type: Number, optional: true }),
-    currency: field({ type: String, optional: true, enum: ['MNT', 'USD'] }),
+    currency: field({ type: String, optional: true, enum: ['', 'MNT', 'USD'] }),
     leadTime: field({ type: Number, optional: true }),
     shippingTerms: field({
       type: String,
       optional: true,
-      enum: ['DDP - OT UB warehouse', 'DDP - OT site', 'FCA - Supplier Facility', 'EXW'],
+      enum: ['', 'DDP - OT UB warehouse', 'DDP - OT site', 'FCA - Supplier Facility', 'EXW'],
     }),
-    alternative: field({ type: String, optional: true, enum: ['Yes', 'No'] }),
+    alternative: field({ type: String, optional: true, enum: ['', 'Yes', 'No'] }),
     comment: field({ type: String, optional: true }),
     file: field({ type: FileSchema, optional: true }),
   },

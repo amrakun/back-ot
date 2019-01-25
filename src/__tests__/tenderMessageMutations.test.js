@@ -1,20 +1,10 @@
 /* eslint-env jest */
 /* eslint-disable no-underscore-dangle */
 
-import sinon from 'sinon';
-import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Configs, Users, Tenders, TenderMessages } from '../db/models';
-import {
-  userFactory,
-  configFactory,
-  tenderDoc,
-  tenderFactory,
-  tenderResponseFactory,
-  companyFactory,
-} from '../db/factories';
+import { connect, disconnect } from '../db/connection';
+import { Users, Tenders, TenderMessages } from '../db/models';
+import { userFactory, tenderFactory } from '../db/factories';
 
-import tenderMutations from '../data/resolvers/mutations/tenders';
-import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 import mutations from '../data/resolvers/mutations/tenderMessages';
 
 beforeAll(() => connect());
