@@ -6,6 +6,7 @@ import {
   sendEmail,
   getAttachments,
 } from '../../../data/tenderUtils';
+import moment from 'moment';
 
 import { readS3File } from '../../../data/utils';
 
@@ -47,6 +48,15 @@ const tenderMutations = {
       action: 'edit',
       description: '',
     });
+
+    if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
+      TenderLog.write({
+        tenderId: oldTender._id.toString(),
+        userId: user._id.toString(),
+        action: 'extend',
+        description: '',
+      });
+    }
 
     if (oldTender.status === 'open') {
       const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
@@ -101,7 +111,7 @@ const tenderMutations = {
     TenderLog.write({
       tenderId: _id.toString(),
       userId: user._id.toString(),
-      action: 'reopen',
+      action: 'remove',
       description: '',
     });
     return result;
