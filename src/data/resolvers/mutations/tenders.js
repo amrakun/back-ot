@@ -1,4 +1,4 @@
-import { Tenders, TenderResponses, Companies } from '../../../db/models';
+import { Tenders, TenderResponses, Companies, TenderLog } from '../../../db/models';
 import {
   sendConfigEmail,
   sendEmailToSuppliers,
@@ -17,8 +17,17 @@ const tenderMutations = {
    * @param {Object} doc - tenders fields
    * @return {Promise} newly created tender object
    */
-  tendersAdd(root, doc, { user }) {
-    return Tenders.createTender(doc, user._id);
+  async tendersAdd(root, doc, { user }) {
+    const tender = await Tenders.createTender(doc, user._id);
+
+    TenderLog.write({
+      tenderId: tender._id,
+      userId: user._id,
+      action: 'create',
+      description: '',
+    });
+
+    return tender;
   },
 
   /**
@@ -27,10 +36,17 @@ const tenderMutations = {
    * @param {Object} fields - tenders fields
    * @return {Promise} updated tender object
    */
-  async tendersEdit(root, { _id, ...fields }) {
+  async tendersEdit(root, { _id, ...fields }, { user }) {
     const oldTender = await Tenders.findById(_id);
     const oldSupplierIds = oldTender.getSupplierIds();
     const updatedTender = await Tenders.updateTender(_id, { ...fields });
+
+    TenderLog.write({
+      tenderId: oldTender._id.toString(),
+      userId: user._id,
+      action: 'edit',
+      description: '',
+    });
 
     if (oldTender.status === 'open') {
       const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
@@ -58,6 +74,13 @@ const tenderMutations = {
       const updatedTenderIds = new Set(updatedTender.getSupplierIds());
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
+      TenderLog.write({
+        tenderId: oldTender._id.toString(),
+        userId: user._id,
+        action: 'reopen',
+        description: '',
+      });
+
       await sendEmailToSuppliers({
         kind: 'supplier__reopen',
         tender: updatedTender,
@@ -73,8 +96,15 @@ const tenderMutations = {
    * @param {String} doc - tenders fields
    * @return {Promise}
    */
-  tendersRemove(root, { _id }) {
-    return Tenders.removeTender(_id);
+  async tendersRemove(root, { _id }, { user }) {
+    const result = await Tenders.removeTender(_id);
+    TenderLog.write({
+      tenderId: _id,
+      userId: user._id,
+      action: 'reopen',
+      description: '',
+    });
+    return result;
   },
 
   /**
@@ -85,6 +115,13 @@ const tenderMutations = {
    */
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments });
+
+    TenderLog.write({
+      tenderId: _id,
+      userId: user._id,
+      action: 'award',
+      description: '',
+    });
 
     await sendEmailToBuyer({ kind: 'buyer__award', tender });
 
@@ -161,11 +198,18 @@ const tenderMutations = {
    * @param {String} _id - Tender id
    * @return {Promise} - updated tender
    */
-  async tendersCancel(root, { _id }) {
+  async tendersCancel(root, { _id }, { user }) {
     const tender = await Tenders.findOne({ _id });
 
     if (tender) {
       const canceledTender = await tender.cancel();
+
+      TenderLog.write({
+        tenderId: tender._id,
+        userId: user._id,
+        action: 'cancel',
+        description: '',
+      });
 
       await sendEmail({ kind: 'cancel', tender: canceledTender });
 

@@ -13,8 +13,7 @@ const tenderLogQuery = {
     const docs = await TenderLog.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
-      .limit(perPage)
-      .lean();
+      .limit(perPage);
 
     return docs;
   },

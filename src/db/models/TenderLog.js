@@ -4,7 +4,7 @@ import { field } from './utils';
 const tenderLogSchema = new mongoose.Schema(
   {
     tenderId: field({ type: String }),
-    isAuto: field({ type: Boolean, default: true }),
+    isAuto: field({ type: Boolean, default: false }),
     userId: field({ type: String, optional: true }),
     action: field({ type: String }),
     description: field({ type: String }),
@@ -16,7 +16,7 @@ const tenderLogSchema = new mongoose.Schema(
 
 class TenderLog {
   static async write(doc) {
-    this.create(doc);
+    return this.create(doc);
   }
 }
 
