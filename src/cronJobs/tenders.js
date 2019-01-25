@@ -1,5 +1,5 @@
 import schedule from 'node-schedule';
-import { Tenders } from '../db/models';
+import { Tenders, TenderLog } from '../db/models';
 import { sendEmail, sendEmailToSuppliers, getAttachments } from '../data/tenderUtils';
 import { readS3File } from '../data/utils';
 
@@ -13,6 +13,13 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   for (const tender of publishedTenders) {
     const attachments = await getAttachments(tender);
+
+    TenderLog.write({
+      tenderId: tender._id.toString(),
+      isAuto: true,
+      action: 'open',
+      description: '',
+    });
 
     await sendEmail({
       kind: 'publish',
@@ -28,6 +35,12 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   for (const tender of closedTenders) {
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
+    TenderLog.write({
+      tenderId: tender._id.toString(),
+      isAuto: true,
+      action: 'close',
+      description: '',
+    });
   }
 
   console.log('Checked tender status'); // eslint-disable-line
@@ -39,6 +52,12 @@ schedule.scheduleJob('* 45 23 * *', async () => {
   const remindTenders = await Tenders.tendersToRemind();
 
   for (const tender of remindTenders) {
+    TenderLog.write({
+      tenderId: tender._id.toString(),
+      isAuto: true,
+      action: 'remind',
+      description: '',
+    });
     sendEmailToSuppliers({ kind: 'supplier__reminder', tender });
   }
 

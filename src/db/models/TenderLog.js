@@ -16,7 +16,6 @@ const tenderLogSchema = new mongoose.Schema(
 
 class TenderLog {
   static async write(doc) {
-    console.log(doc);
     return this.create(doc);
   }
 }
