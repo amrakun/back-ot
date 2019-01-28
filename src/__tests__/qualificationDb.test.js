@@ -20,7 +20,7 @@ afterAll(() => disconnect());
 const generateDoc = (schema, qualified) => {
   const doc = {};
 
-  Object.keys(schema.paths).forEach((name, index) => {
+  Qualifications.getFieldsBySchema(schema).forEach((name, index) => {
     doc[name] = qualified || index % 2 === 0;
   });
 

@@ -1,8 +1,8 @@
 import {
   financialInfoFields,
-  businessInfoFields,
-  environmentalInfoFields,
-  healthInfoFields,
+  businessInfoQualifiableFields,
+  environmentalInfoQualifiableFields,
+  healthInfoQualifiableFields,
 } from './company';
 
 // Replacing ....
@@ -13,7 +13,9 @@ import {
 // to
 // reasonToCannotNotProvide: Boolean,
 // currency: Boolean,
-const generateFields = fields => fields.replace(/(\w+)(:\s\w+)/g, '$1: Boolean');
+const generateFields = fields => {
+  return fields.replace(/(\w+)(:\s\w+)/g, '$1: Boolean');
+};
 
 const qfinancialInfoFields = `
   ${generateFields(financialInfoFields)}
@@ -26,16 +28,16 @@ const qfinancialInfoFields = `
 `;
 
 const qbusinessInfoFields = `
-  ${generateFields(businessInfoFields)}
+  ${generateFields(businessInfoQualifiableFields)}
   investigations: Boolean
 `;
 
 const qenvironmentalInfoFields = `
-  ${generateFields(environmentalInfoFields)}
+  ${generateFields(environmentalInfoQualifiableFields)}
 `;
 
 const qhealthInfoFields = `
-  ${generateFields(healthInfoFields)}
+  ${generateFields(healthInfoQualifiableFields)}
 `;
 
 export const types = `
