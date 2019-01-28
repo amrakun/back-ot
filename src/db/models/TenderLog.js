@@ -6,7 +6,22 @@ const tenderLogSchema = new mongoose.Schema(
     tenderId: field({ type: String }),
     isAuto: field({ type: Boolean, default: false }),
     userId: field({ type: String, optional: true }),
-    action: field({ type: String }),
+    action: {
+      type: String,
+      enum: [
+        'award',
+        'cancel',
+        'close',
+        'create',
+        'edit',
+        'extend',
+        'open',
+        'remind',
+        'remove',
+        'reopen',
+      ],
+      required: true,
+    },
     description: field({ type: String, optional: true }),
   },
   {
