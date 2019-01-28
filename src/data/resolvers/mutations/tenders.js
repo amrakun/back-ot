@@ -21,7 +21,7 @@ const tenderMutations = {
   async tendersAdd(root, doc, { user }) {
     const tender = await Tenders.createTender(doc, user._id);
 
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: tender._id.toString(),
       userId: user._id.toString(),
       action: 'create',
@@ -42,7 +42,7 @@ const tenderMutations = {
     const oldSupplierIds = oldTender.getSupplierIds();
     const updatedTender = await Tenders.updateTender(_id, { ...fields });
 
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: oldTender._id.toString(),
       userId: user._id.toString(),
       action: 'edit',
@@ -50,7 +50,7 @@ const tenderMutations = {
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
-      TenderLog.write({
+      await TenderLog.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'extend',
@@ -84,7 +84,7 @@ const tenderMutations = {
       const updatedTenderIds = new Set(updatedTender.getSupplierIds());
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
-      TenderLog.write({
+      await TenderLog.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'reopen',
@@ -108,7 +108,7 @@ const tenderMutations = {
    */
   async tendersRemove(root, { _id }, { user }) {
     const result = await Tenders.removeTender(_id);
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'remove',
@@ -126,7 +126,7 @@ const tenderMutations = {
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments });
 
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'award',
@@ -214,7 +214,7 @@ const tenderMutations = {
     if (tender) {
       const canceledTender = await tender.cancel();
 
-      TenderLog.write({
+      await TenderLog.write({
         tenderId: tender._id.toString(),
         userId: user._id.toString(),
         action: 'cancel',
