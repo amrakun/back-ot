@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Companies, Configs } from '../db/models';
+import { Users, Companies, Configs, Qualifications } from '../db/models';
 import { userFactory, companyFactory, configFactory } from '../db/factories';
 import {
   FinancialInfoSchema,
@@ -67,9 +67,11 @@ describe('Company mutations', () => {
   const callMutation = async ({ mutationName, inputName, sectionName, schema }) => {
     // generate section params ==========
     const sectionParams = {};
+    const fieldsToSelect = [];
 
-    Object.keys(schema.paths).forEach((name, index) => {
+    Qualifications.getFieldsBySchema(schema).forEach((name, index) => {
       sectionParams[name] = index % 2 === 0;
+      fieldsToSelect.push(name);
     });
 
     const params = {
@@ -78,8 +80,6 @@ describe('Company mutations', () => {
     };
 
     const context = { user: _user };
-
-    const fieldsToSelect = Object.keys(schema.paths);
 
     const mutation = `
       mutation ${mutationName}($supplierId: String!, $${sectionName}: ${inputName}) {

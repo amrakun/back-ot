@@ -3,7 +3,6 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderMessages } from '../db/models';
-import mutations from '../data/resolvers/mutations/tenderMessages';
 
 import { userFactory, tenderFactory } from '../db/factories';
 
@@ -25,8 +24,7 @@ describe('TenderMessage db', () => {
     const supplier2 = await userFactory({ isSupplier: true });
     const tender = await tenderFactory();
 
-    await mutations.tenderMessageBuyerSend(
-      {},
+    await TenderMessages.tenderMessageBuyerSend(
       {
         tenderId: tender._id,
         subject: 'attach',
@@ -34,7 +32,7 @@ describe('TenderMessage db', () => {
         recipientSupplierIds: [supplier1.companyId],
         attachment: { url: 'attach10.png', name: '/attach10' },
       },
-      { user: admin },
+      admin,
     );
 
     expect(await TenderMessages.isAuthorizedToDownload('attach10.png', admin)).toBe(true);

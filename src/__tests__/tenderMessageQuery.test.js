@@ -5,7 +5,6 @@ import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderMessages } from '../db/models';
 import { userFactory, tenderFactory } from '../db/factories';
 
-import mutations from '../data/resolvers/mutations/tenderMessages';
 import queries from '../data/resolvers/queries/tenderMessages';
 
 beforeAll(() => connect());
@@ -34,27 +33,25 @@ describe('Tender message queries', () => {
   });
 
   const adminToSupplier = async () => {
-    return mutations.tenderMessageBuyerSend(
-      {},
+    return TenderMessages.tenderMessageBuyerSend(
       {
         tenderId: _tender._id,
         subject: 'test',
         body: 'test',
         recipientSupplierIds: [_supplier.companyId],
       },
-      { user: _admin },
+      _admin,
     );
   };
 
   const supplierToAdmin = async () => {
-    return mutations.tenderMessageSupplierSend(
-      {},
+    return TenderMessages.tenderMessageSupplierSend(
       {
         tenderId: _tender._id,
         subject: 'test',
         body: 'test',
       },
-      { user: _supplier },
+      _supplier,
     );
   };
 

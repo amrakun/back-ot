@@ -10,8 +10,26 @@ import {
 
 import { Configs, Companies } from './';
 
-const generateFields = schema => {
+/*
+ * Get all possible fields for given schema
+ */
+const getFieldsBySchema = schema => {
+  const filterdNames = [];
   const names = Object.keys(schema.paths);
+
+  for (let name of names) {
+    const options = schema.paths[name].options;
+
+    if (options.qualifiable !== false) {
+      filterdNames.push(name);
+    }
+  }
+
+  return filterdNames;
+};
+
+const generateFields = schema => {
+  const names = getFieldsBySchema(schema);
 
   const definations = {};
 
@@ -40,6 +58,10 @@ const QualificationSchema = mongoose.Schema({
 });
 
 class Qualification {
+  static getFieldsBySchema(...args) {
+    return getFieldsBySchema(...args);
+  }
+
   /*
    * Check per sections' all values are true
    */
