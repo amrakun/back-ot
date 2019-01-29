@@ -272,7 +272,7 @@ export const BusinessInfoSchema = mongoose.Schema(
 
     organizationChartFile: field({ type: FileSchema }),
 
-    hasConvictedLabourLawsDescription: field({ type: String, optional: true }),
+    hasConvictedLabourLawsDescription: field({ type: String, optional: true, qualifiable: false }),
     hasConvictedForHumanRightsDescription: field({
       type: String,
       optional: true,

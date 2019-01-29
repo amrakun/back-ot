@@ -123,12 +123,12 @@ export const businessInfoQualifiableFields = `
   doesEmployeePoliticallyExposed: Boolean
   pepName: String
   organizationChartFile: JSON
-  hasConvictedLabourLawsDescription: String
-  hasConvictedForHumanRightsDescription: String
   isSubContractor: Boolean
 `;
 
 const businessInfoNotQualifiableFields = `
+  hasConvictedLabourLawsDescription: String
+  hasConvictedForHumanRightsDescription: String
   doesMeetMinimumStandartsFile: JSON
   doesHaveJobDescriptionFile: JSON
   doesHaveLiabilityInsuranceFile: JSON
