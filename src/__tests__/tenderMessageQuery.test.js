@@ -34,27 +34,25 @@ describe('Tender message queries', () => {
   });
 
   const adminToSupplier = async () => {
-    return mutations.tenderMessageBuyerSend(
-      {},
+    return TenderMessages.tenderMessageBuyerSend(
       {
         tenderId: _tender._id,
         subject: 'test',
         body: 'test',
         recipientSupplierIds: [_supplier.companyId],
       },
-      { user: _admin },
+      _admin,
     );
   };
 
   const supplierToAdmin = async () => {
-    return mutations.tenderMessageSupplierSend(
-      {},
+    return TenderMessages.tenderMessageSupplierSend(
       {
         tenderId: _tender._id,
         subject: 'test',
         body: 'test',
       },
-      { user: _supplier },
+      _supplier,
     );
   };
 
