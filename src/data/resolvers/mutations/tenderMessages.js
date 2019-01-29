@@ -3,9 +3,6 @@ import { TenderMessages, Tenders } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
 
-//supplier__message__notification
-//buyer__message__notification
-
 const tenderMessageMutations = {
   async tenderMessageBuyerSend(parent, args, { user }) {
     const p = await TenderMessages.tenderMessageBuyerSend(args, user);
