@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { Users, Tenders, TenderMessages } from '../db/models';
-import { userFactory, tenderFactory } from '../db/factories';
+import { Users, Tenders, TenderMessages, Configs } from '../db/models';
+import { userFactory, tenderFactory, configFactory } from '../db/factories';
 
 import mutations from '../data/resolvers/mutations/tenderMessages';
 
@@ -21,6 +21,7 @@ describe('Tender mutations', () => {
     _admin = await userFactory({ isSupplier: false });
     _supplier = await userFactory({ isSupplier: true });
     _tender = await tenderFactory();
+    await configFactory();
   });
 
   afterEach(async () => {
@@ -28,6 +29,7 @@ describe('Tender mutations', () => {
     await TenderMessages.remove({});
     await Tenders.remove({});
     await Users.remove({});
+    await Configs.remove({});
   });
 
   test('Supplier cannot send as buyer', async () => {

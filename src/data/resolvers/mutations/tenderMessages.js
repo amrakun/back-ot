@@ -9,7 +9,7 @@ const tenderMessageMutations = {
     const tender = await Tenders.findOne({ _id: args.tenderId });
     const supplierIds = args.recipientSupplierIds;
     await sendEmailToSuppliers({
-      kind: 'message__notification',
+      kind: 'supplier__message_notification',
       tender,
       supplierIds,
     });
@@ -20,7 +20,7 @@ const tenderMessageMutations = {
   async tenderMessageSupplierSend(parent, args, { user }) {
     const p = await TenderMessages.tenderMessageSupplierSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
-    await sendEmailToBuyer({ kind: 'message__notification', tender });
+    await sendEmailToBuyer({ kind: 'buyer__message_notification', tender });
     return p;
   },
 
