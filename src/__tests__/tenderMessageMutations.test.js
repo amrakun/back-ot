@@ -5,8 +5,6 @@ import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderMessages, Configs } from '../db/models';
 import { userFactory, tenderFactory, configFactory } from '../db/factories';
 
-import mutations from '../data/resolvers/mutations/tenderMessages';
-
 beforeAll(() => connect());
 
 afterAll(() => disconnect());
