@@ -844,8 +844,6 @@ export const configFactory = (params = {}) => {
       supplier__regretLetter: commonTemplate,
       buyer__cancel: commonTemplate,
       supplier__cancel: commonTemplate,
-      supplier__message_notification: commonTemplate,
-      buyer__message_notification: commonTemplate,
     },
     capacityBuildingTemplates: {
       buyer__submit: commonTemplate,
