@@ -91,12 +91,15 @@ const dateFileFields = `
 `;
 
 // exporting to use in qualification
-export const financialInfoFields = `
+export const financialInfoQualifiableFields = `
   canProvideAccountsInfo: Boolean
-  reasonToCannotNotProvide: String
   currency: String
   isUpToDateSSP: Boolean
   isUpToDateCTP: Boolean
+`;
+
+const financialInfoNotQualifiableFields = `
+  reasonToCannotNotProvide: String
 `;
 
 const investigationFields = `
@@ -266,7 +269,8 @@ export const types = `
   input CompanyDateFileInput { ${dateFileFields} }
 
   type CompanyFinancialInfo {
-    ${financialInfoFields}
+    ${financialInfoQualifiableFields}
+    ${financialInfoNotQualifiableFields}
     annualTurnover: [CompanyYearAmount]
     preTaxProfit: [CompanyYearAmount]
     totalAssets: [CompanyYearAmount]
@@ -276,7 +280,8 @@ export const types = `
   }
 
   input CompanyFinancialInfoInput {
-    ${financialInfoFields}
+    ${financialInfoQualifiableFields}
+    ${financialInfoNotQualifiableFields}
     annualTurnover: [CompanyYearAmountInput]
     preTaxProfit: [CompanyYearAmountInput]
     totalAssets: [CompanyYearAmountInput]

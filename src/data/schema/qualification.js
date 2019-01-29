@@ -1,5 +1,5 @@
 import {
-  financialInfoFields,
+  financialInfoQualifiableFields,
   businessInfoQualifiableFields,
   environmentalInfoQualifiableFields,
   healthInfoQualifiableFields,
@@ -18,7 +18,7 @@ const generateFields = fields => {
 };
 
 const qfinancialInfoFields = `
-  ${generateFields(financialInfoFields)}
+  ${generateFields(financialInfoQualifiableFields)}
   annualTurnover: Boolean
   preTaxProfit: Boolean
   totalAssets: Boolean
