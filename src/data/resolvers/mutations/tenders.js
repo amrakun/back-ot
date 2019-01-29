@@ -25,7 +25,7 @@ const tenderMutations = {
       tenderId: tender._id.toString(),
       userId: user._id.toString(),
       action: 'create',
-      description: '',
+      description: `Created a draft ${tender.number}.`,
     });
 
     return tender;
@@ -46,7 +46,7 @@ const tenderMutations = {
       tenderId: oldTender._id.toString(),
       userId: user._id.toString(),
       action: 'edit',
-      description: '',
+      description: `Edited a ${oldTender.status} ${oldTender.number} tender.`,
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
@@ -54,7 +54,9 @@ const tenderMutations = {
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'extend',
-        description: '',
+        description: `Extended close date from ${oldTender.closeDate} to ${
+          updatedTender.closeDate
+        }`,
       });
     }
 
@@ -81,14 +83,14 @@ const tenderMutations = {
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
-      const updatedTenderIds = new Set(updatedTender.getSupplierIds());
-      const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
+      const updatedSupplierIds = new Set(updatedTender.getSupplierIds());
+      const intersectionIds = oldSupplierIds.filter(x => updatedSupplierIds.has(x));
 
       await TenderLog.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'reopen',
-        description: '',
+        description: `Reopened a ${oldTender.status}  ${oldTender.number} tender.`,
       });
 
       await sendEmailToSuppliers({
@@ -112,7 +114,7 @@ const tenderMutations = {
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'remove',
-      description: '',
+      description: 'Deleted a tender',
     });
     return result;
   },
@@ -130,7 +132,7 @@ const tenderMutations = {
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'award',
-      description: '',
+      description: 'Awarded',
     });
 
     await sendEmailToBuyer({ kind: 'buyer__award', tender });
@@ -218,7 +220,7 @@ const tenderMutations = {
         tenderId: tender._id.toString(),
         userId: user._id.toString(),
         action: 'cancel',
-        description: '',
+        description: `Canceled a tender ${canceledTender.number}`,
       });
 
       await sendEmail({ kind: 'cancel', tender: canceledTender });

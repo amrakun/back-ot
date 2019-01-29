@@ -13,11 +13,11 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   for (const tender of publishedTenders) {
     const attachments = await getAttachments(tender);
 
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: tender._id.toString(),
       isAuto: true,
       action: 'open',
-      description: '',
+      description: `System opened a tender ${tender.number}`,
     });
 
     await sendEmail({
@@ -34,11 +34,11 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   for (const tender of closedTenders) {
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
-    TenderLog.write({
+    await TenderLog.write({
       tenderId: tender._id.toString(),
       isAuto: true,
       action: 'close',
-      description: '',
+      description: `System closed a tender ${tender.number}`,
     });
   }
 
@@ -51,13 +51,13 @@ schedule.scheduleJob('* 45 23 * *', async () => {
   const remindTenders = await Tenders.tendersToRemind();
 
   for (const tender of remindTenders) {
-    TenderLog.write({
+    sendEmailToSuppliers({ kind: 'supplier__reminder', tender });
+    await TenderLog.write({
       tenderId: tender._id.toString(),
       isAuto: true,
       action: 'remind',
-      description: '',
+      description: `System sent a reminder of tender ${tender.number}`,
     });
-    sendEmailToSuppliers({ kind: 'supplier__reminder', tender });
   }
 
   console.log('Checked tender reminder'); // eslint-disable-line
