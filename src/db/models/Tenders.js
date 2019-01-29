@@ -73,6 +73,21 @@ const TenderSchema = mongoose.Schema({
 
 class Tender extends StatusPublishClose {
   /**
+   * @returns {String}
+   */
+  getLabelOfType() {
+    switch (this.type) {
+      case 'rfq':
+        return 'RFQ';
+      case 'eoi':
+        return 'EOI';
+      case 'trfq':
+        return 'Travel RFQ';
+      default:
+        throw new Error('Invalid tender type');
+    }
+  }
+  /**
    * Create new tender
    * @param {Object} doc - tender fields
    * @param {Object} userId - Creating user

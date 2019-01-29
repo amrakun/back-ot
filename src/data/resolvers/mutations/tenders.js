@@ -25,7 +25,7 @@ const tenderMutations = {
       tenderId: tender._id.toString(),
       userId: user._id.toString(),
       action: 'create',
-      description: `Created a draft ${tender.number}.`,
+      description: `Created a ${tender.getLabelOfType()} draft ${tender.number}.`,
     });
 
     return tender;
@@ -46,7 +46,9 @@ const tenderMutations = {
       tenderId: oldTender._id.toString(),
       userId: user._id.toString(),
       action: 'edit',
-      description: `Edited a ${oldTender.status} ${oldTender.number} tender.`,
+      description: `Edited a ${oldTender.status} ${
+        oldTender.number
+      } ${oldTender.getLabelOfType()}.`,
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
@@ -54,9 +56,9 @@ const tenderMutations = {
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'extend',
-        description: `Extended close date from ${oldTender.closeDate} to ${
-          updatedTender.closeDate
-        }`,
+        description: `Extended a ${oldTender.getLabelOfType()}'s close date from ${
+          oldTender.closeDate
+        } to ${updatedTender.closeDate}`,
       });
     }
 
@@ -90,7 +92,9 @@ const tenderMutations = {
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'reopen',
-        description: `Reopened a ${oldTender.status}  ${oldTender.number} tender.`,
+        description: `Reopened a ${oldTender.status} ${oldTender.getLabelOfType()} ${
+          oldTender.number
+        } ${oldTender.getLabelOfType()}.`,
       });
 
       await sendEmailToSuppliers({
@@ -114,7 +118,7 @@ const tenderMutations = {
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'remove',
-      description: 'Deleted a tender',
+      description: `Deleted a tender`,
     });
     return result;
   },
@@ -132,7 +136,7 @@ const tenderMutations = {
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'award',
-      description: 'Awarded',
+      description: `Awarded a ${tender.getLabelOfType()}`,
     });
 
     await sendEmailToBuyer({ kind: 'buyer__award', tender });
@@ -220,7 +224,7 @@ const tenderMutations = {
         tenderId: tender._id.toString(),
         userId: user._id.toString(),
         action: 'cancel',
-        description: `Canceled a tender ${canceledTender.number}`,
+        description: `Canceled a ${tender.getLabelOfType()} ${canceledTender.number}`,
       });
 
       await sendEmail({ kind: 'cancel', tender: canceledTender });
