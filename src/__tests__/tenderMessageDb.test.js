@@ -3,7 +3,6 @@
 
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderMessages } from '../db/models';
-import mutations from '../data/resolvers/mutations/tenderMessages';
 
 import { userFactory, tenderFactory } from '../db/factories';
 
