@@ -298,9 +298,9 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
     // company within the last 5 years?
     hasEnvironmentalRegulatorInvestigated: field({ type: Boolean }),
 
-    dateOfInvestigation: field({ type: String, optional: true }),
+    dateOfInvestigation: field({ type: String, optional: true, qualifiable: false }),
 
-    reasonForInvestigation: field({ type: String, optional: true }),
+    reasonForInvestigation: field({ type: String, optional: true, qualifiable: false }),
 
     actionStatus: field({ type: String, optional: true }),
 
@@ -311,7 +311,7 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
     hasConvictedForEnvironmentalLaws: field({ type: Boolean }),
 
     // If Yes, what steps have you taken to ensure this does not happen again?
-    proveHasNotConvicted: field({ type: String, optional: true }),
+    proveHasNotConvicted: field({ type: String, optional: true, qualifiable: false }),
   },
   { _id: false },
 );

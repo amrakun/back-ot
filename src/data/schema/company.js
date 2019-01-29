@@ -143,16 +143,16 @@ const businessInfoNotQualifiableFields = `
 export const environmentalInfoQualifiableFields = `
   doesHavePlan: Boolean
   hasEnvironmentalRegulatorInvestigated: Boolean
-  dateOfInvestigation: String
-  reasonForInvestigation: String
   actionStatus: String
   investigationDocumentation: JSON
   hasConvictedForEnvironmentalLaws: Boolean
-  proveHasNotConvicted: String
 `;
 
 const environmentalInfoNotQualifiableFields = `
   doesHavePlanFile: JSON
+  dateOfInvestigation: String
+  reasonForInvestigation: String
+  proveHasNotConvicted: String
 `;
 
 // exporting to use in qualification
