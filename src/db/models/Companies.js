@@ -254,7 +254,7 @@ export const BusinessInfoSchema = mongoose.Schema(
     hasConvictedForBusinessIntegrity: field({ type: Boolean }),
 
     // If Yes, what steps have you taken to ensure this does not happen again?
-    proveHasNotConvicted: field({ type: String, optional: true }),
+    proveHasNotConvicted: field({ type: String, optional: true, qualifiable: false }),
 
     // Has your company or any of its directors been investigated or convicted of
     // any other legal infringement not described above within the last five years?

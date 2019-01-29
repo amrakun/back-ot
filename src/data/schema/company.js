@@ -121,7 +121,6 @@ export const businessInfoQualifiableFields = `
   hasConvictedLabourLaws: Boolean
   hasConvictedForHumanRights: Boolean
   hasConvictedForBusinessIntegrity: Boolean
-  proveHasNotConvicted: String
   hasLeadersConvicted: Boolean
   doesEmployeePoliticallyExposed: Boolean
   pepName: String
@@ -132,6 +131,7 @@ export const businessInfoQualifiableFields = `
 const businessInfoNotQualifiableFields = `
   hasConvictedLabourLawsDescription: String
   hasConvictedForHumanRightsDescription: String
+  proveHasNotConvicted: String
   doesMeetMinimumStandartsFile: JSON
   doesHaveJobDescriptionFile: JSON
   doesHaveLiabilityInsuranceFile: JSON
