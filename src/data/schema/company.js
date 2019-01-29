@@ -143,8 +143,6 @@ const businessInfoNotQualifiableFields = `
 export const environmentalInfoQualifiableFields = `
   doesHavePlan: Boolean
   hasEnvironmentalRegulatorInvestigated: Boolean
-  actionStatus: String
-  investigationDocumentation: JSON
   hasConvictedForEnvironmentalLaws: Boolean
 `;
 
@@ -152,6 +150,8 @@ const environmentalInfoNotQualifiableFields = `
   doesHavePlanFile: JSON
   dateOfInvestigation: String
   reasonForInvestigation: String
+  actionStatus: String
+  investigationDocumentation: JSON
   proveHasNotConvicted: String
 `;
 

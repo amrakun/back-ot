@@ -302,9 +302,9 @@ export const EnvironmentalInfoSchema = mongoose.Schema(
 
     reasonForInvestigation: field({ type: String, optional: true, qualifiable: false }),
 
-    actionStatus: field({ type: String, optional: true }),
+    actionStatus: field({ type: String, optional: true, qualifiable: false }),
 
-    investigationDocumentation: field({ type: FileSchema, optional: true }),
+    investigationDocumentation: field({ type: FileSchema, optional: true, qualifiable: false }),
 
     // Has your company ever been convicted for a breach of any
     // Environmental laws in the countries you operate?
