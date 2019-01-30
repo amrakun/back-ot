@@ -134,6 +134,7 @@ const businessInfoNotQualifiableFields = `
   proveHasNotConvicted: String
   doesMeetMinimumStandartsFile: JSON
   doesHaveJobDescriptionFile: JSON
+  doesConcludeValidContractsFile: JSON
   doesHaveLiabilityInsuranceFile: JSON
   doesHaveCodeEthicsFile: JSON
   doesHaveResponsiblityPolicyFile: JSON
