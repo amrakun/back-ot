@@ -34,10 +34,12 @@ const tenderResponseQueries = {
       query.respondedProducts = {
         $elemMatch: {
           code: productCode,
-          [name]: { $gte: minValue, $lte: maxValue },
+          [name]: { $gte: parseFloat(minValue), $lte: parseFloat(maxValue) },
         },
       };
     }
+
+    let aggregations = [{ $match: query }];
 
     const sortName = sort.name;
     const sortProductCode = sort.productCode;
@@ -58,43 +60,30 @@ const tenderResponseQueries = {
       subField = 'totalPrice';
     }
 
-    const responses = await TenderResponses.aggregate([
-      { $match: query },
-      {
-        $unwind: '$respondedProducts',
-      },
-      {
-        $match: {
-          'respondedProducts.code': sortProductCode,
-        },
-      },
-      {
-        $sort: {
-          [`respondedProducts.${subField}`]: -1,
-        },
-      },
-      {
-        $group: {
-          _id: '$_id',
-          doc: {
-            $first: '$$ROOT',
-          },
-          respondedProducts: {
-            $push: '$respondedProducts',
+    if (sortName && sortProductCode) {
+      aggregations = [
+        ...aggregations,
+        {
+          $addFields: {
+            rps: {
+              $filter: {
+                input: '$respondedProducts',
+                as: 'respondedProduct',
+                cond: { $eq: ['$$respondedProduct.code', sortProductCode] },
+              },
+            },
           },
         },
-      },
-      {
-        $addFields: {
-          'doc.respondedProducts': '$respondedProducts',
+        {
+          $unwind: '$rps',
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$doc',
+        {
+          $sort: { [`rps.${subField}`]: 1 },
         },
-      },
-    ]);
+      ];
+    }
+
+    const responses = await TenderResponses.aggregate(aggregations);
 
     return responses.map(response => ({
       ...response,
