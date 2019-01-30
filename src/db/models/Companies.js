@@ -219,6 +219,7 @@ export const BusinessInfoSchema = mongoose.Schema(
     // Does the company conclude valid contracts with all employees. (include skilled/unskilled,
     // temporary and permanent, and underage workers, etc)
     doesConcludeValidContracts: field({ type: Boolean }),
+    doesConcludeValidContractsFile: field({ type: FileSchema, optional: true, qualifiable: false }),
 
     // Please provide the employee turnover rate within your company in the last 12 months
     employeeTurnoverRate: field({ type: Number }),
