@@ -91,12 +91,15 @@ const dateFileFields = `
 `;
 
 // exporting to use in qualification
-export const financialInfoFields = `
+export const financialInfoQualifiableFields = `
   canProvideAccountsInfo: Boolean
-  reasonToCannotNotProvide: String
   currency: String
   isUpToDateSSP: Boolean
   isUpToDateCTP: Boolean
+`;
+
+const financialInfoNotQualifiableFields = `
+  reasonToCannotNotProvide: String
 `;
 
 const investigationFields = `
@@ -107,77 +110,60 @@ const investigationFields = `
 `;
 
 // exporting to use in qualification
-export const businessInfoFields = `
+export const businessInfoQualifiableFields = `
   doesMeetMinimumStandarts: Boolean
-  doesMeetMinimumStandartsFile: JSON
-
   doesHaveJobDescription: Boolean
-  doesHaveJobDescriptionFile: JSON
-
   doesConcludeValidContracts: Boolean
   employeeTurnoverRate: Float
-
   doesHaveLiabilityInsurance: Boolean
-  doesHaveLiabilityInsuranceFile: JSON
-
   doesHaveCodeEthics: Boolean
-  doesHaveCodeEthicsFile: JSON
-
   doesHaveResponsiblityPolicy: Boolean
-  doesHaveResponsiblityPolicyFile: JSON
-
   hasConvictedLabourLaws: Boolean
   hasConvictedForHumanRights: Boolean
   hasConvictedForBusinessIntegrity: Boolean
-  proveHasNotConvicted: String
   hasLeadersConvicted: Boolean
   doesEmployeePoliticallyExposed: Boolean
   pepName: String
-
   organizationChartFile: JSON
-
-  hasConvictedLabourLawsDescription: String
-  hasConvictedForHumanRightsDescription: String
-
   isSubContractor: Boolean
 `;
 
+const businessInfoNotQualifiableFields = `
+  hasConvictedLabourLawsDescription: String
+  hasConvictedForHumanRightsDescription: String
+  proveHasNotConvicted: String
+  doesMeetMinimumStandartsFile: JSON
+  doesHaveJobDescriptionFile: JSON
+  doesHaveLiabilityInsuranceFile: JSON
+  doesHaveCodeEthicsFile: JSON
+  doesHaveResponsiblityPolicyFile: JSON
+`;
+
 // exporting to use in qualification
-export const environmentalInfoFields = `
+export const environmentalInfoQualifiableFields = `
   doesHavePlan: Boolean
-  doesHavePlanFile: JSON
   hasEnvironmentalRegulatorInvestigated: Boolean
+  hasConvictedForEnvironmentalLaws: Boolean
+`;
+
+const environmentalInfoNotQualifiableFields = `
+  doesHavePlanFile: JSON
   dateOfInvestigation: String
   reasonForInvestigation: String
   actionStatus: String
   investigationDocumentation: JSON
-  hasConvictedForEnvironmentalLaws: Boolean
   proveHasNotConvicted: String
 `;
 
 // exporting to use in qualification
-export const healthInfoFields = `
+export const healthInfoQualifiableFields = `
   doesHaveHealthSafety: Boolean
-  doesHaveHealthSafetyFile: JSON
-
   areHSEResourcesClearlyIdentified: Boolean
-  areHSEResourcesClearlyIdentifiedFile: JSON
-
   doesHaveDocumentedProcessToEnsure: Boolean
-  doesHaveDocumentedProcessToEnsureFile: JSON
-
   areEmployeesUnderYourControl: Boolean
-  areEmployeesUnderYourControlFile: JSON
-
   doesHaveDocumentForRiskAssesment: Boolean
-  doesHaveDocumentForRiskAssesmentFile: JSON
-
   doesHaveDocumentForIncidentInvestigation: Boolean
-  doesHaveDocumentForIncidentInvestigationFile: JSON
-
   doesHaveDocumentedFitness: Boolean
-  doesHaveDocumentedFitnessFile: JSON
-
   isWillingToComply: Boolean
   hasIndustrialAccident: Boolean
   tmha: String
@@ -187,10 +173,20 @@ export const healthInfoFields = `
   isWillingToCommit: Boolean
   isPerparedToCompile: Boolean
   hasWorkedOnWorldBank: Boolean
-  hasWorkedOnWorldBankDescription: String
   hasWorkedOnLargeProjects: Boolean
-  hasWorkedOnLargeProjectsDescription: String
   doesHaveLicense: Boolean
+`;
+
+const healthInfoNotQualifiableFields = `
+  doesHaveHealthSafetyFile: JSON
+  areHSEResourcesClearlyIdentifiedFile: JSON
+  doesHaveDocumentedProcessToEnsureFile: JSON
+  areEmployeesUnderYourControlFile: JSON
+  doesHaveDocumentForRiskAssesmentFile: JSON
+  doesHaveDocumentForIncidentInvestigationFile: JSON
+  doesHaveDocumentedFitnessFile: JSON
+  hasWorkedOnWorldBankDescription: String
+  hasWorkedOnLargeProjectsDescription: String
   doesHaveLicenseDescription: String
 `;
 
@@ -273,7 +269,8 @@ export const types = `
   input CompanyDateFileInput { ${dateFileFields} }
 
   type CompanyFinancialInfo {
-    ${financialInfoFields}
+    ${financialInfoQualifiableFields}
+    ${financialInfoNotQualifiableFields}
     annualTurnover: [CompanyYearAmount]
     preTaxProfit: [CompanyYearAmount]
     totalAssets: [CompanyYearAmount]
@@ -283,7 +280,8 @@ export const types = `
   }
 
   input CompanyFinancialInfoInput {
-    ${financialInfoFields}
+    ${financialInfoQualifiableFields}
+    ${financialInfoNotQualifiableFields}
     annualTurnover: [CompanyYearAmountInput]
     preTaxProfit: [CompanyYearAmountInput]
     totalAssets: [CompanyYearAmountInput]
@@ -297,22 +295,36 @@ export const types = `
   input CompanyInvestigationtInput { ${investigationFields} }
 
   type CompanyBusinessInfo {
-    ${businessInfoFields}
+    ${businessInfoQualifiableFields}
+    ${businessInfoNotQualifiableFields}
     investigations: [CompanyInvestigation]
   }
 
   input CompanyBusinessInfoInput {
-    ${businessInfoFields}
+    ${businessInfoQualifiableFields}
+    ${businessInfoNotQualifiableFields}
     investigations: [CompanyInvestigationtInput]
   }
 
   # environmental management =============
-  type CompanyEnvironmentalInfo { ${environmentalInfoFields} }
-  input CompanyEnvironmentalInfoInput { ${environmentalInfoFields} }
+  type CompanyEnvironmentalInfo {
+    ${environmentalInfoQualifiableFields}
+    ${environmentalInfoNotQualifiableFields}
+  }
+  input CompanyEnvironmentalInfoInput {
+    ${environmentalInfoQualifiableFields}
+    ${environmentalInfoNotQualifiableFields}
+  }
 
    # health and safety management system  ==========
-  type CompanyHealthInfo { ${healthInfoFields} }
-  input CompanyHealthInfoInput { ${healthInfoFields} }
+  type CompanyHealthInfo {
+    ${healthInfoQualifiableFields}
+    ${healthInfoNotQualifiableFields}
+  }
+  input CompanyHealthInfoInput {
+    ${healthInfoQualifiableFields}
+    ${healthInfoNotQualifiableFields}
+  }
 
   type CompanyProductsInfoValidation {
     date: Date
