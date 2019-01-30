@@ -56,9 +56,9 @@ const tenderMutations = {
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'extend',
-        description: `Extended a ${oldTender.getLabelOfType()}'s close date from ${
+        description: `Extended a ${oldTender.getLabelOfType()}'s close date from (${
           oldTender.closeDate
-        } to ${updatedTender.closeDate}`,
+        }) to (${updatedTender.closeDate})`,
       });
     }
 
