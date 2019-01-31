@@ -13,13 +13,13 @@ const FileSchema = mongoose.Schema(
 
 const ProductSchema = mongoose.Schema(
   {
-    code: field({ type: String }),
-    purchaseRequestNumber: field({ type: Number, max: 99999999 }),
+    code: field({ type: String, optional: true }),
+    purchaseRequestNumber: field({ type: Number, max: 99999999, optional: true }),
     shortText: field({ type: String }),
     quantity: field({ type: Number }),
     uom: field({ type: String }),
-    manufacturer: field({ type: String }),
-    manufacturerPartNumber: field({ type: String }),
+    manufacturer: field({ type: String, optional: true }),
+    manufacturerPartNumber: field({ type: String, optional: true }),
   },
   { _id: false },
 );
