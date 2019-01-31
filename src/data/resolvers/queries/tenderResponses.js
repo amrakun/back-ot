@@ -1,5 +1,5 @@
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
-import { encrypt, decryptArray } from '../../../db/models/utils';
+import { decrypt, encrypt, decryptArray } from '../../../db/models/utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { supplierFilter } from './utils';
 
@@ -23,77 +23,72 @@ const tenderResponseQueries = {
       ids.map(id => encrypt(id.toString())),
     );
 
-    const sortName = sort.name;
-    const sortProductCode = sort.productCode;
-
     // filter by interest
     if (isNotInterested !== undefined) {
       query.isNotInterested = isNotInterested;
     }
 
-    let responses = await TenderResponses.find(query);
+    const { name, minValue, maxValue, productCode } = betweenSearch;
 
-    // search by between values =========
-    // filter by sub field value
-    const filterBySubField = name =>
-      responses.filter(tender => {
-        const { minValue, maxValue, productCode } = betweenSearch;
-
-        const respondedProducts = tender.respondedProducts || [];
-        const product = respondedProducts.find(p => p.code === productCode);
-
-        return product && product[name] >= minValue && product[name] <= maxValue;
-      });
-
-    // totalPrice
-    if (betweenSearch.name === 'totalPrice') {
-      responses = filterBySubField('totalPrice');
+    if (name && productCode) {
+      query.respondedProducts = {
+        $elemMatch: {
+          code: productCode,
+          [name]: { $gte: parseFloat(minValue), $lte: parseFloat(maxValue) },
+        },
+      };
     }
 
-    // unit price
-    if (betweenSearch.name === 'unitPrice') {
-      responses = filterBySubField('unitPrice');
-    }
+    let aggregations = [{ $match: query }];
 
-    // lead time
-    if (betweenSearch.name === 'leadTime') {
-      responses = filterBySubField('leadTime');
-    }
+    const sortName = sort.name;
+    const sortProductCode = sort.productCode;
 
-    // sort by sub field value ===================
-    const sortBySubField = name =>
-      responses.sort((doc1, doc2) => {
-        if (!sortProductCode) {
-          return;
-        }
+    let subField;
 
-        // doc1's responded product for productCode
-        const d1p = (doc1.respondedProducts || []).find(p => p.code === sortProductCode);
-
-        // doc2's responded product for productCode
-        const d2p = (doc2.respondedProducts || []).find(p => p.code === sortProductCode);
-
-        if (d1p && d2p) {
-          return d1p[name] > d2p[name];
-        }
-      });
-
-    // minimum unit price
     if (sortName === 'minUnitPrice') {
-      responses = sortBySubField('unitPrice');
+      subField = 'unitPrice';
     }
 
     // minimum lead time
     if (sortName === 'minLeadTime') {
-      responses = sortBySubField('leadTime');
+      subField = 'leadTime';
     }
 
     // minimum total price
     if (sortName === 'minTotalPrice') {
-      responses = sortBySubField('totalPrice');
+      subField = 'totalPrice';
     }
 
-    return responses;
+    if (sortName && sortProductCode) {
+      aggregations = [
+        ...aggregations,
+        {
+          $addFields: {
+            rps: {
+              $filter: {
+                input: '$respondedProducts',
+                as: 'respondedProduct',
+                cond: { $eq: ['$$respondedProduct.code', sortProductCode] },
+              },
+            },
+          },
+        },
+        {
+          $unwind: '$rps',
+        },
+        {
+          $sort: { [`rps.${subField}`]: 1 },
+        },
+      ];
+    }
+
+    const responses = await TenderResponses.aggregate(aggregations);
+
+    return responses.map(response => ({
+      ...response,
+      supplierId: decrypt(response.supplierId),
+    }));
   },
 
   /**

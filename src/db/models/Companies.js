@@ -269,7 +269,7 @@ export const BusinessInfoSchema = mongoose.Schema(
 
     /// Does your company employ any politically exposed person?
     // If yes, provide list of PEP name
-    pepName: field({ type: String, optional: true }),
+    pepName: field({ type: String, optional: true, qualifiable: false }),
 
     organizationChartFile: field({ type: FileSchema }),
 
