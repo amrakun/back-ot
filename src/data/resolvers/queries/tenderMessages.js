@@ -53,10 +53,6 @@ const tenderMessageQuery = {
 
     if (tenderId) query.tenderId = tenderId;
 
-    if (user.isSupplier) {
-      query.$or = [];
-    }
-
     return TenderMessages.find(query).count();
   },
 };
