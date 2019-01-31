@@ -572,7 +572,7 @@ describe('Tender queries', () => {
     // drafts must be excluded
     let response = await doQuery();
 
-    expect(response.length).toBe(2);
+    expect(response.length).toBe(3);
 
     // by type ==============
     response = await doQuery({ type: 'rfq' });

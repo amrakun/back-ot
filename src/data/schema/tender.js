@@ -61,6 +61,7 @@ export const types = `
   type SupplierTender {
     ${commonTenderFields}
     isParticipated: Boolean
+    isNotInterested: Boolean
     isSent: Boolean
   }
 
