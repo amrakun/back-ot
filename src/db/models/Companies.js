@@ -661,6 +661,14 @@ class Company {
       }
     }
 
+    // prevent disabled prequalification info from editing ========
+    const preqTabs = ['financial', 'business', 'environmental', 'health'];
+    const editable = company.isPrequalificationInfoEditable;
+
+    if (preqTabs.includes(key.replace('Info', '')) && !editable) {
+      throw new Error('Changes disabled');
+    }
+
     // update
     await this.update({ _id }, { $set: { [key]: value } });
 
@@ -675,14 +683,6 @@ class Company {
           },
         },
       );
-    }
-
-    // prevent disabled prequalification info from editing ========
-    const preqTabs = ['financial', 'business', 'environmental', 'health'];
-    const editable = company.isPrequalificationInfoEditable;
-
-    if (preqTabs.includes(key.replace('Info', '')) && !editable) {
-      throw new Error('Changes disabled');
     }
 
     return this.findOne({ _id });
