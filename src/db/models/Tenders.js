@@ -119,20 +119,12 @@ class Tender extends StatusPublishClose {
       }
     }
 
-    // reset responses's sent status
-    if (['closed', 'canceled'].includes(tender.status)) {
-      await TenderResponses.update(
-        { tenderId: tender._id },
-        { $set: { isSent: false } },
-        { multi: true },
-      );
-    }
-
-    // if tender is open and requirements are changed then reset
+    // if tender is not draft and requirements are changed then reset
     // previously sent responses
     const isChanged = await tender.isChanged(doc);
 
-    if (tender.status === 'open' && isChanged) {
+    // reset responses's sent status
+    if (['closed', 'canceled', 'open'].includes(tender.status) && isChanged) {
       await TenderResponses.update(
         { tenderId: tender._id },
         { $set: { isSent: false } },
