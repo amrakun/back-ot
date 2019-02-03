@@ -323,8 +323,6 @@ class Tender extends StatusPublishClose {
       this.number !== doc.number ||
       this.name !== doc.name ||
       this.sourcingOfficer !== doc.sourcingOfficer ||
-      this.publishDate.toString() !== doc.publishDate.toString() ||
-      this.closeDate.toString() !== doc.closeDate.toString() ||
       JSON.stringify(this.requestedDocuments || []) !==
         JSON.stringify(doc.requestedDocuments || []) ||
       JSON.stringify(this.requestedProducts || []) !== JSON.stringify(doc.requestedProducts || [])

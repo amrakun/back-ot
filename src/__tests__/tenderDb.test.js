@@ -458,8 +458,8 @@ describe('Tender db', () => {
     expect(await tender.isChanged({ ...doc, number: 'number' })).toBe(true);
     expect(await tender.isChanged({ ...doc, name: 'name' })).toBe(true);
     expect(await tender.isChanged({ ...doc, sourcingOfficer: 'sourcingOfficer' })).toBe(true);
-    expect(await tender.isChanged({ ...doc, publishDate: new Date('2000-01-01') })).toBe(true);
-    expect(await tender.isChanged({ ...doc, closeDate: new Date('2000-01-01') })).toBe(true);
+    expect(await tender.isChanged({ ...doc, publishDate: new Date('2000-01-01') })).toBe(false);
+    expect(await tender.isChanged({ ...doc, closeDate: new Date('2000-01-01') })).toBe(false);
     expect(await tender.isChanged({ ...doc, requestedDocuments: ['d1', 'd2'] })).toBe(true);
     expect(await tender.isChanged({ ...doc, requestedProducts: [{ code: '1' }] })).toBe(true);
   });
