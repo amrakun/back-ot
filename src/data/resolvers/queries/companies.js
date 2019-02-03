@@ -106,7 +106,10 @@ const companiesFilter = async args => {
   checkStatus(productsInfoStatus, 'isProductsInfoValidated');
 
   // by pre qualified status
-  checkStatus(prequalifiedStatus, 'isPrequalified');
+  if (prequalifiedStatus) {
+    selector.isSentPrequalificationInfo = true;
+    checkStatus(prequalifiedStatus, 'isPrequalified');
+  }
 
   // by qualified status
   checkStatus(qualifiedStatus, 'isQualified');
