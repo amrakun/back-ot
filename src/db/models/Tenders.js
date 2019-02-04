@@ -57,6 +57,8 @@ const TenderSchema = mongoose.Schema({
 
   // encrypted supplier ids
   supplierIds: field({ type: [String] }),
+  tierTypes: field({ type: [String], optional: true }),
+  isToAll: field({ type: Boolean, default: false }),
 
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
@@ -72,6 +74,14 @@ const TenderSchema = mongoose.Schema({
 });
 
 class Tender extends StatusPublishClose {
+  static validateSuppliers(doc) {
+    const { tierTypes, isToAll, supplierIds = [] } = doc;
+
+    if (!tierTypes && !isToAll && supplierIds.length === 0) {
+      throw new Error('Suppliers are required');
+    }
+  }
+
   /**
    * Create new tender
    * @param {Object} doc - tender fields
@@ -79,17 +89,21 @@ class Tender extends StatusPublishClose {
    * @return {Promise} newly created tender object
    */
   static async createTender(doc, userId) {
+    const supplierIds = doc.supplierIds || [];
+
     const extendedDoc = {
       ...doc,
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
-      supplierIds: encryptArray(doc.supplierIds),
+      supplierIds: encryptArray(supplierIds),
     };
 
     if (doc.type === 'rfq' && !['goods', 'service'].includes(doc.rfqType)) {
       throw new Error('Invalid rfq type');
     }
+
+    Tender.validateSuppliers(doc);
 
     const saved = await Tenders.create(extendedDoc);
 
@@ -104,6 +118,8 @@ class Tender extends StatusPublishClose {
    */
   static async updateTender(_id, doc) {
     const tender = await this.findOne({ _id });
+
+    Tender.validateSuppliers(doc);
 
     if (tender.status === 'awarded') {
       throw new Error(`Can not update ${tender.status} tender`);

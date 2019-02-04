@@ -83,6 +83,16 @@ describe('Tender db', () => {
     }
   });
 
+  test('Create tender: required suppliers', async () => {
+    expect.assertions(1);
+
+    try {
+      await Tenders.createTender({ supplierIds: [] });
+    } catch (e) {
+      expect(e.message).toBe('Suppliers are required');
+    }
+  });
+
   test('Update tender', async () => {
     const doc = await tenderDoc();
 
