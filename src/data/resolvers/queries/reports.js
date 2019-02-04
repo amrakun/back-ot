@@ -150,6 +150,7 @@ const reportsQuery = {
         { _id: { $in: it.getSupplierIds() } },
         { basicInfo: 1 },
       );
+
       const supplierNames = suppliers.map(s => s.basicInfo && s.basicInfo.enName);
 
       sheet.cell(rowIndex, 4).value(supplierNames.join());

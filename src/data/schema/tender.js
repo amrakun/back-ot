@@ -67,7 +67,9 @@ export const types = `
 
   type Tender {
     ${commonTenderFields}
-    supplierIds: [String]!
+    supplierIds: [String]
+    isToAll: Boolean
+    tierTypes: [String]
     createdUserId: String!
     winnerIds: [String]
     awardNote: String
@@ -200,7 +202,9 @@ const commonParams = `
   file: JSON
   sourcingOfficer: String
   reminderDay: Float
-  supplierIds: [String]!
+  supplierIds: [String]
+  tierTypes: [String]
+  isToAll: Boolean
   requestedProducts: [TenderRequestedProductInput]
   requestedDocuments: [String]
 `;

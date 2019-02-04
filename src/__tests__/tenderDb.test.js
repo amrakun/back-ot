@@ -77,6 +77,7 @@ describe('Tender db', () => {
       await Tenders.createTender({
         type: 'rfq',
         rfqType: 'invalid',
+        supplierIds: ['_id'],
       });
     } catch (e) {
       expect(e.message).toBe('Invalid rfq type');
@@ -91,6 +92,29 @@ describe('Tender db', () => {
     } catch (e) {
       expect(e.message).toBe('Suppliers are required');
     }
+  });
+
+  test('Validate suppliers', async () => {
+    expect.assertions(4);
+
+    let doc = { tierTypes: ['test', 'tier1'] };
+
+    try {
+      await Tenders.validateSuppliers(doc);
+    } catch (e) {
+      expect(e.message).toBe('Invalid tier type');
+    }
+
+    // if we selected tier types then supplierIds be resetted
+    doc = { tierTypes: ['tier2', 'tier1'], supplierIds: ['_id'] };
+    await Tenders.validateSuppliers(doc);
+    expect(doc.supplierIds).toEqual([]);
+
+    // if we selected all then tierTypes, supplierIds be resetted
+    doc = { isToAll: true, tierTypes: ['tier2', 'tier1'], supplierIds: ['_id'] };
+    await Tenders.validateSuppliers(doc);
+    expect(doc.tierTypes).toEqual([]);
+    expect(doc.supplierIds).toEqual([]);
   });
 
   test('Update tender', async () => {

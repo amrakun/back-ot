@@ -2,6 +2,7 @@ import moment from 'moment';
 import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { field, isReached, encrypt, encryptArray, decryptArray, StatusPublishClose } from './utils';
+import { TIER_TYPES } from './constants';
 
 const FileSchema = mongoose.Schema(
   {
@@ -56,7 +57,7 @@ const TenderSchema = mongoose.Schema({
   reminderDay: field({ type: Number, optional: true }),
 
   // encrypted supplier ids
-  supplierIds: field({ type: [String] }),
+  supplierIds: field({ type: [String], optional: true }),
   tierTypes: field({ type: [String], optional: true }),
   isToAll: field({ type: Boolean, default: false }),
 
@@ -77,9 +78,26 @@ class Tender extends StatusPublishClose {
   static validateSuppliers(doc) {
     const { tierTypes, isToAll, supplierIds = [] } = doc;
 
+    if (isToAll) {
+      doc.tierTypes = [];
+      doc.supplierIds = [];
+    }
+
+    if (tierTypes && tierTypes.length > 0) {
+      doc.supplierIds = [];
+
+      const commonItems = tierTypes.filter(t => TIER_TYPES.includes(t));
+
+      if (commonItems.length !== tierTypes.length) {
+        throw new Error('Invalid tier type');
+      }
+    }
+
     if (!tierTypes && !isToAll && supplierIds.length === 0) {
       throw new Error('Suppliers are required');
     }
+
+    return doc;
   }
 
   /**
@@ -90,6 +108,8 @@ class Tender extends StatusPublishClose {
    */
   static async createTender(doc, userId) {
     const supplierIds = doc.supplierIds || [];
+
+    Tender.validateSuppliers(doc);
 
     const extendedDoc = {
       ...doc,
@@ -102,8 +122,6 @@ class Tender extends StatusPublishClose {
     if (doc.type === 'rfq' && !['goods', 'service'].includes(doc.rfqType)) {
       throw new Error('Invalid rfq type');
     }
-
-    Tender.validateSuppliers(doc);
 
     const saved = await Tenders.create(extendedDoc);
 
