@@ -1,6 +1,7 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import { Companies } from './';
 import { field, isReached, encrypt, encryptArray, decryptArray, StatusPublishClose } from './utils';
 import { TIER_TYPES } from './constants';
 
@@ -231,7 +232,45 @@ class Tender extends StatusPublishClose {
     return this.findOne({ _id });
   }
 
+  /*
+   * All tenders that given user can see
+   */
+  static async getPossibleTendersByUser(user) {
+    const company = await Companies.findOne({ _id: user.companyId });
+
+    const tenders = await Tenders.find(
+      {
+        $or: [
+          { isToAll: true },
+          { tierTypes: { $in: [company.tierType] } },
+          { supplierIds: { $in: [encrypt(user.companyId)] } },
+        ],
+      },
+      { _id: 1 },
+    );
+
+    return tenders.map(tender => tender._id.toString());
+  }
+
   getSupplierIds() {
+    return decryptArray(this.supplierIds);
+  }
+
+  async getAllPossibleSupplierIds() {
+    let suppliers = [];
+
+    if (this.isToAll) {
+      suppliers = await Companies.find({}, { _id: 1 });
+    }
+
+    if (this.tierTypes && this.tierTypes.length > 0) {
+      suppliers = await Companies.find({ tierType: { $in: this.tierTypes } }, { _id: 1 });
+    }
+
+    if (suppliers.length > 0) {
+      return suppliers.map(sup => sup._id.toString());
+    }
+
     return decryptArray(this.supplierIds);
   }
 
@@ -271,6 +310,14 @@ class Tender extends StatusPublishClose {
    * total suppliers count
    */
   requestedCount() {
+    if (this.isToAll) {
+      return Companies.find({}).count();
+    }
+
+    if (this.tierTypes && this.tierTypes.length > 0) {
+      return Companies.find({ tierType: { $in: this.tierTypes } }).count();
+    }
+
     return this.supplierIds.length;
   }
 

@@ -15,7 +15,7 @@ export const replacer = ({ text, tender }) => {
 };
 
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
-  const filterIds = supplierIds || tender.getSupplierIds();
+  const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
 
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 

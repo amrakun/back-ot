@@ -22,6 +22,7 @@ afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
   let _user;
+  let _tender;
 
   const commonParams = `
     $number: String!,
@@ -33,7 +34,9 @@ describe('Tender mutations', () => {
     $sourcingOfficer: String,
     $file: JSON!,
     $reminderDay: Float!,
-    $supplierIds: [String]!,
+    $supplierIds: [String],
+    $isToAll: Boolean,
+    $tierTypes: [String]
     $requestedProducts: [TenderRequestedProductInput]
     $requestedDocuments: [String]
   `;
@@ -49,6 +52,8 @@ describe('Tender mutations', () => {
     file: $file,
     reminderDay: $reminderDay,
     supplierIds: $supplierIds,
+    isToAll: $isToAll,
+    tierTypes: $tierTypes,
     requestedProducts: $requestedProducts,
     requestedDocuments: $requestedDocuments
   `;
@@ -56,6 +61,7 @@ describe('Tender mutations', () => {
   beforeEach(async () => {
     // Creating test data
     _user = await userFactory();
+    _tender = await tenderFactory();
 
     await configFactory();
   });
@@ -116,7 +122,7 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender', async () => {
-    const mock = sinon.stub(Tenders, 'createTender').callsFake(() => ({ _id: Math.random() }));
+    const mock = sinon.stub(Tenders, 'createTender').callsFake(() => _tender);
 
     const mutation = `
       mutation tendersAdd($type: String!, $rfqType: String ${commonParams}) {
@@ -137,7 +143,7 @@ describe('Tender mutations', () => {
   });
 
   test('Update tender', async () => {
-    const mock = sinon.stub(Tenders, 'updateTender').callsFake(() => ({ _id: Math.random() }));
+    const mock = sinon.stub(Tenders, 'updateTender').callsFake(() => _tender);
 
     const mutation = `
       mutation tendersEdit($_id: String!  ${commonParams}) {
@@ -161,7 +167,7 @@ describe('Tender mutations', () => {
   });
 
   test('Delete tender', async () => {
-    const mock = sinon.stub(Tenders, 'removeTender').callsFake(() => ({ _id: Math.random() }));
+    const mock = sinon.stub(Tenders, 'removeTender').callsFake(() => _tender);
 
     const mutation = `
       mutation tendersRemove($_id: String!) {

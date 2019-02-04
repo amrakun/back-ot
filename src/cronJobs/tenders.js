@@ -1,7 +1,6 @@
 import schedule from 'node-schedule';
 import { Tenders } from '../db/models';
 import { sendEmail, sendEmailToSuppliers, getAttachments } from '../data/tenderUtils';
-import { readS3File } from '../data/utils';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {

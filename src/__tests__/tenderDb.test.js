@@ -497,4 +497,28 @@ describe('Tender db', () => {
     expect(await tender.isChanged({ ...doc, requestedDocuments: ['d1', 'd2'] })).toBe(true);
     expect(await tender.isChanged({ ...doc, requestedProducts: [{ code: '1' }] })).toBe(true);
   });
+
+  test('getPossibleTendersByUser', async () => {
+    const company1 = await companyFactory({ tierType: 'tier1' });
+    const company2 = await companyFactory({ tierType: 'tier2' });
+
+    const user1 = await userFactory({ companyId: company1._id });
+    const user2 = await userFactory({ companyId: company2._id });
+
+    const t1 = await tenderFactory({ isToAll: true });
+    const t2 = await tenderFactory({ supplierIds: [company1._id] });
+    const t3 = await tenderFactory({ tierTypes: ['tier1', 'tier3'] });
+
+    const t4 = await tenderFactory({ tierTypes: ['tier2'] });
+
+    expect(await Tenders.getPossibleTendersByUser(user1)).toEqual([
+      t1._id.toString(),
+      t2._id.toString(),
+      t3._id.toString(),
+    ]);
+    expect(await Tenders.getPossibleTendersByUser(user2)).toEqual([
+      t1._id.toString(),
+      t4._id.toString(),
+    ]);
+  });
 });
