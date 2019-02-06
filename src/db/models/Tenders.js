@@ -344,8 +344,9 @@ class Tender extends StatusPublishClose {
    */
   async notRespondedCount() {
     const respondedCount = (await this.submittedCount()) + (await this.notInterestedCount());
+    const requestedCount = await this.requestedCount();
 
-    return this.requestedCount() - respondedCount;
+    return requestedCount - respondedCount;
   }
 
   /*
