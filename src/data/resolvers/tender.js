@@ -17,8 +17,9 @@ export default {
     return tender.getWinnerIds();
   },
 
-  suppliers(tender) {
-    return Companies.find({ _id: { $in: tender.getSupplierIds() } });
+  async suppliers(tender) {
+    const ids = await tender.getAllPossibleSupplierIds();
+    return Companies.find({ _id: { $in: ids } });
   },
 
   requestedCount(tender) {
