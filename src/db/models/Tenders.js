@@ -145,7 +145,7 @@ class Tender extends StatusPublishClose {
     }
 
     if (tender.status === 'open') {
-      const supplierIds = tender.getSupplierIds();
+      const supplierIds = await tender.getAllPossibleSupplierIds();
 
       for (const supplierId of supplierIds) {
         if (!doc.supplierIds.includes(supplierId)) {
@@ -250,10 +250,6 @@ class Tender extends StatusPublishClose {
     );
 
     return tenders.map(tender => tender._id.toString());
-  }
-
-  getSupplierIds() {
-    return decryptArray(this.supplierIds);
   }
 
   async getAllPossibleSupplierIds() {

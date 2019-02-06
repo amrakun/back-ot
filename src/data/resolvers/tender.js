@@ -10,7 +10,7 @@ export default {
   },
 
   supplierIds(tender) {
-    return tender.getSupplierIds();
+    return tender.getAllPossibleSupplierIds();
   },
 
   winnerIds(tender) {

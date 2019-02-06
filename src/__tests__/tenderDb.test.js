@@ -64,7 +64,7 @@ describe('Tender db', () => {
 
     compare(flatten(doc), flatten(savedTender));
 
-    expect(savedTender.getSupplierIds()).toEqual(doc.supplierIds);
+    expect(await savedTender.getAllPossibleSupplierIds()).toEqual(doc.supplierIds);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');
@@ -124,7 +124,7 @@ describe('Tender db', () => {
 
     compare(flatten(doc), flatten(updated));
 
-    expect(updated.getSupplierIds()).toEqual(doc.supplierIds);
+    expect(await updated.getAllPossibleSupplierIds()).toEqual(doc.supplierIds);
   });
 
   test('Update tender: with awarded status', async () => {
@@ -172,7 +172,7 @@ describe('Tender db', () => {
     const tender = await tenderFactory({ status: 'open' });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
-    const doc = { ...tender.toJSON(), supplierIds: tender.getSupplierIds() };
+    const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
     await Tenders.updateTender(tender._id, doc);
 
@@ -190,7 +190,7 @@ describe('Tender db', () => {
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
-    const doc = { ...tender.toJSON(), supplierIds: tender.getSupplierIds() };
+    const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
     await Tenders.updateTender(tender._id, doc);
 
@@ -226,7 +226,11 @@ describe('Tender db', () => {
     const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
     const updated = await Tenders.updateTender(tender._id, doc);
 
-    expect(updated.getSupplierIds()).toEqual([supplier1._id, supplier2._id, supplier3._id]);
+    expect(await updated.getAllPossibleSupplierIds()).toEqual([
+      supplier1._id,
+      supplier2._id,
+      supplier3._id,
+    ]);
 
     // sent responses must be resetted to not send =====
     const updatedResponse1 = await TenderResponses.findOne({ _id: response1._id });

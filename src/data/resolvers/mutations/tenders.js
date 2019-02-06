@@ -29,7 +29,7 @@ const tenderMutations = {
    */
   async tendersEdit(root, { _id, ...fields }) {
     const oldTender = await Tenders.findById(_id);
-    const oldSupplierIds = oldTender.getSupplierIds();
+    const oldSupplierIds = await oldTender.getAllPossibleSupplierIds();
     const updatedTender = await Tenders.updateTender(_id, { ...fields });
 
     if (oldTender.status === 'open') {
@@ -55,7 +55,7 @@ const tenderMutations = {
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
-      const updatedTenderIds = new Set(updatedTender.getSupplierIds());
+      const updatedTenderIds = new Set(await updatedTender.getAllSupplierIds());
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
       await sendEmailToSuppliers({
