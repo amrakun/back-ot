@@ -135,7 +135,7 @@ class Tender extends StatusPublishClose {
    * @param {Object} doc - tender fields
    * @return {Promise} updated tender info
    */
-  static async updateTender(_id, doc) {
+  static async updateTender(_id, doc, userId) {
     const tender = await this.findOne({ _id });
 
     Tender.validateSuppliers(doc);
@@ -242,22 +242,51 @@ class Tender extends StatusPublishClose {
     return tenders.map(tender => tender._id.toString());
   }
 
-  async getAllPossibleSupplierIds() {
+  /*
+   * Compare old supplier ids with given doc
+   */
+  async getNewSupplierIds(doc) {
+    const oldSupplierIds = await this.getExactSupplierIds();
+
+    const currentSupplierIds = await Tenders.calculateSupplierIds({
+      ...doc,
+      supplierIds: encryptArray(doc.supplierIds || []),
+    });
+
+    return currentSupplierIds.filter(supplierId => !oldSupplierIds.includes(supplierId));
+  }
+
+  /*
+   * Get exact supplier ids when it is published
+   */
+  async getExactSupplierIds() {
+    return Tenders.calculateSupplierIds(this, { createdDate: { $lte: this.publishDate } });
+  }
+
+  static async calculateSupplierIds(tender, selector = {}) {
     let suppliers = [];
 
-    if (this.isToAll) {
-      suppliers = await Companies.find({}, { _id: 1 });
+    if (tender.isToAll) {
+      suppliers = await Companies.find(selector, { _id: 1 });
     }
 
-    if (this.tierTypes && this.tierTypes.length > 0) {
-      suppliers = await Companies.find({ tierType: { $in: this.tierTypes } }, { _id: 1 });
+    if (tender.tierTypes && tender.tierTypes.length > 0) {
+      selector.tierType = { $in: tender.tierTypes };
+      suppliers = await Companies.find(selector, { _id: 1 });
     }
 
     if (suppliers.length > 0) {
       return suppliers.map(sup => sup._id.toString());
     }
 
-    return decryptArray(this.supplierIds);
+    return decryptArray(tender.supplierIds);
+  }
+
+  /*
+   * All suppliers who can see this tender
+   */
+  getAllPossibleSupplierIds() {
+    return Tenders.calculateSupplierIds(this);
   }
 
   getWinnerIds() {
@@ -295,16 +324,10 @@ class Tender extends StatusPublishClose {
   /*
    * total suppliers count
    */
-  requestedCount() {
-    if (this.isToAll) {
-      return Companies.find({}).count();
-    }
+  async requestedCount() {
+    const supplierIds = await Tenders.calculateSupplierIds(this);
 
-    if (this.tierTypes && this.tierTypes.length > 0) {
-      return Companies.find({ tierType: { $in: this.tierTypes } }).count();
-    }
-
-    return this.supplierIds.length;
+    return supplierIds.length;
   }
 
   /*

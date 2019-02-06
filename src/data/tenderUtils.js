@@ -99,3 +99,11 @@ export const getAttachments = async tender => {
 
   return attachments;
 };
+
+export default {
+  sendConfigEmail,
+  sendEmailToSuppliers,
+  sendEmailToBuyer,
+  sendEmail,
+  getAttachments,
+};
