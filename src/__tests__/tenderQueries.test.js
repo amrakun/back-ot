@@ -906,6 +906,7 @@ describe('Tender queries', () => {
     await tenderResponseFactory({
       tenderId: tender._id,
       supplierId: supplier1._id,
+      isSent: true,
     });
 
     const [notRespondedSupplier] = await graphqlRequest(

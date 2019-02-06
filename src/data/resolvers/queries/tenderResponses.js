@@ -110,7 +110,7 @@ const tenderResponseQueries = {
     const tender = await Tenders.findOne({ _id: tenderId });
     const allSupplierIds = await tender.getAllPossibleSupplierIds();
 
-    const responses = await TenderResponses.find({ tenderId });
+    const responses = await TenderResponses.find({ tenderId, isSent: true });
     const responededSupplierIds = responses.map(response => response.supplierId);
 
     const notRespondedSupplierIds = allSupplierIds.filter(
