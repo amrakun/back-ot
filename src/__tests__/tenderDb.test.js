@@ -202,7 +202,7 @@ describe('Tender db', () => {
   });
 
   test('Update tender: open tender supplierIds update', async () => {
-    expect.assertions(4);
+    expect.assertions(3);
 
     const supplier1 = await companyFactory({});
     const supplier2 = await companyFactory({});
@@ -215,13 +215,6 @@ describe('Tender db', () => {
 
     const response1 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     const response2 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
-
-    try {
-      const doc = await tenderDoc({ supplierIds: [supplier1._id] });
-      await Tenders.updateTender(tender._id, doc);
-    } catch (e) {
-      expect(e.message).toBe('Can not remove previously added supplier');
-    }
 
     const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
     const updated = await Tenders.updateTender(tender._id, doc);

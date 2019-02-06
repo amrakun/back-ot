@@ -144,16 +144,6 @@ class Tender extends StatusPublishClose {
       throw new Error(`Can not update ${tender.status} tender`);
     }
 
-    if (tender.status === 'open') {
-      const supplierIds = await tender.getAllPossibleSupplierIds();
-
-      for (const supplierId of supplierIds) {
-        if (!doc.supplierIds.includes(supplierId)) {
-          throw new Error('Can not remove previously added supplier');
-        }
-      }
-    }
-
     // if tender is not draft and requirements are changed then reset
     // previously sent responses
     const isChanged = await tender.isChanged(doc);
