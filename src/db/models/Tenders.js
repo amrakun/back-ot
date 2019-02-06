@@ -511,6 +511,11 @@ class TenderResponse {
     const { tenderId, supplierId } = doc;
 
     const tender = await Tenders.findOne({ _id: tenderId });
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    if (tender.type === 'eoi' && !supplier.basicInfo) {
+      throw Error('Please complete registration stage');
+    }
 
     // can send to only open rfqs
     if (tender.type === 'rfq' && tender.status !== 'open') {
