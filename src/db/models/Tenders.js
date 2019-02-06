@@ -46,6 +46,7 @@ const TenderSchema = mongoose.Schema({
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
+  updatedDate: field({ type: Date }),
 
   number: field({ type: String }),
   name: field({ type: String }),
@@ -117,6 +118,7 @@ class Tender extends StatusPublishClose {
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
+      updatedDate: new Date(),
       supplierIds: encryptArray(supplierIds),
     };
 
@@ -157,6 +159,7 @@ class Tender extends StatusPublishClose {
       );
     }
 
+    doc.updatedDate = new Date();
     doc.supplierIds = encryptArray(doc.supplierIds);
 
     if (tender.status !== 'open') {
@@ -257,10 +260,10 @@ class Tender extends StatusPublishClose {
   }
 
   /*
-   * Get exact supplier ids when it is published
+   * Get exact supplier ids when it is last updated
    */
   async getExactSupplierIds() {
-    return Tenders.calculateSupplierIds(this, { createdDate: { $lte: this.publishDate } });
+    return Tenders.calculateSupplierIds(this, { createdDate: { $lte: this.updatedDate } });
   }
 
   static async calculateSupplierIds(tender, selector = {}) {

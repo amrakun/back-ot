@@ -233,7 +233,7 @@ describe('Tender mutations', () => {
   });
 
   test('Update tender: specified tierTypes & with closed status', async () => {
-    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+    let mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
 
     await Companies.remove({});
 
@@ -261,11 +261,27 @@ describe('Tender mutations', () => {
 
     expect(mock.calledOnce).toBe(true);
 
-    const [firstCallArgs] = mock.firstCall.args;
+    let [firstCallArgs] = mock.firstCall.args;
     expect(firstCallArgs.kind).toBe('supplier__reopen');
     expect(firstCallArgs.supplierIds).toEqual([company1._id.toString(), company2._id.toString()]);
-
     mock.restore();
+
+    // second edit ==============
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
+    const secondMock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args);
+
+    expect(secondMock.calledOnce).toBe(true);
+
+    [firstCallArgs] = secondMock.firstCall.args;
+    expect(firstCallArgs.kind).toBe('supplier__reopen');
+    expect(firstCallArgs.supplierIds).toEqual([
+      company1._id.toString(),
+      company2._id.toString(),
+      company3._id.toString(),
+    ]);
+
+    secondMock.restore();
   });
 
   test('Delete tender', async () => {
