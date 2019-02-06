@@ -108,14 +108,16 @@ const tenderResponseQueries = {
    */
   async tenderResponseNotRespondedSuppliers(root, { tenderId }) {
     const tender = await Tenders.findOne({ _id: tenderId });
-    const responses = await TenderResponses.find({ tenderId });
-    const responededSupplierIds = responses.map(response => encrypt(response.supplierId));
+    const allSupplierIds = await tender.getAllPossibleSupplierIds();
 
-    const notRespondedSupplierIds = tender.supplierIds.filter(
+    const responses = await TenderResponses.find({ tenderId });
+    const responededSupplierIds = responses.map(response => response.supplierId);
+
+    const notRespondedSupplierIds = allSupplierIds.filter(
       supplierId => !responededSupplierIds.includes(supplierId),
     );
 
-    return Companies.find({ _id: { $in: decryptArray(notRespondedSupplierIds) } });
+    return Companies.find({ _id: { $in: notRespondedSupplierIds } });
   },
 
   /**
