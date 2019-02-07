@@ -82,7 +82,9 @@ const tendersSupplierFilter = async (args, user) => {
   delete args.status;
 
   const query = await tendersFilter(args, async query => {
-    query.$and.push({ supplierIds: { $in: [encrypt(user.companyId)] } });
+    const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
+
+    query.$and.push({ _id: { $in: possibleTenderIds } });
     query.$and.push({ status: { $ne: 'draft' } });
 
     // status filter ==========
@@ -219,12 +221,13 @@ const tenderQueries = {
    */
   async tenderDetailSupplier(root, { _id }, { user }) {
     const tender = await Tenders.findOne({ _id });
+    const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
 
-    if (tender && !tender.supplierIds.includes(encrypt(user.companyId))) {
+    if (tender && !possibleTenderIds.includes(tender._id.toString())) {
       throw new Error('Not found');
     }
 
-    return Tenders.findOne({ _id, supplierIds: { $in: [encrypt(user.companyId)] } });
+    return Tenders.findOne({ _id });
   },
 
   /*

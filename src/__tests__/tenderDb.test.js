@@ -64,7 +64,7 @@ describe('Tender db', () => {
 
     compare(flatten(doc), flatten(savedTender));
 
-    expect(savedTender.getSupplierIds()).toEqual(doc.supplierIds);
+    expect(await savedTender.getAllPossibleSupplierIds()).toEqual(doc.supplierIds);
     expect(createdDate).toBeDefined();
     expect(createdUserId).toEqual(_user._id);
     expect(status).toEqual('draft');
@@ -77,10 +77,44 @@ describe('Tender db', () => {
       await Tenders.createTender({
         type: 'rfq',
         rfqType: 'invalid',
+        supplierIds: ['_id'],
       });
     } catch (e) {
       expect(e.message).toBe('Invalid rfq type');
     }
+  });
+
+  test('Create tender: required suppliers', async () => {
+    expect.assertions(1);
+
+    try {
+      await Tenders.createTender({ supplierIds: [] });
+    } catch (e) {
+      expect(e.message).toBe('Suppliers are required');
+    }
+  });
+
+  test('Validate suppliers', async () => {
+    expect.assertions(4);
+
+    let doc = { tierTypes: ['test', 'tier1'] };
+
+    try {
+      await Tenders.validateSuppliers(doc);
+    } catch (e) {
+      expect(e.message).toBe('Invalid tier type');
+    }
+
+    // if we selected tier types then supplierIds be resetted
+    doc = { tierTypes: ['tier2', 'tier1'], supplierIds: ['_id'] };
+    await Tenders.validateSuppliers(doc);
+    expect(doc.supplierIds).toEqual([]);
+
+    // if we selected all then tierTypes, supplierIds be resetted
+    doc = { isToAll: true, tierTypes: ['tier2', 'tier1'], supplierIds: ['_id'] };
+    await Tenders.validateSuppliers(doc);
+    expect(doc.tierTypes).toEqual([]);
+    expect(doc.supplierIds).toEqual([]);
   });
 
   test('Update tender', async () => {
@@ -90,7 +124,7 @@ describe('Tender db', () => {
 
     compare(flatten(doc), flatten(updated));
 
-    expect(updated.getSupplierIds()).toEqual(doc.supplierIds);
+    expect(await updated.getAllPossibleSupplierIds()).toEqual(doc.supplierIds);
   });
 
   test('Update tender: with awarded status', async () => {
@@ -138,7 +172,7 @@ describe('Tender db', () => {
     const tender = await tenderFactory({ status: 'open' });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
-    const doc = { ...tender.toJSON(), supplierIds: tender.getSupplierIds() };
+    const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
     await Tenders.updateTender(tender._id, doc);
 
@@ -156,7 +190,7 @@ describe('Tender db', () => {
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
-    const doc = { ...tender.toJSON(), supplierIds: tender.getSupplierIds() };
+    const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
     await Tenders.updateTender(tender._id, doc);
 
@@ -168,7 +202,7 @@ describe('Tender db', () => {
   });
 
   test('Update tender: open tender supplierIds update', async () => {
-    expect.assertions(4);
+    expect.assertions(3);
 
     const supplier1 = await companyFactory({});
     const supplier2 = await companyFactory({});
@@ -182,17 +216,14 @@ describe('Tender db', () => {
     const response1 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     const response2 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
 
-    try {
-      const doc = await tenderDoc({ supplierIds: [supplier1._id] });
-      await Tenders.updateTender(tender._id, doc);
-    } catch (e) {
-      expect(e.message).toBe('Can not remove previously added supplier');
-    }
-
     const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
     const updated = await Tenders.updateTender(tender._id, doc);
 
-    expect(updated.getSupplierIds()).toEqual([supplier1._id, supplier2._id, supplier3._id]);
+    expect(await updated.getAllPossibleSupplierIds()).toEqual([
+      supplier1._id,
+      supplier2._id,
+      supplier3._id,
+    ]);
 
     // sent responses must be resetted to not send =====
     const updatedResponse1 = await TenderResponses.findOne({ _id: response1._id });
@@ -462,5 +493,29 @@ describe('Tender db', () => {
     expect(await tender.isChanged({ ...doc, closeDate: new Date('2000-01-01') })).toBe(false);
     expect(await tender.isChanged({ ...doc, requestedDocuments: ['d1', 'd2'] })).toBe(true);
     expect(await tender.isChanged({ ...doc, requestedProducts: [{ code: '1' }] })).toBe(true);
+  });
+
+  test('getPossibleTendersByUser', async () => {
+    const company1 = await companyFactory({ tierType: 'tier1' });
+    const company2 = await companyFactory({ tierType: 'tier2' });
+
+    const user1 = await userFactory({ companyId: company1._id });
+    const user2 = await userFactory({ companyId: company2._id });
+
+    const t1 = await tenderFactory({ isToAll: true });
+    const t2 = await tenderFactory({ supplierIds: [company1._id] });
+    const t3 = await tenderFactory({ tierTypes: ['tier1', 'tier3'] });
+
+    const t4 = await tenderFactory({ tierTypes: ['tier2'] });
+
+    expect(await Tenders.getPossibleTendersByUser(user1)).toEqual([
+      t1._id.toString(),
+      t2._id.toString(),
+      t3._id.toString(),
+    ]);
+    expect(await Tenders.getPossibleTendersByUser(user2)).toEqual([
+      t1._id.toString(),
+      t4._id.toString(),
+    ]);
   });
 });

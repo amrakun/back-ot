@@ -15,15 +15,21 @@ export const replacer = ({ text, tender }) => {
 };
 
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
-  const filterIds = supplierIds || tender.getSupplierIds();
+  const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
 
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
   for (const supplier of suppliers) {
+    const { basicInfo } = supplier;
+
+    if (!basicInfo || !basicInfo.email) {
+      continue;
+    }
+
     await utils.sendConfigEmail({
       name: `${tender.type}Templates`,
       kind,
-      toEmails: [supplier.basicInfo.email],
+      toEmails: [basicInfo.email],
       attachments,
       replacer: text => {
         return replacer({ text, tender });
@@ -92,4 +98,12 @@ export const getAttachments = async tender => {
   }
 
   return attachments;
+};
+
+export default {
+  sendConfigEmail,
+  sendEmailToSuppliers,
+  sendEmailToBuyer,
+  sendEmail,
+  getAttachments,
 };

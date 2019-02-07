@@ -906,12 +906,15 @@ describe('Tender queries', () => {
     await tenderResponseFactory({
       tenderId: tender._id,
       supplierId: supplier1._id,
+      isSent: true,
     });
 
-    const [notRespondedSupplier] = await graphqlRequest(
+    const { list } = await graphqlRequest(
       `query tenderResponseNotRespondedSuppliers($tenderId: String) {
           tenderResponseNotRespondedSuppliers(tenderId: $tenderId) {
-            _id
+            list {
+              _id
+            }
           }
         }
       `,
@@ -919,6 +922,8 @@ describe('Tender queries', () => {
       { tenderId: tender._id },
       { user },
     );
+
+    const [notRespondedSupplier] = list;
 
     expect(notRespondedSupplier._id).toBe(supplier2._id);
   });

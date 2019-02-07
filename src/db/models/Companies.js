@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 import { Users, Feedbacks, BlockedCompanies } from './';
+import { TIER_TYPES } from './constants';
 
 const FileSchema = mongoose.Schema(
   {
@@ -462,7 +463,7 @@ const CompanySchema = mongoose.Schema({
 
   tierType: field({
     type: String,
-    enum: ['national', 'umnugovi', 'tier1', 'tier2', 'tier3'],
+    enum: TIER_TYPES,
     optional: true,
   }),
 

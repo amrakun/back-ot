@@ -1,7 +1,9 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import { Companies } from './';
 import { field, isReached, encrypt, encryptArray, decryptArray, StatusPublishClose } from './utils';
+import { TIER_TYPES } from './constants';
 
 const FileSchema = mongoose.Schema(
   {
@@ -44,6 +46,7 @@ const TenderSchema = mongoose.Schema({
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
+  updatedDate: field({ type: Date }),
 
   number: field({ type: String }),
   name: field({ type: String }),
@@ -56,7 +59,9 @@ const TenderSchema = mongoose.Schema({
   reminderDay: field({ type: Number, optional: true }),
 
   // encrypted supplier ids
-  supplierIds: field({ type: [String] }),
+  supplierIds: field({ type: [String], optional: true }),
+  tierTypes: field({ type: [String], optional: true }),
+  isToAll: field({ type: Boolean, default: false }),
 
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
@@ -72,6 +77,31 @@ const TenderSchema = mongoose.Schema({
 });
 
 class Tender extends StatusPublishClose {
+  static validateSuppliers(doc) {
+    const { tierTypes, isToAll, supplierIds = [] } = doc;
+
+    if (isToAll) {
+      doc.tierTypes = [];
+      doc.supplierIds = [];
+    }
+
+    if (tierTypes && tierTypes.length > 0) {
+      doc.supplierIds = [];
+
+      const commonItems = tierTypes.filter(t => TIER_TYPES.includes(t));
+
+      if (commonItems.length !== tierTypes.length) {
+        throw new Error('Invalid tier type');
+      }
+    }
+
+    if (!tierTypes && !isToAll && supplierIds.length === 0) {
+      throw new Error('Suppliers are required');
+    }
+
+    return doc;
+  }
+
   /**
    * Create new tender
    * @param {Object} doc - tender fields
@@ -79,12 +109,17 @@ class Tender extends StatusPublishClose {
    * @return {Promise} newly created tender object
    */
   static async createTender(doc, userId) {
+    const supplierIds = doc.supplierIds || [];
+
+    Tender.validateSuppliers(doc);
+
     const extendedDoc = {
       ...doc,
       status: 'draft',
       createdDate: new Date(),
       createdUserId: userId,
-      supplierIds: encryptArray(doc.supplierIds),
+      updatedDate: new Date(),
+      supplierIds: encryptArray(supplierIds),
     };
 
     if (doc.type === 'rfq' && !['goods', 'service'].includes(doc.rfqType)) {
@@ -102,21 +137,13 @@ class Tender extends StatusPublishClose {
    * @param {Object} doc - tender fields
    * @return {Promise} updated tender info
    */
-  static async updateTender(_id, doc) {
+  static async updateTender(_id, doc, userId) {
     const tender = await this.findOne({ _id });
+
+    Tender.validateSuppliers(doc);
 
     if (tender.status === 'awarded') {
       throw new Error(`Can not update ${tender.status} tender`);
-    }
-
-    if (tender.status === 'open') {
-      const supplierIds = tender.getSupplierIds();
-
-      for (const supplierId of supplierIds) {
-        if (!doc.supplierIds.includes(supplierId)) {
-          throw new Error('Can not remove previously added supplier');
-        }
-      }
     }
 
     // if tender is not draft and requirements are changed then reset
@@ -132,6 +159,7 @@ class Tender extends StatusPublishClose {
       );
     }
 
+    doc.updatedDate = new Date();
     doc.supplierIds = encryptArray(doc.supplierIds);
 
     if (tender.status !== 'open') {
@@ -197,8 +225,71 @@ class Tender extends StatusPublishClose {
     return this.findOne({ _id });
   }
 
-  getSupplierIds() {
-    return decryptArray(this.supplierIds);
+  /*
+   * All tenders that given user can see
+   */
+  static async getPossibleTendersByUser(user) {
+    const company = await Companies.findOne({ _id: user.companyId });
+
+    const tenders = await Tenders.find(
+      {
+        $or: [
+          { isToAll: true },
+          { tierTypes: { $in: [company.tierType] } },
+          { supplierIds: { $in: [encrypt(user.companyId)] } },
+        ],
+      },
+      { _id: 1 },
+    );
+
+    return tenders.map(tender => tender._id.toString());
+  }
+
+  /*
+   * Compare old supplier ids with given doc
+   */
+  async getNewSupplierIds(doc) {
+    const oldSupplierIds = await this.getExactSupplierIds();
+
+    const currentSupplierIds = await Tenders.calculateSupplierIds({
+      ...doc,
+      supplierIds: encryptArray(doc.supplierIds || []),
+    });
+
+    return currentSupplierIds.filter(supplierId => !oldSupplierIds.includes(supplierId));
+  }
+
+  /*
+   * Get exact supplier ids when it is last updated
+   */
+  async getExactSupplierIds() {
+    return Tenders.calculateSupplierIds(this, { createdDate: { $lte: this.updatedDate } });
+  }
+
+  static async calculateSupplierIds(tender, selector = {}) {
+    let suppliers = [];
+
+    if (tender.isToAll) {
+      suppliers = await Companies.find(selector, { _id: 1 });
+    }
+
+    if (tender.tierTypes && tender.tierTypes.length > 0) {
+      selector.tierType = { $in: tender.tierTypes };
+      suppliers = await Companies.find(selector, { _id: 1 });
+    }
+
+    if (suppliers.length > 0) {
+      return suppliers.map(sup => sup._id.toString());
+    }
+
+    return decryptArray(tender.supplierIds);
+  }
+
+  /*
+   * All suppliers who can see this tender
+   */
+  getAllPossibleSupplierIds() {
+    return Tenders.calculateSupplierIds(this);
   }
 
   getWinnerIds() {
@@ -236,8 +327,10 @@ class Tender extends StatusPublishClose {
   /*
    * total suppliers count
    */
-  requestedCount() {
-    return this.supplierIds.length;
+  async requestedCount() {
+    const supplierIds = await Tenders.calculateSupplierIds(this);
+
+    return supplierIds.length;
   }
 
   /*
@@ -263,8 +356,9 @@ class Tender extends StatusPublishClose {
    */
   async notRespondedCount() {
     const respondedCount = (await this.submittedCount()) + (await this.notInterestedCount());
+    const requestedCount = await this.requestedCount();
 
-    return this.requestedCount() - respondedCount;
+    return requestedCount - respondedCount;
   }
 
   /*
@@ -420,6 +514,11 @@ class TenderResponse {
     const { tenderId, supplierId } = doc;
 
     const tender = await Tenders.findOne({ _id: tenderId });
+    const supplier = await Companies.findOne({ _id: supplierId });
+
+    if (tender.type === 'eoi' && !supplier.basicInfo) {
+      throw Error('Please complete registration stage');
+    }
 
     // can send to only open rfqs
     if (tender.type === 'rfq' && tender.status !== 'open') {
