@@ -120,6 +120,11 @@ export const types = `
     isSent: Boolean
     isNotInterested: Boolean
   }
+
+  type TenderResponseSuppliers {
+    list: [Company]
+    totalCount: Int
+  }
 `;
 
 const tenderQueryParams = `
@@ -131,6 +136,14 @@ const tenderQueryParams = `
   month: Date
   sortField: String
   sortDirection: Int
+`;
+
+const tenderResponsesParams = `
+  tenderId: String!
+  sort: JSON
+  betweenSearch: JSON
+  supplierSearch: String
+  isNotInterested: Boolean
 `;
 
 export const queries = `
@@ -146,14 +159,17 @@ export const queries = `
   tenderGenerateMaterialsTemplate(tenderId: String!): String
 
   tenderResponses(
-    tenderId: String!
-    sort: JSON
-    betweenSearch: JSON
-    supplierSearch: String
-    isNotInterested: Boolean
+    page: Int
+    perPage: Int
+    ${tenderResponsesParams}
   ): [TenderResponse]
 
-  tenderResponseNotRespondedSuppliers(tenderId: String): [Company]
+  tenderResponsesTotalCount(
+    ${tenderResponsesParams}
+  ): Int
+
+  tenderResponseNotRespondedSuppliers(tenderId: String, page: Int perPage: Int): TenderResponseSuppliers
+  tenderResponseInvitedSuppliers(tenderId: String, page: Int perPage: Int): TenderResponseSuppliers
 
   tenderResponseDetail(_id: String!): TenderResponse
   tenderResponseByUser(tenderId: String!): TenderResponse
