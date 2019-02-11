@@ -145,6 +145,7 @@ describe('Tender db', () => {
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, isNotInterested: true, isSent: true });
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
     const doc = await tenderDoc();
@@ -152,11 +153,16 @@ describe('Tender db', () => {
 
     expect(updated.status).toBe('draft');
 
-    // responses's sent status must be resetted
-    const [response1, response2] = await TenderResponses.find({ tenderId: tender._id });
+    const responses = await TenderResponses.find({ tenderId: tender._id });
 
-    expect(response1.isSent).toBe(false);
-    expect(response2.isSent).toBe(false);
+    // responses's sent status must be resetted
+    const resettedResponses = responses.filter(r => !r.isSent);
+    const interestedResponses = responses.filter(r => !r.isNotInterested);
+    const notInterestedResponses = responses.filter(r => r.isNotInterested);
+
+    expect(resettedResponses.length).toBe(2);
+    expect(interestedResponses.length).toBe(2);
+    expect(notInterestedResponses.length).toBe(1);
   });
 
   test('Update tender: with canceled status', async () => {
