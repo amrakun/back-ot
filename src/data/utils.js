@@ -299,7 +299,9 @@ export const tokenize = str => {
 /*
  * Generate xlsx
  */
-export const generateXlsx = async (user, workbook, name) => {
+export const generateXlsx = async (user, workbook, _name) => {
+  const name = _name.replace(/\//g, '-');
+
   if (!user) {
     return '';
   }
