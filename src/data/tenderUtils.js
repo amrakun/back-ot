@@ -107,7 +107,7 @@ export const getAttachments = async tender => {
 export const downloadFiles = async (tenderId, user) => {
   const tender = await Tenders.findOne({ _id: tenderId });
 
-  if (!tender || tender.type !== 'eoi') {
+  if (!tender || tender.status === 'open' || tender.type !== 'eoi') {
     return Promise.resolve(null);
   }
 
