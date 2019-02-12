@@ -43,6 +43,10 @@ export const readS3File = async (key, user) => {
     return { Body: '' };
   }
 
+  if (!user) {
+    throw new Error('Forbidden');
+  }
+
   if (
     !user === 'system' &&
     !(
