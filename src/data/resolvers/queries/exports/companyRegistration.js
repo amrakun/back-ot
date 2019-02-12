@@ -184,7 +184,7 @@ const companyRegistration = async (user, supplier) => {
       sheet.cell(index, 2).value(factory.name || '');
       sheet.cell(index, 3).value(factory.townOrCity || '');
       sheet.cell(index, 4).value(factory.country || '');
-      sheet.cell(index, 5).value(factory.productCodes || '');
+      sheet.cell(index, 5).value((factory.productCodes || []).join(','));
       index++;
     }
   }

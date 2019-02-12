@@ -231,10 +231,10 @@ const companyQueries = {
   /*
    * Export supplier's registration info from buyer
    */
-  async companyRegistrationExport(root, { _id }) {
+  async companyRegistrationExport(root, { _id }, { user }) {
     const supplier = await Companies.findOne({ _id });
 
-    return companyRegistration(supplier);
+    return companyRegistration(user, supplier);
   },
 
   /*
