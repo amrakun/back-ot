@@ -118,8 +118,13 @@ export const downloadFiles = async (tenderId, user) => {
 
   for (const response of responses) {
     const supplier = await Companies.findOne({ _id: response.supplierId });
-    const subFolder = attachments.folder(supplier.basicInfo.enName);
     const documents = response.respondedDocuments || [];
+
+    if (documents.length === 0) {
+      continue;
+    }
+
+    const subFolder = attachments.folder(supplier.basicInfo.enName);
 
     for (const document of documents) {
       const { file } = document;
