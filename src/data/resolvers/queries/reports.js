@@ -146,8 +146,10 @@ const reportsQuery = {
       sheet.cell(rowIndex, 2).value(it.number);
       sheet.cell(rowIndex, 3).value(it.name || '');
 
+      const supplierIds = await it.getExactSupplierIds();
+
       const suppliers = await Companies.find(
-        { _id: { $in: it.getSupplierIds() } },
+        { _id: { $in: supplierIds } },
         { basicInfo: 1 },
       );
 
