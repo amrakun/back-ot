@@ -394,8 +394,17 @@ class Tender extends StatusPublishClose {
       return true;
     }
 
-    const check = extraSelector =>
-      Tenders.findOne({ supplierIds: { $in: encryptArray([user.companyId]) }, ...extraSelector });
+    const check = async (selector) => {
+      const tender = await Tenders.findOne(selector);
+
+      if (!tender) {
+        return false;
+      }
+
+      const supplierIds = await tender.getExactSupplierIds();
+
+      return supplierIds.includes(user.companyId);
+    }
 
     if (await check({ 'file.url': key })) {
       return true;

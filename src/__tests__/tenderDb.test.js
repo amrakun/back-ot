@@ -441,7 +441,7 @@ describe('Tender db', () => {
     expect(updatedTender.status).toBe('canceled');
   });
 
-  test('Check file permission', async () => {
+  test('Check file permission: selected suppliers', async () => {
     const supplier1 = await userFactory({ isSupplier: true });
     const supplier2 = await userFactory({ isSupplier: true });
     const supplier3 = await userFactory({ isSupplier: true });
@@ -471,6 +471,32 @@ describe('Tender db', () => {
     expect(await Tenders.isAuthorizedToDownload('attach10.png', supplier1)).toBe(true);
     expect(await Tenders.isAuthorizedToDownload('attach2.png', supplier2)).toBe(true);
     expect(await Tenders.isAuthorizedToDownload('attach4.png', supplier2)).toBe(true);
+  });
+
+  test('Check file permission: to all', async () => {
+    const supplier1 = await userFactory({ isSupplier: true });
+    const supplier2 = await userFactory({ isSupplier: true });
+
+    const buyer = await userFactory({});
+
+    await tenderFactory({
+      isToAll: true,
+      file: { url: 'f1.png', name: '/f1' },
+      attachments: [
+        { url: 'attach10.png', name: '/attach10' },
+      ],
+    });
+
+    // buyer can download all files
+    expect(await Tenders.isAuthorizedToDownload('f1.png', buyer)).toBe(true);
+
+    // Since we enabled to all suppliers they can all download it
+    expect(await Tenders.isAuthorizedToDownload('f1.png', supplier1)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('f1.png', supplier2)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('f2.png', supplier2)).toBe(false);
+
+    expect(await Tenders.isAuthorizedToDownload('attach10.png', supplier1)).toBe(true);
+    expect(await Tenders.isAuthorizedToDownload('attach10.png', supplier2)).toBe(true);
   });
 
   test('isChanged', async () => {
