@@ -127,7 +127,7 @@ describe('User db utils', () => {
   });
 
   test('Remove user', async () => {
-    expect.assertions(6);
+    expect.assertions(7);
 
     // audit usage ===================
     await auditFactory({ createdUserId: _user._id });
@@ -180,10 +180,14 @@ describe('User db utils', () => {
     // successfull ==================
     await Users.update({ _id: _user._id }, { $set: { isSupplier: false } });
     await Tenders.remove({});
-    await Users.removeUser(_user._id);
 
-    // ensure removed
-    expect(await Users.find().count()).toBe(0);
+    const aboutToDeactivateUser = await Users.findOne({ _id: _user._id });
+    expect(aboutToDeactivateUser.isActive).toBe(true);
+
+    const deactivedUser = await Users.removeUser(_user._id);
+
+    // deactived user
+    expect(deactivedUser.isActive).toBe(false);
   });
 
   test('Edit profile', async () => {

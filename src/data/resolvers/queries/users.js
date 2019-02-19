@@ -54,7 +54,7 @@ const userQueries = {
    */
   currentUser(root, args, { user }) {
     if (user) {
-      return Users.findOne({ _id: user._id });
+      return Users.findOne({ _id: user._id, isActive: true });
     }
 
     return null;

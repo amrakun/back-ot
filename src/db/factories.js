@@ -321,6 +321,7 @@ export const userFactory = async (params = {}) => {
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
+    isActive: typeof(params.isActive) === 'undefined' ? true : params.isActive,
     companyId: params.companyId,
     delegatedUserId: params.delegatedUserId,
     delegationStartDate: params.delegationStartDate,
