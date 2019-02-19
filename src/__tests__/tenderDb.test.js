@@ -117,10 +117,24 @@ describe('Tender db', () => {
     expect(doc.supplierIds).toEqual([]);
   });
 
+  test('Update tender: check created user', async () => {
+    expect.assertions(1);
+
+    const user = await userFactory({ isSupplier: false });
+    const tender = await tenderFactory({ createdUserId: user._id });
+    const doc = await tenderDoc();
+
+    try {
+      await Tenders.updateTender(tender._id, { ...doc });
+    } catch (e) {
+      expect(e.message).toBe('Permission denied');
+    }
+  });
+
   test('Update tender', async () => {
     const doc = await tenderDoc();
 
-    const updated = await Tenders.updateTender(_tender._id, { ...doc });
+    const updated = await Tenders.updateTender(_tender._id, { ...doc }, _tender.createdUserId);
 
     compare(flatten(doc), flatten(updated));
 
@@ -134,7 +148,7 @@ describe('Tender db', () => {
     expect.assertions(1);
 
     try {
-      await Tenders.updateTender(tender._id, doc);
+      await Tenders.updateTender(tender._id, doc, tender.createdUserId);
     } catch (e) {
       expect(e.message).toBe('Can not update awarded tender');
     }
@@ -149,7 +163,7 @@ describe('Tender db', () => {
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
 
     const doc = await tenderDoc();
-    const updated = await Tenders.updateTender(tender._id, doc);
+    const updated = await Tenders.updateTender(tender._id, doc, tender.createdUserId);
 
     expect(updated.status).toBe('draft');
 
@@ -169,7 +183,7 @@ describe('Tender db', () => {
     const tender = await tenderFactory({ status: 'canceled' });
     const doc = await tenderDoc();
 
-    const updated = await Tenders.updateTender(tender._id, doc);
+    const updated = await Tenders.updateTender(tender._id, doc, tender.createdUserId);
 
     expect(updated.status).toBe('draft');
   });
@@ -180,7 +194,7 @@ describe('Tender db', () => {
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
-    await Tenders.updateTender(tender._id, doc);
+    await Tenders.updateTender(tender._id, doc, tender.createdUserId);
 
     // responses's sent status must be intact
     const [response1, response2] = await TenderResponses.find({ tenderId: tender._id });
@@ -198,7 +212,7 @@ describe('Tender db', () => {
 
     const doc = { ...tender.toJSON(), supplierIds: await tender.getAllPossibleSupplierIds() };
 
-    await Tenders.updateTender(tender._id, doc);
+    await Tenders.updateTender(tender._id, doc, tender.createdUserId);
 
     // responses's sent status must be intact
     const [response1, response2] = await TenderResponses.find({ tenderId: tender._id });
@@ -223,7 +237,7 @@ describe('Tender db', () => {
     const response2 = await tenderResponseFactory({ tenderId: tender._id, isSent: true });
 
     const doc = await tenderDoc({ supplierIds: [supplier1._id, supplier2._id, supplier3._id] });
-    const updated = await Tenders.updateTender(tender._id, doc);
+    const updated = await Tenders.updateTender(tender._id, doc, tender.createdUserId);
 
     expect(await updated.getAllPossibleSupplierIds()).toEqual([
       supplier1._id,

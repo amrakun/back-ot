@@ -175,7 +175,7 @@ describe('Tender mutations', () => {
     const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
     const args = { _id: tenderId, ...doc };
 
-    await graphqlRequest(editTenderMutation, 'tendersEdit', args);
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
     expect(mock.calledTwice).toBe(true);
 
@@ -215,7 +215,7 @@ describe('Tender mutations', () => {
     const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
     const args = { _id: tenderId, ...doc };
 
-    await graphqlRequest(editTenderMutation, 'tendersEdit', args);
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
     expect(mock.calledTwice).toBe(true);
 
@@ -255,7 +255,7 @@ describe('Tender mutations', () => {
     const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
     const args = { _id: tenderId, ...doc };
 
-    await graphqlRequest(editTenderMutation, 'tendersEdit', args);
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
     expect(mock.calledOnce).toBe(true);
 
@@ -267,7 +267,7 @@ describe('Tender mutations', () => {
     // second edit ==============
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
     const secondMock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
-    await graphqlRequest(editTenderMutation, 'tendersEdit', args);
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
     expect(secondMock.calledOnce).toBe(true);
 

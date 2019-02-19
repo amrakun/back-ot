@@ -141,6 +141,11 @@ class Tender extends StatusPublishClose {
   static async updateTender(_id, doc, userId) {
     const tender = await this.findOne({ _id });
 
+    // Only created user can edit
+    if (tender.createdUserId !== userId) {
+      throw new Error('Permission denied');
+    }
+
     Tender.validateSuppliers(doc);
 
     if (tender.status === 'awarded') {
