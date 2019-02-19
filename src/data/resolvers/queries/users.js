@@ -10,7 +10,7 @@ const userQueries = {
    */
   users(root, args) {
     const { search } = args;
-    const selector = { isSupplier: false };
+    const selector = { isSupplier: false, isActive: true };
 
     if (search) {
       selector.$or = [
@@ -35,7 +35,7 @@ const userQueries = {
    * @return {Promise} found user
    */
   userDetail(root, { _id }) {
-    return Users.findOne({ _id });
+    return Users.findOne({ _id, isActive: true });
   },
 
   /**
@@ -45,7 +45,7 @@ const userQueries = {
    * @return {Promise} total count
    */
   usersTotalCount() {
-    return Users.find({ isSupplier: false }).count();
+    return Users.find({ isSupplier: false, isActive: true }).count();
   },
 
   /**

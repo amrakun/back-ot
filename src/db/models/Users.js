@@ -224,22 +224,6 @@ class User {
       throw new Error('Can not remove supplier');
     }
 
-    if (await Audits.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in audit');
-    }
-
-    if (await BlockedCompanies.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in block list');
-    }
-
-    if (await Feedbacks.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in success feedback');
-    }
-
-    if (await Tenders.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in tender');
-    }
-
     await Users.update({ _id }, { $set: { isActive: false } });
 
     return this.findOne({ _id });
