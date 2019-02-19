@@ -183,7 +183,18 @@ class Tender extends StatusPublishClose {
    * @param {String} supplierIds - Company ids
    * @return {Promise} - Updated tender object
    */
-  static async award({ _id, supplierIds, note, attachments }) {
+  static async award({ _id, supplierIds, note, attachments }, userId) {
+    const tender = await Tenders.findOne({ _id });
+
+    if (!tender) {
+      throw new Error('Tender not found');
+    }
+
+    // Only created user can award
+    if (tender.createdUserId !== userId) {
+      throw new Error('Permission denied');
+    }
+
     if (supplierIds.length === 0) {
       throw new Error('Select some suppliers');
     }

@@ -254,7 +254,7 @@ describe('Tender db', () => {
   });
 
   test('Award', async () => {
-    expect.assertions(9);
+    expect.assertions(10);
 
     const tender = await tenderFactory({ status: 'open' });
 
@@ -262,14 +262,22 @@ describe('Tender db', () => {
 
     // select at least one supplier ===============
     try {
-      await Tenders.award({ _id: tender._id, supplierIds: [] });
+      const otherUser = await userFactory({ isSupplier: false });
+      await Tenders.award({ _id: tender._id }, otherUser._id);
+    } catch (e) {
+      expect(e.message).toBe('Permission denied');
+    }
+
+    // select at least one supplier ===============
+    try {
+      await Tenders.award({ _id: tender._id, supplierIds: [] }, tender.createdUserId);
     } catch (e) {
       expect(e.message).toBe('Select some suppliers');
     }
 
     // can not award not responded supplier ===============
     try {
-      await Tenders.award({ _id: tender._id, supplierIds: ['DFAFDSFDSF'] });
+      await Tenders.award({ _id: tender._id, supplierIds: ['DFAFDSFDSF'] }, tender.createdUserId);
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
@@ -284,7 +292,7 @@ describe('Tender db', () => {
     });
 
     try {
-      await Tenders.award({ _id: tender._id, supplierIds: [supplier._id] });
+      await Tenders.award({ _id: tender._id, supplierIds: [supplier._id] }, tender.createdUserId);
     } catch (e) {
       expect(e.message).toBe('Invalid supplier');
     }
@@ -309,7 +317,7 @@ describe('Tender db', () => {
       supplierIds: [supplier._id],
       note: 'note',
       attachments,
-    });
+    }, tender.createdUserId);
 
     expect(updatedTender.status).toBe('awarded');
     expect(updatedTender.awardNote).toBe('note');

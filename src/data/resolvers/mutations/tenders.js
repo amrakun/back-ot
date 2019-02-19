@@ -68,7 +68,7 @@ const tenderMutations = {
    * @return {Promise} - updated tender
    */
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
-    const tender = await Tenders.award({ _id, supplierIds, note, attachments });
+    const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
 
     await tenderUtils.sendEmailToBuyer({ kind: 'buyer__award', tender });
 

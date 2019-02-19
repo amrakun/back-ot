@@ -23,7 +23,6 @@ afterAll(() => disconnect());
 
 describe('Tender mutations', () => {
   let _user;
-  let _tender;
 
   const commonParams = `
     $number: String!,
@@ -62,7 +61,7 @@ describe('Tender mutations', () => {
   beforeEach(async () => {
     // Creating test data
     _user = await userFactory();
-    _tender = await tenderFactory();
+    await tenderFactory({});
 
     await configFactory();
   });
@@ -283,6 +282,8 @@ describe('Tender mutations', () => {
   });
 
   test('Award', async () => {
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+
     const mutation = `
       mutation tendersAward($_id: String!, $supplierIds: [String!]!, $note: String, $attachments: [TenderAwardAttachment]) {
         tendersAward(_id: $_id, supplierIds: $supplierIds, note: $note, attachments: $attachments) {
@@ -292,7 +293,7 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', createdUserId: _user._id });
     const supplier = await companyFactory({});
 
     await tenderResponseFactory({
@@ -312,7 +313,9 @@ describe('Tender mutations', () => {
       ],
     };
 
-    const response = await graphqlRequest(mutation, 'tendersAward', args);
+    const response = await graphqlRequest(mutation, 'tendersAward', args, { user: _user });
+
+    mock.restore();
 
     expect(response.winnerIds.length).toBe(1);
     expect(response.awardNote).toBe('note');
