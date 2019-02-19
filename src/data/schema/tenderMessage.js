@@ -22,6 +22,7 @@ export const types = `
     isAuto:              Boolean!
     isRead:              Boolean!
     isReplySent:         Boolean!
+    createdAt:           Date
   }
 `;
 
