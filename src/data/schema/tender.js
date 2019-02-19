@@ -71,6 +71,7 @@ export const types = `
     isToAll: Boolean
     tierTypes: [String]
     createdUserId: String!
+    responsibleBuyerIds: [String]
     winnerIds: [String]
     awardNote: String
     sentRegretLetter: Boolean
@@ -217,6 +218,7 @@ const commonParams = `
   closeDate: Date!
   file: JSON
   sourcingOfficer: String
+  responsibleBuyerIds: [String]
   reminderDay: Float
   supplierIds: [String]
   tierTypes: [String]

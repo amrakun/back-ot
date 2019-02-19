@@ -46,6 +46,7 @@ const TenderSchema = mongoose.Schema({
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
+  responsibleBuyerIds: field({ type: [String], optional: true }),
   updatedDate: field({ type: Date }),
 
   number: field({ type: String }),
@@ -425,7 +426,6 @@ class Tender extends StatusPublishClose {
       this.content !== doc.content ||
       this.number !== doc.number ||
       this.name !== doc.name ||
-      this.sourcingOfficer !== doc.sourcingOfficer ||
       JSON.stringify(this.requestedDocuments || []) !==
         JSON.stringify(doc.requestedDocuments || []) ||
       JSON.stringify(this.requestedProducts || []) !== JSON.stringify(doc.requestedProducts || [])

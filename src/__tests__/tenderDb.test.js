@@ -514,13 +514,16 @@ describe('Tender db', () => {
       ],
     });
 
+    const buyer = await userFactory({ isSupplier: false });
+
     const doc = tender.toJSON();
 
     expect(await tender.isChanged(doc)).toBe(false);
+    expect(await tender.isChanged({ ...doc, responsibleBuyerIds: [buyer._id] })).toBe(false);
+    expect(await tender.isChanged({ ...doc, sourcingOfficer: 'sourcingOfficer' })).toBe(false);
     expect(await tender.isChanged({ ...doc, content: 'content' })).toBe(true);
     expect(await tender.isChanged({ ...doc, number: 'number' })).toBe(true);
     expect(await tender.isChanged({ ...doc, name: 'name' })).toBe(true);
-    expect(await tender.isChanged({ ...doc, sourcingOfficer: 'sourcingOfficer' })).toBe(true);
     expect(await tender.isChanged({ ...doc, publishDate: new Date('2000-01-01') })).toBe(false);
     expect(await tender.isChanged({ ...doc, closeDate: new Date('2000-01-01') })).toBe(false);
     expect(await tender.isChanged({ ...doc, requestedDocuments: ['d1', 'd2'] })).toBe(true);

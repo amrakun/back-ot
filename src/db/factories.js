@@ -317,6 +317,7 @@ export const userFactory = async (params = {}) => {
     lastName: params.lastName || faker.name.firstName(),
     jobTitle: params.jobTitle || faker.random.word(),
     phone: params.phone || faker.random.number(),
+    responsibleBuyerIds: params.responsibleBuyerIds || [],
 
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
