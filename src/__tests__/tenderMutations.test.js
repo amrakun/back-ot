@@ -357,10 +357,11 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const tender = await tenderFactory();
+    const user = await userFactory({ isSupplier: false });
+    const tender = await tenderFactory({ createdUserId: user._id });
     const args = { _id: tender._id };
 
-    const response = await graphqlRequest(mutation, 'tendersCancel', args);
+    const response = await graphqlRequest(mutation, 'tendersCancel', args, { user });
 
     expect(response.status).toBe('canceled');
   });

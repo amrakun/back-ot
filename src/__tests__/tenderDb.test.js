@@ -409,16 +409,24 @@ describe('Tender db', () => {
   });
 
   test('Cancel', async () => {
-    expect.assertions(2);
+    expect.assertions(3);
 
     let tender = await tenderFactory({ status: 'closed' });
 
     tender = await Tenders.findOne({ _id: tender._id });
 
     try {
-      await tender.cancel();
+      await tender.cancel(tender.createdUserId);
     } catch (e) {
       expect(e.message).toBe('Can not cancel awarded or closed tender');
+    }
+
+    // not created user =============
+    try {
+      const otherUser = await userFactory({ isSupplier: false });
+      await tender.cancel(otherUser._id);
+    } catch (e) {
+      expect(e.message).toBe('Permission denied');
     }
 
     // successfull ===========================
@@ -426,7 +434,7 @@ describe('Tender db', () => {
 
     tender = await Tenders.findOne({ _id: tender._id });
 
-    await tender.cancel();
+    await tender.cancel(tender.createdUserId);
 
     const updatedTender = await Tenders.findOne({ _id: tender._id });
 

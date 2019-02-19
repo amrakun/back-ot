@@ -145,11 +145,11 @@ const tenderMutations = {
    * @param {String} _id - Tender id
    * @return {Promise} - updated tender
    */
-  async tendersCancel(root, { _id }) {
+  async tendersCancel(root, { _id }, { user }) {
     const tender = await Tenders.findOne({ _id });
 
     if (tender) {
-      const canceledTender = await tender.cancel();
+      const canceledTender = await tender.cancel(user._id);
 
       await tenderUtils.sendEmail({ kind: 'cancel', tender: canceledTender });
 

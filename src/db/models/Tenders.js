@@ -305,7 +305,11 @@ class Tender extends StatusPublishClose {
   /*
    * Mark as canceled
    */
-  async cancel() {
+  async cancel(userId) {
+    if (this.createdUserId !== userId) {
+      throw new Error('Permission denied');
+    }
+
     if (['closed', 'awarded'].includes(this.status)) {
       throw new Error('Can not cancel awarded or closed tender');
     }
