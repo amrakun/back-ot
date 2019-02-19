@@ -84,12 +84,11 @@ describe('Tender mutations', () => {
       }
     };
 
-    expect.assertions(5);
+    expect.assertions(4);
 
     const mutations = [
       'tendersAdd',
       'tendersEdit',
-      'tendersRemove',
       'tendersAward',
       'tendersSendRegretLetter',
     ];
@@ -124,7 +123,7 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender', async () => {
-    const mock = sinon.stub(Tenders, 'createTender').callsFake(() => _tender);
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
 
     const mutation = `
       mutation tendersAdd($type: String!, $rfqType: String ${commonParams}) {
@@ -136,10 +135,9 @@ describe('Tender mutations', () => {
 
     const doc = await tenderDoc({ type: 'rfq' });
 
-    await graphqlRequest(mutation, 'tendersAdd', doc, { user: _user });
+    const tender = await graphqlRequest(mutation, 'tendersAdd', doc, { user: _user });
 
-    expect(mock.called).toBe(true);
-    expect(mock.calledWith(doc, _user._id)).toBe(true);
+    expect(tender._id).toBeDefined();
 
     mock.restore();
   });
@@ -282,26 +280,6 @@ describe('Tender mutations', () => {
     ]);
 
     secondMock.restore();
-  });
-
-  test('Delete tender', async () => {
-    const mock = sinon.stub(Tenders, 'removeTender').callsFake(() => _tender);
-
-    const mutation = `
-      mutation tendersRemove($_id: String!) {
-        tendersRemove(_id: $_id)
-      }
-    `;
-
-    const tender = await tenderFactory();
-    const tenderId = tender._id.toString();
-
-    await graphqlRequest(mutation, 'tendersRemove', { _id: tenderId });
-
-    expect(mock.calledOnce).toBe(true);
-    expect(mock.calledWith(tenderId)).toBe(true);
-
-    mock.restore();
   });
 
   test('Award', async () => {

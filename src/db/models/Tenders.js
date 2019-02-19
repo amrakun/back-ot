@@ -173,21 +173,6 @@ class Tender extends StatusPublishClose {
   }
 
   /*
-   * Remove tender
-   * @param {String} _id - Tender id
-   * @return {Promise} - remove method response
-   */
-  static async removeTender(_id) {
-    const tender = await this.findOne({ _id });
-
-    if (tender.status !== 'draft') {
-      throw new Error('Can not delete open or closed tender');
-    }
-
-    return this.remove({ _id });
-  }
-
-  /*
    * Choose tender winners
    * @param {String} _id - Tender id
    * @param {String} supplierIds - Company ids

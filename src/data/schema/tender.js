@@ -238,7 +238,6 @@ const responseCommonParams = `
 export const mutations = `
   tendersAdd(type: String!, rfqType: String, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
-  tendersRemove(_id: String!): String
 
   tendersAward(
     _id: String!

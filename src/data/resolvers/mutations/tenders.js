@@ -62,15 +62,6 @@ const tenderMutations = {
   },
 
   /**
-   * Delete tender
-   * @param {String} doc - tenders fields
-   * @return {Promise}
-   */
-  tendersRemove(root, { _id }) {
-    return Tenders.removeTender(_id);
-  },
-
-  /**
    * Choose winners
    * @param {String} _id - Tender id
    * @param {String} supplierIds - Company ids
