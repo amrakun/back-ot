@@ -128,7 +128,23 @@ describe('Tender queries', () => {
     }
   });
 
-  test('tenders', async () => {
+  test('tenders: responsibleBuyerIds', async () => {
+    // Creating test data ==============
+
+    const user = await userFactory({ isSupplier: false, role: 'contributor' });
+
+    await tenderFactory({ type: 'eoi', status: 'open', responsibleBuyerIds: [user._id] });
+    await tenderFactory({ type: 'eoi', status: 'open', createdUserId: user._id });
+    await tenderFactory({ type: 'eoi', status: 'open' });
+
+    const doQuery = args => graphqlRequest(query, 'tenders', {}, { user });
+
+    let response = await doQuery({});
+
+    expect(response.length).toBe(2);
+  });
+
+  test('tenders: filters', async () => {
     // Creating test data ==============
 
     supplier1 = await companyFactory();

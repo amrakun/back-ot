@@ -317,7 +317,6 @@ export const userFactory = async (params = {}) => {
     lastName: params.lastName || faker.name.firstName(),
     jobTitle: params.jobTitle || faker.random.word(),
     phone: params.phone || faker.random.number(),
-    responsibleBuyerIds: params.responsibleBuyerIds || [],
 
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
@@ -351,6 +350,7 @@ export const tenderDoc = async (params = {}) => {
   const doc = {
     number: params.number || faker.random.word(),
     sourcingOfficer: params.sourcingOfficer || faker.random.word(),
+    responsibleBuyerIds: params.responsibleBuyerIds || [],
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
     attachments: params.attachments || [{ name: 'name', url: 'url' }],

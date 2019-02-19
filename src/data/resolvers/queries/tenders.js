@@ -67,7 +67,12 @@ const tendersFilter = async (args, extraChecks) => {
 const tendersBuyerFilter = async (args, user) =>
   tendersFilter(args, query => {
     if (user.role !== 'admin') {
-      query.$and.push({ createdUserId: user._id });
+      query.$and.push({ $or:
+        [
+          { responsibleBuyerIds: { $in: [user._id] } },
+          { createdUserId: user._id }
+        ]
+      });
     }
   });
 
