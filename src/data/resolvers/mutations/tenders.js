@@ -14,9 +14,10 @@ const tenderMutations = {
   async tendersAdd(root, doc, { user }) {
     const tender = await Tenders.createTender(doc, user._id);
 
+    // create log
     await TenderLogs.write({
-      tenderId: tender._id.toString(),
-      userId: user._id.toString(),
+      tenderId: tender._id,
+      userId: user._id,
       action: 'create',
       description: `Created a ${tender.getLabelOfType()} draft ${tender.number}.`,
     });
@@ -36,9 +37,10 @@ const tenderMutations = {
 
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
 
+    // write edit log
     await TenderLogs.write({
-      tenderId: oldTender._id.toString(),
-      userId: user._id.toString(),
+      tenderId: oldTender._id,
+      userId: user._id,
       action: 'edit',
       description: `Edited a ${oldTender.status} ${
         oldTender.number
@@ -46,9 +48,10 @@ const tenderMutations = {
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
+      // write extended log
       await TenderLogs.write({
-        tenderId: oldTender._id.toString(),
-        userId: user._id.toString(),
+        tenderId: oldTender._id,
+        userId: user._id,
         action: 'extend',
         description: `Extended a ${oldTender.getLabelOfType()}'s close date from (${
           oldTender.closeDate
@@ -79,9 +82,10 @@ const tenderMutations = {
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
+      // write reopen log
       await TenderLogs.write({
-        tenderId: oldTender._id.toString(),
-        userId: user._id.toString(),
+        tenderId: oldTender._id,
+        userId: user._id,
         action: 'reopen',
         description: `Reopened a ${oldTender.status} ${oldTender.getLabelOfType()} ${
           oldTender.number
@@ -110,9 +114,10 @@ const tenderMutations = {
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
 
+    // write awarded log
     await TenderLogs.write({
-      tenderId: _id.toString(),
-      userId: user._id.toString(),
+      tenderId: _id,
+      userId: user._id,
       action: 'award',
       description: `Awarded a ${tender.getLabelOfType()}`,
     });
@@ -198,9 +203,10 @@ const tenderMutations = {
     if (tender) {
       const canceledTender = await tender.cancel(user._id);
 
+      // write canceled log
       await TenderLogs.write({
-        tenderId: tender._id.toString(),
-        userId: user._id.toString(),
+        tenderId: tender._id,
+        userId: user._id,
         action: 'cancel',
         description: `Canceled a ${tender.getLabelOfType()} ${canceledTender.number}`,
       });
