@@ -1,5 +1,5 @@
 node_modules
-dump
+*dump
 dist
 static
 .DS_Store

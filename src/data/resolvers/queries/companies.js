@@ -106,7 +106,10 @@ const companiesFilter = async args => {
   checkStatus(productsInfoStatus, 'isProductsInfoValidated');
 
   // by pre qualified status
-  checkStatus(prequalifiedStatus, 'isPrequalified');
+  if (prequalifiedStatus) {
+    selector.isSentPrequalificationInfo = true;
+    checkStatus(prequalifiedStatus, 'isPrequalified');
+  }
 
   // by qualified status
   checkStatus(qualifiedStatus, 'isQualified');
@@ -228,10 +231,10 @@ const companyQueries = {
   /*
    * Export supplier's registration info from buyer
    */
-  async companyRegistrationExport(root, { _id }) {
+  async companyRegistrationExport(root, { _id }, { user }) {
     const supplier = await Companies.findOne({ _id });
 
-    return companyRegistration(supplier);
+    return companyRegistration(user, supplier);
   },
 
   /*

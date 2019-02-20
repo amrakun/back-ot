@@ -30,7 +30,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   // send closed email to suppliers ================
   const closedTenderIds = await Tenders.closeOpens();
-  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds } });
+  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds }, type: { $ne: 'eoi' } });
 
   for (const tender of closedTenders) {
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });

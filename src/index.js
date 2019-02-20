@@ -20,6 +20,7 @@ import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
 import { uploadFile, readS3File, tokenize, virusDetector } from './data/utils';
+import { downloadFiles } from './data/tenderUtils';
 import schema from './data';
 import { init } from './startup';
 
@@ -79,6 +80,21 @@ app.get('/read-file', async (req, res) => {
     res.attachment(key);
 
     return res.send(response.Body);
+  } catch (e) {
+    return res.end(e.message);
+  }
+});
+
+// download tender files
+app.get('/download-tender-files', async (req, res) => {
+  const tenderId = req.query.tenderId;
+
+  try {
+    const response = await downloadFiles(tenderId, req.user);
+
+    res.attachment('files.zip');
+
+    return res.send(response);
   } catch (e) {
     return res.end(e.message);
   }

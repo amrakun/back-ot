@@ -128,7 +128,23 @@ describe('Tender queries', () => {
     }
   });
 
-  test('tenders', async () => {
+  test('tenders: responsibleBuyerIds', async () => {
+    // Creating test data ==============
+
+    const user = await userFactory({ isSupplier: false, role: 'contributor' });
+
+    await tenderFactory({ type: 'eoi', status: 'open', responsibleBuyerIds: [user._id] });
+    await tenderFactory({ type: 'eoi', status: 'open', createdUserId: user._id });
+    await tenderFactory({ type: 'eoi', status: 'open' });
+
+    const doQuery = args => graphqlRequest(query, 'tenders', {}, { user });
+
+    let response = await doQuery({});
+
+    expect(response.length).toBe(2);
+  });
+
+  test('tenders: filters', async () => {
     // Creating test data ==============
 
     supplier1 = await companyFactory();
@@ -572,7 +588,7 @@ describe('Tender queries', () => {
     // drafts must be excluded
     let response = await doQuery();
 
-    expect(response.length).toBe(2);
+    expect(response.length).toBe(3);
 
     // by type ==============
     response = await doQuery({ type: 'rfq' });
@@ -906,12 +922,15 @@ describe('Tender queries', () => {
     await tenderResponseFactory({
       tenderId: tender._id,
       supplierId: supplier1._id,
+      isSent: true,
     });
 
-    const [notRespondedSupplier] = await graphqlRequest(
+    const { list } = await graphqlRequest(
       `query tenderResponseNotRespondedSuppliers($tenderId: String) {
           tenderResponseNotRespondedSuppliers(tenderId: $tenderId) {
-            _id
+            list {
+              _id
+            }
           }
         }
       `,
@@ -919,6 +938,8 @@ describe('Tender queries', () => {
       { tenderId: tender._id },
       { user },
     );
+
+    const [notRespondedSupplier] = list;
 
     expect(notRespondedSupplier._id).toBe(supplier2._id);
   });

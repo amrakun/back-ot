@@ -538,7 +538,8 @@ describe('User mutations', async () => {
     await userMutations.usersRemove({}, { _id: removeUserId }, { user: _adminUser });
 
     // ensure removed
-    expect(await Users.findOne({ _id: removeUserId })).toBe(null);
+    const deactivatedUser = await Users.findOne({ _id: removeUserId });
+    expect(deactivatedUser.isActive).toBe(false);
   });
 
   test('delegate', async () => {

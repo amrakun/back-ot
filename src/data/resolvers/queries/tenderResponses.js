@@ -1,7 +1,33 @@
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
-import { encrypt, decryptArray } from '../../../db/models/utils';
+import { decrypt, encrypt, decryptArray } from '../../../db/models/utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
-import { supplierFilter } from './utils';
+import { paginate, supplierFilter } from './utils';
+
+const tenderResponsesFilter = async args => {
+  const { tenderId, betweenSearch = {}, supplierSearch, isNotInterested } = args;
+
+  const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch, ids =>
+    ids.map(id => encrypt(id.toString())),
+  );
+
+  // filter by interest
+  if (isNotInterested !== undefined) {
+    query.isNotInterested = isNotInterested;
+  }
+
+  const { name, minValue, maxValue, productCode } = betweenSearch;
+
+  if (name && productCode) {
+    query.respondedProducts = {
+      $elemMatch: {
+        code: productCode,
+        [name]: { $gte: parseFloat(minValue), $lte: parseFloat(maxValue) },
+      },
+    };
+  }
+
+  return query;
+};
 
 const tenderResponseQueries = {
   /**
@@ -10,7 +36,7 @@ const tenderResponseQueries = {
    * @return {Promise} filtered tenderResponses list by given parameters
    */
   async tenderResponses(root, args) {
-    const { tenderId, sort = {}, betweenSearch = {}, supplierSearch, isNotInterested } = args;
+    const { tenderId, sort = {} } = args;
 
     const tender = await Tenders.findOne({ _id: tenderId });
 
@@ -19,81 +45,92 @@ const tenderResponseQueries = {
       return [];
     }
 
-    const query = await supplierFilter({ tenderId, isSent: true }, supplierSearch, ids =>
-      ids.map(id => encrypt(id.toString())),
-    );
+    const query = await tenderResponsesFilter(args);
+
+    let aggregations = [{ $match: query }];
 
     const sortName = sort.name;
     const sortProductCode = sort.productCode;
 
-    // filter by interest
-    if (isNotInterested !== undefined) {
-      query.isNotInterested = isNotInterested;
-    }
+    let subField;
 
-    let responses = await TenderResponses.find(query);
-
-    // search by between values =========
-    // filter by sub field value
-    const filterBySubField = name =>
-      responses.filter(tender => {
-        const { minValue, maxValue, productCode } = betweenSearch;
-
-        const respondedProducts = tender.respondedProducts || [];
-        const product = respondedProducts.find(p => p.code === productCode);
-
-        return product && product[name] >= minValue && product[name] <= maxValue;
-      });
-
-    // totalPrice
-    if (betweenSearch.name === 'totalPrice') {
-      responses = filterBySubField('totalPrice');
-    }
-
-    // unit price
-    if (betweenSearch.name === 'unitPrice') {
-      responses = filterBySubField('unitPrice');
-    }
-
-    // lead time
-    if (betweenSearch.name === 'leadTime') {
-      responses = filterBySubField('leadTime');
-    }
-
-    // sort by sub field value ===================
-    const sortBySubField = name =>
-      responses.sort((doc1, doc2) => {
-        if (!sortProductCode) {
-          return;
-        }
-
-        // doc1's responded product for productCode
-        const d1p = (doc1.respondedProducts || []).find(p => p.code === sortProductCode);
-
-        // doc2's responded product for productCode
-        const d2p = (doc2.respondedProducts || []).find(p => p.code === sortProductCode);
-
-        if (d1p && d2p) {
-          return d1p[name] > d2p[name];
-        }
-      });
-
-    // minimum unit price
     if (sortName === 'minUnitPrice') {
-      responses = sortBySubField('unitPrice');
+      subField = 'unitPrice';
     }
 
     // minimum lead time
     if (sortName === 'minLeadTime') {
-      responses = sortBySubField('leadTime');
+      subField = 'leadTime';
     }
 
     // minimum total price
     if (sortName === 'minTotalPrice') {
-      responses = sortBySubField('totalPrice');
+      subField = 'totalPrice';
     }
 
-    return responses;
+    const { page, perPage } = args;
+    const _page = Number(page || '1');
+    const _limit = Number(perPage || '15');
+
+    if (sortName && sortProductCode) {
+      aggregations = [
+        ...aggregations,
+        {
+          $addFields: {
+            rps: {
+              $filter: {
+                input: '$respondedProducts',
+                as: 'respondedProduct',
+                cond: { $eq: ['$$respondedProduct.code', sortProductCode] },
+              },
+            },
+          },
+        },
+        {
+          $unwind: '$rps',
+        },
+        {
+          $sort: { [`rps.${subField}`]: 1 },
+        },
+      ];
+    }
+
+    aggregations = [
+      ...aggregations,
+      {
+        $skip: (_page - 1) * _limit,
+      },
+      {
+        $limit: _limit,
+      },
+    ];
+
+    const responses = await TenderResponses.aggregate(aggregations);
+
+    return responses.map(response => ({
+      ...response,
+      supplierId: decrypt(response.supplierId),
+    }));
+  },
+
+  /**
+   * TenderResponses total count
+   * @param {Object} args - Query params
+   * @return {Promise} number
+   */
+  async tenderResponsesTotalCount(root, args) {
+    const { tenderId } = args;
+
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    // do not show open tender's responses
+    if (tender.status === 'open') {
+      return 0;
+    }
+
+    const query = await tenderResponsesFilter(args);
+
+    return TenderResponses.find(query).count();
   },
 
   /**
@@ -111,16 +148,42 @@ const tenderResponseQueries = {
    * @param {String} tenderId - Tender id
    * @return {Promise} - Companies list
    */
-  async tenderResponseNotRespondedSuppliers(root, { tenderId }) {
+  async tenderResponseNotRespondedSuppliers(root, args) {
+    const { tenderId } = args;
     const tender = await Tenders.findOne({ _id: tenderId });
-    const responses = await TenderResponses.find({ tenderId });
-    const responededSupplierIds = responses.map(response => encrypt(response.supplierId));
+    const allSupplierIds = await tender.getAllPossibleSupplierIds();
 
-    const notRespondedSupplierIds = tender.supplierIds.filter(
+    const responses = await TenderResponses.find({ tenderId, isSent: true });
+    const responededSupplierIds = responses.map(response => response.supplierId);
+
+    const notRespondedSupplierIds = allSupplierIds.filter(
       supplierId => !responededSupplierIds.includes(supplierId),
     );
 
-    return Companies.find({ _id: { $in: decryptArray(notRespondedSupplierIds) } });
+    const selector = { _id: { $in: notRespondedSupplierIds } };
+
+    return {
+      list: await paginate(Companies.find(selector), args),
+      totalCount: await Companies.find(selector).count(),
+    };
+  },
+
+  /**
+   * All invited suppliers
+   * @param {String} tenderId - Tender id
+   * @return {Promise} - Companies list
+   */
+  async tenderResponseInvitedSuppliers(root, args) {
+    const { tenderId } = args;
+    const tender = await Tenders.findOne({ _id: tenderId });
+    const allSupplierIds = await tender.getAllPossibleSupplierIds();
+
+    const selector = { _id: { $in: allSupplierIds } };
+
+    return {
+      list: await paginate(Companies.find(selector), args),
+      totalCount: await Companies.find(selector).count(),
+    };
   },
 
   /**
@@ -134,8 +197,10 @@ const tenderResponseQueries = {
 };
 
 requireBuyer(tenderResponseQueries, 'tenderResponses');
+requireBuyer(tenderResponseQueries, 'tenderResponsesTotalCount');
 requireBuyer(tenderResponseQueries, 'tenderResponseDetail');
 requireBuyer(tenderResponseQueries, 'tenderResponseNotRespondedSuppliers');
+requireBuyer(tenderResponseQueries, 'tenderResponseInvitedSuppliers');
 requireSupplier(tenderResponseQueries, 'tenderResponseByUser');
 
 export default tenderResponseQueries;

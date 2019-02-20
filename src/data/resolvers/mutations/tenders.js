@@ -1,15 +1,9 @@
 import { Tenders, TenderResponses, Companies, TenderLog } from '../../../db/models';
-import {
-  sendConfigEmail,
-  sendEmailToSuppliers,
-  sendEmailToBuyer,
-  sendEmail,
-  getAttachments,
-} from '../../../data/tenderUtils';
 import moment from 'moment';
 
+import { Tenders, TenderResponses, Companies } from '../../../db/models';
+import tenderUtils from '../../../data/tenderUtils';
 import { readS3File } from '../../../data/utils';
-
 import { moduleRequireBuyer } from '../../permissions';
 
 const tenderMutations = {
@@ -39,8 +33,9 @@ const tenderMutations = {
    */
   async tendersEdit(root, { _id, ...fields }, { user }) {
     const oldTender = await Tenders.findById(_id);
-    const oldSupplierIds = oldTender.getSupplierIds();
-    const updatedTender = await Tenders.updateTender(_id, { ...fields });
+    const oldSupplierIds = await oldTender.getExactSupplierIds();
+
+    const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
 
     await TenderLog.write({
       tenderId: oldTender._id.toString(),
@@ -63,31 +58,28 @@ const tenderMutations = {
     }
 
     if (oldTender.status === 'open') {
-      const newSupplierIds = fields.supplierIds.filter(sId => !oldSupplierIds.includes(sId));
+      const newSupplierIds = await oldTender.getNewSupplierIds(fields);
 
       // send publish emails to new suppliers
-      await sendEmailToSuppliers({
+      await tenderUtils.sendEmailToSuppliers({
         kind: 'supplier__publish',
         tender: updatedTender,
-        attachments: await getAttachments(updatedTender),
+        attachments: await tenderUtils.getAttachments(updatedTender),
         supplierIds: newSupplierIds,
       });
 
       // if tender is changed than send edit email to old suppliers
       if (await oldTender.isChanged(fields)) {
-        await sendEmailToSuppliers({
+        await tenderUtils.sendEmailToSuppliers({
           kind: 'supplier__edit',
           tender: updatedTender,
-          attachments: await getAttachments(updatedTender),
+          attachments: await tenderUtils.getAttachments(updatedTender),
           supplierIds: oldSupplierIds,
         });
       }
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
-      const updatedSupplierIds = new Set(updatedTender.getSupplierIds());
-      const intersectionIds = oldSupplierIds.filter(x => updatedSupplierIds.has(x));
-
       await TenderLog.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
@@ -97,7 +89,10 @@ const tenderMutations = {
         } ${oldTender.getLabelOfType()}.`,
       });
 
-      await sendEmailToSuppliers({
+      const updatedTenderIds = new Set(await updatedTender.getExactSupplierIds());
+      const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
+
+      await tenderUtils.sendEmailToSuppliers({
         kind: 'supplier__reopen',
         tender: updatedTender,
         supplierIds: intersectionIds,
@@ -108,29 +103,13 @@ const tenderMutations = {
   },
 
   /**
-   * Delete tender
-   * @param {String} doc - tenders fields
-   * @return {Promise}
-   */
-  async tendersRemove(root, { _id }, { user }) {
-    const result = await Tenders.removeTender(_id);
-    await TenderLog.write({
-      tenderId: _id.toString(),
-      userId: user._id.toString(),
-      action: 'remove',
-      description: `Deleted a tender`,
-    });
-    return result;
-  },
-
-  /**
    * Choose winners
    * @param {String} _id - Tender id
    * @param {String} supplierIds - Company ids
    * @return {Promise} - updated tender
    */
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
-    const tender = await Tenders.award({ _id, supplierIds, note, attachments });
+    const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
 
     await TenderLog.write({
       tenderId: _id.toString(),
@@ -139,7 +118,7 @@ const tenderMutations = {
       description: `Awarded a ${tender.getLabelOfType()}`,
     });
 
-    await sendEmailToBuyer({ kind: 'buyer__award', tender });
+    await tenderUtils.sendEmailToBuyer({ kind: 'buyer__award', tender });
 
     const suppliers = await Companies.find({ _id: { $in: supplierIds } });
 
@@ -157,7 +136,7 @@ const tenderMutations = {
 
       const file = await readS3File(attachment.url, user);
 
-      await sendConfigEmail({
+      await tenderUtils.sendConfigEmail({
         kind: 'supplier__award',
         tender,
         toEmails: [supplier.basicInfo.email],
@@ -195,7 +174,7 @@ const tenderMutations = {
       const selector = { _id: notAwardedResponse.supplierId };
       const supplier = (await Companies.findOne(selector)) || {};
 
-      await sendConfigEmail({
+      await tenderUtils.sendConfigEmail({
         name: `${tender.type}Templates`,
         kind: 'supplier__regretLetter',
         tender,
@@ -218,7 +197,7 @@ const tenderMutations = {
     const tender = await Tenders.findOne({ _id });
 
     if (tender) {
-      const canceledTender = await tender.cancel();
+      const canceledTender = await tender.cancel(user._id);
 
       await TenderLog.write({
         tenderId: tender._id.toString(),
@@ -227,7 +206,7 @@ const tenderMutations = {
         description: `Canceled a ${tender.getLabelOfType()} ${canceledTender.number}`,
       });
 
-      await sendEmail({ kind: 'cancel', tender: canceledTender });
+      await tenderUtils.sendEmail({ kind: 'cancel', tender: canceledTender });
 
       return canceledTender;
     }

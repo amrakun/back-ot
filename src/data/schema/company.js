@@ -123,7 +123,6 @@ export const businessInfoQualifiableFields = `
   hasConvictedForBusinessIntegrity: Boolean
   hasLeadersConvicted: Boolean
   doesEmployeePoliticallyExposed: Boolean
-  pepName: String
   organizationChartFile: JSON
   isSubContractor: Boolean
 `;
@@ -138,6 +137,7 @@ const businessInfoNotQualifiableFields = `
   doesHaveLiabilityInsuranceFile: JSON
   doesHaveCodeEthicsFile: JSON
   doesHaveResponsiblityPolicyFile: JSON
+  pepName: String
 `;
 
 // exporting to use in qualification

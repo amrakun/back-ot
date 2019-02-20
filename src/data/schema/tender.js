@@ -61,13 +61,17 @@ export const types = `
   type SupplierTender {
     ${commonTenderFields}
     isParticipated: Boolean
+    isNotInterested: Boolean
     isSent: Boolean
   }
 
   type Tender {
     ${commonTenderFields}
-    supplierIds: [String]!
+    supplierIds: [String]
+    isToAll: Boolean
+    tierTypes: [String]
     createdUserId: String!
+    responsibleBuyerIds: [String]
     winnerIds: [String]
     awardNote: String
     sentRegretLetter: Boolean
@@ -117,6 +121,11 @@ export const types = `
     isSent: Boolean
     isNotInterested: Boolean
   }
+
+  type TenderResponseSuppliers {
+    list: [Company]
+    totalCount: Int
+  }
 `;
 
 const tenderQueryParams = `
@@ -128,6 +137,14 @@ const tenderQueryParams = `
   month: Date
   sortField: String
   sortDirection: Int
+`;
+
+const tenderResponsesParams = `
+  tenderId: String!
+  sort: JSON
+  betweenSearch: JSON
+  supplierSearch: String
+  isNotInterested: Boolean
 `;
 
 export const queries = `
@@ -143,14 +160,17 @@ export const queries = `
   tenderGenerateMaterialsTemplate(tenderId: String!): String
 
   tenderResponses(
-    tenderId: String!
-    sort: JSON
-    betweenSearch: JSON
-    supplierSearch: String
-    isNotInterested: Boolean
+    page: Int
+    perPage: Int
+    ${tenderResponsesParams}
   ): [TenderResponse]
 
-  tenderResponseNotRespondedSuppliers(tenderId: String): [Company]
+  tenderResponsesTotalCount(
+    ${tenderResponsesParams}
+  ): Int
+
+  tenderResponseNotRespondedSuppliers(tenderId: String, page: Int perPage: Int): TenderResponseSuppliers
+  tenderResponseInvitedSuppliers(tenderId: String, page: Int perPage: Int): TenderResponseSuppliers
 
   tenderResponseDetail(_id: String!): TenderResponse
   tenderResponseByUser(tenderId: String!): TenderResponse
@@ -198,8 +218,11 @@ const commonParams = `
   closeDate: Date!
   file: JSON
   sourcingOfficer: String
+  responsibleBuyerIds: [String]
   reminderDay: Float
-  supplierIds: [String]!
+  supplierIds: [String]
+  tierTypes: [String]
+  isToAll: Boolean
   requestedProducts: [TenderRequestedProductInput]
   requestedDocuments: [String]
 `;
@@ -215,7 +238,6 @@ const responseCommonParams = `
 export const mutations = `
   tendersAdd(type: String!, rfqType: String, ${commonParams}): Tender
   tendersEdit(_id: String!, ${commonParams}): Tender
-  tendersRemove(_id: String!): String
 
   tendersAward(
     _id: String!

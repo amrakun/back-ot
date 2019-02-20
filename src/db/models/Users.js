@@ -29,6 +29,7 @@ const UserSchema = mongoose.Schema({
   }),
 
   isSupplier: field({ type: Boolean, optional: true }),
+  isActive: field({ type: Boolean, default: true }),
 
   email: field({
     type: String,
@@ -105,6 +106,7 @@ class User {
       ...doc,
 
       isSupplier: false,
+      isActive: true,
 
       // hash password
       password: await this.generatePassword(password),
@@ -222,23 +224,9 @@ class User {
       throw new Error('Can not remove supplier');
     }
 
-    if (await Audits.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in audit');
-    }
+    await Users.update({ _id }, { $set: { isActive: false } });
 
-    if (await BlockedCompanies.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in block list');
-    }
-
-    if (await Feedbacks.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in success feedback');
-    }
-
-    if (await Tenders.findOne({ createdUserId: _id })) {
-      throw new Error('Unable to remove. Used in tender');
-    }
-
-    return Users.remove({ _id });
+    return this.findOne({ _id });
   }
 
   /*
@@ -443,6 +431,7 @@ class User {
       username: email,
       email,
       isSupplier: true,
+      isActive: true,
       registrationToken: await this.generateRandomToken(),
       registrationTokenExpires: Date.now() + 86400000,
     });

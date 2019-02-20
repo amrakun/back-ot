@@ -11,6 +11,19 @@ export default {
     return count > 0;
   },
 
+  async isNotInterested(tender, args, { user }) {
+    const response = await TenderResponses.findOne({
+      tenderId: tender._id,
+      supplierId: encrypt(user.companyId),
+    });
+
+    if (response) {
+      return response.isNotInterested;
+    }
+
+    return false;
+  },
+
   async isSent(tender, args, { user }) {
     const response = await TenderResponses.findOne({
       tenderId: tender._id,

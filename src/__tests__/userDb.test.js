@@ -127,46 +127,14 @@ describe('User db utils', () => {
   });
 
   test('Remove user', async () => {
-    expect.assertions(6);
+    expect.assertions(3);
 
     // audit usage ===================
     await auditFactory({ createdUserId: _user._id });
 
-    try {
-      await Users.removeUser(_user._id);
-    } catch (e) {
-      expect(e.message).toBe('Unable to remove. Used in audit');
-    }
-
-    // block list usage ===================
-    await Audits.remove({});
-    await blockedCompanyFactory({ createdUserId: _user._id });
-
-    try {
-      await Users.removeUser(_user._id);
-    } catch (e) {
-      expect(e.message).toBe('Unable to remove. Used in block list');
-    }
-
     // feedback usage ===================
     await BlockedCompanies.remove({});
     await feedbackFactory({ createdUserId: _user._id });
-
-    try {
-      await Users.removeUser(_user._id);
-    } catch (e) {
-      expect(e.message).toBe('Unable to remove. Used in success feedback');
-    }
-
-    // tender usage ===================
-    await Feedbacks.remove({});
-    await tenderFactory({ createdUserId: _user._id });
-
-    try {
-      await Users.removeUser(_user._id);
-    } catch (e) {
-      expect(e.message).toBe('Unable to remove. Used in tender');
-    }
 
     // can not remove a supplier ===================
     await Users.update({ _id: _user._id }, { $set: { isSupplier: true } });
@@ -180,10 +148,14 @@ describe('User db utils', () => {
     // successfull ==================
     await Users.update({ _id: _user._id }, { $set: { isSupplier: false } });
     await Tenders.remove({});
-    await Users.removeUser(_user._id);
 
-    // ensure removed
-    expect(await Users.find().count()).toBe(0);
+    const aboutToDeactivateUser = await Users.findOne({ _id: _user._id });
+    expect(aboutToDeactivateUser.isActive).toBe(true);
+
+    const deactivedUser = await Users.removeUser(_user._id);
+
+    // deactived user
+    expect(deactivedUser.isActive).toBe(false);
   });
 
   test('Edit profile', async () => {

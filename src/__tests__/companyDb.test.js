@@ -259,7 +259,7 @@ describe('Companies model tests', () => {
   });
 
   test('Prequalication changes disabled', async () => {
-    expect.assertions(4);
+    expect.assertions(8);
 
     const company = await companyFactory({ isPrequalificationInfoEditable: false });
 
@@ -267,6 +267,11 @@ describe('Companies model tests', () => {
       try {
         await Companies.updateSection(company._id, `${name}Info`, companyDocs[name]());
       } catch (e) {
+        const updatedCompany = await Companies.findOne({ _id: company._id });
+
+        expect(JSON.stringify(updatedCompany[`${name}Info`])).not.toBe(
+          JSON.stringify(companyDocs[name]()),
+        );
         expect(e.message).toBe('Changes disabled');
       }
     };

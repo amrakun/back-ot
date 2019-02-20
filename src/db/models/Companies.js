@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 import { Users, Feedbacks, BlockedCompanies } from './';
+import { TIER_TYPES } from './constants';
 
 const FileSchema = mongoose.Schema(
   {
@@ -269,7 +270,7 @@ export const BusinessInfoSchema = mongoose.Schema(
 
     /// Does your company employ any politically exposed person?
     // If yes, provide list of PEP name
-    pepName: field({ type: String, optional: true }),
+    pepName: field({ type: String, optional: true, qualifiable: false }),
 
     organizationChartFile: field({ type: FileSchema }),
 
@@ -462,7 +463,7 @@ const CompanySchema = mongoose.Schema({
 
   tierType: field({
     type: String,
-    enum: ['national', 'umnugovi', 'tier1', 'tier2', 'tier3'],
+    enum: TIER_TYPES,
     optional: true,
   }),
 
@@ -661,6 +662,14 @@ class Company {
       }
     }
 
+    // prevent disabled prequalification info from editing ========
+    const preqTabs = ['financial', 'business', 'environmental', 'health'];
+    const editable = company.isPrequalificationInfoEditable;
+
+    if (preqTabs.includes(key.replace('Info', '')) && !editable) {
+      throw new Error('Changes disabled');
+    }
+
     // update
     await this.update({ _id }, { $set: { [key]: value } });
 
@@ -675,14 +684,6 @@ class Company {
           },
         },
       );
-    }
-
-    // prevent disabled prequalification info from editing ========
-    const preqTabs = ['financial', 'business', 'environmental', 'health'];
-    const editable = company.isPrequalificationInfoEditable;
-
-    if (preqTabs.includes(key.replace('Info', '')) && !editable) {
-      throw new Error('Changes disabled');
     }
 
     return this.findOne({ _id });

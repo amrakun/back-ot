@@ -3,7 +3,7 @@
 
 import sinon from 'sinon';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Configs, Users, Tenders } from '../db/models';
+import { Configs, Users, Tenders, Companies } from '../db/models';
 import {
   userFactory,
   configFactory,
@@ -13,6 +13,7 @@ import {
   companyFactory,
 } from '../db/factories';
 
+import tenderUtils from '../data/tenderUtils';
 import tenderMutations from '../data/resolvers/mutations/tenders';
 import tenderResponseMutations from '../data/resolvers/mutations/tenderResponses';
 
@@ -33,7 +34,9 @@ describe('Tender mutations', () => {
     $sourcingOfficer: String,
     $file: JSON!,
     $reminderDay: Float!,
-    $supplierIds: [String]!,
+    $supplierIds: [String],
+    $isToAll: Boolean,
+    $tierTypes: [String]
     $requestedProducts: [TenderRequestedProductInput]
     $requestedDocuments: [String]
   `;
@@ -49,6 +52,8 @@ describe('Tender mutations', () => {
     file: $file,
     reminderDay: $reminderDay,
     supplierIds: $supplierIds,
+    isToAll: $isToAll,
+    tierTypes: $tierTypes,
     requestedProducts: $requestedProducts,
     requestedDocuments: $requestedDocuments
   `;
@@ -56,6 +61,7 @@ describe('Tender mutations', () => {
   beforeEach(async () => {
     // Creating test data
     _user = await userFactory();
+    await tenderFactory({});
 
     await configFactory();
   });
@@ -65,6 +71,7 @@ describe('Tender mutations', () => {
     await Configs.remove({});
     await Tenders.remove({});
     await Users.remove({});
+    await Companies.remove({});
   });
 
   test('Tenders buyer required functions', async () => {
@@ -76,12 +83,11 @@ describe('Tender mutations', () => {
       }
     };
 
-    expect.assertions(5);
+    expect.assertions(4);
 
     const mutations = [
       'tendersAdd',
       'tendersEdit',
-      'tendersRemove',
       'tendersAward',
       'tendersSendRegretLetter',
     ];
@@ -116,7 +122,7 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender', async () => {
-    const mock = sinon.stub(Tenders, 'createTender').callsFake(() => ({ _id: Math.random() }));
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
 
     const mutation = `
       mutation tendersAdd($type: String!, $rfqType: String ${commonParams}) {
@@ -128,59 +134,156 @@ describe('Tender mutations', () => {
 
     const doc = await tenderDoc({ type: 'rfq' });
 
-    await graphqlRequest(mutation, 'tendersAdd', doc, { user: _user });
+    const tender = await graphqlRequest(mutation, 'tendersAdd', doc, { user: _user });
 
-    expect(mock.called).toBe(true);
-    expect(mock.calledWith(doc, _user._id)).toBe(true);
+    expect(tender._id).toBeDefined();
 
     mock.restore();
   });
 
-  test('Update tender', async () => {
-    const mock = sinon.stub(Tenders, 'updateTender').callsFake(() => ({ _id: Math.random() }));
-
-    const mutation = `
-      mutation tendersEdit($_id: String!  ${commonParams}) {
-        tendersEdit(_id: $_id, ${commonValues}) {
-          _id
-        }
+  const editTenderMutation = `
+    mutation tendersEdit($_id: String!  ${commonParams}) {
+      tendersEdit(_id: $_id, ${commonValues}) {
+        _id
       }
-    `;
+    }
+  `;
 
-    const tender = await tenderFactory();
+  test('Update tender: supplierIds are specified', async () => {
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+
+    expect(await Companies.find().count()).toBe(2);
+
+    const [company1, company2] = await Companies.find({});
+
+    const commonDoc = {
+      status: 'open',
+      isToAll: true,
+      supplierIds: [company1._id.toString(), company2._id.toString()],
+      createdUserId: _user._id,
+      publishDate: new Date(),
+    };
+
+    // at this point we had 2 suppliers
+    const tender = await tenderFactory(commonDoc);
+
+    // new company registered after above tender's publish
+    const company3 = await companyFactory({});
+
     const tenderId = tender._id.toString();
-    const doc = await tenderDoc();
+    const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
     const args = { _id: tenderId, ...doc };
 
-    await graphqlRequest(mutation, 'tendersEdit', args);
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
-    expect(mock.calledOnce).toBe(true);
-    expect(mock.calledWith(tenderId, doc)).toBe(true);
+    expect(mock.calledTwice).toBe(true);
+
+    const [firstCallArgs] = mock.firstCall.args;
+    expect(firstCallArgs.kind).toBe('supplier__publish');
+    expect(firstCallArgs.supplierIds).toEqual([company3._id.toString()]);
+
+    const [secondCallArgs] = mock.secondCall.args;
+    expect(secondCallArgs.kind).toBe('supplier__edit');
+    expect(secondCallArgs.supplierIds).toEqual([company1._id.toString(), company2._id.toString()]);
 
     mock.restore();
   });
 
-  test('Delete tender', async () => {
-    const mock = sinon.stub(Tenders, 'removeTender').callsFake(() => ({ _id: Math.random() }));
+  test('Update tender: isToAll is true', async () => {
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
 
-    const mutation = `
-      mutation tendersRemove($_id: String!) {
-        tendersRemove(_id: $_id)
-      }
-    `;
+    expect(await Companies.find().count()).toBe(2);
 
-    const tender = await tenderFactory();
+    const [company1, company2] = await Companies.find({});
+
+    const commonDoc = {
+      status: 'open',
+      isToAll: true,
+      supplierIds: [],
+      createdUserId: _user._id,
+      publishDate: new Date(),
+    };
+
+    // at this point we had 2 suppliers
+    const tender = await tenderFactory(commonDoc);
+
+    // new company registered after above tender's publish
+    const company3 = await companyFactory({});
+
     const tenderId = tender._id.toString();
+    const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
+    const args = { _id: tenderId, ...doc };
 
-    await graphqlRequest(mutation, 'tendersRemove', { _id: tenderId });
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
 
-    expect(mock.calledOnce).toBe(true);
-    expect(mock.calledWith(tenderId)).toBe(true);
+    expect(mock.calledTwice).toBe(true);
+
+    const [firstCallArgs] = mock.firstCall.args;
+    expect(firstCallArgs.kind).toBe('supplier__publish');
+    expect(firstCallArgs.supplierIds).toEqual([company3._id.toString()]);
+
+    const [secondCallArgs] = mock.secondCall.args;
+    expect(secondCallArgs.kind).toBe('supplier__edit');
+    expect(secondCallArgs.supplierIds).toEqual([company1._id.toString(), company2._id.toString()]);
 
     mock.restore();
+  });
+
+  test('Update tender: specified tierTypes & with closed status', async () => {
+    let mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+
+    await Companies.remove({});
+
+    const company1 = await companyFactory({ tierType: 'tier1' });
+    const company2 = await companyFactory({ tierType: 'tier2' });
+
+    const commonDoc = {
+      status: 'open',
+      tierTypes: ['tier1', 'tier2'],
+      createdUserId: _user._id,
+      publishDate: new Date(),
+    };
+
+    // at this point we had 2 suppliers
+    const tender = await tenderFactory({ ...commonDoc, status: 'closed' });
+
+    // new company registered after above tender's publish
+    const company3 = await companyFactory({ tierType: 'tier1' });
+
+    const tenderId = tender._id.toString();
+    const doc = await tenderDoc({ ...commonDoc, content: 'updated content' });
+    const args = { _id: tenderId, ...doc };
+
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
+
+    expect(mock.calledOnce).toBe(true);
+
+    let [firstCallArgs] = mock.firstCall.args;
+    expect(firstCallArgs.kind).toBe('supplier__reopen');
+    expect(firstCallArgs.supplierIds).toEqual([company1._id.toString(), company2._id.toString()]);
+    mock.restore();
+
+    // second edit ==============
+    await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
+    const secondMock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+    await graphqlRequest(editTenderMutation, 'tendersEdit', args, { user: _user });
+
+    expect(secondMock.calledOnce).toBe(true);
+
+    [firstCallArgs] = secondMock.firstCall.args;
+    expect(firstCallArgs.kind).toBe('supplier__reopen');
+    expect(firstCallArgs.supplierIds).toEqual([
+      company1._id.toString(),
+      company2._id.toString(),
+      company3._id.toString(),
+    ]);
+
+    secondMock.restore();
   });
 
   test('Award', async () => {
+    const mock = sinon.stub(tenderUtils, 'sendEmailToSuppliers').callsFake(() => 'sent');
+
     const mutation = `
       mutation tendersAward($_id: String!, $supplierIds: [String!]!, $note: String, $attachments: [TenderAwardAttachment]) {
         tendersAward(_id: $_id, supplierIds: $supplierIds, note: $note, attachments: $attachments) {
@@ -190,7 +293,7 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', createdUserId: _user._id });
     const supplier = await companyFactory({});
 
     await tenderResponseFactory({
@@ -210,7 +313,9 @@ describe('Tender mutations', () => {
       ],
     };
 
-    const response = await graphqlRequest(mutation, 'tendersAward', args);
+    const response = await graphqlRequest(mutation, 'tendersAward', args, { user: _user });
+
+    mock.restore();
 
     expect(response.winnerIds.length).toBe(1);
     expect(response.awardNote).toBe('note');
@@ -255,10 +360,11 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const tender = await tenderFactory();
+    const user = await userFactory({ isSupplier: false });
+    const tender = await tenderFactory({ createdUserId: user._id });
     const args = { _id: tender._id };
 
-    const response = await graphqlRequest(mutation, 'tendersCancel', args);
+    const response = await graphqlRequest(mutation, 'tendersCancel', args, { user });
 
     expect(response.status).toBe('canceled');
   });

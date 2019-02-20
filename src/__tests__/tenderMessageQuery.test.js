@@ -68,30 +68,4 @@ describe('Tender message queries', () => {
 
     expect(result).toHaveLength(0);
   });
-
-  test('Supplier cannot view unrelated message', async () => {
-    await adminToSupplier();
-    const msg = await adminToSupplier();
-    const msg2 = await supplierToAdmin();
-
-    const result = await queries.tenderMessageDetail({}, { _id: msg._id }, { user: _supplier2 });
-
-    const result2 = await queries.tenderMessageDetail({}, { _id: msg2._id }, { user: _supplier2 });
-
-    expect(result).toBeNull();
-    expect(result2).toBeNull();
-  });
-
-  test("Supplier cannot view unrelated tender's message count", async () => {
-    await adminToSupplier();
-    await adminToSupplier();
-    await supplierToAdmin();
-
-    expect.assertions(1);
-    try {
-      await queries.tenderMessageTotalCount({}, { tenderId: _tender._id }, { user: _supplier2 });
-    } catch (e) {
-      expect(e.message).toBe('Permission denied');
-    }
-  });
 });

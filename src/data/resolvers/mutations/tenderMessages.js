@@ -1,30 +1,41 @@
 import { TenderMessages, Tenders } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
-import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
+import { sendEmailToSuppliers, replacer } from '../../tenderUtils';
+import { sendConfigEmail } from '../../utils';
 
 const tenderMessageMutations = {
-  async tenderMessageBuyerSend(parent, args, { user }) {
-    const p = await TenderMessages.tenderMessageBuyerSend(args, user);
+  async tenderMessageBuyerSend(root, args, { user }) {
+    const tenderMessage = await TenderMessages.tenderMessageBuyerSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
     const supplierIds = args.recipientSupplierIds;
+
     await sendEmailToSuppliers({
       kind: 'supplier__message_notification',
       tender,
       supplierIds,
     });
 
-    return p;
+    return tenderMessage;
   },
 
-  async tenderMessageSupplierSend(parent, args, { user }) {
-    const p = await TenderMessages.tenderMessageSupplierSend(args, user);
+  async tenderMessageSupplierSend(root, args, { user }) {
+    const tenderMessage = await TenderMessages.tenderMessageSupplierSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
-    await sendEmailToBuyer({ kind: 'buyer__message_notification', tender });
-    return p;
+
+    await sendConfigEmail({
+      name: `${tender.type}Templates`,
+      kind: 'buyer__message_notification',
+      toEmails: [tenderMessage.senderBuyerId],
+      replacer: text => {
+        return replacer({ text, tender });
+      },
+    });
+
+    return tenderMessage;
   },
 
-  async tenderMessageSetAsRead(parent, args, { user }) {
+  async tenderMessageSetAsRead(root, args, { user }) {
     return TenderMessages.tenderMessageSetAsRead(args, user);
   },
 };

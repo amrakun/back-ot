@@ -321,6 +321,7 @@ export const userFactory = async (params = {}) => {
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
+    isActive: typeof(params.isActive) === 'undefined' ? true : params.isActive,
     companyId: params.companyId,
     delegatedUserId: params.delegatedUserId,
     delegationStartDate: params.delegationStartDate,
@@ -349,6 +350,7 @@ export const tenderDoc = async (params = {}) => {
   const doc = {
     number: params.number || faker.random.word(),
     sourcingOfficer: params.sourcingOfficer || faker.random.word(),
+    responsibleBuyerIds: params.responsibleBuyerIds || [],
     name: params.name || faker.random.word(),
     content: params.content || faker.random.word(),
     attachments: params.attachments || [{ name: 'name', url: 'url' }],
@@ -361,6 +363,8 @@ export const tenderDoc = async (params = {}) => {
     supplierIds: params.supplierIds,
     requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocument || [],
+    isToAll: params.isToAll || false,
+    tierTypes: params.tierTypes || [],
   };
 
   if (params.type) {

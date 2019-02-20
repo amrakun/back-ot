@@ -43,8 +43,12 @@ export const readS3File = async (key, user) => {
     return { Body: '' };
   }
 
+  if (!user) {
+    throw new Error('Forbidden');
+  }
+
   if (
-    !user === 'system' &&
+    user !== 'system' &&
     !(
       (await Companies.isAuthorizedToDownload(key, user)) ||
       (await Tenders.isAuthorizedToDownload(key, user)) ||
@@ -295,7 +299,9 @@ export const tokenize = str => {
 /*
  * Generate xlsx
  */
-export const generateXlsx = async (user, workbook, name) => {
+export const generateXlsx = async (user, workbook, _name) => {
+  const name = _name.replace(/\//g, '-');
+
   if (!user) {
     return '';
   }

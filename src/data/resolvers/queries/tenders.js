@@ -67,7 +67,12 @@ const tendersFilter = async (args, extraChecks) => {
 const tendersBuyerFilter = async (args, user) =>
   tendersFilter(args, query => {
     if (user.role !== 'admin') {
-      query.$and.push({ createdUserId: user._id });
+      query.$and.push({ $or:
+        [
+          { responsibleBuyerIds: { $in: [user._id] } },
+          { createdUserId: user._id }
+        ]
+      });
     }
   });
 
@@ -82,25 +87,31 @@ const tendersSupplierFilter = async (args, user) => {
   delete args.status;
 
   const query = await tendersFilter(args, async query => {
-    query.$and.push({ supplierIds: { $in: [encrypt(user.companyId)] } });
+    const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
+
+    query.$and.push({ _id: { $in: possibleTenderIds } });
     query.$and.push({ status: { $ne: 'draft' } });
-
-    // ignore not interested tenders =============
-    const notInterestedTenders = await TenderResponses.find({
-      supplierId: encrypt(user.companyId),
-      isNotInterested: true,
-    });
-
-    const notInterestedTenderIds = notInterestedTenders.map(res => res.tenderId);
-
-    query.$and.push({ _id: { $nin: notInterestedTenderIds } });
 
     // status filter ==========
     if (status) {
+      // ignore not interested tenders =============
+      if (!status.includes('notInterested')) {
+        const notInterestedTenders = await TenderResponses.find({
+          supplierId: encrypt(user.companyId),
+          isNotInterested: true,
+        });
+
+        const notInterestedTenderIds = notInterestedTenders.map(res => res.tenderId);
+
+        query.$and.push({ _id: { $nin: notInterestedTenderIds } });
+      }
+
       const isParticipated = status.includes('participated');
 
       // exclude participated and empty values
-      const statuses = status.split(',').filter(s => !['', 'participated'].includes(s));
+      const statuses = status
+        .split(',')
+        .filter(s => !['', 'participated', 'notInterested'].includes(s));
 
       // generate status filter depending on statuses length
       const statusFilter = statuses.length > 0 ? { status: { $in: statuses } } : {};
@@ -215,12 +226,13 @@ const tenderQueries = {
    */
   async tenderDetailSupplier(root, { _id }, { user }) {
     const tender = await Tenders.findOne({ _id });
+    const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
 
-    if (tender && !tender.supplierIds.includes(encrypt(user.companyId))) {
+    if (tender && !possibleTenderIds.includes(tender._id.toString())) {
       throw new Error('Not found');
     }
 
-    return Tenders.findOne({ _id, supplierIds: { $in: [encrypt(user.companyId)] } });
+    return Tenders.findOne({ _id });
   },
 
   /*
