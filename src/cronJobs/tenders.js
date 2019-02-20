@@ -13,8 +13,9 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   for (const tender of publishedTenders) {
     const attachments = await getAttachments(tender);
 
+    // write open log
     await TenderLog.write({
-      tenderId: tender._id.toString(),
+      tenderId: tender._id,
       isAuto: true,
       action: 'open',
       description: `System opened a tender ${tender.number}`,
@@ -34,8 +35,10 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   for (const tender of closedTenders) {
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
+
+    // write close lo
     await TenderLog.write({
-      tenderId: tender._id.toString(),
+      tenderId: tender._id,
       isAuto: true,
       action: 'close',
       description: `System closed a tender ${tender.number}`,
@@ -52,8 +55,10 @@ schedule.scheduleJob('* 45 23 * *', async () => {
 
   for (const tender of remindTenders) {
     sendEmailToSuppliers({ kind: 'supplier__reminder', tender });
+
+    // write remind log
     await TenderLog.write({
-      tenderId: tender._id.toString(),
+      tenderId: tender._id,
       isAuto: true,
       action: 'remind',
       description: `System sent a reminder of tender ${tender.number}`,
