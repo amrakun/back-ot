@@ -17,8 +17,8 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     await TenderLog.write({
       tenderId: tender._id,
       isAuto: true,
-      action: 'open',
-      description: `System opened a tender ${tender.number}`,
+      action: 'publish',
+      description: `System published a tender ${tender.number}`,
     });
 
     await sendEmail({
