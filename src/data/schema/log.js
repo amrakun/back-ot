@@ -21,9 +21,8 @@ export const queries = `
   logsSuppliersByProductCodeLogsExport(startDate: Date!, endDate: Date!, productCodes: [String!]): String
   logsActivityLogsExport(startDate: Date!, endDate: Date!, module: String): String
 
-  logsTenders(page: Int, perPage: Int, tenderId: String): [TenderLog]
-  logsTenderDetail(_id: String!): TenderLog
-  logsTenderCount(tenderId: String): Int
+  logsTender(page: Int, perPage: Int, tenderId: String): [TenderLog]
+  logsTenderTotalCount(tenderId: String): Int
 `;
 
 export const mutations = `

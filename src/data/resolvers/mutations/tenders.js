@@ -19,7 +19,7 @@ const tenderMutations = {
       tenderId: tender._id,
       userId: user._id,
       action: 'create',
-      description: `Created a ${tender.getLabelOfType()} draft ${tender.number}.`,
+      description: 'Created',
     });
 
     return tender;
@@ -42,9 +42,7 @@ const tenderMutations = {
       tenderId: oldTender._id,
       userId: user._id,
       action: 'edit',
-      description: `Edited a ${oldTender.status} ${
-        oldTender.number
-      } ${oldTender.getLabelOfType()}.`,
+      description: 'Edited',
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
@@ -53,9 +51,7 @@ const tenderMutations = {
         tenderId: oldTender._id,
         userId: user._id,
         action: 'extend',
-        description: `Extended a ${oldTender.getLabelOfType()}'s close date from (${
-          oldTender.closeDate
-        }) to (${updatedTender.closeDate})`,
+        description: `Extended close date from (${oldTender.closeDate}) to (${updatedTender.closeDate})`,
       });
     }
 
@@ -87,9 +83,7 @@ const tenderMutations = {
         tenderId: oldTender._id,
         userId: user._id,
         action: 'reopen',
-        description: `Reopened a ${oldTender.status} ${oldTender.getLabelOfType()} ${
-          oldTender.number
-        } ${oldTender.getLabelOfType()}.`,
+        description: 'Reopened',
       });
 
       const updatedTenderIds = new Set(await updatedTender.getExactSupplierIds());
@@ -119,7 +113,7 @@ const tenderMutations = {
       tenderId: _id,
       userId: user._id,
       action: 'award',
-      description: `Awarded a ${tender.getLabelOfType()}`,
+      description: 'Awarded',
     });
 
     await tenderUtils.sendEmailToBuyer({ kind: 'buyer__award', tender });
@@ -208,7 +202,7 @@ const tenderMutations = {
         tenderId: tender._id,
         userId: user._id,
         action: 'cancel',
-        description: `Canceled a ${tender.getLabelOfType()} ${canceledTender.number}`,
+        description: `Canceled`,
       });
 
       await tenderUtils.sendEmail({ kind: 'cancel', tender: canceledTender });

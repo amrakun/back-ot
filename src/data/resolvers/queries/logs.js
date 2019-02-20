@@ -105,7 +105,7 @@ const logQueries = {
     );
   },
 
-  async logsTenders(root, { tenderId, page = 1, perPage = 20 }) {
+  async logsTender(root, { tenderId, page = 1, perPage = 20 }) {
     const query = {};
 
     if (tenderId) {
@@ -120,11 +120,7 @@ const logQueries = {
     return docs;
   },
 
-  async logsTenderDetail(root, { _id }) {
-    return TenderLogs.findOne({ _id });
-  },
-
-  async logsTenderCount(root, { tenderId }) {
+  async logsTenderTotalCount(root, { tenderId }) {
     return TenderLogs.find({ tenderId }).count();
   },
 };
