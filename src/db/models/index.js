@@ -8,9 +8,8 @@ import Qualifications from './Qualifications';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
 import MailDeliveries from './MailDeliveries';
-import { SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
+import { TenderLogs, SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
 import TenderMessages from './TenderMessages';
-import TenderLog from './TenderLog';
 
 export {
   Companies,
@@ -27,10 +26,10 @@ export {
   PhysicalAudits,
   Configs,
   SearchLogs,
+  TenderLogs,
   TenderResponseLogs,
   SuppliersByProductCodeLogs,
   ActivityLogs,
   MailDeliveries,
   TenderMessages,
-  TenderLog,
 };

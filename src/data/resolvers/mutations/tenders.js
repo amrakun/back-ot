@@ -1,7 +1,6 @@
-import { Tenders, TenderResponses, Companies, TenderLog } from '../../../db/models';
 import moment from 'moment';
 
-import { Tenders, TenderResponses, Companies } from '../../../db/models';
+import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/models';
 import tenderUtils from '../../../data/tenderUtils';
 import { readS3File } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
@@ -15,7 +14,7 @@ const tenderMutations = {
   async tendersAdd(root, doc, { user }) {
     const tender = await Tenders.createTender(doc, user._id);
 
-    await TenderLog.write({
+    await TenderLogs.write({
       tenderId: tender._id.toString(),
       userId: user._id.toString(),
       action: 'create',
@@ -37,7 +36,7 @@ const tenderMutations = {
 
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
 
-    await TenderLog.write({
+    await TenderLogs.write({
       tenderId: oldTender._id.toString(),
       userId: user._id.toString(),
       action: 'edit',
@@ -47,7 +46,7 @@ const tenderMutations = {
     });
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
-      await TenderLog.write({
+      await TenderLogs.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'extend',
@@ -80,7 +79,7 @@ const tenderMutations = {
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
-      await TenderLog.write({
+      await TenderLogs.write({
         tenderId: oldTender._id.toString(),
         userId: user._id.toString(),
         action: 'reopen',
@@ -111,7 +110,7 @@ const tenderMutations = {
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
 
-    await TenderLog.write({
+    await TenderLogs.write({
       tenderId: _id.toString(),
       userId: user._id.toString(),
       action: 'award',
@@ -199,7 +198,7 @@ const tenderMutations = {
     if (tender) {
       const canceledTender = await tender.cancel(user._id);
 
-      await TenderLog.write({
+      await TenderLogs.write({
         tenderId: tender._id.toString(),
         userId: user._id.toString(),
         action: 'cancel',
