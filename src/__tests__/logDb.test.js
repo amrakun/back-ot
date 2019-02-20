@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { connect, disconnect } from '../db/connection';
-import { SuppliersByProductCodeLogs, Companies } from '../db/models';
-import { companyFactory } from '../db/factories';
+import { SuppliersByProductCodeLogs, Companies, Tenders, Users, TenderLogs } from '../db/models';
+import { companyFactory, tenderFactory, userFactory } from '../db/factories';
 
 beforeAll(() => connect());
 
@@ -22,7 +22,6 @@ describe('suppliers by product code logs', () => {
   });
 
   test('Create audit', async () => {
-    // const user = await userFactory();
     _company.groupInfo = {
       factories: [
         {
@@ -61,5 +60,32 @@ describe('suppliers by product code logs', () => {
     expect(log1b.endDate != null).toBe(true);
     expect(log2.endDate).toBeUndefined();
     expect(await SuppliersByProductCodeLogs.find({}).count()).toBe(2);
+  });
+});
+
+describe('TenderLog db', () => {
+  let _tender;
+  let _user;
+
+  beforeEach(async () => {
+    // Creating test data
+    _tender = await tenderFactory();
+    _user = await userFactory();
+  });
+
+  afterEach(async () => {
+    // Clearing test data
+    await Tenders.remove({});
+    await Users.remove({});
+    await TenderLogs.remove({});
+  });
+
+  test('Can write', async () => {
+    TenderLogs.write({
+      tenderId: _tender._id.toString(),
+      userId: _user._id.toString(),
+      action: 'cancel',
+      description: undefined,
+    });
   });
 });

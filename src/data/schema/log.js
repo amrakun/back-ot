@@ -1,3 +1,15 @@
+export const types = `
+  type TenderLog {
+    _id:         String!
+    tender:      Tender!
+    user:        User
+    isAuto:      Boolean!
+    action:      String!
+    description: String!
+    createdAt:   Date!
+  }
+`;
+
 export const queries = `
   logsSupplierLoginsExport(startDate: Date!, endDate: Date!): String
   logsBuyerLoginsExport(startDate: Date!, endDate: Date!): String
@@ -8,6 +20,9 @@ export const queries = `
   logsRfqCreatedAndSentExport(startDate: Date!, endDate: Date!): String
   logsSuppliersByProductCodeLogsExport(startDate: Date!, endDate: Date!, productCodes: [String!]): String
   logsActivityLogsExport(startDate: Date!, endDate: Date!, module: String): String
+
+  logsTender(page: Int, perPage: Int, tenderId: String): [TenderLog]
+  logsTenderTotalCount(tenderId: String): Int
 `;
 
 export const mutations = `

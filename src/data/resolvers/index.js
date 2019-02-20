@@ -12,6 +12,7 @@ import Audit from './audit';
 import AuditResponse from './auditResponse';
 import PhysicalAudit from './physicalAudit';
 import TenderMessage from './tenderMessage';
+import TenderLog from './tenderLog';
 import Mutation from './mutations';
 import Query from './queries';
 
@@ -30,6 +31,7 @@ export default {
   AuditResponse,
   PhysicalAudit,
   TenderMessage,
+  TenderLog,
 
   Mutation,
   Query,

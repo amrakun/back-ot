@@ -1,4 +1,6 @@
-import { Tenders, TenderResponses, Companies } from '../../../db/models';
+import moment from 'moment';
+
+import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/models';
 import tenderUtils from '../../../data/tenderUtils';
 import { readS3File } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
@@ -9,8 +11,18 @@ const tenderMutations = {
    * @param {Object} doc - tenders fields
    * @return {Promise} newly created tender object
    */
-  tendersAdd(root, doc, { user }) {
-    return Tenders.createTender(doc, user._id);
+  async tendersAdd(root, doc, { user }) {
+    const tender = await Tenders.createTender(doc, user._id);
+
+    // create log
+    await TenderLogs.write({
+      tenderId: tender._id,
+      userId: user._id,
+      action: 'create',
+      description: 'Created',
+    });
+
+    return tender;
   },
 
   /**
@@ -24,6 +36,24 @@ const tenderMutations = {
     const oldSupplierIds = await oldTender.getExactSupplierIds();
 
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
+
+    // write edit log
+    await TenderLogs.write({
+      tenderId: oldTender._id,
+      userId: user._id,
+      action: 'edit',
+      description: 'Edited',
+    });
+
+    if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
+      // write extended log
+      await TenderLogs.write({
+        tenderId: oldTender._id,
+        userId: user._id,
+        action: 'extend',
+        description: `Extended close date from (${oldTender.closeDate}) to (${updatedTender.closeDate})`,
+      });
+    }
 
     if (oldTender.status === 'open') {
       const newSupplierIds = await oldTender.getNewSupplierIds(fields);
@@ -48,6 +78,14 @@ const tenderMutations = {
     }
 
     if (['closed', 'canceled'].includes(oldTender.status)) {
+      // write reopen log
+      await TenderLogs.write({
+        tenderId: oldTender._id,
+        userId: user._id,
+        action: 'reopen',
+        description: 'Reopened',
+      });
+
       const updatedTenderIds = new Set(await updatedTender.getExactSupplierIds());
       const intersectionIds = oldSupplierIds.filter(x => updatedTenderIds.has(x));
 
@@ -69,6 +107,14 @@ const tenderMutations = {
    */
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
+
+    // write awarded log
+    await TenderLogs.write({
+      tenderId: _id,
+      userId: user._id,
+      action: 'award',
+      description: 'Awarded',
+    });
 
     await tenderUtils.sendEmailToBuyer({ kind: 'buyer__award', tender });
 
@@ -150,6 +196,14 @@ const tenderMutations = {
 
     if (tender) {
       const canceledTender = await tender.cancel(user._id);
+
+      // write canceled log
+      await TenderLogs.write({
+        tenderId: tender._id,
+        userId: user._id,
+        action: 'cancel',
+        description: `Canceled`,
+      });
 
       await tenderUtils.sendEmail({ kind: 'cancel', tender: canceledTender });
 

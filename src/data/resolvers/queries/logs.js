@@ -1,4 +1,5 @@
 import { moduleRequireBuyer } from '../../permissions';
+import { TenderLogs } from '../../../db/models';
 import {
   buildSupplierLoginsLog,
   buildBuyerLoginsLog,
@@ -102,6 +103,25 @@ const logQueries = {
       },
       user,
     );
+  },
+
+  async logsTender(root, { tenderId, page = 1, perPage = 20 }) {
+    const query = {};
+
+    if (tenderId) {
+      query.tenderId = tenderId;
+    }
+
+    const docs = await TenderLogs.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    return docs;
+  },
+
+  async logsTenderTotalCount(root, { tenderId }) {
+    return TenderLogs.find({ tenderId }).count();
   },
 };
 

@@ -54,7 +54,7 @@ import {
   mutations as MassMailMutations,
 } from './massMail';
 
-import { queries as LogQueries, mutations as LogMutations } from './log';
+import { types as LogTypes, queries as LogQueries, mutations as LogMutations } from './log';
 
 import {
   types as TenderMessageTypes,
@@ -79,6 +79,7 @@ export const types = `
   ${MassMailTypes}
   ${PermissionTypes}
   ${TenderMessageTypes}
+  ${LogTypes}
 `;
 
 export const queries = `
