@@ -156,7 +156,7 @@ const tenderLogSchema = new mongoose.Schema(
         'create',
         'edit',
         'extend',
-        'open',
+        'publish',
         'remind',
         'remove',
         'reopen',
