@@ -1,8 +1,7 @@
 import { TenderMessages, Tenders, Users } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
-import { sendEmailToSuppliers, replacer } from '../../tenderUtils';
-import { sendConfigEmail } from '../../utils';
+import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
 
 const tenderMessageMutations = {
   async tenderMessageBuyerSend(root, args, { user }) {
@@ -22,15 +21,12 @@ const tenderMessageMutations = {
   async tenderMessageSupplierSend(root, args, { user }) {
     const tenderMessage = await TenderMessages.tenderMessageSupplierSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
-    const buyer = await Users.findOne({ _id: tenderMessage.senderBuyerId });
+    const buyers = await Users.find({ _id: { $in: tender.responsibleBuyerIds || [] } });
 
-    await sendConfigEmail({
-      name: `${tender.type}Templates`,
+    await sendEmailToBuyer({
       kind: 'buyer__message_notification',
-      toEmails: [buyer.email],
-      replacer: text => {
-        return replacer({ text, tender });
-      },
+      tender,
+      extraBuyerEmails: buyers.map(buyer => buyer.email),
     });
 
     return tenderMessage;
