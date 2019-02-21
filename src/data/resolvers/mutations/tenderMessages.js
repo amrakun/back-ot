@@ -1,4 +1,4 @@
-import { TenderMessages, Tenders } from '../../../db/models';
+import { TenderMessages, Tenders, Users } from '../../../db/models';
 
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmailToSuppliers, replacer } from '../../tenderUtils';
@@ -22,11 +22,12 @@ const tenderMessageMutations = {
   async tenderMessageSupplierSend(root, args, { user }) {
     const tenderMessage = await TenderMessages.tenderMessageSupplierSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
+    const buyer = await Users.findOne({ _id: tenderMessage.senderBuyerId });
 
     await sendConfigEmail({
       name: `${tender.type}Templates`,
       kind: 'buyer__message_notification',
-      toEmails: [tenderMessage.senderBuyerId],
+      toEmails: [buyer.email],
       replacer: text => {
         return replacer({ text, tender });
       },
