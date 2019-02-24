@@ -1,5 +1,5 @@
 import schedule from 'node-schedule';
-import { Tenders, TenderLog } from '../db/models';
+import { Tenders, TenderLogs } from '../db/models';
 import { sendEmail, sendEmailToSuppliers, getAttachments } from '../data/tenderUtils';
 
 // every 1 minute
@@ -13,19 +13,19 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   for (const tender of publishedTenders) {
     const attachments = await getAttachments(tender);
 
-    // write open log
-    await TenderLog.write({
-      tenderId: tender._id,
-      isAuto: true,
-      action: 'publish',
-      description: `System published a tender ${tender.number}`,
-    });
-
     await sendEmail({
       kind: 'publish',
       tender,
       attachments,
       extraBuyerEmails,
+    });
+
+    // write open log
+    await TenderLogs.write({
+      tenderId: tender._id,
+      isAuto: true,
+      action: 'publish',
+      description: `System published a tender ${tender.number}`,
     });
   }
 
@@ -37,7 +37,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
 
     // write close lo
-    await TenderLog.write({
+    await TenderLogs.write({
       tenderId: tender._id,
       isAuto: true,
       action: 'close',
@@ -57,7 +57,7 @@ schedule.scheduleJob('* 45 23 * *', async () => {
     sendEmailToSuppliers({ kind: 'supplier__reminder', tender });
 
     // write remind log
-    await TenderLog.write({
+    await TenderLogs.write({
       tenderId: tender._id,
       isAuto: true,
       action: 'remind',
