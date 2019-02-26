@@ -152,19 +152,6 @@ class Tender extends StatusPublishClose {
       throw new Error(`Can not update ${tender.status} tender`);
     }
 
-    // if tender is not draft and requirements are changed then reset
-    // previously sent responses
-    const isChanged = await tender.isChanged(doc);
-
-    // reset responses's sent status
-    if (['closed', 'canceled', 'open'].includes(tender.status) && isChanged) {
-      await TenderResponses.update(
-        { tenderId: tender._id, isNotInterested: { $ne: true } },
-        { $set: { isSent: false } },
-        { multi: true },
-      );
-    }
-
     doc.updatedDate = new Date();
     doc.supplierIds = encryptArray(doc.supplierIds);
 
