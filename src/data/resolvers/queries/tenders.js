@@ -11,7 +11,7 @@ import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports'
 const tendersFilter = async (args, extraChecks) => {
   const { type, status, search, month } = args;
 
-  const query = { $and: [] };
+  const query = { $and: [{ isDeleted: { $ne: true } }] };
 
   // type: rfq, eoi
   if (type) {

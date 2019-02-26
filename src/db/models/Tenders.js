@@ -43,6 +43,7 @@ const TenderSchema = mongoose.Schema({
   rfqType: field({ type: String, optional: true }),
 
   status: field({ type: String }),
+  isDeleted: field({ type: Boolean, default: false }),
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
