@@ -132,6 +132,7 @@ app.post('/upload-file', async (req, res) => {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/pdf',
         'application/zip',
+        'application/x-rar-compressed'
       ].includes(mime)
     ) {
       // check for virus
