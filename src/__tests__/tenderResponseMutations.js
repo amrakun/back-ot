@@ -72,7 +72,7 @@ describe('Tender mutations', () => {
   });
 
   test('Create tender response', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     const doc = {
       tenderId: tender._id,
@@ -136,7 +136,7 @@ describe('Tender mutations', () => {
 
   test('Update tender response', async () => {
     const user = await userFactory({ isSupplier: true });
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
 

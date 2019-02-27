@@ -151,7 +151,7 @@ describe('Tender queries', () => {
     supplier2 = await companyFactory();
 
     // below tender must be excluded by created user check
-    await tenderFactory({ type: 'rfq', status: 'open' });
+    await tenderFactory({ type: 'rfq', status: 'open', isToAll: true });
 
     user = await userFactory({
       companyId: supplier1._id,
@@ -163,6 +163,7 @@ describe('Tender queries', () => {
       type: 'rfq',
       createdUserId: user._id,
       status: 'open',
+      isToAll: true,
     });
 
     await tenderResponseFactory({
@@ -180,6 +181,7 @@ describe('Tender queries', () => {
       publishDate: new Date('2012-01-01'),
       closeDate: new Date('2012-02-01'),
       createdUserId: user._id,
+      isToAll: true,
     });
 
     await tenderFactory({
@@ -187,6 +189,7 @@ describe('Tender queries', () => {
       supplierIds: [supplier1._id],
       number: 'number',
       createdUserId: user._id,
+      isToAll: true,
     });
 
     await tenderFactory({
@@ -194,6 +197,7 @@ describe('Tender queries', () => {
       supplierIds: [supplier2._id],
       number: '2',
       createdUserId: user._id,
+      isToAll: true,
     });
 
     const doQuery = args => graphqlRequest(query, 'tenders', args, { user });
@@ -485,7 +489,7 @@ describe('Tender queries', () => {
 
   test('tender response by user', async () => {
     const company = await companyFactory();
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     user = await userFactory({ isSupplier: true, companyId: company._id });
 
@@ -523,7 +527,7 @@ describe('Tender queries', () => {
   });
 
   test('exclude not sent responses', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
@@ -627,7 +631,7 @@ describe('Tender queries', () => {
   });
 
   test('tender responses: hide open tender responses', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
@@ -648,7 +652,7 @@ describe('Tender queries', () => {
   });
 
   test('tender responses search: not interested', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const user = await userFactory({ isSupplier: false });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
@@ -682,7 +686,7 @@ describe('Tender queries', () => {
   });
 
   test('tender responses search & sort', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const user = await userFactory({ isSupplier: false });
     const supplier = await companyFactory({ enName: 'enName' });
 

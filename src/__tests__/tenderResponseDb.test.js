@@ -19,7 +19,7 @@ describe('Tender response db', () => {
 
   beforeEach(async () => {
     // Creating test data
-    _tender = await tenderFactory({ status: 'open' });
+    _tender = await tenderFactory({ status: 'open', isToAll: true });
     _company = await companyFactory();
   });
 
@@ -86,7 +86,7 @@ describe('Tender response db', () => {
   test('Create tender response: with not open status', async () => {
     expect.assertions(1);
 
-    const tender = await tenderFactory({ status: 'draft' });
+    const tender = await tenderFactory({ status: 'draft', isToAll: true });
 
     try {
       await TenderResponses.createTenderResponse({ tenderId: tender._id });
@@ -95,8 +95,20 @@ describe('Tender response db', () => {
     }
   });
 
-  test('Send', async () => {
+  test('Create tender response: not participated', async () => {
+    expect.assertions(1);
+
     const tender = await tenderFactory({ status: 'open' });
+
+    try {
+      await TenderResponses.createTenderResponse({ tenderId: tender._id, supplierId: _company._id });
+    } catch (e) {
+      expect(e.message).toBe('Not participated');
+    }
+  });
+
+  test('Send', async () => {
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     let tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
     await Tenders.update({ _id: tender._id }, { $set: { status: 'canceled' } });
@@ -121,7 +133,7 @@ describe('Tender response db', () => {
   });
 
   test('Send: EOI with late status', async () => {
-    const tender = await tenderFactory({ type: 'eoi', status: 'open' });
+    const tender = await tenderFactory({ type: 'eoi', status: 'open', isToAll: true });
     const tenderResponse = await tenderResponseFactory({ tenderId: tender._id });
 
     await Tenders.update({ _id: tender._id }, { $set: { status: 'closed' } });
@@ -135,7 +147,7 @@ describe('Tender response db', () => {
   });
 
   test('Edit tender response', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const response = await tenderResponseFactory({ tenderId: tender._id });
 
     await Tenders.update({ _id: response.tenderId }, { $set: { status: 'closed' } });
@@ -193,7 +205,7 @@ describe('Tender response db', () => {
     const supplier2 = await userFactory({ isSupplier: true });
     const buyer = await userFactory({});
 
-    const tender = await tenderFactory({});
+    const tender = await tenderFactory({ isToAll: true });
     await Tenders.update({ _id: tender._id }, { $set: { status: 'open' } });
 
     await tenderResponseFactory({

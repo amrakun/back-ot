@@ -155,7 +155,7 @@ describe('Tender db', () => {
   });
 
   test('Update tender: with closed status', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
@@ -178,7 +178,7 @@ describe('Tender db', () => {
   });
 
   test('Update closed tender & no requirements changed', async () => {
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
     await tenderResponseFactory({ tenderId: tender._id, isSent: true });
@@ -220,7 +220,7 @@ describe('Tender db', () => {
   test('Award', async () => {
     expect.assertions(10);
 
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
 
     expect(tender.winnerIds.length).toBe(0);
 

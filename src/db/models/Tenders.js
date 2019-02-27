@@ -522,6 +522,15 @@ class TenderResponse {
     const tender = await Tenders.findOne({ _id: tenderId });
     const supplier = await Companies.findOne({ _id: supplierId });
 
+    // Checking whether this user is involved in this tender or not
+    if (!tender.isToAll) {
+      if (
+        (!tender.tierTypes || tender.tierTypes.length === 0) &&
+        !tender.supplierIds.includes(encrypt(supplierId))
+      )
+      throw Error('Not participated');
+    }
+
     if (tender.type === 'eoi' && !supplier.basicInfo) {
       throw Error('Please complete registration stage');
     }

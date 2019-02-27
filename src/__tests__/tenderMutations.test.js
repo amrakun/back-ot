@@ -293,7 +293,7 @@ describe('Tender mutations', () => {
       }
     `;
 
-    const tender = await tenderFactory({ status: 'open', createdUserId: _user._id });
+    const tender = await tenderFactory({ status: 'open', createdUserId: _user._id, isToAll: true });
     const supplier = await companyFactory({});
 
     await tenderResponseFactory({
@@ -324,7 +324,7 @@ describe('Tender mutations', () => {
   test('Send regret letter', async () => {
     const supplier = await companyFactory({});
     const supplierId = supplier._id;
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const tenderId = tender._id.toString();
 
     await tender.update({ winnerIds: [supplierId] });
@@ -371,7 +371,7 @@ describe('Tender mutations', () => {
 
   test('Send response', async () => {
     const company = await companyFactory();
-    const tender = await tenderFactory({ status: 'open' });
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
     const user = await userFactory({ isSupplier: true });
 
     await tenderResponseFactory({ supplierId: company._id, tenderId: tender._id });
