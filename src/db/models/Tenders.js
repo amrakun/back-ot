@@ -225,7 +225,7 @@ class Tender extends StatusPublishClose {
       {
         $or: [
           { isToAll: true },
-          { tierTypes: { $in: [company.tierType] } },
+          { tierTypes: { $ne: null, $ne: undefined, $in: [company.tierType] } },
           { supplierIds: { $in: [encrypt(user.companyId)] } },
         ],
       },

@@ -3,7 +3,7 @@
 
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
-import { Users, Tenders, TenderResponses } from '../db/models';
+import { Users, Tenders, TenderResponses, Companies } from '../db/models';
 import dbUtils from '../db/models/utils';
 import {
   userFactory,
@@ -515,6 +515,17 @@ describe('Tender db', () => {
 
     const t4 = await tenderFactory({ tierTypes: ['tier2'] });
 
+    // if tender.tierTypes is null and company.tierType is null and
+    // we did not check { tierTypes: { $ne: null, $ne: undefined } } this condition
+    // eventually we will accidentally return all suppliers which will lead to huge bug
+    const company3 = await companyFactory({});
+    await Companies.update({ _id: company3._id }, { $set: { tierType: null } });
+    const user3 = await userFactory({ companyId: company3._id });
+
+    await tenderFactory({});
+    await tenderFactory({});
+    await tenderFactory({});
+
     expect(await Tenders.getPossibleTendersByUser(user1)).toEqual([
       t1._id.toString(),
       t2._id.toString(),
@@ -524,5 +535,7 @@ describe('Tender db', () => {
       t1._id.toString(),
       t4._id.toString(),
     ]);
+
+    expect(await Tenders.getPossibleTendersByUser(user3)).toEqual([t1._id.toString()]);
   });
 });

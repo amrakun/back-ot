@@ -364,7 +364,7 @@ export const tenderDoc = async (params = {}) => {
     requestedProducts: params.requestedProducts || [requestedProduct],
     requestedDocuments: params.requestedDocument || [],
     isToAll: params.isToAll || false,
-    tierTypes: params.tierTypes || [],
+    tierTypes: params.tierTypes,
   };
 
   if (params.type) {
