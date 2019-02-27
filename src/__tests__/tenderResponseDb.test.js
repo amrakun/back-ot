@@ -55,8 +55,10 @@ describe('Tender response db', () => {
   test('Create tender response', async () => {
     expect(await TenderResponses.find().count()).toBe(0);
 
+    const tender = await tenderFactory({ status: 'open', supplierIds: [_company._id] });
+
     const tenderResponseObj = await TenderResponses.createTenderResponse({
-      tenderId: _tender._id,
+      tenderId: tender._id,
       supplierId: _company._id,
       respondedProducts,
       respondedDocuments,
@@ -64,7 +66,7 @@ describe('Tender response db', () => {
 
     expect(tenderResponseObj).toBeDefined();
     expect(tenderResponseObj.createdDate).toBeDefined();
-    expect(tenderResponseObj.tenderId.toString()).toBe(_tender._id.toString());
+    expect(tenderResponseObj.tenderId.toString()).toBe(tender._id.toString());
     expect(tenderResponseObj.supplierId.toString()).toBe(_company._id.toString());
     expect(tenderResponseObj.isNotInterested).toBe(false);
 
@@ -73,7 +75,7 @@ describe('Tender response db', () => {
 
     // check duplications
     const response = await TenderResponses.createTenderResponse({
-      tenderId: _tender._id,
+      tenderId: tender._id,
       supplierId: _company._id,
       respondedProducts,
     });
