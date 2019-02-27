@@ -148,6 +148,23 @@ describe('Tender response db', () => {
     expect(response.isSent).toBe(true);
   });
 
+  test('Edit tender response: only supplier user can edit', async () => {
+    expect.assertions(1);
+
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
+    const response = await tenderResponseFactory({ tenderId: tender._id });
+    const hackingSupplier = await companyFactory({});
+
+    try {
+      await TenderResponses.updateTenderResponse({
+        tenderId: response.tenderId,
+        supplierId: hackingSupplier._id,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Response not found');
+    }
+  });
+
   test('Edit tender response', async () => {
     const tender = await tenderFactory({ status: 'open', isToAll: true });
     const response = await tenderResponseFactory({ tenderId: tender._id });
