@@ -512,6 +512,8 @@ const CompanySchema = mongoose.Schema({
   dueDiligences: field({ type: [DueDiligenceSchema], optional: true }),
   difotScores: field({ type: [DateAmountSchema], optional: true }),
   averageDifotScore: field({ type: Number, optional: true }),
+
+  isDeleted: field({ type: Boolean, default: false }),
 });
 
 class Company {

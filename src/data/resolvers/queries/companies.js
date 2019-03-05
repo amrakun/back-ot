@@ -30,6 +30,7 @@ const companiesFilter = async args => {
   } = args;
 
   const selector = {
+    isDeleted: { $ne: true },
     // ignore incomplete suppliers
     isSentRegistrationInfo: true,
   };

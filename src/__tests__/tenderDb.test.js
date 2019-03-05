@@ -290,6 +290,26 @@ describe('Tender db', () => {
     expect(updatedTender.getWinnerIds()).toContain(supplier._id);
   });
 
+  test('Award: delete supplier', async () => {
+    expect.assertions(1);
+
+    const supplier = await companyFactory();
+    await Companies.update({ _id: supplier._id }, { $set: { isDeleted: true } });
+
+    const tender = await tenderFactory({ status: 'open', isToAll: true });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier._id,
+    });
+
+    try {
+      await Tenders.award({ _id: tender._id, supplierIds: [supplier._id] }, tender.createdUserId);
+    } catch (e) {
+      expect(e.message).toBe('Can not award deleted supplier');
+    }
+  });
+
   test('Publish drafts', async () => {
     // mocking datetime now
     dbUtils.getNow = jest.fn(() => new Date('2040-02-01 01:01'));

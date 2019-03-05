@@ -198,6 +198,12 @@ class Tender extends StatusPublishClose {
       if (response.isNotInterested) {
         throw new Error('Invalid supplier');
       }
+
+      const supplier = await Companies.findOne({ _id: supplierId });
+
+      if (supplier.isDeleted) {
+        throw new Error('Can not award deleted supplier')
+      }
     }
 
     await this.update(

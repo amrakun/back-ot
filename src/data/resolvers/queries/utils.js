@@ -24,6 +24,7 @@ export const paginate = (collection, params) => {
 export const supplierFilter = async (query, search, hook) => {
   if (search) {
     const suppliers = await Companies.find({
+      isDeleted: { $ne: true },
       $or: [
         { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
         { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
@@ -34,6 +35,11 @@ export const supplierFilter = async (query, search, hook) => {
     const supplierIds = suppliers.map(s => s._id);
 
     query.supplierId = { $in: hook ? hook(supplierIds) : supplierIds };
+  } else {
+    const deletedSuppliers = await Companies.find({ isDeleted: true }, { _id: 1 });
+    const deletedSupplierIds = deletedSuppliers.map(supplier => supplier._id);
+
+    query.supplierId = { $nin: hook ? hook(deletedSupplierIds) : deletedSupplierIds };
   }
 
   return query;
