@@ -21,21 +21,30 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
   for (const supplier of suppliers) {
-    const { basicInfo } = supplier;
+    const user = await Users.findOne({ companyId: supplier._id });
 
-    if (!basicInfo || !basicInfo.email) {
-      continue;
-    }
-
-    await utils.sendConfigEmail({
+    const options = {
       name: `${tender.type}Templates`,
       kind,
-      toEmails: [basicInfo.email],
       attachments,
       replacer: text => {
         return replacer({ text, tender });
       },
+    };
+
+    await utils.sendConfigEmail({
+      ...options,
+      toEmails: [user.email],
     });
+
+    const { basicInfo } = supplier;
+
+    if (basicInfo && basicInfo.email) {
+      await utils.sendConfigEmail({
+        ...options,
+        toEmails: [basicInfo.email],
+      });
+    }
   }
 };
 
