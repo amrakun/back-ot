@@ -405,7 +405,7 @@ class Tender extends StatusPublishClose {
         return false;
       }
 
-      const supplierIds = await tender.getExactSupplierIds();
+      const supplierIds = await tender.getAllPossibleSupplierIds();
 
       return supplierIds.includes(user.companyId);
     }
