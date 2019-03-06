@@ -123,7 +123,7 @@ export const downloadFiles = async (tenderId, user) => {
   const zip = new JSZip();
   const attachments = zip.folder('files');
 
-  const responses = await TenderResponses.find({ tenderId });
+  const responses = await TenderResponses.find({ tenderId, isSent: true, isNotInterested: { $ne: true } });
 
   for (const response of responses) {
     const supplier = await Companies.findOne({ _id: response.supplierId });
