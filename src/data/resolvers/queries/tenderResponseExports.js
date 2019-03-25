@@ -63,9 +63,15 @@ const tenderResponseQueries = {
         sheet.cell(10, columnIndex).value(supplier.basicInfo.enName);
 
         // fill suppliers section
+        let total = 0;
+
+        if (product.quantity && rp.unitPrice) {
+          total = product.quantity * rp.unitPrice;
+        }
+
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
         sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
-        sheet.cell(rowIndex, columnIndex + 2).value(product.quantity * rp.unitPrice);
+        sheet.cell(rowIndex, columnIndex + 2).value(total);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
         sheet.cell(rowIndex, columnIndex + 4).value(rp.shippingTerms);
       }
