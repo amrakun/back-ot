@@ -1,5 +1,5 @@
 import { Feedbacks, FeedbackResponses } from '../../../db/models';
-import { requireBuyer } from '../../permissions';
+import { requireBuyer, requireLogin } from '../../permissions';
 import { supplierFilter } from './utils';
 
 const feedbackQueries = {
@@ -35,7 +35,7 @@ const feedbackQueries = {
 };
 
 requireBuyer(feedbackQueries, 'feedbacks');
-requireBuyer(feedbackQueries, 'feedbackDetail');
+requireLogin(feedbackQueries, 'feedbackDetail');
 requireBuyer(feedbackQueries, 'feedbackResponses');
 
 export default feedbackQueries;
