@@ -865,8 +865,11 @@ class Company {
       case 'national':
         return 'National';
 
-      default:
+      case 'umnugovi':
         return 'Umnugovi';
+
+      default:
+        return '-';
     }
   }
 
