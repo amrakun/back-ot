@@ -372,6 +372,7 @@ class Tender extends StatusPublishClose {
     const opens = await this.find({
       status: 'open',
       reminderDay: { $exists: true },
+      isDeleted: { $ne: true },
     });
 
     const results = [];

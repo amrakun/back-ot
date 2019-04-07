@@ -13,6 +13,10 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   for (const tender of publishedTenders) {
     const attachments = await getAttachments(tender);
 
+    if (tender.isDeleted) {
+      continue
+    }
+
     await sendEmail({
       kind: 'publish',
       tender,
@@ -34,6 +38,10 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds }, type: { $ne: 'eoi' } });
 
   for (const tender of closedTenders) {
+    if (tender.isDeleted) {
+      continue
+    }
+
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
 
     // write close lo
