@@ -93,6 +93,11 @@ const tenderResponseQueries = {
       template: 'eoi_short_list',
     });
 
+    // if not sent regret letter then save last state
+    if (!tender.sentRegretLetter) {
+      await Tenders.update({ _id: tender._id }, { $set: { shortListedSupplierIds: supplierIds } });
+    }
+
     const maxColumns = 2 + responses.length;
 
     // complete colored titles

@@ -67,6 +67,9 @@ const TenderSchema = mongoose.Schema({
 
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
+  // winners for eoi
+  shortListedSupplierIds: field({ type: [String], optional: true }),
+
   // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
   awardNote: field({ type: String, optional: true }),
