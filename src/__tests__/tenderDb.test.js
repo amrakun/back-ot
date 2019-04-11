@@ -369,10 +369,12 @@ describe('Tender db', () => {
     expect(tenders.length).toBe(1);
   });
 
-  test('Send regret letter', async () => {
+  test('Send regret letter: rfq', async () => {
     expect.assertions(4);
 
-    let tender = await Tenders.findOne({ _id: _tender._id });
+    const rfq = await tenderFactory({ type: 'rfq' });
+
+    let tender = await Tenders.findOne({ _id: rfq._id });
 
     expect(tender.sentRegretLetter).toBe(false);
 
@@ -397,6 +399,20 @@ describe('Tender db', () => {
       await updatedTender.sendRegretLetter();
     } catch (e) {
       expect(e.message).toBe('Already sent');
+    }
+  });
+
+  test('Send regret letter: eoi', async () => {
+    expect.assertions(1);
+
+    const eoi = await tenderFactory({ type: 'eoi' });
+    let tender = await Tenders.findOne({ _id: eoi._id });
+
+    // try not short listed
+    try {
+      await tender.sendRegretLetter();
+    } catch (e) {
+      expect(e.message).toBe('Not short listed');
     }
   });
 

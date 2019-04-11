@@ -321,7 +321,14 @@ describe('Tender mutations', () => {
     expect(response.awardNote).toBe('note');
   });
 
-  test('Send regret letter', async () => {
+
+  const sendRegretLetterMmutation = `
+    mutation tendersSendRegretLetter($_id: String!, $subject: String!, $content: String!) {
+      tendersSendRegretLetter(_id: $_id, subject: $subject, content: $content)
+    }
+  `;
+
+  test('Send regret letter: rfq', async () => {
     const supplier = await companyFactory({});
     const supplierId = supplier._id;
     const tender = await tenderFactory({ status: 'open', isToAll: true });
@@ -333,20 +340,37 @@ describe('Tender mutations', () => {
     const notAwarded1 = await tenderResponseFactory({ tenderId });
     const notAwarded2 = await tenderResponseFactory({ tenderId });
 
-    const mutation = `
-      mutation tendersSendRegretLetter($_id: String!, $subject: String!, $content: String!) {
-        tendersSendRegretLetter(_id: $_id, subject: $subject, content: $content)
-      }
-    `;
-
     const args = { _id: tenderId, subject: 'subject', content: 'content' };
-
-    const response = await graphqlRequest(mutation, 'tendersSendRegretLetter', args);
+    const response = await graphqlRequest(sendRegretLetterMmutation, 'tendersSendRegretLetter', args);
 
     const updatedTender = await Tenders.findOne({ _id: tenderId });
 
     expect(response).toContain(notAwarded1.supplierId);
     expect(response).toContain(notAwarded2.supplierId);
+
+    expect(updatedTender.sentRegretLetter).toBe(true);
+  });
+
+  test('Send regret letter: eoi', async () => {
+    const supplier = await companyFactory({});
+    const supplierId = supplier._id;
+    const tender = await tenderFactory({ status: 'open', type: 'eoi', isToAll: true });
+    const tenderId = tender._id.toString();
+
+    await tender.update({ shortListedSupplierIds: [supplierId] });
+
+    await tenderResponseFactory({ tenderId, supplierId });
+
+    const notChosen1 = await tenderResponseFactory({ tenderId });
+    const notChosen2 = await tenderResponseFactory({ tenderId });
+
+    const args = { _id: tenderId, subject: 'subject', content: 'content' };
+    const response = await graphqlRequest(sendRegretLetterMmutation, 'tendersSendRegretLetter', args);
+
+    const updatedTender = await Tenders.findOne({ _id: tenderId });
+
+    expect(response).toContain(notChosen1.supplierId);
+    expect(response).toContain(notChosen2.supplierId);
 
     expect(updatedTender.sentRegretLetter).toBe(true);
   });

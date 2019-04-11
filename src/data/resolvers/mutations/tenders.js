@@ -162,14 +162,23 @@ const tenderMutations = {
 
     await tender.sendRegretLetter();
 
-    const notAwardedResponses = await TenderResponses.find({
+    // rfq
+    let notChosenResponses = await TenderResponses.find({
       tenderId: _id,
       supplierId: { $nin: tender.winnerIds },
     });
 
-    // send email to not awarded suppliers
-    for (let notAwardedResponse of notAwardedResponses) {
-      const selector = { _id: notAwardedResponse.supplierId };
+    // eoi
+    if (tender.type === 'eoi') {
+      notChosenResponses = await TenderResponses.find({
+        tenderId: _id,
+        supplierId: { $nin: tender.shortListedSupplierIds },
+      });
+    }
+
+    // send email to not chosen suppliers
+    for (let notChosenResponse of notChosenResponses) {
+      const selector = { _id: notChosenResponse.supplierId };
       const supplier = (await Companies.findOne(selector)) || {};
 
       await tenderUtils.sendConfigEmail({
@@ -183,7 +192,7 @@ const tenderMutations = {
       });
     }
 
-    return notAwardedResponses.map(response => response.supplierId);
+    return notChosenResponses.map(response => response.supplierId);
   },
 
   /**

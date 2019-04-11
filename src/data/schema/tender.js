@@ -72,6 +72,7 @@ export const types = `
     tierTypes: [String]
     createdUserId: String!
     responsibleBuyerIds: [String]
+    shortListedSupplierIds: [String]
     winnerIds: [String]
     awardNote: String
     sentRegretLetter: Boolean
