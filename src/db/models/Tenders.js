@@ -295,6 +295,10 @@ class Tender extends StatusPublishClose {
     return decryptArray(this.winnerIds);
   }
 
+  getShortListedSupplierIds() {
+    return decryptArray(this.shortListedSupplierIds);
+  }
+
   /*
    * Mark as sent regret letter
    */

@@ -62,7 +62,7 @@ describe('Tender queries', () => {
 
     let updatedTender = await Tenders.findOne({ _id: tender._id });
 
-    expect(updatedTender.shortListedSupplierIds.toObject()).toEqual([response.supplierId]);
+    expect(updatedTender.getShortListedSupplierIds()).toEqual([response.supplierId]);
 
     // sent regret letter ================
     await Tenders.update({ _id: tender._id }, { $set: { sentRegretLetter: true } });
@@ -74,7 +74,7 @@ describe('Tender queries', () => {
 
     updatedTender = await Tenders.findOne({ _id: tender._id });
 
-    expect(updatedTender.shortListedSupplierIds.toObject()).not.toEqual([
+    expect(updatedTender.getShortListedSupplierIds()).not.toEqual([
       response.supplierId,
       response2.supplierId,
     ]);

@@ -4,6 +4,7 @@
 import sinon from 'sinon';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
 import { Configs, Users, Tenders, Companies } from '../db/models';
+import { encryptArray } from '../db/models/utils';
 import {
   userFactory,
   configFactory,
@@ -334,9 +335,9 @@ describe('Tender mutations', () => {
     const tender = await tenderFactory({ status: 'open', isToAll: true });
     const tenderId = tender._id.toString();
 
-    await tender.update({ winnerIds: [supplierId] });
+    await tender.update({ winnerIds: encryptArray([supplierId]) });
 
-    await tenderResponseFactory({ tenderId, supplierId });
+    const chosen = await tenderResponseFactory({ tenderId, supplierId });
     const notAwarded1 = await tenderResponseFactory({ tenderId });
     const notAwarded2 = await tenderResponseFactory({ tenderId });
 
@@ -345,6 +346,7 @@ describe('Tender mutations', () => {
 
     const updatedTender = await Tenders.findOne({ _id: tenderId });
 
+    expect(response).not.toContain(chosen.supplierId);
     expect(response).toContain(notAwarded1.supplierId);
     expect(response).toContain(notAwarded2.supplierId);
 
@@ -357,9 +359,9 @@ describe('Tender mutations', () => {
     const tender = await tenderFactory({ status: 'open', type: 'eoi', isToAll: true });
     const tenderId = tender._id.toString();
 
-    await tender.update({ shortListedSupplierIds: [supplierId] });
+    await tender.update({ shortListedSupplierIds: encryptArray([supplierId]) });
 
-    await tenderResponseFactory({ tenderId, supplierId });
+    const chosen = await tenderResponseFactory({ tenderId, supplierId });
 
     const notChosen1 = await tenderResponseFactory({ tenderId });
     const notChosen2 = await tenderResponseFactory({ tenderId });
@@ -369,6 +371,7 @@ describe('Tender mutations', () => {
 
     const updatedTender = await Tenders.findOne({ _id: tenderId });
 
+    expect(response).not.toContain(chosen.supplierId);
     expect(response).toContain(notChosen1.supplierId);
     expect(response).toContain(notChosen2.supplierId);
 
