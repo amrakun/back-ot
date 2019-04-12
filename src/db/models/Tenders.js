@@ -308,7 +308,7 @@ class Tender extends StatusPublishClose {
     }
 
     if (this.type === 'eoi' && (!this.bidderListedSupplierIds || this.bidderListedSupplierIds.length === 0)) {
-       throw new Error('Not short listed');
+       throw new Error('Not bidder listed');
     }
 
     if (this.type != 'eoi' && (!this.winnerIds || this.winnerIds.length === 0)) {

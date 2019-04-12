@@ -408,11 +408,11 @@ describe('Tender db', () => {
     const eoi = await tenderFactory({ type: 'eoi' });
     let tender = await Tenders.findOne({ _id: eoi._id });
 
-    // try not short listed
+    // try not bidder listed
     try {
       await tender.sendRegretLetter();
     } catch (e) {
-      expect(e.message).toBe('Not short listed');
+      expect(e.message).toBe('Not bidder listed');
     }
   });
 
