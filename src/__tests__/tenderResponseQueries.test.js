@@ -20,8 +20,8 @@ describe('Tender queries', () => {
   `;
 
   const query = `
-    query tenderResponsesEoiShortList(${commonParams}) {
-      tenderResponsesEoiShortList(${commonValues})
+    query tenderResponsesEoiBidderList(${commonParams}) {
+      tenderResponsesEoiBidderList(${commonValues})
     }
   `;
 
@@ -55,7 +55,7 @@ describe('Tender queries', () => {
     });
 
     // not sent regret letter ================
-    await graphqlRequest(query, 'tenderResponsesEoiShortList', {
+    await graphqlRequest(query, 'tenderResponsesEoiBidderList', {
       tenderId: tender._id,
       supplierIds: [response.supplierId],
     });
@@ -67,7 +67,7 @@ describe('Tender queries', () => {
     // sent regret letter ================
     await Tenders.update({ _id: tender._id }, { $set: { sentRegretLetter: true } });
 
-    await graphqlRequest(query, 'tenderResponsesEoiShortList', {
+    await graphqlRequest(query, 'tenderResponsesEoiBidderList', {
       tenderId: tender._id,
       supplierIds: [response.supplierId, response2.supplierId],
     });

@@ -93,11 +93,6 @@ const tenderResponseQueries = {
       template: 'eoi_short_list',
     });
 
-    // if not sent regret letter then save last state
-    if (!tender.sentRegretLetter) {
-      await Tenders.update({ _id: tender._id }, { $set: { bidderListedSupplierIds: encryptArray(supplierIds) } });
-    }
-
     const maxColumns = 2 + responses.length;
 
     // complete colored titles
@@ -162,6 +157,11 @@ const tenderResponseQueries = {
       supplierIds,
       template: 'eoi_bidder_list',
     });
+
+    // if not sent regret letter then save last state
+    if (!tender.sentRegretLetter) {
+      await Tenders.update({ _id: tender._id }, { $set: { bidderListedSupplierIds: encryptArray(supplierIds) } });
+    }
 
     // WS/CW NUMBER
     sheet.cell(8, 1).value(tender.number);
