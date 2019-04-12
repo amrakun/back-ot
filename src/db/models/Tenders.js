@@ -68,7 +68,7 @@ const TenderSchema = mongoose.Schema({
   requestedProducts: field({ type: [ProductSchema], optional: true }),
 
   // winners for eoi
-  shortListedSupplierIds: field({ type: [String], optional: true }),
+  bidderListedSupplierIds: field({ type: [String], optional: true }),
 
   // Awarded response ids: encrypted supplier ids
   winnerIds: field({ type: [String], optional: true }),
@@ -295,8 +295,8 @@ class Tender extends StatusPublishClose {
     return decryptArray(this.winnerIds);
   }
 
-  getShortListedSupplierIds() {
-    return decryptArray(this.shortListedSupplierIds);
+  getbidderListedSupplierIds() {
+    return decryptArray(this.bidderListedSupplierIds);
   }
 
   /*
@@ -307,7 +307,7 @@ class Tender extends StatusPublishClose {
       throw new Error('Already sent');
     }
 
-    if (this.type === 'eoi' && (!this.shortListedSupplierIds || this.shortListedSupplierIds.length === 0)) {
+    if (this.type === 'eoi' && (!this.bidderListedSupplierIds || this.bidderListedSupplierIds.length === 0)) {
        throw new Error('Not short listed');
     }
 

@@ -359,7 +359,7 @@ describe('Tender mutations', () => {
     const tender = await tenderFactory({ status: 'open', type: 'eoi', isToAll: true });
     const tenderId = tender._id.toString();
 
-    await tender.update({ shortListedSupplierIds: encryptArray([supplierId]) });
+    await tender.update({ bidderListedSupplierIds: encryptArray([supplierId]) });
 
     const chosen = await tenderResponseFactory({ tenderId, supplierId });
 

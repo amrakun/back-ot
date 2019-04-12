@@ -172,7 +172,7 @@ const tenderMutations = {
     if (tender.type === 'eoi') {
       notChosenResponses = await TenderResponses.find({
         tenderId: _id,
-        supplierId: { $nin: tender.shortListedSupplierIds },
+        supplierId: { $nin: tender.bidderListedSupplierIds },
       });
     }
 
