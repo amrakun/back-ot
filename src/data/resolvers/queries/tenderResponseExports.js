@@ -217,8 +217,17 @@ const tenderResponseQueries = {
       .merged(true)
       .value('');
 
-    // go down 3 line and add below text ========
-    rowIndex += 3;
+    // go down 2 line and add below text ========
+    rowIndex += 2;
+    sheet
+      .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
+      .merged(true)
+      .value(
+        `* If supplier is a Tier 3, please state the name of the country`,
+      )
+      .style({ italic: true, fill: 'f5f903' });
+
+    rowIndex += 2;
     sheet
       .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
       .merged(true)
