@@ -152,11 +152,13 @@ const tenderResponseQueries = {
    * @return {String} generated file link
    */
   async tenderResponsesEoiBidderList(root, { tenderId, supplierIds }, { user }) {
-    const { tender, responses, workbook, sheet } = await prepareReport({
+    const { tender, workbook, sheet } = await prepareReport({
       tenderId,
       supplierIds,
       template: 'eoi_bidder_list',
     });
+
+    const responses = await TenderResponses.find({ tenderId });
 
     // if not sent regret letter then save last state
     if (!tender.sentRegretLetter) {
@@ -172,7 +174,7 @@ const tenderResponseQueries = {
     // PROJECT TITLE
     sheet.cell(8, 7).value(tender.name);
 
-    let rowIndex = 21;
+    let rowIndex = 22;
 
     // identified potential suppliers information ============
     let addRow = (colIndex, value) => {
@@ -182,7 +184,12 @@ const tenderResponseQueries = {
         .value(value);
     };
 
-    for (let [index, response] of responses.entries()) {
+    const sortedResponses = [
+      ...responses.filter(response => supplierIds.includes(response.supplierId)),
+      ...responses.filter(response => !supplierIds.includes(response.supplierId)),
+    ]
+
+    for (let [index, response] of sortedResponses.entries()) {
       const supplier = await Companies.findOne({ _id: response.supplierId });
       const basicInfo = supplier.basicInfo || {};
 
@@ -190,7 +197,7 @@ const tenderResponseQueries = {
       addRow(2, basicInfo.enName);
       addRow(4, supplier.prequalificationStatusDisplay());
       addRow(5, supplier.tierTypeDisplay());
-      addRow(6, 'YES');
+      addRow(6, supplierIds.includes(response.supplierId) ? 'YES' : 'NO');
 
       // go down 1 line
       rowIndex++;
@@ -210,8 +217,8 @@ const tenderResponseQueries = {
       .merged(true)
       .value('');
 
-    // go down 4 line and add below text ========
-    rowIndex += 4;
+    // go down 3 line and add below text ========
+    rowIndex += 3;
     sheet
       .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
       .merged(true)
