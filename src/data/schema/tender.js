@@ -73,6 +73,7 @@ export const types = `
     createdUserId: String!
     responsibleBuyerIds: [String]
     bidderListedSupplierIds: [String]
+    notBidderListedSuppliers: [Company]
     winnerIds: [String]
     awardNote: String
     sentRegretLetter: Boolean

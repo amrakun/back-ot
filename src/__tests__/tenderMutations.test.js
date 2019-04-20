@@ -363,6 +363,7 @@ describe('Tender mutations', () => {
 
     const chosen = await tenderResponseFactory({ tenderId, supplierId });
 
+    const notInterested = await tenderResponseFactory({ tenderId, isNotInterested: true });
     const notChosen1 = await tenderResponseFactory({ tenderId });
     const notChosen2 = await tenderResponseFactory({ tenderId });
 
@@ -371,6 +372,7 @@ describe('Tender mutations', () => {
 
     const updatedTender = await Tenders.findOne({ _id: tenderId });
 
+    expect(response).not.toContain(notInterested.supplierId);
     expect(response).not.toContain(chosen.supplierId);
     expect(response).toContain(notChosen1.supplierId);
     expect(response).toContain(notChosen2.supplierId);

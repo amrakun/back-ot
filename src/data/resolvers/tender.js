@@ -1,4 +1,5 @@
 import { Users, TenderResponses, Companies } from '../../db/models';
+import { relativeTimeThreshold } from 'moment';
 
 export default {
   createdUser(tender) {
@@ -20,6 +21,10 @@ export default {
   async suppliers(tender) {
     const ids = await tender.getAllPossibleSupplierIds();
     return Companies.find({ _id: { $in: ids } });
+  },
+
+  notBidderListedSuppliers(tender) {
+    return tender.getNotBidderListedSuppliers();
   },
 
   requestedCount(tender) {

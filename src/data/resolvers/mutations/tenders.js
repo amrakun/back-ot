@@ -163,24 +163,20 @@ const tenderMutations = {
     await tender.sendRegretLetter();
 
     // rfq
-    let notChosenResponses = await TenderResponses.find({
+    const notChosenResponses = await TenderResponses.find({
       tenderId: _id,
       supplierId: { $nin: tender.winnerIds },
     });
 
+    let notChosenSuppliers = await Companies.find({ _id: { $in: notChosenResponses.map(r => r.supplierId) }});
+
     // eoi
     if (tender.type === 'eoi') {
-      notChosenResponses = await TenderResponses.find({
-        tenderId: _id,
-        supplierId: { $nin: tender.bidderListedSupplierIds },
-      });
+      notChosenSuppliers = await tender.getNotBidderListedSuppliers();
     }
 
     // send email to not chosen suppliers
-    for (let notChosenResponse of notChosenResponses) {
-      const selector = { _id: notChosenResponse.supplierId };
-      const supplier = (await Companies.findOne(selector)) || {};
-
+    for (let supplier of notChosenSuppliers) {
       await tenderUtils.sendConfigEmail({
         name: `${tender.type}Templates`,
         kind: 'supplier__regretLetter',
@@ -192,7 +188,7 @@ const tenderMutations = {
       });
     }
 
-    return notChosenResponses.map(response => response.supplierId);
+    return notChosenSuppliers.map(response => response._id);
   },
 
   /**

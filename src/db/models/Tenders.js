@@ -299,6 +299,18 @@ class Tender extends StatusPublishClose {
     return decryptArray(this.bidderListedSupplierIds);
   }
 
+  async getNotBidderListedSuppliers() {
+    const notChosenResponses = await TenderResponses.find({
+      tenderId: this._id,
+      supplierId: { $nin: this.bidderListedSupplierIds },
+      isNotInterested: { $ne: true }
+    });
+
+    const supplierIds = notChosenResponses.map(response => response.supplierId);
+
+    return Companies.find({ _id: { $in: supplierIds } });
+  }
+
   /*
    * Mark as sent regret letter
    */
