@@ -209,8 +209,8 @@ const tenderResponseQueries = {
       .merged(true)
       .value('');
 
-    // go down 3 line and add below text ========
-    rowIndex += 3;
+    // go down 4 line and add below text ========
+    rowIndex += 4;
     sheet
       .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
       .merged(true)
