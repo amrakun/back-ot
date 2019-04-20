@@ -188,8 +188,9 @@ const tenderResponseQueries = {
 
       addRow(1, index + 1);
       addRow(2, basicInfo.enName);
-      addRow(3, basicInfo.totalNumberOfEmployees);
-      addRow(8, 'YES');
+      addRow(4, supplier.prequalificationStatusDisplay());
+      addRow(5, supplier.tierTypeDisplay());
+      addRow(6, 'YES');
 
       // go down 1 line
       rowIndex++;
