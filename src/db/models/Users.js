@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import passwordValidator from 'password-validator';
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
-import { Session, Audits, BlockedCompanies, Feedbacks, Tenders } from './';
+import { Session } from './';
 
 const SALT_WORK_FACTOR = 10;
 
