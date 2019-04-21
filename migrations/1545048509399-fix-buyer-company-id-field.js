@@ -16,6 +16,10 @@ module.exports.up = next => {
       const users = await Users.find({ isSupplier: false, companyId: { $exists: true } });
 
       for (const user of users) {
+          if (!user.companyId) {
+            continue;
+          }
+
           const company = await Companies.findOne({ _id: user.companyId });
 
           await Users.update({ _id: user._id }, { $set: { companyId: null } });
