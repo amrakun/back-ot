@@ -143,7 +143,7 @@ describe('User mutations', async () => {
   tomorrow.setDate(today.getDate() + 1);
 
   test('Confirm registration: via supplier', async () => {
-    const user = await userFactory({});
+    const user = await userFactory({ isSupplier: true });
 
     await Users.update(
       { _id: user._id },
@@ -258,14 +258,41 @@ describe('User mutations', async () => {
     expect(Users.forgotPassword).toBeCalledWith(doc.email);
   });
 
-  test('Reset password', async () => {
-    Users.resetPassword = jest.fn(() => ({}));
+  test('Reset password: buyer', async () => {
+    const user = await userFactory({});
+    const token = '2424920429402';
+
+    await Companies.remove({});
+
+    await Users.update({ _id: user._id }, {
+      resetPasswordToken: token,
+      resetPasswordExpires: Date.now() + 86400000,
+    });
 
     const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
     await userMutations.resetPassword({}, doc, {});
 
-    expect(Users.resetPassword).toBeCalledWith(doc);
+    expect(await Companies.count()).toBe(0);
+  });
+
+  test('Reset password: supplier', async () => {
+    const user = await userFactory({ isSupplier: true });
+    const token = '2424920429402';
+
+    await Companies.remove({});
+
+    await Users.update({ _id: user._id }, {
+      companyId: null,
+      resetPasswordToken: token,
+      resetPasswordExpires: Date.now() + 86400000,
+    });
+
+    const doc = { token: '2424920429402', newPassword: 'Password$123' };
+
+    await userMutations.resetPassword({}, doc, {});
+
+    expect(await Companies.count()).toBe(1);
   });
 
   test('Change password', async () => {
