@@ -158,7 +158,7 @@ const tenderResponseQueries = {
       template: 'eoi_bidder_list',
     });
 
-    const responses = await TenderResponses.find({ tenderId });
+    const responses = await TenderResponses.find({ tenderId, isNotInterested: { $ne: true } });
 
     // if not sent regret letter then save last state
     if (!tender.sentRegretLetter) {
