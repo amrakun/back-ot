@@ -35,6 +35,11 @@ const companiesFilter = async args => {
     isSentRegistrationInfo: true,
   };
 
+  if (source === 'searcher') {
+    selector.basicInfo = { $exists: true };
+    delete selector.isSentRegistrationInfo;
+  }
+
   if (source === 'prequalification') {
     selector.isSentPrequalificationInfo = true;
   }
