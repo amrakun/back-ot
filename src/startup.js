@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-// import './cronJobs/companies';
+import './cronJobs/companies';
 import './cronJobs/audits';
 import './cronJobs/tenders';
 import './cronJobs/feedbacks';
