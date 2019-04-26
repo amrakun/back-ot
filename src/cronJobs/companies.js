@@ -2,7 +2,7 @@ import schedule from 'node-schedule';
 import { AuditResponses, Qualifications, Companies } from '../db/models';
 
 // every day at 23 45
-schedule.scheduleJob('* 45 23 * *', async () => {
+schedule.scheduleJob('0 45 23 * * *', async () => {
   const companies = await Companies.find({});
 
   for (const company of companies) {

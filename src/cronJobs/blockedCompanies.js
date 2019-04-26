@@ -4,7 +4,7 @@ import { BlockedCompanies } from '../db/models';
 import { sendConfigEmail } from '../data/utils';
 
 // every day at 23 45
-schedule.scheduleJob('* 45 23 * *', async () => {
+schedule.scheduleJob('0 45 23 * * *', async () => {
   const blockedSuppliers = await BlockedCompanies.blockedSuppliersByGroupId();
 
   for (const { createdUser, endDate, suppliers } of blockedSuppliers) {

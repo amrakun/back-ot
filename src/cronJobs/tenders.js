@@ -57,7 +57,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 });
 
 // every day at 23 45
-schedule.scheduleJob('* 45 23 * *', async () => {
+schedule.scheduleJob('0 45 23 * * *', async () => {
   // send reminder email to suppliers ================
   const remindTenders = await Tenders.tendersToRemind();
 
