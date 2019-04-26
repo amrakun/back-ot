@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { BlockedCompanies, Qualifications } from '../../../db/models';
+import { BlockedCompanies, Qualifications, Users } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
 /**
@@ -11,26 +11,61 @@ import { readTemplate, generateXlsx } from '../../utils';
 export const companiesExport = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers');
+  const currentYear = new Date().getFullYear();
 
   let rowIndex = 1;
+
+  sheet.cell(rowIndex, 1).value('Supplier name');
+  sheet.cell(rowIndex, 2).value('Vendor number');
+  sheet.cell(rowIndex, 3).value('Tier type');
+  sheet.cell(rowIndex, 4).value('Pre-Qualification status');
+  sheet.cell(rowIndex, 5).value('Qualification status');
+  sheet.cell(rowIndex, 6).value('Validation status');
+  sheet.cell(rowIndex, 7).value(`Sales revenue ${currentYear - 3}`);
+  sheet.cell(rowIndex, 8).value(`Sales revenue ${currentYear - 2}`);
+  sheet.cell(rowIndex, 9).value(`Sales revenue ${currentYear - 1}`);
+  sheet.cell(rowIndex, 10).value('Block status');
+  sheet.cell(rowIndex, 11).value('Due diligence');
+  sheet.cell(rowIndex, 12).value('Difot score');
+  sheet.cell(rowIndex, 13).value('Owner');
+  sheet.cell(rowIndex, 14).value('Contact person');
+  sheet.cell(rowIndex, 15).value('Email address');
+  sheet.cell(rowIndex, 16).value('Phone number');
+
+  const displayBool = value => {
+    if (value) {
+      return 'Yes';
+    }
+
+    return 'No';
+  };
 
   for (let company of companies) {
     rowIndex++;
 
+    const user = (await Users.findOne({ companyId: company._id })) || {};
     const basicInfo = company.basicInfo || {};
     const contactInfo = company.contactInfo || {};
+    const financialInfo = company.financialInfo || {};
+    const salesRevenue = financialInfo.annualTurnover || [];
+    const [rev1, rev2, rev3] = salesRevenue.sort((r1, r2) => r1.year > r2.year);
 
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
-    sheet.cell(rowIndex, 3).value(company.isSentRegistrationInfo);
-    sheet.cell(rowIndex, 4).value(company.isPrequalified);
-    sheet.cell(rowIndex, 5).value(company.isQualfied);
-    sheet.cell(rowIndex, 6).value(company.isProductsInfoValidated);
-    sheet.cell(rowIndex, 7).value(Boolean(company.dueDiligences));
-    sheet.cell(rowIndex, 8).value(company.averageDifotScore);
-    sheet.cell(rowIndex, 9).value(await BlockedCompanies.isBlocked(company._id));
-    sheet.cell(rowIndex, 11).value(contactInfo.email);
-    sheet.cell(rowIndex, 12).value(contactInfo.phone);
+    sheet.cell(rowIndex, 3).value(company.tierTypeDisplay());
+    sheet.cell(rowIndex, 4).value(company.prequalificationStatusDisplay());
+    sheet.cell(rowIndex, 5).value(displayBool(company.isQualfied));
+    sheet.cell(rowIndex, 6).value(displayBool(company.isProductsInfoValidated));
+    sheet.cell(rowIndex, 7).value(rev1 && rev1.amount ? rev1.amount.toLocaleString() : null);
+    sheet.cell(rowIndex, 8).value(rev2 && rev2.amount ? rev2.amount.toLocaleString() : null);
+    sheet.cell(rowIndex, 9).value(rev3 && rev3.amount ? rev3.amount.toLocaleString() : null);
+    sheet.cell(rowIndex, 10).value(displayBool(await BlockedCompanies.isBlocked(company._id)));
+    sheet.cell(rowIndex, 11).value(displayBool(Boolean(company.dueDiligences)));
+    sheet.cell(rowIndex, 12).value(company.averageDifotScore);
+    sheet.cell(rowIndex, 13).value(user.email);
+    sheet.cell(rowIndex, 14).value(contactInfo.phone);
+    sheet.cell(rowIndex, 15).value(contactInfo.email);
+    sheet.cell(rowIndex, 16).value(contactInfo.phone);
   }
 
   // Write to file.
