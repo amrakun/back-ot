@@ -205,7 +205,7 @@ class Tender extends StatusPublishClose {
       const supplier = await Companies.findOne({ _id: supplierId });
 
       if (supplier.isDeleted) {
-        throw new Error('Can not award deleted supplier')
+        throw new Error('Can not award deleted supplier');
       }
     }
 
@@ -303,7 +303,8 @@ class Tender extends StatusPublishClose {
     const notChosenResponses = await TenderResponses.find({
       tenderId: this._id,
       supplierId: { $nin: this.bidderListedSupplierIds },
-      isNotInterested: { $ne: true }
+      isSent: true,
+      isNotInterested: { $ne: true },
     });
 
     const supplierIds = notChosenResponses.map(response => response.supplierId);
@@ -319,8 +320,11 @@ class Tender extends StatusPublishClose {
       throw new Error('Already sent');
     }
 
-    if (this.type === 'eoi' && (!this.bidderListedSupplierIds || this.bidderListedSupplierIds.length === 0)) {
-       throw new Error('Not bidder listed');
+    if (
+      this.type === 'eoi' &&
+      (!this.bidderListedSupplierIds || this.bidderListedSupplierIds.length === 0)
+    ) {
+      throw new Error('Not bidder listed');
     }
 
     if (this.type != 'eoi' && (!this.winnerIds || this.winnerIds.length === 0)) {
@@ -418,7 +422,7 @@ class Tender extends StatusPublishClose {
       return true;
     }
 
-    const check = async (selector) => {
+    const check = async selector => {
       const tender = await Tenders.findOne(selector);
 
       if (!tender) {
@@ -428,7 +432,7 @@ class Tender extends StatusPublishClose {
       const supplierIds = await tender.getAllPossibleSupplierIds();
 
       return supplierIds.includes(user.companyId);
-    }
+    };
 
     if (await check({ 'file.url': key })) {
       return true;
@@ -554,7 +558,7 @@ class TenderResponse {
         (!tender.tierTypes || tender.tierTypes.length === 0) &&
         !tender.supplierIds.includes(encrypt(supplierId))
       )
-      throw Error('Not participated');
+        throw Error('Not participated');
     }
 
     if (tender.type === 'eoi' && !supplier.basicInfo) {
