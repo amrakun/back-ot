@@ -158,11 +158,18 @@ const tenderResponseQueries = {
       template: 'eoi_bidder_list',
     });
 
-    const responses = await TenderResponses.find({ tenderId, isNotInterested: { $ne: true } });
+    const responses = await TenderResponses.find({
+      tenderId,
+      isSent: true,
+      isNotInterested: { $ne: true },
+    });
 
     // if not sent regret letter then save last state
     if (!tender.sentRegretLetter) {
-      await Tenders.update({ _id: tender._id }, { $set: { bidderListedSupplierIds: encryptArray(supplierIds) } });
+      await Tenders.update(
+        { _id: tender._id },
+        { $set: { bidderListedSupplierIds: encryptArray(supplierIds) } },
+      );
     }
 
     // WS/CW NUMBER
@@ -187,7 +194,7 @@ const tenderResponseQueries = {
     const sortedResponses = [
       ...responses.filter(response => supplierIds.includes(response.supplierId)),
       ...responses.filter(response => !supplierIds.includes(response.supplierId)),
-    ]
+    ];
 
     for (let [index, response] of sortedResponses.entries()) {
       const supplier = await Companies.findOne({ _id: response.supplierId });
@@ -222,9 +229,7 @@ const tenderResponseQueries = {
     sheet
       .range(`${cf(`R${rowIndex}C1`)}:${cf(`R${rowIndex}C9`)}`)
       .merged(true)
-      .value(
-        `* If supplier is a Tier 3, please state the name of the country`,
-      )
+      .value(`* If supplier is a Tier 3, please state the name of the country`)
       .style({ italic: true, fill: 'f5f903' });
 
     rowIndex += 2;
