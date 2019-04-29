@@ -191,10 +191,10 @@ const tenderResponseQueries = {
         .value(value);
     };
 
-    const sortedResponses = [
-      ...responses.filter(response => supplierIds.includes(response.supplierId)),
-      ...responses.filter(response => !supplierIds.includes(response.supplierId)),
-    ];
+    const chosen = responses.filter(response => supplierIds.includes(response.supplierId));
+    const notChosen = responses.filter(response => !supplierIds.includes(response.supplierId));
+
+    const sortedResponses = [...chosen, ...notChosen];
 
     for (let [index, response] of sortedResponses.entries()) {
       const supplier = await Companies.findOne({ _id: response.supplierId });
@@ -271,7 +271,7 @@ const tenderResponseQueries = {
       });
     };
 
-    for (let [index, response] of responses.entries()) {
+    for (let [index, response] of chosen.entries()) {
       const supplier = (await Companies.findOne({ _id: response.supplierId })) || {};
       const basicInfo = supplier.basicInfo || {};
       const contactInfo = supplier.contactInfo || {};
