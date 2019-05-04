@@ -342,8 +342,8 @@ class Tender extends StatusPublishClose {
       throw new Error('Permission denied');
     }
 
-    if (['closed', 'awarded'].includes(this.status)) {
-      throw new Error('Can not cancel awarded or closed tender');
+    if (['canceled', 'awarded'].includes(this.status)) {
+      throw new Error('Can not cancel awarded or canceled tender');
     }
 
     await this.update({ status: 'canceled' });

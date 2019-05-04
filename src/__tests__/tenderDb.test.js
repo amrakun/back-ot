@@ -276,12 +276,15 @@ describe('Tender db', () => {
       },
     ];
 
-    const updatedTender = await Tenders.award({
-      _id: tender._id,
-      supplierIds: [supplier._id],
-      note: 'note',
-      attachments,
-    }, tender.createdUserId);
+    const updatedTender = await Tenders.award(
+      {
+        _id: tender._id,
+        supplierIds: [supplier._id],
+        note: 'note',
+        attachments,
+      },
+      tender.createdUserId,
+    );
 
     expect(updatedTender.status).toBe('awarded');
     expect(updatedTender.awardNote).toBe('note');
@@ -419,14 +422,14 @@ describe('Tender db', () => {
   test('Cancel', async () => {
     expect.assertions(3);
 
-    let tender = await tenderFactory({ status: 'closed' });
+    let tender = await tenderFactory({ status: 'canceled' });
 
     tender = await Tenders.findOne({ _id: tender._id });
 
     try {
       await tender.cancel(tender.createdUserId);
     } catch (e) {
-      expect(e.message).toBe('Can not cancel awarded or closed tender');
+      expect(e.message).toBe('Can not cancel awarded or canceled tender');
     }
 
     // not created user =============
@@ -490,9 +493,7 @@ describe('Tender db', () => {
     await tenderFactory({
       isToAll: true,
       file: { url: 'f1.png', name: '/f1' },
-      attachments: [
-        { url: 'attach10.png', name: '/attach10' },
-      ],
+      attachments: [{ url: 'attach10.png', name: '/attach10' }],
     });
 
     // buyer can download all files
