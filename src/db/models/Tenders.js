@@ -527,9 +527,9 @@ const RespondedDocumentSchema = mongoose.Schema(
 );
 
 const TenderResponseSchema = mongoose.Schema({
-  createdDate: field({ type: Date }),
-  tenderId: field({ type: String }),
-  supplierId: field({ type: String }),
+  createdDate: field({ type: Date, index: true }),
+  tenderId: field({ type: String, index: true }),
+  supplierId: field({ type: String, index: true }),
   respondedProducts: [RespondedProductSchema],
 
   // used both in service, travel rfq

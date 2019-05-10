@@ -453,7 +453,7 @@ const ProductsInfoValidation = mongoose.Schema(
 
 // Main schema ============
 const CompanySchema = mongoose.Schema({
-  createdDate: field({ type: Date }),
+  createdDate: field({ type: Date, index: true }),
 
   basicInfo: field({ type: BasicInfoSchema, optional: true }),
   contactInfo: field({ type: ContactInfoSchema, optional: true }),
