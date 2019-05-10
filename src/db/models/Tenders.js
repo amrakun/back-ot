@@ -245,6 +245,24 @@ class Tender extends StatusPublishClose {
   }
 
   /*
+   * All participated suppliers except not interested
+   */
+  async participatedSuppliers({ onlyIds = false }) {
+    const responses = await TenderResponses.find({
+      tenderId: this._id,
+      isNotInterested: { $ne: true },
+      isSent: true,
+    });
+    const supplierIds = responses.map(response => response.supplierId);
+
+    if (onlyIds) {
+      return supplierIds;
+    }
+
+    return Companies.find({ _id: { $in: supplierIds } });
+  }
+
+  /*
    * Compare old supplier ids with given doc
    */
   async getNewSupplierIds(doc) {

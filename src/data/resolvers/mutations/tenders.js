@@ -51,7 +51,9 @@ const tenderMutations = {
         tenderId: oldTender._id,
         userId: user._id,
         action: 'extend',
-        description: `Extended close date from (${oldTender.closeDate}) to (${updatedTender.closeDate})`,
+        description: `Extended close date from (${oldTender.closeDate}) to (${
+          updatedTender.closeDate
+        })`,
       });
     }
 
@@ -168,7 +170,9 @@ const tenderMutations = {
       supplierId: { $nin: tender.winnerIds },
     });
 
-    let notChosenSuppliers = await Companies.find({ _id: { $in: notChosenResponses.map(r => r.supplierId) }});
+    let notChosenSuppliers = await Companies.find({
+      _id: { $in: notChosenResponses.map(r => r.supplierId) },
+    });
 
     // eoi
     if (tender.type === 'eoi') {
@@ -210,7 +214,16 @@ const tenderMutations = {
         description: `Canceled`,
       });
 
-      await tenderUtils.sendEmail({ kind: 'cancel', tender: canceledTender });
+      const supplierIds = await tender.participatedSuppliers({ onlyIds: true });
+
+      // send canceled emails to participated suppliers
+      await tenderUtils.sendEmailToSuppliers({
+        kind: 'supplier__cancel',
+        tender: canceledTender,
+        supplierIds,
+      });
+
+      await tenderUtils.sendEmailToBuyer({ kind: 'buyer__cancel', tender: canceledTender });
 
       return canceledTender;
     }
