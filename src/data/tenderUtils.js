@@ -5,6 +5,7 @@ import { Users, Companies, TenderResponses, Tenders } from '../db/models';
 export const replacer = ({ text, tender }) => {
   let result = text;
 
+  result = result.replace(/{tender.id}/g, tender._id);
   result = result.replace(/{tender.content}/g, tender.content);
   result = result.replace(/{tender.number}/g, tender.number);
   result = result.replace(/{tender.name}/g, tender.name);
@@ -123,7 +124,11 @@ export const downloadFiles = async (tenderId, user) => {
   const zip = new JSZip();
   const attachments = zip.folder('files');
 
-  const responses = await TenderResponses.find({ tenderId, isSent: true, isNotInterested: { $ne: true } });
+  const responses = await TenderResponses.find({
+    tenderId,
+    isSent: true,
+    isNotInterested: { $ne: true },
+  });
 
   for (const response of responses) {
     const supplier = await Companies.findOne({ _id: response.supplierId });
@@ -150,7 +155,7 @@ export const downloadFiles = async (tenderId, user) => {
   }
 
   return zip.generateAsync({ type: 'nodebuffer' });
-}
+};
 
 export default {
   sendConfigEmail,
@@ -158,5 +163,5 @@ export default {
   sendEmailToBuyer,
   sendEmail,
   getAttachments,
-  downloadFiles
+  downloadFiles,
 };
