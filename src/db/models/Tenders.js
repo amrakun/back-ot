@@ -541,12 +541,12 @@ const TenderResponseSchema = mongoose.Schema({
 
   // when tender type is eoi, we can still receive responses after closedDate
   // So eoi status will be late
-  status: field({ type: String, optional: true }),
+  status: field({ type: String, optional: true, index: true }),
 
-  isSent: field({ type: Boolean, optional: true }),
+  isSent: field({ type: Boolean, optional: true, index: true }),
   sentDate: field({ type: Date, optional: true }),
 
-  isNotInterested: field({ type: Boolean, default: false }),
+  isNotInterested: field({ type: Boolean, default: false, index: true }),
 });
 
 TenderResponseSchema.plugin(fieldEncryption, {

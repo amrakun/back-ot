@@ -113,7 +113,7 @@ const reportsQuery = {
    * @return {String} file url of the generated reports_tenders.xlsx
    */
   async reportsTendersExport(root, { type, publishDate, closeDate }, { user }) {
-    let filter = {};
+    let filter = { isDeleted: { $ne: true } };
 
     if (publishDate) {
       filter.publishDate = {
@@ -146,22 +146,36 @@ const reportsQuery = {
       sheet.cell(rowIndex, 2).value(it.number);
       sheet.cell(rowIndex, 3).value(it.name || '');
 
-      const supplierIds = await it.getExactSupplierIds();
+      const invitedSupplierIds = await it.getExactSupplierIds();
+      const particatedSupplierIds = await it.participatedSuppliers({ onlyIds: true });
 
-      const suppliers = await Companies.find(
-        { _id: { $in: supplierIds } },
+      const invitedSuppliers = await Companies.find(
+        { _id: { $in: invitedSupplierIds } },
         { basicInfo: 1 },
       );
 
-      const supplierNames = suppliers.map(s => s.basicInfo && s.basicInfo.enName);
+      const invitedSupplierNames = [];
+      const participatedSupplierNames = [];
 
-      sheet.cell(rowIndex, 4).value(supplierNames.join());
-      sheet.cell(rowIndex, 5).value(it.sourcingOfficier);
-      sheet.cell(rowIndex, 6).value(it.type);
-      sheet.cell(rowIndex, 7).value(it.publishDate.toLocaleDateString());
-      sheet.cell(rowIndex, 8).value(it.closeDate.toLocaleDateString());
-      sheet.cell(rowIndex, 9).value(it.status);
-      sheet.cell(rowIndex, 10).value(it.sentRegretLetter ? 'yes' : 'no');
+      for (const supplier of invitedSuppliers) {
+        const name = supplier.basicInfo ? supplier.basicInfo.enName : '';
+
+        invitedSupplierNames.push(name);
+
+        if (particatedSupplierIds.includes(supplier._id.toString())) {
+          participatedSupplierNames.push(name);
+        }
+      }
+
+      sheet.cell(rowIndex, 4).value(invitedSupplierNames.join());
+      sheet.cell(rowIndex, 5).value(participatedSupplierNames.join());
+      sheet.cell(rowIndex, 6).value(it.sourcingOfficier || '');
+      sheet.cell(rowIndex, 7).value(it.type);
+      sheet.cell(rowIndex, 8).value(it.publishDate.toLocaleDateString());
+      sheet.cell(rowIndex, 9).value(it.closeDate.toLocaleDateString());
+      sheet.cell(rowIndex, 10).value(it.status);
+      sheet.cell(rowIndex, 11).value(it.sentRegretLetter ? 'yes' : 'no');
+      sheet.cell(rowIndex, 12).value(it.cancelReason || '');
     }
 
     // Write to file.
