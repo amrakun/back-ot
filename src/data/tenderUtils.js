@@ -9,6 +9,7 @@ export const replacer = ({ text, tender }) => {
   result = result.replace(/{tender.content}/g, tender.content);
   result = result.replace(/{tender.number}/g, tender.number);
   result = result.replace(/{tender.name}/g, tender.name);
+  result = result.replace(/{tender.cancelReason}/g, tender.cancelReason);
   result = result.replace(/{tender.closeDate}/g, tender.closeDate.toLocaleString());
   result = result.replace(/{tender.publishDate}/g, tender.publishDate.toLocaleString());
   result = result.replace(/{now}/g, new Date().toLocaleString());
