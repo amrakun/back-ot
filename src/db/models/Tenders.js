@@ -43,6 +43,8 @@ const TenderSchema = mongoose.Schema({
   rfqType: field({ type: String, optional: true }),
 
   status: field({ type: String }),
+  cancelReason: field({ type: String, optional: true }),
+
   isDeleted: field({ type: Boolean, default: false }),
 
   createdDate: field({ type: Date }),
@@ -355,7 +357,7 @@ class Tender extends StatusPublishClose {
   /*
    * Mark as canceled
    */
-  async cancel(userId) {
+  async cancel(userId, reason) {
     if (this.createdUserId !== userId) {
       throw new Error('Permission denied');
     }
@@ -364,7 +366,7 @@ class Tender extends StatusPublishClose {
       throw new Error('Can not cancel awarded or canceled tender');
     }
 
-    await this.update({ status: 'canceled' });
+    await this.update({ status: 'canceled', cancelReason: reason });
 
     return Tenders.findOne({ _id: this._id });
   }

@@ -420,14 +420,14 @@ describe('Tender db', () => {
   });
 
   test('Cancel', async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     let tender = await tenderFactory({ status: 'canceled' });
 
     tender = await Tenders.findOne({ _id: tender._id });
 
     try {
-      await tender.cancel(tender.createdUserId);
+      await tender.cancel(tender.createdUserId, 'reason');
     } catch (e) {
       expect(e.message).toBe('Can not cancel awarded or canceled tender');
     }
@@ -435,7 +435,7 @@ describe('Tender db', () => {
     // not created user =============
     try {
       const otherUser = await userFactory({ isSupplier: false });
-      await tender.cancel(otherUser._id);
+      await tender.cancel(otherUser._id, 'reason');
     } catch (e) {
       expect(e.message).toBe('Permission denied');
     }
@@ -445,11 +445,12 @@ describe('Tender db', () => {
 
     tender = await Tenders.findOne({ _id: tender._id });
 
-    await tender.cancel(tender.createdUserId);
+    await tender.cancel(tender.createdUserId, 'reason');
 
     const updatedTender = await Tenders.findOne({ _id: tender._id });
 
     expect(updatedTender.status).toBe('canceled');
+    expect(updatedTender.cancelReason).toBe('reason');
   });
 
   test('Check file permission: selected suppliers', async () => {

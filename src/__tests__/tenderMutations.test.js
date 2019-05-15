@@ -388,20 +388,22 @@ describe('Tender mutations', () => {
 
   test('Cancel', async () => {
     const mutation = `
-      mutation tendersCancel($_id: String!) {
-        tendersCancel(_id: $_id) {
+      mutation tendersCancel($_id: String!, $reason: String!) {
+        tendersCancel(_id: $_id, reason: $reason) {
           status
+          cancelReason
         }
       }
     `;
 
     const user = await userFactory({ isSupplier: false });
     const tender = await tenderFactory({ createdUserId: user._id });
-    const args = { _id: tender._id };
+    const args = { _id: tender._id, reason: 'reason' };
 
     const response = await graphqlRequest(mutation, 'tendersCancel', args, { user });
 
     expect(response.status).toBe('canceled');
+    expect(response.cancelReason).toBe('reason');
   });
 
   test('Send response', async () => {

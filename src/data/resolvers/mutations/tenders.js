@@ -200,11 +200,11 @@ const tenderMutations = {
    * @param {String} _id - Tender id
    * @return {Promise} - updated tender
    */
-  async tendersCancel(root, { _id }, { user }) {
+  async tendersCancel(root, { _id, reason }, { user }) {
     const tender = await Tenders.findOne({ _id });
 
     if (tender) {
-      const canceledTender = await tender.cancel(user._id);
+      const canceledTender = await tender.cancel(user._id, reason);
 
       // write canceled log
       await TenderLogs.write({

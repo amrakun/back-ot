@@ -32,6 +32,7 @@ const respondedDocumentFields = `
 const commonTenderFields = `
   _id: String!
   status: String!
+  cancelReason: String
   type: String!
   rfqType: String
   createdDate: Date
@@ -254,7 +255,7 @@ export const mutations = `
     content: String!
   ): [String]
 
-  tendersCancel(_id: String!): Tender
+  tendersCancel(_id: String!, reason: String!): Tender
 
   tenderResponsesAdd(${responseCommonParams}): TenderResponse
   tenderResponsesEdit(${responseCommonParams}): TenderResponse
