@@ -358,6 +358,10 @@ class Tender extends StatusPublishClose {
    * Mark as canceled
    */
   async cancel(userId, reason) {
+    if (!reason) {
+      throw new Error('Reason required');
+    }
+
     if (this.createdUserId !== userId) {
       throw new Error('Permission denied');
     }
