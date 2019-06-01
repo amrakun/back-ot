@@ -113,17 +113,14 @@ export const getAttachments = async tender => {
 };
 
 /*
- * Download eoi supplier responded files
+ * Download tender supplier responded files
  */
 export const downloadFiles = async (tenderId, user) => {
   const tender = await Tenders.findOne({ _id: tenderId });
 
-  if (!tender || tender.status === 'open' || tender.type !== 'eoi') {
-    return Promise.resolve(null);
+  if (!tender || tender.status === 'open') {
+    return Promise.reject(new Error('Invalid request'));
   }
-
-  const zip = new JSZip();
-  const attachments = zip.folder('files');
 
   const responses = await TenderResponses.find({
     tenderId,
@@ -131,27 +128,54 @@ export const downloadFiles = async (tenderId, user) => {
     isNotInterested: { $ne: true },
   });
 
+  if (responses.length === 0) {
+    return Promise.reject(new Error('No responses found'));
+  }
+
+  const type = tender.type;
+  const zip = new JSZip();
+  const attachments = zip.folder(tender.name);
+
   for (const response of responses) {
     const supplier = await Companies.findOne({ _id: response.supplierId });
-    const documents = response.respondedDocuments || [];
 
-    if (documents.length === 0) {
+    let filesDoc = [];
+
+    if (type === 'eoi') {
+      filesDoc = (response.respondedDocuments || []).map(document => ({
+        file: document.file,
+        name: document.name,
+      }));
+    } else {
+      filesDoc = (response.respondedProducts || []).map(product => ({
+        file: product.file,
+        name: product.code,
+      }));
+    }
+
+    if (filesDoc.length === 0) {
       continue;
     }
 
-    const subFolder = attachments.folder(supplier.basicInfo.enName);
+    const subFolderName = supplier.basicInfo.enName;
+    const subFolder = attachments.folder(subFolderName);
+    let filesCount = 0;
 
-    for (const document of documents) {
-      const { file } = document;
-
+    for (const { file, name } of filesDoc) {
       if (!file) {
         continue;
       }
 
       const response = await utils.readS3File(file.url, user);
-      const documentFolder = subFolder.folder(document.name);
+      const filesFolder = subFolder.folder((name || '').replace(/\//g, ' '));
 
-      documentFolder.file(file.name, response.Body);
+      filesFolder.file(file.name, response.Body);
+
+      filesCount++;
+    }
+
+    if (filesCount === 0) {
+      attachments.remove(subFolderName);
     }
   }
 
