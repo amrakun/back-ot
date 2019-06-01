@@ -146,10 +146,19 @@ export const downloadFiles = async (tenderId, user) => {
         file: document.file,
         name: document.name,
       }));
-    } else {
+    }
+
+    if (type === 'rfq') {
       filesDoc = (response.respondedProducts || []).map(product => ({
         file: product.file,
         name: product.code,
+      }));
+    }
+
+    if (type === 'trfq') {
+      filesDoc = (response.respondedFiles || []).map(file => ({
+        file,
+        name: 'Attachments',
       }));
     }
 
