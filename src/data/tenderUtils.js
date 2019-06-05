@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import utils from './utils';
-import { Users, Companies, TenderResponses, Tenders } from '../db/models';
+import { Users, Companies, TenderResponses, Tenders, TenderMessages } from '../db/models';
 
 export const replacer = ({ text, tender }) => {
   let result = text;
@@ -191,6 +191,40 @@ export const downloadFiles = async (tenderId, user) => {
   return zip.generateAsync({ type: 'nodebuffer' });
 };
 
+/*
+ * Download tender message files
+ */
+export const downloadTenderMessageFiles = async (tenderId, user) => {
+  const tender = await Tenders.findOne({ _id: tenderId });
+
+  const messages = await TenderMessages.find({
+    tenderId,
+    attachment: { $exists: true },
+    senderSupplierId: { $exists: true },
+  });
+
+  const zip = new JSZip();
+  const attachments = zip.folder(tender.name);
+
+  for (const message of messages) {
+    const { attachment, senderSupplierId } = message;
+    const supplier = await Companies.findOne({ _id: senderSupplierId });
+
+    if (!supplier || !attachment) {
+      continue;
+    }
+
+    const subFolder = attachments.folder(supplier.basicInfo.enName);
+
+    // download file from s3
+    const response = await utils.readS3File(attachment.url, user);
+
+    subFolder.file((attachment.name || '').replace(/\//g, ' '), response.Body);
+  }
+
+  return zip.generateAsync({ type: 'nodebuffer' });
+};
+
 export default {
   sendConfigEmail,
   sendEmailToSuppliers,
@@ -198,4 +232,5 @@ export default {
   sendEmail,
   getAttachments,
   downloadFiles,
+  downloadTenderMessageFiles,
 };

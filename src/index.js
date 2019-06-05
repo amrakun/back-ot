@@ -20,7 +20,7 @@ import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
 import { uploadFile, readS3File, tokenize, virusDetector } from './data/utils';
-import { downloadFiles } from './data/tenderUtils';
+import { downloadFiles, downloadTenderMessageFiles } from './data/tenderUtils';
 import schema from './data';
 import { init } from './startup';
 
@@ -100,6 +100,21 @@ app.get('/download-tender-files', async (req, res) => {
   }
 });
 
+// download tender message files
+app.get('/download-tender-message-files', async (req, res) => {
+  const tenderId = req.query.tenderId;
+
+  try {
+    const response = await downloadTenderMessageFiles(tenderId, req.user);
+
+    res.attachment('files.zip');
+
+    return res.send(response);
+  } catch (e) {
+    return res.end(e.message);
+  }
+});
+
 // file upload
 app.post('/upload-file', async (req, res) => {
   if (!req.user) {
@@ -132,7 +147,7 @@ app.post('/upload-file', async (req, res) => {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/pdf',
         'application/zip',
-        'application/x-rar-compressed'
+        'application/x-rar-compressed',
       ].includes(mime)
     ) {
       // check for virus
