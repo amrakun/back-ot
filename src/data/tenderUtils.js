@@ -205,21 +205,26 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
 
   const zip = new JSZip();
   const attachments = zip.folder(tender.name);
+  const folders = {};
 
   for (const message of messages) {
     const { attachment, senderSupplierId } = message;
     const supplier = await Companies.findOne({ _id: senderSupplierId });
 
-    if (!supplier || !attachment) {
+    if (!supplier || !attachment || !supplier.basicInfo || !supplier.basicInfo.enName) {
       continue;
     }
 
-    const subFolder = attachments.folder(supplier.basicInfo.enName);
+    const supplierName = supplier.basicInfo.enName;
+
+    if (!folders[supplierName]) {
+      folders[supplierName] = attachments.folder(supplierName);
+    }
 
     // download file from s3
     const response = await utils.readS3File(attachment.url, user);
 
-    subFolder.file((attachment.name || '').replace(/\//g, ' '), response.Body);
+    folders[supplierName].file((attachment.name || '').replace(/\//g, ' '), response.Body);
   }
 
   return zip.generateAsync({ type: 'nodebuffer' });
