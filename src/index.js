@@ -35,6 +35,11 @@ app.use(cookieParser());
 
 app.use(userMiddleware);
 
+// for health check
+app.get('/status', async (_req, res) => {
+  res.end('ok');
+});
+
 app.use(
   '/static',
   (req, res, next) => {
