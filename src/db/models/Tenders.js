@@ -585,13 +585,17 @@ class TenderResponse {
         throw Error('Not participated');
     }
 
-    if (tender.type === 'eoi' && !supplier.basicInfo) {
-      throw Error('Please complete registration stage');
-    }
-
     // can send to only open rfqs
     if (tender.type === 'rfq' && tender.status !== 'open') {
       throw Error('This tender is not available');
+    }
+
+    if (!supplier.isSentRegistrationInfo) {
+      throw Error('Please complete registration stage');
+    }
+
+    if (tender.type === 'eoi' && !supplier.isSentPrequalificationInfo) {
+      throw Error('Please complete prequalification stage');
     }
 
     const previousEntry = await this.findBySupplierId({ tenderId, supplierId });

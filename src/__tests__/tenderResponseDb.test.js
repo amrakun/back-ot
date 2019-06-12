@@ -14,12 +14,10 @@ const toObject = data => {
 };
 
 describe('Tender response db', () => {
-  let _tender;
   let _company;
 
   beforeEach(async () => {
     // Creating test data
-    _tender = await tenderFactory({ status: 'open', isToAll: true });
     _company = await companyFactory();
   });
 
@@ -103,7 +101,10 @@ describe('Tender response db', () => {
     const tender = await tenderFactory({ status: 'open' });
 
     try {
-      await TenderResponses.createTenderResponse({ tenderId: tender._id, supplierId: _company._id });
+      await TenderResponses.createTenderResponse({
+        tenderId: tender._id,
+        supplierId: _company._id,
+      });
     } catch (e) {
       expect(e.message).toBe('Not participated');
     }
@@ -269,5 +270,43 @@ describe('Tender response db', () => {
 
     // second supplier can not download
     expect(await TenderResponses.isAuthorizedToDownload('s1_rs1.png', supplier2)).toBe(false);
+  });
+
+  test('Create tender response: not sent registration info', async () => {
+    expect.assertions(1);
+
+    const supplier = await companyFactory({ isSentRegistrationInfo: false });
+
+    const tender = await tenderFactory({ status: 'open', supplierIds: [supplier._id] });
+
+    try {
+      await TenderResponses.createTenderResponse({
+        tenderId: tender._id,
+        supplierId: supplier._id,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Please complete registration stage');
+    }
+  });
+
+  test('Create tender response: not sent prequalification info', async () => {
+    expect.assertions(1);
+
+    const supplier = await companyFactory({ isSentPrequalificationInfo: false });
+
+    const tender = await tenderFactory({
+      type: 'eoi',
+      status: 'open',
+      supplierIds: [supplier._id],
+    });
+
+    try {
+      await TenderResponses.createTenderResponse({
+        tenderId: tender._id,
+        supplierId: supplier._id,
+      });
+    } catch (e) {
+      expect(e.message).toBe('Please complete prequalification stage');
+    }
   });
 });
