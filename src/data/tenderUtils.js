@@ -112,6 +112,11 @@ export const getAttachments = async tender => {
   return attachments;
 };
 
+const generateFileName = name => {
+  const random = Math.random();
+  return `${random}-${(name || '').replace(/\//g, ' ')}`;
+};
+
 /*
  * Download tender supplier responded files
  */
@@ -178,7 +183,7 @@ export const downloadFiles = async (tenderId, user) => {
       const response = await utils.readS3File(file.url, user);
       const filesFolder = subFolder.folder((name || '').replace(/\//g, ' '));
 
-      filesFolder.file(file.name, response.Body);
+      filesFolder.file(generateFileName(file.name), response.Body);
 
       filesCount++;
     }
@@ -224,7 +229,7 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
     // download file from s3
     const response = await utils.readS3File(attachment.url, user);
 
-    folders[supplierName].file((attachment.name || '').replace(/\//g, ' '), response.Body);
+    folders[supplierName].file(generateFileName(attachment.name), response.Body);
   }
 
   return zip.generateAsync({ type: 'nodebuffer' });
