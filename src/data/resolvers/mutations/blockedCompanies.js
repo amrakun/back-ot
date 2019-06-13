@@ -1,4 +1,4 @@
-import { Companies, Users, BlockedCompanies } from '../../../db/models';
+import { Companies, BlockedCompanies } from '../../../db/models';
 import { sendConfigEmail } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
 
@@ -16,14 +16,10 @@ const blockedCompanyMutations = {
       await BlockedCompanies.block({ supplierId, ...doc }, user._id);
     }
 
-    // send notification email to all buyers
-    const users = await Users.find({ isSupplier: false });
-    const toEmails = users.map(user => user.email);
-
     await sendConfigEmail({
       name: 'blockTemplates',
       kind: 'buyer__block',
-      toEmails,
+      toEmails: [BLOCK_NOTIFICATIONS_EMAILS.split(',')],
       replacer: text => {
         return text
           .replace('{startDate}', doc.startDate.toLocaleString())
