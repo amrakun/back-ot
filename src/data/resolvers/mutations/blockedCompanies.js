@@ -16,6 +16,8 @@ const blockedCompanyMutations = {
       await BlockedCompanies.block({ supplierId, ...doc }, user._id);
     }
 
+    const { BLOCK_NOTIFICATIONS_EMAILS = '' } = process.env;
+
     await sendConfigEmail({
       name: 'blockTemplates',
       kind: 'buyer__block',
