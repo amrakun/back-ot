@@ -23,6 +23,7 @@ export const types = `
     isRead:              Boolean!
     isReplySent:         Boolean!
     createdAt:           Date
+    relatedMessages:     [TenderMessage]
   }
 `;
 

@@ -1,5 +1,15 @@
 import { Users, Tenders, Companies, TenderMessages } from '../../db/models';
 
+const findRelatedMessages = async (message, totalMessages) => {
+  if (message.replyToId) {
+    const parentMessage = await TenderMessages.findOne({ _id: message.replyToId });
+
+    totalMessages.push(parentMessage);
+
+    return findRelatedMessages(parentMessage, totalMessages);
+  }
+};
+
 export default {
   tender({ tenderId }) {
     return Tenders.findOne({ _id: tenderId });
@@ -23,5 +33,13 @@ export default {
 
   replyTo({ replyToId }) {
     return TenderMessages.findOne({ _id: replyToId });
+  },
+
+  async relatedMessages(message) {
+    const relatedMessages = [];
+
+    await findRelatedMessages(message, relatedMessages);
+
+    return relatedMessages;
   },
 };

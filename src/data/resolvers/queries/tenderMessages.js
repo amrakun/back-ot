@@ -32,7 +32,7 @@ const tenderMessageQuery = {
     return docs;
   },
 
-  async tenderMessageDetail(root, { _id }, { user }) {
+  tenderMessageDetail(root, { _id }, { user }) {
     const query = { _id };
 
     if (user.isSupplier) {
