@@ -39,12 +39,12 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
       toEmails: [user.email],
     });
 
-    const { basicInfo } = supplier;
+    const { contactInfo } = supplier;
 
-    if (basicInfo && basicInfo.email && basicInfo.email !== user.email) {
+    if (contactInfo && contactInfo.email && contactInfo.email !== user.email) {
       await utils.sendConfigEmail({
         ...options,
-        toEmails: [basicInfo.email],
+        toEmails: [contactInfo.email],
       });
     }
   }
