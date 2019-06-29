@@ -37,8 +37,6 @@ const reportsQuery = {
     let rowIndex = 2;
 
     for (const it of suppliers) {
-      rowIndex++;
-
       let colIndex = 0;
 
       const fill = value => {
@@ -55,45 +53,58 @@ const reportsQuery = {
       // business info =========
       const businessInfo = it.businessInfo || {};
 
-      fill(rowIndex - 2);
-      fill(bi.sRegisteredOnSup ? 'yes' : 'no');
-      fill(bi.sapNumber || '');
-      fill(it.tierType || '');
-      fill((it.productsInfo || []).join(','));
-      fill(bi.enName || '');
-      fill(bi.mnName || '');
-      fill(it.averageDifotScore || 0);
-      fill(it.isQualified ? 'yes' : 'no');
-      fill(it.isProductsInfoValidated ? 'yes' : 'no');
+      const fillRow = productCode => {
+        fill(rowIndex - 2);
+        fill(bi.sRegisteredOnSup ? 'yes' : 'no');
+        fill(bi.sapNumber || '');
+        fill(it.tierType || '');
+        fill(productCode);
+        fill(bi.enName || '');
+        fill(bi.mnName || '');
+        fill(it.averageDifotScore || 0);
+        fill(it.isQualified ? 'yes' : 'no');
+        fill(it.isProductsInfoValidated ? 'yes' : 'no');
 
-      fill(ci.address || '');
-      fill(ci.address2 || '');
-      fill(ci.address3 || '');
-      fill(ci.townOrCity || '');
-      fill(`${ci.country || ''} / ${ci.province || ''}`);
-      fill(ci.zipCode);
+        fill(ci.address || '');
+        fill(ci.address2 || '');
+        fill(ci.address3 || '');
+        fill(ci.townOrCity || '');
+        fill(`${ci.country || ''} / ${ci.province || ''}`);
+        fill(ci.zipCode);
 
-      fill(bi.registeredInCountry || '');
-      fill(bi.registeredInAimag || '');
-      fill(bi.registeredInSum || '');
-      fill(bi.isChinese ? 'yes' : 'no');
-      fill(businessInfo.isSubContractor ? 'yes' : 'no');
-      fill(bi.corporateStructure || '');
-      fill(bi.registrationNumber || '');
-      fill((bi.certificateOfRegistration && bi.certificateOfRegistration.url) || '');
+        fill(bi.registeredInCountry || '');
+        fill(bi.registeredInAimag || '');
+        fill(bi.registeredInSum || '');
+        fill(bi.isChinese ? 'yes' : 'no');
+        fill(businessInfo.isSubContractor ? 'yes' : 'no');
+        fill(bi.corporateStructure || '');
+        fill(bi.registrationNumber || '');
+        fill((bi.certificateOfRegistration && bi.certificateOfRegistration.url) || '');
 
-      fill(bi.website || '');
+        fill(bi.website || '');
 
-      // administrators
-      fill('');
+        // administrators
+        fill('');
 
-      fill(ci.phone || '');
-      fill(bi.email || '');
-      fill(bi.foreignOwnershipPercentage || '');
+        fill(ci.phone || '');
+        fill(bi.email || '');
+        fill(bi.foreignOwnershipPercentage || '');
 
-      fill(bi.totalNumberOfEmployees || 0);
-      fill(bi.totalNumberOfMongolianEmployees || 0);
-      fill(bi.totalNumberOfUmnugoviEmployees || 0);
+        fill(bi.totalNumberOfEmployees || 0);
+        fill(bi.totalNumberOfMongolianEmployees || 0);
+        fill(bi.totalNumberOfUmnugoviEmployees || 0);
+      };
+
+      if (it.productsInfo) {
+        for (const productCode of it.productsInfo) {
+          rowIndex++;
+          colIndex = 0;
+          fillRow(productCode);
+        }
+      } else {
+        rowIndex++;
+        fillRow('');
+      }
     }
 
     // Write to file.
