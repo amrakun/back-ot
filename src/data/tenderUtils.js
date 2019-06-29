@@ -1,6 +1,13 @@
 import JSZip from 'jszip';
 import utils from './utils';
-import { Users, Companies, TenderResponses, Tenders, TenderMessages } from '../db/models';
+import {
+  Users,
+  Companies,
+  TenderResponses,
+  Tenders,
+  TenderMessages,
+  BlockedCompanies,
+} from '../db/models';
 
 export const replacer = ({ text, tender }) => {
   let result = text;
@@ -23,6 +30,12 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
   for (const supplier of suppliers) {
+    const isBlocked = await BlockedCompanies.isBlocked(supplier._id);
+
+    if (tender.type === 'eoi' && isBlocked) {
+      continue;
+    }
+
     const user = await Users.findOne({ companyId: supplier._id });
 
     const options = {
