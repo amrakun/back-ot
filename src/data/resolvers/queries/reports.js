@@ -153,6 +153,7 @@ const reportsQuery = {
     for (const it of tenders) {
       const invitedSupplierIds = await it.getExactSupplierIds();
       const particatedSupplierIds = await it.participatedSuppliers({ onlyIds: true });
+      const winnerIds = it.getWinnerIds();
 
       const invitedSuppliers = await Companies.find(
         { _id: { $in: invitedSupplierIds } },
@@ -162,6 +163,7 @@ const reportsQuery = {
       for (const supplier of invitedSuppliers) {
         rowIndex++;
 
+        const supId = supplier._id.toString();
         const name = supplier.basicInfo ? supplier.basicInfo.enName : '';
 
         sheet.cell(rowIndex, 1).value(rowIndex - 4);
@@ -169,16 +171,15 @@ const reportsQuery = {
         sheet.cell(rowIndex, 3).value(it.name || '');
 
         sheet.cell(rowIndex, 4).value(name);
-        sheet
-          .cell(rowIndex, 5)
-          .value(particatedSupplierIds.includes(supplier._id.toString()) ? 'yes' : 'no');
-        sheet.cell(rowIndex, 6).value(it.sourcingOfficer || '');
-        sheet.cell(rowIndex, 7).value(it.type);
-        sheet.cell(rowIndex, 8).value(it.publishDate.toLocaleDateString());
-        sheet.cell(rowIndex, 9).value(it.closeDate.toLocaleDateString());
-        sheet.cell(rowIndex, 10).value(it.status);
-        sheet.cell(rowIndex, 11).value(it.sentRegretLetter ? 'yes' : 'no');
-        sheet.cell(rowIndex, 12).value(it.cancelReason || '');
+        sheet.cell(rowIndex, 5).value(particatedSupplierIds.includes(supId) ? 'yes' : 'no');
+        sheet.cell(rowIndex, 6).value(winnerIds.includes(supId) ? 'yes' : 'no');
+        sheet.cell(rowIndex, 7).value(it.sourcingOfficer || '');
+        sheet.cell(rowIndex, 8).value(it.type);
+        sheet.cell(rowIndex, 9).value(it.publishDate.toLocaleDateString());
+        sheet.cell(rowIndex, 10).value(it.closeDate.toLocaleDateString());
+        sheet.cell(rowIndex, 11).value(it.status);
+        sheet.cell(rowIndex, 12).value(it.sentRegretLetter ? 'yes' : 'no');
+        sheet.cell(rowIndex, 13).value(it.cancelReason || '');
       }
     }
 
