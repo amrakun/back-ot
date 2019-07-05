@@ -1,4 +1,5 @@
 import xlsxPopulate from 'xlsx-populate';
+import strip from 'strip';
 import AWS from 'aws-sdk';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
@@ -181,6 +182,10 @@ export const sendEmail = async args => {
   // do not send email it is running in test mode
   if (NODE_ENV == 'test') {
     return;
+  }
+
+  if (!strip(title) || !strip(content)) {
+    return console.log('Empty subject or content');
   }
 
   const transporter = await createTransporter();
