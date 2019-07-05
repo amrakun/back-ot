@@ -3,7 +3,7 @@
 
 import moment from 'moment';
 import { graphqlRequest, connect, disconnect } from '../db/connection';
-import { Users, Tenders, TenderResponses, Companies } from '../db/models';
+import { Users, Tenders, TenderResponses, Companies, BlockedCompanies } from '../db/models';
 import { userFactory, tenderFactory, tenderResponseFactory, companyFactory } from '../db/factories';
 
 import tenderQueries from '../data/resolvers/queries/tenders';
@@ -606,6 +606,48 @@ describe('Tender queries', () => {
     response = await doQuery({ type: 'eoi', status: 'participated' });
 
     expect(response.length).toBe(1);
+  });
+
+  test('tenders supplier: ignore blocked', async () => {
+    const user = await userFactory({ isSupplier: true });
+
+    await BlockedCompanies.block(
+      {
+        supplierId: user.companyId,
+        startDate: new Date(),
+        endDate: moment()
+          .add(1, 'day')
+          .endOf('day')
+          .toDate(),
+        groupId: Math.random().toString(),
+      },
+      user,
+    );
+
+    const supplierQuery = `
+      query tendersSupplier(${commonParams}) {
+          tendersSupplier(${commonValues}) {
+            _id
+            isParticipated
+            isSent
+          }
+        }
+      `;
+
+    const supplierIds = [user.companyId];
+
+    await tenderFactory({ type: 'eoi', status: 'draft', supplierIds });
+    await tenderFactory({ type: 'eoi', status: 'open', supplierIds });
+    const tender = await tenderFactory({ type: 'eoi', status: 'open', supplierIds });
+
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
+
+    const doQuery = (args = {}) => graphqlRequest(supplierQuery, 'tendersSupplier', args, { user });
+
+    // supplier is blocked then there has to be no tenders found
+    let response = await doQuery();
+
+    expect(response.length).toBe(0);
   });
 
   test('tender detail supplier', async () => {

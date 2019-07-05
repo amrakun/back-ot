@@ -32,7 +32,7 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
   for (const supplier of suppliers) {
     const isBlocked = await BlockedCompanies.isBlocked(supplier._id);
 
-    if (tender.type === 'eoi' && isBlocked) {
+    if (isBlocked) {
       continue;
     }
 

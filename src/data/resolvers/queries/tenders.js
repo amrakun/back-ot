@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { Tenders, TenderResponses } from '../../../db/models';
-import { encrypt } from '../../../db/models/utils';
+import { Tenders, TenderResponses, BlockedCompanies } from '../../../db/models';
+import { encrypt, encryptArray } from '../../../db/models/utils';
 import { requireSupplier, requireBuyer, requireLogin } from '../../permissions';
 import { paginate } from './utils';
 import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
@@ -67,11 +67,8 @@ const tendersFilter = async (args, extraChecks) => {
 const tendersBuyerFilter = async (args, user) =>
   tendersFilter(args, query => {
     if (user.role !== 'admin') {
-      query.$and.push({ $or:
-        [
-          { responsibleBuyerIds: { $in: [user._id] } },
-          { createdUserId: user._id }
-        ]
+      query.$and.push({
+        $or: [{ responsibleBuyerIds: { $in: [user._id] } }, { createdUserId: user._id }],
       });
     }
   });
@@ -88,8 +85,10 @@ const tendersSupplierFilter = async (args, user) => {
 
   const query = await tendersFilter(args, async query => {
     const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
+    const blockedSupplierIds = await BlockedCompanies.blockedIds();
 
     query.$and.push({ _id: { $in: possibleTenderIds } });
+    query.$and.push({ supplierIds: { $nin: encryptArray(blockedSupplierIds) } });
     query.$and.push({ status: { $ne: 'draft' } });
 
     // status filter ==========
