@@ -608,12 +608,20 @@ describe('Tender queries', () => {
     expect(response.length).toBe(1);
   });
 
-  test('tenders supplier: ignore blocked', async () => {
-    const user = await userFactory({ isSupplier: true });
+  const supplierQuery = `
+    query tendersSupplier(${commonParams}) {
+        tendersSupplier(${commonValues}) {
+          _id
+          isParticipated
+          isSent
+        }
+      }
+    `;
 
-    await BlockedCompanies.block(
+  const block = u => {
+    return BlockedCompanies.block(
       {
-        supplierId: user.companyId,
+        supplierId: u.companyId,
         startDate: new Date(),
         endDate: moment()
           .add(1, 'day')
@@ -621,24 +629,59 @@ describe('Tender queries', () => {
           .toDate(),
         groupId: Math.random().toString(),
       },
-      user,
+      u,
     );
+  };
 
-    const supplierQuery = `
-      query tendersSupplier(${commonParams}) {
-          tendersSupplier(${commonValues}) {
-            _id
-            isParticipated
-            isSent
-          }
-        }
-      `;
+  test('tenders supplier: ignore blocked', async () => {
+    const user = await userFactory({ isSupplier: true });
+
+    await block(user);
 
     const supplierIds = [user.companyId];
 
     await tenderFactory({ type: 'eoi', status: 'draft', supplierIds });
     await tenderFactory({ type: 'eoi', status: 'open', supplierIds });
     const tender = await tenderFactory({ type: 'eoi', status: 'open', supplierIds });
+
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
+
+    const doQuery = (args = {}) => graphqlRequest(supplierQuery, 'tendersSupplier', args, { user });
+
+    // supplier is blocked then there has to be no tenders found
+    let response = await doQuery();
+
+    expect(response.length).toBe(0);
+  });
+
+  test('tenders supplier: ignore blocked: to all', async () => {
+    const user = await userFactory({ isSupplier: true });
+
+    await block(user);
+
+    const tender = await tenderFactory({ type: 'eoi', status: 'open', isToAll: true });
+
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
+
+    const doQuery = (args = {}) => graphqlRequest(supplierQuery, 'tendersSupplier', args, { user });
+
+    // supplier is blocked then there has to be no tenders found
+    let response = await doQuery();
+
+    expect(response.length).toBe(0);
+  });
+
+  test('tenders supplier: ignore blocked: tier type', async () => {
+    const supplier = await companyFactory({ tierType: 'tier1' });
+    const user = await userFactory({ companyId: supplier._id, isSupplier: true });
+
+    await block(user);
+
+    const tender = await tenderFactory({
+      type: 'eoi',
+      status: 'open',
+      tierTypes: [supplier.tierType],
+    });
 
     await tenderResponseFactory({ tenderId: tender._id, supplierId: user.companyId });
 

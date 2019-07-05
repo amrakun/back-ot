@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { Tenders, TenderResponses, BlockedCompanies } from '../../../db/models';
-import { encrypt, encryptArray } from '../../../db/models/utils';
+import { Tenders, TenderResponses, BlockedCompanies, Companies } from '../../../db/models';
+import { encrypt } from '../../../db/models/utils';
 import { requireSupplier, requireBuyer, requireLogin } from '../../permissions';
 import { paginate } from './utils';
 import { tendersExport, tenderGenerateMaterialsTemplate } from './tenderExports';
@@ -79,24 +79,32 @@ const tendersBuyerFilter = async (args, user) =>
 const tendersSupplierFilter = async (args, user) => {
   const { status } = args;
 
+  const supplierId = user.companyId;
+  const supplier = await Companies.findOne({ _id: supplierId });
+  const isBlocked = await BlockedCompanies.isBlocked(supplierId);
+
   // removing status filter to implement custom status filter
   // below
   delete args.status;
 
   const query = await tendersFilter(args, async query => {
     const possibleTenderIds = await Tenders.getPossibleTendersByUser(user);
-    const blockedSupplierIds = await BlockedCompanies.blockedIds();
 
     query.$and.push({ _id: { $in: possibleTenderIds } });
-    query.$and.push({ supplierIds: { $nin: encryptArray(blockedSupplierIds) } });
     query.$and.push({ status: { $ne: 'draft' } });
+
+    if (isBlocked) {
+      query.$and.push({ supplierIds: { $nin: [encrypt(supplierId)] } });
+      query.$and.push({ isToAll: false });
+      query.$and.push({ tierTypes: { $nin: [supplier.tierType] } });
+    }
 
     // status filter ==========
     if (status) {
       // ignore not interested tenders =============
       if (!status.includes('notInterested')) {
         const notInterestedTenders = await TenderResponses.find({
-          supplierId: encrypt(user.companyId),
+          supplierId: encrypt(supplierId),
           isNotInterested: true,
         });
 
