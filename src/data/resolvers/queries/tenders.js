@@ -94,9 +94,9 @@ const tendersSupplierFilter = async (args, user) => {
     query.$and.push({ status: { $ne: 'draft' } });
 
     if (isBlocked) {
-      query.$and.push({ status: 'open', supplierIds: { $nin: [encrypt(supplierId)] } });
-      query.$and.push({ status: 'open', isToAll: false });
-      query.$and.push({ status: 'open', tierTypes: { $nin: [supplier.tierType] } });
+      query.$and.push({ supplierIds: { $nin: [encrypt(supplierId)] } });
+      query.$and.push({ isToAll: false });
+      query.$and.push({ tierTypes: { $nin: [supplier.tierType] } });
     }
 
     // status filter ==========
