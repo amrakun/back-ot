@@ -48,9 +48,9 @@ const userMutations = {
   async resendConfirmationLink(root, { email }) {
     const user = await Users.regenerateRegistrationTokens(email);
 
-    const { link } = await registrationEmail(user);
+    await registrationEmail(user);
 
-    return link;
+    return 'sent';
   },
 
   /*

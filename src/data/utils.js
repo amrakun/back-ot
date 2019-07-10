@@ -184,8 +184,8 @@ export const sendEmail = async args => {
     return;
   }
 
-  if (!strip(title) || !strip(content)) {
-    return console.log('Empty subject or content');
+  if (!strip(title) && !strip(content)) {
+    return console.log('Empty subject and content');
   }
 
   const transporter = await createTransporter();
