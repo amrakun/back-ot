@@ -1,15 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import faker from 'faker';
-import moment from 'moment';
-import { Users, Companies } from './db/models';
-import {
-  userFactory,
-  companyFactory,
-  tenderFactory,
-  tenderResponseFactory,
-  physicalAuditFactory,
-} from './db/factories';
+import { Users } from './db/models';
+import { userFactory, companyFactory } from './db/factories';
 
 dotenv.config();
 
@@ -132,111 +125,6 @@ export const importData = async () => {
 
       i++;
     }
-  }
-
-  // create tenders ================
-  const suppliers = await Companies.find({});
-  const supplierIds = suppliers.map(s => s._id);
-
-  const tenderFigures = [
-    { publishDate: '2028-02-02', times: 7, statusDuration: 2 },
-    { publishDate: '2028-02-02', times: 10, statusDuration: 3 },
-    { publishDate: '2028-02-03', times: 3, statusDuration: 2 },
-    { publishDate: '2028-02-04', times: 9, statusDuration: 5 },
-    { publishDate: '2028-02-05', times: 8, statusDuration: 4 },
-    { publishDate: '2028-02-06', times: 7, statusDuration: 1 },
-    { publishDate: '2028-02-07', times: 4, statusDuration: 2 },
-    { publishDate: '2028-02-08', times: 8, statusDuration: 2 },
-    { publishDate: '2028-02-09', times: 2, statusDuration: 2 },
-    { publishDate: '2028-02-10', times: 1, statusDuration: 1 },
-  ];
-
-  const requestedProducts = [
-    {
-      code: 'product1',
-      purchaseRequestNumber: 1,
-      shortText: 'short text 1',
-      quantity: 1,
-      uom: 'uom1',
-      manufacturer: 'manufacturer1',
-      manufacturerPartNumber: 1,
-    },
-    {
-      code: 'product2',
-      purchaseRequestNumber: 2,
-      shortText: 'short text 2',
-      quantity: 2,
-      uom: 'uom2',
-      manufacturer: 'manufacturer2',
-      manufacturerPartNumber: 2,
-    },
-  ];
-
-  const respondedProducts = [
-    {
-      code: 'product1',
-      suggestedManufacturer: 'suggestedManufacturer1',
-      suggestedManufacturerPartNumber: 2,
-      unitPrice: 100,
-      totalPrice: 100,
-      currency: 'USD',
-      leadTime: 1,
-      shippingTerms: 'shippingTerms1',
-    },
-    {
-      code: 'product2',
-      suggestedManufacturer: 'suggestedManufacturer2',
-      suggestedManufacturerPartNumber: 2,
-      unitPrice: 200,
-      totalPrice: 200,
-      currency: 'USD',
-      leadTime: 2,
-      shippingTerms: 'shippingTerms2',
-    },
-  ];
-
-  const createTender = async ({ publishDate, status }) => {
-    const tender = await tenderFactory({
-      type: faker.random.boolean() ? 'rfq' : 'eoi',
-      publishDate: moment(publishDate),
-      closeDate: moment(publishDate).add(30, 'days'),
-      status,
-      supplierIds,
-      requestedProducts,
-    });
-
-    // create responses
-    for (let supplierId of supplierIds) {
-      await tenderResponseFactory({
-        tenderId: tender._id,
-        supplierId,
-        notInterested: faker.random.boolean(),
-        isSent: true,
-        respondedProducts,
-      });
-    }
-  };
-
-  for (const figure of tenderFigures) {
-    let i = 0;
-
-    while (i < figure.times) {
-      await createTender({
-        ...figure,
-        status: i % figure.statusDuration === 0 ? 'open' : 'closed',
-      });
-
-      i++;
-    }
-  }
-
-  await userFactory({
-    isSupplier: true,
-    email: 'chantsal1201@gmail.com',
-  });
-
-  for (let i = 0; i < 30; i++) {
-    await physicalAuditFactory();
   }
 
   mongoose.connection.close();
