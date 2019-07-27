@@ -76,7 +76,7 @@ const tendersBuyerFilter = async (args, user) =>
 /**
  * Supplier only filters
  */
-const tendersSupplierFilter = async (args, user) => {
+export const tendersSupplierFilter = async (args, user) => {
   const { status } = args;
 
   const supplierId = user.companyId;

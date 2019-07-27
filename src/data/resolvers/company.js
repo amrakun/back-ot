@@ -1,6 +1,5 @@
 import {
   Tenders,
-  TenderResponses,
   FeedbackResponses,
   Qualifications,
   Audits,
@@ -8,7 +7,7 @@ import {
   Users,
 } from '../../db/models';
 
-import { encrypt } from '../../db/models/utils';
+import { tendersSupplierFilter } from './queries/tenders';
 
 export default {
   owner(company) {
@@ -50,19 +49,15 @@ export default {
   },
 
   async openTendersCount(company) {
-    const responses = await TenderResponses.find({
-      supplierId: encrypt(company._id),
-    });
+    const user = await Users.findOne({ companyId: company._id });
 
-    const submittedTenderIds = responses.map(r => r.tenderId);
+    if (!user) {
+      return 0;
+    }
 
-    const openTenders = await Tenders.find({
-      _id: { $nin: submittedTenderIds },
-      supplierIds: { $in: [encrypt(company._id)] },
-      status: 'open',
-    });
+    const query = await tendersSupplierFilter({ status: 'open' }, user);
 
-    return openTenders.length;
+    return Tenders.find(query).count();
   },
 
   audits(company) {
