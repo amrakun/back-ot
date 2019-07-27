@@ -44,11 +44,11 @@ class BlockedCompany {
   }
 
   static blockedRangeQuery() {
-    const today = moment().endOf('day');
+    const now = new Date();
 
     return {
-      startDate: { $lte: today },
-      endDate: { $gte: today },
+      startDate: { $lte: now },
+      endDate: { $gte: now },
     };
   }
 

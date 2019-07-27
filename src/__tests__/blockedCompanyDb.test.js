@@ -62,16 +62,11 @@ describe('BlockedCompany db', () => {
 
   test('isBlocked', async () => {
     // true =================
-    const today = moment().endOf('day');
-    const tomorrow = moment()
-      .add(1, 'day')
-      .endOf('day');
-
     const doc = {
       supplierId: _company._id,
       groupId: 'DFADFFASFD',
-      startDate: today,
-      endDate: tomorrow,
+      startDate: moment().subtract(2, 'hours'),
+      endDate: moment().add(2, 'hours'),
     };
 
     // block a company =================
@@ -81,8 +76,26 @@ describe('BlockedCompany db', () => {
     expect(await BlockedCompanies.isBlocked(_company._id)).toBe(true);
 
     // false =================
-    doc.startDate = moment(today).subtract(2, 'days');
-    doc.endDate = moment(today).subtract(1, 'days');
+    doc.startDate = moment().subtract(2, 'hours');
+    doc.endDate = moment().subtract(1, 'hours');
+
+    // block a company =================
+    await BlockedCompanies.block(doc, _user._id);
+
+    expect(await BlockedCompanies.isBlocked(_company._id)).toBe(false);
+
+    // true =================
+    doc.startDate = new Date();
+    doc.endDate = moment().add(1, 'hours');
+
+    // block a company =================
+    await BlockedCompanies.block(doc, _user._id);
+
+    expect(await BlockedCompanies.isBlocked(_company._id)).toBe(true);
+
+    // false =================
+    doc.startDate = moment().add(1, 'days');
+    doc.endDate = moment().add(2, 'days');
 
     // block a company =================
     await BlockedCompanies.block(doc, _user._id);
