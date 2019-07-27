@@ -11,6 +11,7 @@ export const types = `
 
   type TenderMessage {
     _id:                 String
+    tenderId:            String
     tender:              Tender!
     senderBuyer:         User
     recipientSuppliers: [Company]
