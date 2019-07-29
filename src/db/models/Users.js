@@ -35,7 +35,7 @@ const UserSchema = mongoose.Schema({
     type: String,
     lowercase: true,
     unique: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/, 'Please fill a valid email address'],
   }),
 
   firstName: field({ type: String, optional: true }),
