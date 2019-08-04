@@ -4,6 +4,11 @@ export const types = `
     url:  String!
   }
 
+  type TenderMessageRelatedMessages {
+    list: [TenderMessage]
+    rootMessage:     TenderMessage
+  }
+
   input TenderMessageAttachmentInput {
     name: String!
     url:  String!
@@ -14,7 +19,7 @@ export const types = `
     tenderId:            String
     tender:              Tender!
     senderBuyer:         User
-    recipientSuppliers: [Company]
+    recipientSuppliers:  [Company]
     senderSupplier:      Company
     replyTo:             TenderMessage
     subject:             String!
@@ -24,7 +29,7 @@ export const types = `
     isRead:              Boolean!
     isReplySent:         Boolean!
     createdAt:           Date
-    relatedMessages:     [TenderMessage]
+    relatedMessages:     TenderMessageRelatedMessages
   }
 `;
 

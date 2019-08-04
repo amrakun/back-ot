@@ -8,6 +8,8 @@ const findRelatedMessages = async (message, totalMessages) => {
 
     return findRelatedMessages(parentMessage, totalMessages);
   }
+
+  return message;
 };
 
 export default {
@@ -38,8 +40,11 @@ export default {
   async relatedMessages(message) {
     const relatedMessages = [];
 
-    await findRelatedMessages(message, relatedMessages);
+    const rootMessage = await findRelatedMessages(message, relatedMessages);
 
-    return relatedMessages;
+    return {
+      rootMessage,
+      list: relatedMessages,
+    };
   },
 };
