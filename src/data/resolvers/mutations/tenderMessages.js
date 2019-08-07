@@ -1,5 +1,5 @@
 import { TenderMessages, Tenders, Users } from '../../../db/models';
-
+import { putCreateLog } from '../../utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
 
@@ -15,6 +15,18 @@ const tenderMessageMutations = {
       supplierIds,
     });
 
+    if (tender) {
+      await putCreateLog(
+        {
+          type: 'tenderMessage',
+          object: tenderMessage,
+          newData: JSON.stringify({ ...args, senderBuyerId: user._id }),
+          description: `Message has been created for tender "${tender.name}"`,
+        },
+        user,
+      );
+    }
+
     return tenderMessage;
   },
 
@@ -28,6 +40,16 @@ const tenderMessageMutations = {
       tender,
       extraBuyerEmails: buyers.map(buyer => buyer.email),
     });
+
+    await putCreateLog(
+      {
+        type: 'tenderMessage',
+        object: tenderMessage,
+        newData: JSON.stringify({ ...args, senderSupplierId: user.companyId }),
+        description: `Message has been created for tender ${tender.name}`,
+      },
+      user,
+    );
 
     return tenderMessage;
   },
