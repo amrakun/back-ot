@@ -2,8 +2,40 @@ import moment from 'moment';
 
 import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/models';
 import tenderUtils from '../../../data/tenderUtils';
-import { readS3File } from '../../../data/utils';
+import { readS3File, putCreateLog, putUpdateLog } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
+
+/**
+ * Excludes encrypted tender fields from objects
+ * @param {Object} dbRow Actual tender row in db
+ * @param {Object} doc Tender doc to be added or changed
+ */
+const excludeEncryptedFields = (dbRow, doc) => {
+  // exclude these fields in log
+  const encryptedFieldNames = [
+    'name',
+    'number',
+    'supplierIds',
+    'winnerIds',
+    'bidderListedSupplierIds',
+  ];
+  const oldTender = { ...dbRow };
+  const logObject = { ...doc };
+
+  for (const field of encryptedFieldNames) {
+    if (oldTender[field]) {
+      delete oldTender[field];
+    }
+    if (logObject[field]) {
+      delete logObject[field];
+    }
+  }
+
+  return {
+    row: oldTender,
+    doc: logObject,
+  };
+};
 
 const tenderMutations = {
   /**
@@ -22,6 +54,18 @@ const tenderMutations = {
       description: 'Created',
     });
 
+    const excluded = excludeEncryptedFields(tender, doc);
+
+    await putCreateLog(
+      {
+        type: 'tender',
+        newData: JSON.stringify(excluded.doc),
+        object: excluded.doc,
+        description: `Tender "${tender.name}" has been created`,
+      },
+      user,
+    );
+
     return tender;
   },
 
@@ -34,7 +78,6 @@ const tenderMutations = {
   async tendersEdit(root, { _id, ...fields }, { user }) {
     const oldTender = await Tenders.findById(_id);
     const oldSupplierIds = await oldTender.getExactSupplierIds();
-
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
 
     // write edit log
@@ -44,6 +87,18 @@ const tenderMutations = {
       action: 'edit',
       description: 'Edited',
     });
+
+    const excluded = excludeEncryptedFields(oldTender, fields);
+
+    await putUpdateLog(
+      {
+        type: 'tender',
+        object: excluded.row,
+        newData: JSON.stringify(excluded.doc),
+        description: `Tender "${oldTender.name}" has been edited`,
+      },
+      user,
+    );
 
     if (moment(oldTender.closeDate).isBefore(updatedTender.closeDate)) {
       // write extended log
@@ -108,6 +163,7 @@ const tenderMutations = {
    * @return {Promise} - updated tender
    */
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
+    const oldTender = await Tenders.findOne({ _id });
     const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
 
     // write awarded log
@@ -147,7 +203,28 @@ const tenderMutations = {
           },
         ],
       });
-    }
+    } // end supplier for loop
+
+    // explicitly omitted supplierIds for security reason
+    const oldTenderInfo = {
+      _id,
+      awardNote: oldTender.awardNote,
+      awardAttachments: oldTender.awardAttachments,
+    };
+    const changeDoc = {
+      awardNote: note,
+      awardAttachments: attachments,
+    };
+
+    await putUpdateLog(
+      {
+        type: 'tender',
+        object: oldTenderInfo,
+        newData: JSON.stringify(changeDoc),
+        description: `Tender "${oldTender.name}" has been awarded to suppliers`,
+      },
+      user,
+    );
 
     return tender;
   },
@@ -159,7 +236,7 @@ const tenderMutations = {
    * @param {String} content - Mail content
    * @return {[String]} - send supplier ids
    */
-  async tendersSendRegretLetter(root, { _id, subject, content }) {
+  async tendersSendRegretLetter(root, { _id, subject, content }, { user }) {
     const tender = await Tenders.findOne({ _id });
 
     await tender.sendRegretLetter();
@@ -191,6 +268,16 @@ const tenderMutations = {
         },
       });
     }
+
+    await putUpdateLog(
+      {
+        type: 'tender',
+        object: tender,
+        newData: JSON.stringify({ sendRegretLetter: true }),
+        description: `Regret letters have been sent on tender "${tender.name}"`,
+      },
+      user,
+    );
 
     return notChosenSuppliers.map(response => response._id);
   },
@@ -224,6 +311,22 @@ const tenderMutations = {
       });
 
       await tenderUtils.sendEmailToBuyer({ kind: 'buyer__cancel', tender: canceledTender });
+
+      // Makes change with this in model helper
+      const cancelDoc = {
+        status: 'canceled',
+        cancelReason: reason,
+      };
+
+      await putUpdateLog(
+        {
+          type: 'tender',
+          object: tender,
+          newData: JSON.stringify(cancelDoc),
+          description: `Tender "${tender.name}" has been canceled`,
+        },
+        user,
+      );
 
       return canceledTender;
     }
