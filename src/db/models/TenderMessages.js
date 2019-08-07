@@ -3,25 +3,25 @@ import { field } from './utils';
 
 const attachmentSchema = new Schema(
   {
-    name: field({ type: String }),
-    url: field({ type: String }),
+    name: field({ type: String, label: 'File name' }),
+    url: field({ type: String, label: 'File url' }),
   },
   { _id: false },
 );
 
-const tenderMessageSchema = new Schema(
+export const tenderMessageSchema = new Schema(
   {
-    tenderId: field({ type: String }),
-    senderBuyerId: field({ type: String, optional: true }),
-    recipientSupplierIds: [String],
-    senderSupplierId: field({ type: String, optional: true }),
-    replyToId: field({ type: String, optional: true }),
-    subject: field({ type: String }),
-    body: field({ type: String }),
-    attachment: attachmentSchema,
-    isAuto: field({ type: Boolean, default: false }),
-    isRead: field({ type: Boolean, default: false }),
-    isReplySent: field({ type: Boolean, default: false }),
+    tenderId: field({ type: String, label: 'Tender id' }),
+    senderBuyerId: field({ type: String, optional: true, label: 'Buyer id' }),
+    recipientSupplierIds: field({ type: [String], label: 'Recipient suppliers' }),
+    senderSupplierId: field({ type: String, optional: true, label: 'Sender' }),
+    replyToId: field({ type: String, optional: true, label: 'Reply' }),
+    subject: field({ type: String, label: 'Message subject' }),
+    body: field({ type: String, label: 'Message body' }),
+    attachment: field({ type: attachmentSchema, label: 'Attachment' }),
+    isAuto: field({ type: Boolean, default: false, label: 'Is automatically sent' }),
+    isRead: field({ type: Boolean, default: false, label: 'Is read' }),
+    isReplySent: field({ type: Boolean, default: false, label: 'Is reply sent' }),
   },
   {
     timestamps: true,

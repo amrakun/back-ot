@@ -1,20 +1,20 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
+
 import { field } from './utils';
 import { Users, Companies } from './';
 
 // Blocked company schema
-const BlockedCompanySchema = mongoose.Schema({
-  supplierId: field({ type: String }),
+export const BlockedCompanySchema = mongoose.Schema({
+  supplierId: field({ type: String, label: 'Supplier' }),
 
   // suppliers that are blocked at the same time. will have same groupId
-  groupId: field({ type: String }),
+  groupId: field({ type: String, label: 'Group id' }),
 
-  startDate: field({ type: Date }),
-  endDate: field({ type: Date }),
-  note: field({ type: String, optional: true }),
+  startDate: field({ type: Date, label: 'Start date' }),
+  endDate: field({ type: Date, label: 'End date' }),
+  note: field({ type: String, optional: true, label: 'Note' }),
 
-  createdUserId: field({ type: String }),
+  createdUserId: field({ type: String, label: 'Created user' }),
 });
 
 class BlockedCompany {

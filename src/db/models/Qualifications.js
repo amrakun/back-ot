@@ -31,20 +31,24 @@ const getFieldsBySchema = schema => {
 const generateFields = schema => {
   const names = getFieldsBySchema(schema);
 
-  const definations = {};
+  const definitions = {};
 
   for (let name of names) {
     const options = schema.paths[name].options;
 
-    definations[name] = field({ type: Boolean, optional: options.optional || false });
+    definitions[name] = field({
+      type: Boolean,
+      optional: options.optional || false,
+      label: options.label,
+    });
   }
 
-  return mongoose.Schema(definations, { _id: false });
+  return mongoose.Schema(definitions, { _id: false });
 };
 
-const QualificationSchema = mongoose.Schema({
-  createdDate: field({ type: Date }),
-  supplierId: field({ type: String }),
+export const QualificationSchema = mongoose.Schema({
+  createdDate: field({ type: Date, label: 'Created date' }),
+  supplierId: field({ type: String, label: 'Supplier' }),
   financialInfo: generateFields(FinancialInfoSchema),
   businessInfo: generateFields(BusinessInfoSchema),
   environmentalInfo: generateFields(EnvironmentalInfoSchema),
@@ -54,6 +58,7 @@ const QualificationSchema = mongoose.Schema({
     type: String,
     enum: ['national', 'umnugovi', 'tier1', 'tier2', 'tier3'],
     optional: true,
+    label: 'Tier type',
   }),
 });
 
