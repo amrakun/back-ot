@@ -1,6 +1,6 @@
 import { Companies } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
-import { sendConfigEmail } from '../../../data/utils';
+import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
 
 const companyMutations = {
   async companiesEditCertificateInfo(root, args, { user }) {
@@ -69,17 +69,47 @@ const companyMutations = {
     }
   },
 
-  async companiesValidateProductsInfo(root, args) {
+  /**
+   *
+   * @param {string} args._id Company id
+   * @param {string[]} args.checkedItems
+   * @param {string} args.personName
+   * @param {string} args.justification
+   * @param {string[]} args.files
+   */
+  async companiesValidateProductsInfo(root, args, { user }) {
     const { _id, checkedItems, personName, justification, files } = args;
-
     const company = await Companies.findOne({ _id });
+    const toBeValidated = await Companies.findOne({ _id });
 
-    return company.validateProductsInfo({
+    const basicInfo = company.basicInfo || { enName: '' };
+    const validated = await company.validateProductsInfo({
       checkedItems,
       personName,
       justification,
       files,
     });
+
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: {
+          _id: company._id,
+          productsInfoValidations: toBeValidated.productsInfoValidations,
+          isProductsInfoValidated: toBeValidated.isProductsInfoValidated,
+          validatedProductsInfo: toBeValidated.validatedProductsInfo,
+        },
+        newData: JSON.stringify({
+          productsInfoValidations: validated.productsInfoValidations,
+          isProductsInfoValidated: validated.isProductsInfoValidated,
+          validatedProductsInfo: validated.validatedProductsInfo,
+        }),
+        description: `Company "${basicInfo.enName}" has been validated`,
+      },
+      user,
+    );
+
+    return validated;
   },
 
   async companiesSendRegistrationInfo(root, args, { user }) {
@@ -118,7 +148,27 @@ const companyMutations = {
       },
     });
 
-    return company.sendPrequalificationInfo();
+    const updated = await company.sendPrequalificationInfo();
+
+    // fields set at model helper
+    const prequalificationInfo = {
+      isSentPrequalificationInfo: true,
+      isPrequalificationInfoEditable: false,
+      prequalificationSubmittedCount: (company.prequalificationSubmittedCount || 0) + 1,
+      prequalificationInfoSentDate: new Date(),
+    };
+
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: company,
+        newData: JSON.stringify(prequalificationInfo),
+        description: `Prequalification info of "${company.basicInfo.enName}" has been sent`,
+      },
+      user,
+    );
+
+    return updated;
   },
 
   async companiesTogglePrequalificationState(root, { supplierId }) {
@@ -160,9 +210,28 @@ sections.forEach(section => {
   // capitalize first letter
   const capsedName = section.charAt(0).toUpperCase() + section.slice(1);
   const name = `companiesEdit${capsedName}Info`;
+  const subFieldName = `${section}Info`;
 
-  companyMutations[name] = (root, args, { user }) => {
-    return Companies.updateSection(user.companyId, `${section}Info`, args[`${section}Info`]);
+  /**
+   * @param {Object} args Object containing subField data
+   */
+  companyMutations[name] = async (root, args, { user }) => {
+    const company = await Companies.findOne({ _id: user.companyId });
+    const updated = await Companies.updateSection(user.companyId, subFieldName, args[subFieldName]);
+
+    if (company && updated) {
+      await putUpdateLog(
+        {
+          type: 'company',
+          object: { [subFieldName]: company[subFieldName] },
+          newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
+          description: `"${company.basicInfo.enName}" has been edited`,
+        },
+        user,
+      );
+    }
+
+    return updated;
   };
 
   requireSupplier(companyMutations, name);
