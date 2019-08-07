@@ -1,5 +1,5 @@
 import { Users, Companies } from '../../../db/models';
-import utils from '../../../data/utils';
+import utils, { putCreateLog, putDeleteLog, putUpdateLog } from '../../../data/utils';
 import { requireLogin, requireLogout, requireBuyer } from '../../permissions';
 
 const registrationEmail = async user => {
@@ -29,10 +29,10 @@ const register = async email => {
 };
 
 const userMutations = {
-  /*
+  /**
    * Register
-   * @param {String} email - User email
-   * @return - Confirmation link
+   * @param {string} email - User email
+   * @returns - Confirmation link
    */
   async register(root, { email }) {
     const { link } = await register(email);
@@ -121,12 +121,12 @@ const userMutations = {
     return Users.confirmProfileEdit(token);
   },
 
-  /*
+  /**
    * Login
-   * @param {String} email - User email
-   * @param {String} password - User password
-   * @return tokens.token - Token to use authenticate against graphql endpoints
-   * @return tokens.refreshToken - Token to use refresh expired token
+   * @param {string} email - User email
+   * @param {string} password - User password
+   * @returns {string} tokens.token - Token to use authenticate against graphql endpoints
+   * @returns {string} tokens.refreshToken - Token to use refresh expired token
    */
   async login(root, args, { res }) {
     const response = await Users.login(args);
@@ -219,22 +219,36 @@ const userMutations = {
    * @param {Object} args - User doc
    * @return {Promise} - Newly created user
    */
-  async usersAdd(root, args) {
+  async usersAdd(root, args, { user }) {
     const { password, passwordConfirmation } = args;
 
     if (password !== passwordConfirmation) {
       throw new Error('Incorrect password confirmation');
     }
 
-    return Users.createUser(args);
+    const newUser = await Users.createUser(args);
+
+    if (user) {
+      await putCreateLog(
+        {
+          type: 'user',
+          newData: JSON.stringify(args),
+          description: `"${newUser.username}" has been added`,
+          object: newUser,
+        },
+        user,
+      );
+    }
+
+    return user;
   },
 
-  /*
-   * Update user
+  /**
+   * Updates a user
    * @param {Object} args - User doc
-   * @return {Promise} - Updated user
+   * @returns {Promise} - Updated user
    */
-  usersEdit(root, args) {
+  async usersEdit(root, args, { user }) {
     const { _id, password, passwordConfirmation } = args;
 
     if (password && password !== passwordConfirmation) {
@@ -244,7 +258,22 @@ const userMutations = {
     delete args._id;
     delete args.passwordConfirmation;
 
-    return Users.updateUser(_id, args);
+    const oldUser = await Users.findOne({ _id });
+    const updatedUser = await Users.updateUser(_id, args);
+
+    if (updatedUser) {
+      await putUpdateLog(
+        {
+          type: 'user',
+          object: oldUser,
+          newData: JSON.stringify(args),
+          description: `"${updatedUser.username}" has been edited`,
+        },
+        user,
+      );
+    }
+
+    return updatedUser;
   },
 
   /*
@@ -320,13 +349,27 @@ const userMutations = {
     return receivedUser;
   },
 
-  /*
-   * Remove user
-   * @param {String} _id - User _id
-   * @return {Promise} - Remove user response
+  /**
+   * Removes a user
+   * @param {string} _id - User _id
+   * @returns {Promise} - Remove user response
    */
-  async usersRemove(root, { _id }) {
-    return Users.removeUser(_id);
+  async usersRemove(root, { _id }, { user }) {
+    const found = await Users.findOne({ _id });
+    const removed = await Users.removeUser(_id);
+
+    if (found && removed) {
+      await putDeleteLog(
+        {
+          type: 'user',
+          object: found,
+          description: `"${found.username}" has been removed`,
+        },
+        user,
+      );
+    }
+
+    return removed;
   },
 };
 
