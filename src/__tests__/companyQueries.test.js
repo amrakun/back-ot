@@ -170,7 +170,9 @@ describe('Company queries', () => {
     });
 
     // block this supplier
-    const today = moment().endOf('day');
+    const oneDayAgo = moment()
+      .subtract(1, 'day')
+      .endOf('day');
     const tomorrow = moment()
       .add(1, 'day')
       .endOf('day');
@@ -181,7 +183,7 @@ describe('Company queries', () => {
       {
         supplierId: blockedCompany._id,
         groupId: 'DFFDSASD',
-        startDate: today,
+        startDate: oneDayAgo,
         endDate: tomorrow,
       },
       user._id,
