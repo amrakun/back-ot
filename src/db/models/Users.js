@@ -54,7 +54,7 @@ export const UserSchema = mongoose.Schema({
   jobTitle: field({ type: String, optional: true, label: 'Job title' }),
   phone: field({ type: Number, optional: true, label: 'Phone' }),
 
-  permissions: [String],
+  permissions: field({ type: [String], label: 'Permissions', optional: true }),
 
   // temporary user to replace this user
   delegatedUserId: field({ type: String, optional: true, label: 'Delegated user' }),

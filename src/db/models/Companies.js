@@ -284,7 +284,7 @@ const GroupInfoSchema = mongoose.Schema(
 const CertificateInfoSchema = mongoose.Schema(
   {
     description: field({ type: String, label: 'Description' }),
-    file: field({ type: FileSchema, label: 'Certificate file' }),
+    file: field({ type: FileSchema, label: 'Certificate file', optional: true }),
   },
   { _id: false },
 );
@@ -818,7 +818,7 @@ const DateAmountSchema = mongoose.Schema(
 const DueDiligenceSchema = mongoose.Schema(
   {
     date: field({ type: String, label: 'Date' }),
-    file: field({ type: FileSchema, label: 'File' }),
+    file: field({ type: FileSchema, label: 'File', optional: true }),
     createdUserId: field({ type: String, label: 'Created user' }),
     expireDate: field({ type: String, label: 'Expire date' }),
   },
@@ -830,7 +830,7 @@ const ProductsInfoValidation = mongoose.Schema(
     date: field({ type: String, label: 'Date' }),
     personName: field({ type: String, label: 'Validated person name' }),
     checkedItems: field({ type: [String], label: 'Checked items' }),
-    files: field({ type: [FileSchema], label: 'Supporting documents' }),
+    files: field({ type: [FileSchema], label: 'Supporting documents', optional: true }),
     justification: field({ type: String, label: 'Justification' }),
   },
   { _id: false },

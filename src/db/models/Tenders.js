@@ -563,12 +563,20 @@ const TenderResponseSchema = mongoose.Schema({
   createdDate: field({ type: Date, index: true, label: 'Created date' }),
   tenderId: field({ type: String, index: true, label: 'Tender id' }),
   supplierId: field({ type: String, index: true, label: 'Supplier' }),
-  respondedProducts: field({ type: [RespondedProductSchema], label: 'Responded products' }),
+  respondedProducts: field({
+    type: [RespondedProductSchema],
+    label: 'Responded products',
+    optional: true,
+  }),
 
   // used both in service, travel rfq
-  respondedFiles: field({ type: [FileSchema], label: 'Responded files' }),
+  respondedFiles: field({ type: [FileSchema], label: 'Responded files', optional: true }),
 
-  respondedDocuments: field({ type: [RespondedDocumentSchema], label: 'Responded documents' }),
+  respondedDocuments: field({
+    type: [RespondedDocumentSchema],
+    label: 'Responded documents',
+    optional: true,
+  }),
 
   // when tender type is eoi, we can still receive responses after closedDate
   // So eoi status will be late
