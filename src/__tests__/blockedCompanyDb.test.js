@@ -112,7 +112,9 @@ describe('BlockedCompany db', () => {
       {
         supplierId: blockedSupplier._id,
         groupId: 'FDSAFJDKFJDK',
-        startDate: moment().endOf('day'), // today
+        startDate: moment()
+          .subtract(1, 'day')
+          .endOf('day'), // 1 day ago
         endDate: moment()
           .add(1, 'day')
           .endOf('day'), // tommorrow
@@ -141,7 +143,9 @@ describe('BlockedCompany db', () => {
 
   test('blockedSuppliersByGroupId', async () => {
     const range = {
-      startDate: moment().endOf('day'), // today
+      startDate: moment()
+        .subtract(1, 'day')
+        .endOf('day'), // 1 day ago
       endDate: moment()
         .add(1, 'day')
         .endOf('day'), // tomorrow
