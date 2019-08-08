@@ -38,7 +38,7 @@ export function connect() {
 }
 
 export function disconnect() {
-  return mongoose.connection.close();
+  return mongoose.connection.disconnect();
 }
 
 export const graphqlRequest = async (mutation, name, args, context) => {

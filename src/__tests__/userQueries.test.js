@@ -1,6 +1,11 @@
 /* eslint-env jest */
 
 import userQueries from '../data/resolvers/queries/users';
+import { connect, disconnect } from '../db/connection';
+
+beforeAll(() => connect());
+
+afterAll(() => disconnect());
 
 describe('userQueries', () => {
   test(`test if Error('Login required') exception is working as intended`, async () => {
