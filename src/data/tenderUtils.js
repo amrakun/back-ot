@@ -37,7 +37,6 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
     }
 
     const user = await Users.findOne({ companyId: supplier._id });
-
     const options = {
       name: `${tender.type}Templates`,
       kind,
@@ -47,20 +46,22 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
       },
     };
 
+    const userEmail = user && user.email ? user.email : '';
+
     await utils.sendConfigEmail({
       ...options,
-      toEmails: [user.email],
+      toEmails: [userEmail],
     });
 
     const { contactInfo } = supplier;
 
-    if (contactInfo && contactInfo.email && contactInfo.email !== user.email) {
+    if (contactInfo && contactInfo.email && contactInfo.email !== userEmail) {
       await utils.sendConfigEmail({
         ...options,
         toEmails: [contactInfo.email],
       });
     }
-  }
+  } // end supplier for loop
 };
 
 export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) => {

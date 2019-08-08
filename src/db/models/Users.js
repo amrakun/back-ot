@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import sha256 from 'sha256';
 import jwt from 'jsonwebtoken';
 import passwordValidator from 'password-validator';
+
 import { ROLES } from '../../data/constants';
 import { field } from './utils';
 import { Session } from './';
@@ -11,48 +12,62 @@ import { Session } from './';
 const SALT_WORK_FACTOR = 10;
 
 // User schema
-const UserSchema = mongoose.Schema({
-  companyId: field({ type: String, optional: true }),
+export const UserSchema = mongoose.Schema({
+  companyId: field({ type: String, optional: true, label: 'Company id' }),
 
-  username: field({ type: String }),
-  password: field({ type: String, optional: true }),
+  username: field({ type: String, label: 'Username' }),
+  password: field({ type: String, optional: true, label: 'Password' }),
 
-  registrationToken: field({ type: String, optional: true }),
-  registrationTokenExpires: field({ type: Date, optional: true }),
-  resetPasswordToken: field({ type: String, optional: true }),
-  resetPasswordExpires: field({ type: Date, optional: true }),
+  registrationToken: field({ type: String, optional: true, label: 'Registration token' }),
+  registrationTokenExpires: field({
+    type: Date,
+    optional: true,
+    label: 'Registration token expire date',
+  }),
+  resetPasswordToken: field({ type: String, optional: true, label: 'Reset password token' }),
+  resetPasswordExpires: field({
+    type: Date,
+    optional: true,
+    label: 'Reset password token expire date',
+  }),
 
   role: field({
     type: String,
     enum: [ROLES.ADMIN, ROLES.CONTRIBUTOR],
     optional: true,
+    label: 'User role',
   }),
 
-  isSupplier: field({ type: Boolean, optional: true }),
-  isActive: field({ type: Boolean, default: true }),
+  isSupplier: field({ type: Boolean, optional: true, label: 'Is supplier' }),
+  isActive: field({ type: Boolean, default: true, label: 'Is active' }),
 
   email: field({
     type: String,
     lowercase: true,
     unique: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/, 'Please fill a valid email address'],
+    label: 'Email',
   }),
 
-  firstName: field({ type: String, optional: true }),
-  lastName: field({ type: String, optional: true }),
-  jobTitle: field({ type: String, optional: true }),
-  phone: field({ type: Number, optional: true }),
+  firstName: field({ type: String, optional: true, label: 'First name' }),
+  lastName: field({ type: String, optional: true, label: 'Last name' }),
+  jobTitle: field({ type: String, optional: true, label: 'Job title' }),
+  phone: field({ type: Number, optional: true, label: 'Phone' }),
 
-  permissions: [String],
+  permissions: field({ type: [String], label: 'Permissions', optional: true }),
 
   // temporary user to replace this user
-  delegatedUserId: field({ type: String, optional: true }),
-  delegationStartDate: field({ type: Date, optional: true }),
-  delegationEndDate: field({ type: Date, optional: true }),
+  delegatedUserId: field({ type: String, optional: true, label: 'Delegated user' }),
+  delegationStartDate: field({ type: Date, optional: true, label: 'Delegation start date' }),
+  delegationEndDate: field({ type: Date, optional: true, label: 'Delegation end date' }),
 
-  temporarySecureInformation: field({ type: Object, optional: true }),
+  temporarySecureInformation: field({
+    type: Object,
+    optional: true,
+    label: 'Temporary secure information',
+  }),
 
-  lastLoginDate: field({ type: Date, optional: true }),
+  lastLoginDate: field({ type: Date, optional: true, label: 'Last login date' }),
 });
 
 class User {

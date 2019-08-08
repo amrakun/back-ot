@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import schema from '../data/';
 import { userFactory } from './factories';
+import { debugDb } from '../debuggers';
 
 dotenv.config();
 
@@ -18,13 +19,13 @@ mongoose.set('useCreateIndex', true);
 if (!isTest) {
   mongoose.connection
     .on('connected', () => {
-      console.log(`Connected to the database: ${DB_URI}`);
+      debugDb(`Connected to the database: ${DB_URI}`);
     })
     .on('disconnected', () => {
-      console.log(`Disconnected from the database: ${DB_URI}`);
+      debugDb(`Disconnected from the database: ${DB_URI}`);
     })
     .on('error', error => {
-      console.log(`Database connection error: ${DB_URI}`, error);
+      debugDb(`Database connection error: ${DB_URI}`, error);
     });
 }
 

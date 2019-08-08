@@ -5,6 +5,7 @@ import fs from 'fs';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import clamav from 'clamav.js';
+import requestify from 'requestify';
 import {
   Companies,
   Tenders,
@@ -15,6 +16,7 @@ import {
   PhysicalAudits,
   TenderMessages,
 } from '../db/models';
+import { debugExternalApi, debugBase } from '../debuggers';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -350,6 +352,159 @@ export const virusDetector = stream => {
       }
     });
   });
+};
+
+/**
+ * Sends post request to specific url
+ * @param {Object} param1
+ * @param {string} errorMessage
+ */
+export const sendRequest = async (param1, errorMessage) => {
+  const { url, method, headers, form, body, params } = param1;
+  const NODE_ENV = getEnv({ name: 'NODE_ENV' });
+  const DOMAIN = getEnv({ name: 'DOMAIN' });
+
+  if (NODE_ENV === 'test') {
+    return;
+  }
+
+  debugExternalApi(`
+    Sending request to
+    url: ${url}
+    method: ${method}
+    body: ${JSON.stringify(body)}
+    params: ${JSON.stringify(params)}
+  `);
+
+  try {
+    const response = await requestify.request(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', origin: DOMAIN, ...(headers || {}) },
+      form,
+      body,
+      params,
+    });
+
+    const responseBody = response.getBody();
+
+    debugExternalApi(`
+      Success from : ${url}
+      responseBody: ${JSON.stringify(responseBody)}
+    `);
+
+    return responseBody;
+  } catch (e) {
+    if (e.code === 'ECONNREFUSED') {
+      debugExternalApi(errorMessage);
+      throw new Error(errorMessage);
+    } else {
+      debugExternalApi(`Error occurred : ${e.body}`);
+      throw new Error(e.body);
+    }
+  }
+};
+
+/**
+ * Prepares a create log request to log server
+ * @param params Log document params
+ * @param user User information from mutation context
+ */
+export const putCreateLog = (params, user) => {
+  const doc = { ...params, action: 'create', object: JSON.stringify(params.object) };
+
+  return putLog(doc, user);
+};
+
+/**
+ * Prepares a create log request to log server
+ * @param {Object} params Log document params
+ * @param {string} params.type Module name
+ * @param {Object} params.object Previous data as object
+ * @param {string} params.newData Data to be changed
+ * @param {string} params.description Description text
+ * @param user User information from mutation context
+ */
+export const putUpdateLog = (params, user) => {
+  const doc = { ...params, action: 'update', object: JSON.stringify(params.object) };
+
+  return putLog(doc, user);
+};
+
+/**
+ * Prepares a create log request to log server
+ * @param params Log document params
+ * @param user User information from mutation context
+ */
+export const putDeleteLog = (params, user) => {
+  const doc = { ...params, action: 'delete', object: JSON.stringify(params.object) };
+
+  return putLog(doc, user);
+};
+
+/**
+ * Sends a request to logs api
+ * @param {Object} body Request
+ * @param {Object} user User information from mutation context
+ */
+const putLog = (body, user) => {
+  const LOGS_DOMAIN = getEnv({ name: 'LOGS_API_DOMAIN' });
+
+  if (!LOGS_DOMAIN) {
+    return;
+  }
+
+  const doc = {
+    ...body,
+    createdBy: user._id,
+    unicode: user.username || user.email || user._id,
+  };
+  const msg = `
+    Failed to connect to logs api.
+    Check whether LOGS_API_DOMAIN env is missing or logs api is not running
+  `;
+
+  return sendRequest(
+    { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
+    msg,
+  );
+};
+
+/**
+ * Sends a request to logs api
+ * @param {Object} param0 Request
+ */
+export const fetchLogs = params => {
+  const LOGS_DOMAIN = getEnv({ name: 'LOGS_API_DOMAIN' });
+
+  if (!LOGS_DOMAIN) {
+    return {
+      logs: [],
+      totalCount: 0,
+    };
+  }
+  const msg = `
+    Failed to connect to logs api.
+    Check whether LOGS_API_DOMAIN env is missing or logs api is not running
+  `;
+
+  return sendRequest(
+    { url: `${LOGS_DOMAIN}/logs`, method: 'get', body: { params: JSON.stringify(params) } },
+    msg,
+  );
+};
+
+export const getEnv = ({ name, defaultValue }) => {
+  const value = process.env[name];
+
+  if (!value && typeof defaultValue !== 'undefined') {
+    return defaultValue;
+  }
+
+  if (!value) {
+    debugBase(`Missing environment variable configuration for ${name}`);
+  }
+
+  return value || '';
 };
 
 export default {

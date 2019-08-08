@@ -1,5 +1,6 @@
 import { moduleRequireBuyer } from '../../permissions';
 import { TenderLogs } from '../../../db/models';
+
 import {
   buildSupplierLoginsLog,
   buildBuyerLoginsLog,
@@ -11,6 +12,65 @@ import {
   buildSuppliersByProductCodeLogsExport,
   buildActivityLogsExport,
 } from './logExports';
+import { fetchLogs } from '../../../data/utils';
+
+// schemas
+import { BlockedCompanySchema } from '../../../db/models/BlockedCompanies';
+import { CompanyRelatedSchemas } from '../../../db/models/Companies';
+import { QualificationSchema } from '../../../db/models/Qualifications';
+import { tenderMessageSchema } from '../../../db/models/TenderMessages';
+import { TenderRelatedSchemas } from '../../../db/models/Tenders';
+import { UserSchema } from '../../../db/models/Users';
+
+// Used to show field labels in action log
+const mappings = [
+  {
+    name: 'blockedCompany',
+    schemas: [BlockedCompanySchema],
+  },
+  {
+    name: 'company',
+    schemas: [...CompanyRelatedSchemas],
+  },
+  {
+    name: 'qualification',
+    schemas: [QualificationSchema, ...CompanyRelatedSchemas],
+  },
+  {
+    name: 'tenderResponse',
+    schemas: [...TenderRelatedSchemas],
+  },
+  {
+    name: 'tender',
+    schemas: [...TenderRelatedSchemas],
+  },
+  {
+    name: 'tenderMessage',
+    schemas: [tenderMessageSchema],
+  },
+  {
+    name: 'user',
+    schemas: [UserSchema],
+  },
+];
+
+/**
+ * Creates field name-label mapping list from given object
+ * @param {Object} obj Object field
+ */
+const buildLabelList = (obj = {}) => {
+  const list = [];
+  const fieldNames = Object.getOwnPropertyNames(obj);
+
+  for (const name of fieldNames) {
+    const field = obj[name];
+    const label = field && field.label ? field.label : '';
+
+    list.push({ name, label });
+  }
+
+  return list;
+};
 
 const logQueries = {
   async logsSupplierLoginsExport(root, { startDate, endDate }, { user }) {
@@ -122,6 +182,50 @@ const logQueries = {
 
   async logsTenderTotalCount(root, { tenderId }) {
     return TenderLogs.find({ tenderId }).count();
+  },
+
+  logs(root, params) {
+    const { start, end, userId, action, page, perPage } = params;
+
+    return fetchLogs({
+      start,
+      end,
+      userId,
+      action,
+      page,
+      perPage,
+    });
+  },
+
+  /**
+   * Finds db model field label according to given model type & language.
+   * @param {string} param.type Model
+   */
+  async getDbFieldLabels(root, { type }) {
+    let fieldNames = [];
+    const found = mappings.find(m => m.name === type);
+
+    if (found) {
+      const schemas = found.schemas || [];
+
+      for (const schema of schemas) {
+        const names = Object.getOwnPropertyNames(schema.obj);
+
+        for (const name of names) {
+          const field = schema.obj[name];
+          const label = field && field.label ? field.label : '';
+
+          fieldNames.push({ name, label });
+
+          // nested object field names
+          if (typeof field === 'object' && field.type && field.type.obj) {
+            fieldNames = fieldNames.concat(buildLabelList(field.type.obj));
+          }
+        }
+      } // end schema for loop
+    } // end schema name mapping
+
+    return fieldNames;
   },
 };
 

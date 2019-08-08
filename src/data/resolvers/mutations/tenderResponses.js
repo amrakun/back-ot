@@ -1,36 +1,100 @@
-import { TenderResponses, TenderResponseLogs } from '../../../db/models';
+import { TenderResponses, TenderResponseLogs, Tenders } from '../../../db/models';
 import { moduleRequireSupplier } from '../../permissions';
+import { putCreateLog, putUpdateLog } from '../../utils';
 
 const tenderResponseMutations = {
   /**
-   * Create new tender response
+   * Creates a new tender response
    * @param {Object} doc - tender response fields
-   * @return {Promise} newly created tender reponse object
+   * @returns {Promise} newly created tender reponse object
    */
-  tenderResponsesAdd(root, doc, { user }) {
-    return TenderResponses.createTenderResponse({ ...doc, supplierId: user.companyId });
-  },
+  async tenderResponsesAdd(root, doc, { user }) {
+    const response = await TenderResponses.createTenderResponse({
+      ...doc,
+      supplierId: user.companyId,
+    });
+    const tender = await Tenders.findOne({ _id: doc.tenderId });
 
-  /**
-   * Update existing tender response
-   * @param {Object} doc - tender response fields
-   * @return {Promise} updated tender reponse object
-   */
-  tenderResponsesEdit(root, doc, { user }) {
-    return TenderResponses.updateTenderResponse({ ...doc, supplierId: user.companyId });
-  },
-
-  /**
-   * Mark tender response as sent
-   */
-  async tenderResponsesSend(root, doc, { user }) {
-    const response = await TenderResponses.findBySupplierId(doc);
-
-    if (response) {
-      return response.send();
+    if (response && tender) {
+      await putCreateLog(
+        {
+          type: 'tenderResponse',
+          object: response,
+          newData: JSON.stringify(doc),
+          description: `Response for tender "${tender.name}" has been created`,
+        },
+        user,
+      );
     }
 
-    await TenderResponseLogs.createLog(response, user._id);
+    return response;
+  },
+
+  /**
+   * Updates an existing tender response
+   * @param {Object} doc - tender response fields
+   * @returns {Promise} updated tender reponse object
+   */
+  async tenderResponsesEdit(root, doc, { user }) {
+    const oldResponse = await TenderResponses.findBySupplierId({
+      tenderId: doc.tenderId,
+      supplierId: user.companyId,
+    });
+    const updatedResponse = await TenderResponses.updateTenderResponse({
+      ...doc,
+      supplierId: user.companyId,
+    });
+    const tender = await Tenders.findOne({ _id: doc.tenderId });
+
+    if (oldResponse && tender) {
+      await putUpdateLog(
+        {
+          type: 'tenderResponse',
+          object: oldResponse,
+          newData: JSON.stringify(doc),
+          description: `Response has been edited for tender "${tender.name}"`,
+        },
+        user,
+      );
+    }
+
+    return updatedResponse;
+  },
+
+  /**
+   * Marks tender response as sent
+   * @param {string} doc.supplierId Supplier id
+   * @param {string} doc.tenderId Tender id
+   */
+  async tenderResponsesSend(root, doc, { user }) {
+    const oldResponse = await TenderResponses.findBySupplierId(doc);
+    const tender = await Tenders.findOne({ _id: doc.tenderId });
+
+    if (oldResponse && tender) {
+      const updatedResponse = await oldResponse.send();
+
+      await putUpdateLog(
+        {
+          type: 'tenderResponse',
+          object: {
+            status: oldResponse.status,
+            isSent: oldResponse.isSent,
+            sentDate: oldResponse.sentDate,
+          },
+          newData: JSON.stringify({
+            status: updatedResponse.status,
+            isSent: updatedResponse.isSent,
+            sentDate: updatedResponse.sentDate,
+          }),
+          description: `Response for tender "${tender.name}" has been edited`,
+        },
+        user,
+      );
+
+      return updatedResponse;
+    }
+
+    await TenderResponseLogs.createLog(oldResponse, user._id);
 
     return null;
   },

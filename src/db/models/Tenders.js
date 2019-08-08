@@ -7,29 +7,38 @@ import { TIER_TYPES } from './constants';
 
 const FileSchema = mongoose.Schema(
   {
-    name: field({ type: String }),
-    url: field({ type: String }),
+    name: field({ type: String, label: 'Name' }),
+    url: field({ type: String, label: 'File url' }),
   },
   { _id: false },
 );
 
 const ProductSchema = mongoose.Schema(
   {
-    code: field({ type: String, optional: true }),
-    purchaseRequestNumber: field({ type: Number, max: 99999999, optional: true }),
-    shortText: field({ type: String }),
-    quantity: field({ type: Number }),
-    uom: field({ type: String }),
-    manufacturer: field({ type: String, optional: true }),
-    manufacturerPartNumber: field({ type: String, optional: true }),
+    code: field({ type: String, optional: true, label: 'OT material code' }),
+    purchaseRequestNumber: field({
+      type: Number,
+      max: 99999999,
+      optional: true,
+      label: 'Purchase request number',
+    }),
+    shortText: field({ type: String, label: 'Short text' }),
+    quantity: field({ type: Number, label: 'Quantity' }),
+    uom: field({ type: String, label: 'UOM' }),
+    manufacturer: field({ type: String, optional: true, label: 'Manufacturer' }),
+    manufacturerPartNumber: field({
+      type: String,
+      optional: true,
+      label: 'Manufacturer part number',
+    }),
   },
   { _id: false },
 );
 
 const AwardAttachmentSchema = mongoose.Schema(
   {
-    supplierId: field({ type: String }),
-    attachment: field({ type: FileSchema }),
+    supplierId: field({ type: String, label: 'Supplier' }),
+    attachment: field({ type: FileSchema, label: 'Attachment' }),
   },
   { _id: false },
 );
@@ -37,50 +46,58 @@ const AwardAttachmentSchema = mongoose.Schema(
 // Tender schema
 const TenderSchema = mongoose.Schema({
   // rfq, eoi, trfq(travel rfq)
-  type: field({ type: String }),
+  type: field({ type: String, label: 'Tender type' }),
 
   // goods, service
-  rfqType: field({ type: String, optional: true }),
+  rfqType: field({ type: String, optional: true, label: 'Rfq type' }),
 
-  status: field({ type: String }),
-  cancelReason: field({ type: String, optional: true }),
+  status: field({ type: String, label: 'Status' }),
+  cancelReason: field({ type: String, optional: true, label: 'Cancel reason' }),
 
-  isDeleted: field({ type: Boolean, default: false }),
+  isDeleted: field({ type: Boolean, default: false, label: 'Is deleted' }),
 
-  createdDate: field({ type: Date }),
-  createdUserId: field({ type: String }),
-  responsibleBuyerIds: field({ type: [String], optional: true }),
-  updatedDate: field({ type: Date }),
+  createdDate: field({ type: Date, label: 'Created date' }),
+  createdUserId: field({ type: String, label: 'Created user' }),
+  responsibleBuyerIds: field({ type: [String], optional: true, label: 'Responsible buyers' }),
+  updatedDate: field({ type: Date, label: 'Updated date' }),
 
-  number: field({ type: String }),
-  name: field({ type: String }),
-  content: field({ type: String }),
-  attachments: field({ type: [FileSchema], optional: true }),
-  publishDate: field({ type: Date }),
-  closeDate: field({ type: Date }),
-  file: field({ type: FileSchema, optional: true }),
-  sourcingOfficer: field({ type: String, optional: true }),
-  reminderDay: field({ type: Number, optional: true }),
+  number: field({ type: String, label: 'Number' }),
+  name: field({ type: String, label: 'Name' }),
+  content: field({ type: String, label: 'Email content' }),
+  attachments: field({ type: [FileSchema], optional: true, label: 'Attachments' }),
+  publishDate: field({ type: Date, label: 'Publish date' }),
+  closeDate: field({ type: Date, label: 'Close date' }),
+  file: field({ type: FileSchema, optional: true, label: 'File' }),
+  sourcingOfficer: field({ type: String, optional: true, label: 'Sourcing officer name' }),
+  reminderDay: field({ type: Number, optional: true, label: 'Reminder day' }),
 
   // encrypted supplier ids
-  supplierIds: field({ type: [String], optional: true }),
-  tierTypes: field({ type: [String], optional: true }),
-  isToAll: field({ type: Boolean, default: false }),
+  supplierIds: field({ type: [String], optional: true, label: 'Suppliers' }),
+  tierTypes: field({ type: [String], optional: true, label: 'Tier types' }),
+  isToAll: field({ type: Boolean, default: false, label: 'Invite all suppliers' }),
 
-  requestedProducts: field({ type: [ProductSchema], optional: true }),
+  requestedProducts: field({ type: [ProductSchema], optional: true, label: 'Requested products' }),
 
   // winners for eoi
-  bidderListedSupplierIds: field({ type: [String], optional: true }),
+  bidderListedSupplierIds: field({
+    type: [String],
+    optional: true,
+    label: 'Bidder list suppliers',
+  }),
 
   // Awarded response ids: encrypted supplier ids
-  winnerIds: field({ type: [String], optional: true }),
-  awardNote: field({ type: String, optional: true }),
-  awardAttachments: field({ type: [AwardAttachmentSchema], optional: true }),
+  winnerIds: field({ type: [String], optional: true, label: 'Winners' }),
+  awardNote: field({ type: String, optional: true, label: 'Award note' }),
+  awardAttachments: field({
+    type: [AwardAttachmentSchema],
+    optional: true,
+    label: 'Award attachments',
+  }),
 
-  sentRegretLetter: field({ type: Boolean, default: false }),
+  sentRegretLetter: field({ type: Boolean, default: false, label: 'Is regret letter sent' }),
 
   // eoi documents
-  requestedDocuments: field({ type: [String], optional: true }),
+  requestedDocuments: field({ type: [String], optional: true, label: 'EOI documents' }),
 });
 
 class Tender extends StatusPublishClose {
@@ -236,7 +253,7 @@ class Tender extends StatusPublishClose {
       {
         $or: [
           { isToAll: true },
-          { tierTypes: { $ne: null, $ne: undefined, $in: [company.tierType] } },
+          { tierTypes: { $nin: [null, undefined], $in: [company.tierType] } },
           { supplierIds: { $in: [encrypt(user.companyId)] } },
         ],
       },
@@ -503,54 +520,77 @@ const Tenders = mongoose.model('tenders', TenderSchema);
 // Tender responses =====================
 const RespondedProductSchema = mongoose.Schema(
   {
-    code: field({ type: String, optional: true }),
-    suggestedManufacturer: field({ type: String, optional: true }),
-    suggestedManufacturerPartNumber: field({ type: String, optional: true }),
-    unitPrice: field({ type: Number, optional: true }),
-    totalPrice: field({ type: Number, optional: true }),
-    currency: field({ type: String, optional: true, enum: ['', 'MNT', 'USD'] }),
-    leadTime: field({ type: Number, optional: true }),
+    code: field({ type: String, optional: true, label: 'OT Material code' }),
+    suggestedManufacturer: field({ type: String, optional: true, label: 'Suggested manufacturer' }),
+    suggestedManufacturerPartNumber: field({
+      type: String,
+      optional: true,
+      label: 'Suggested manufacturer part number',
+    }),
+    unitPrice: field({ type: Number, optional: true, label: 'Unit price (Excluding VAT)' }),
+    totalPrice: field({ type: Number, optional: true, label: 'Total price' }),
+    currency: field({ type: String, optional: true, enum: ['', 'MNT', 'USD'], label: 'Currency' }),
+    leadTime: field({ type: Number, optional: true, label: 'Lead time' }),
     shippingTerms: field({
       type: String,
       optional: true,
       enum: ['', 'DDP - OT UB warehouse', 'DDP - OT site', 'FCA - Supplier Facility', 'EXW'],
+      label: 'Shipping terms',
     }),
-    alternative: field({ type: String, optional: true, enum: ['', 'Yes', 'No'] }),
-    comment: field({ type: String, optional: true }),
-    file: field({ type: FileSchema, optional: true }),
+    alternative: field({
+      type: String,
+      optional: true,
+      enum: ['', 'Yes', 'No'],
+      label: 'Alternative',
+    }),
+    comment: field({ type: String, optional: true, label: 'Comment' }),
+    file: field({ type: FileSchema, optional: true, label: 'Picture (If required)' }),
   },
   { _id: false },
 );
 
 const RespondedDocumentSchema = mongoose.Schema(
   {
-    name: field({ type: String, optional: true }),
-    isSubmitted: field({ type: Boolean, optional: true }),
-    notes: field({ type: String, optional: true }),
-    file: field({ type: FileSchema, optional: true }),
+    name: field({ type: String, optional: true, label: 'Name' }),
+    isSubmitted: field({ type: Boolean, optional: true, label: 'Is submitted' }),
+    notes: field({ type: String, optional: true, label: 'Notes' }),
+    file: field({ type: FileSchema, optional: true, label: 'File' }),
   },
   { _id: false },
 );
 
 const TenderResponseSchema = mongoose.Schema({
-  createdDate: field({ type: Date, index: true }),
-  tenderId: field({ type: String, index: true }),
-  supplierId: field({ type: String, index: true }),
-  respondedProducts: [RespondedProductSchema],
+  createdDate: field({ type: Date, index: true, label: 'Created date' }),
+  tenderId: field({ type: String, index: true, label: 'Tender id' }),
+  supplierId: field({ type: String, index: true, label: 'Supplier' }),
+  respondedProducts: field({
+    type: [RespondedProductSchema],
+    label: 'Responded products',
+    optional: true,
+  }),
 
   // used both in service, travel rfq
-  respondedFiles: [FileSchema],
+  respondedFiles: field({ type: [FileSchema], label: 'Responded files', optional: true }),
 
-  respondedDocuments: [RespondedDocumentSchema],
+  respondedDocuments: field({
+    type: [RespondedDocumentSchema],
+    label: 'Responded documents',
+    optional: true,
+  }),
 
   // when tender type is eoi, we can still receive responses after closedDate
   // So eoi status will be late
-  status: field({ type: String, optional: true, index: true }),
+  status: field({ type: String, optional: true, index: true, label: 'Status' }),
 
-  isSent: field({ type: Boolean, optional: true, index: true }),
-  sentDate: field({ type: Date, optional: true }),
+  isSent: field({ type: Boolean, optional: true, index: true, label: 'Is sent' }),
+  sentDate: field({ type: Date, optional: true, label: 'Sent date' }),
 
-  isNotInterested: field({ type: Boolean, default: false, index: true }),
+  isNotInterested: field({
+    type: Boolean,
+    default: false,
+    index: true,
+    label: 'Is not interested',
+  }),
 });
 
 TenderResponseSchema.plugin(fieldEncryption, {
@@ -699,5 +739,15 @@ class TenderResponse {
 TenderResponseSchema.loadClass(TenderResponse);
 
 const TenderResponses = mongoose.model('tender_responses', TenderResponseSchema);
+
+export const TenderRelatedSchemas = [
+  FileSchema,
+  ProductSchema,
+  AwardAttachmentSchema,
+  TenderSchema,
+  RespondedProductSchema,
+  RespondedDocumentSchema,
+  TenderResponseSchema,
+];
 
 export { Tenders, TenderResponses };

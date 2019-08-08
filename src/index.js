@@ -4,6 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 
+import { debugInit } from './debuggers';
+
 // load environment variables
 dotenv.config();
 
@@ -180,7 +182,7 @@ const server = createServer(app);
 const { PORT } = process.env;
 
 server.listen(PORT, () => {
-  console.log(`GraphQL Server is now running on ${PORT}`);
+  debugInit(`GraphQL Server is now running on ${PORT}`);
 
   // execute startup actions
   init(app);

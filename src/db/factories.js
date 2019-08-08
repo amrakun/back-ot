@@ -68,7 +68,6 @@ export const companyFactory = (params = {}) => {
     certificateInfo: params.certificateInfo,
     financialInfo: params.financialInfo,
     businessInfo: params.businessInfo,
-    businessInfo: params.businessInfo,
     environmentalInfo: params.environmentalInfo,
     healthInfo: params.healthInfo,
 
@@ -321,7 +320,7 @@ export const userFactory = async (params = {}) => {
     email: params.email || faker.internet.email(),
     password: params.password || '$2a$10$qfBFBmWmUjeRcR.nBBfgDO/BEbxgoai5qQhyjsrDUMiZC6dG7sg1q',
     isSupplier: params.isSupplier || false,
-    isActive: typeof(params.isActive) === 'undefined' ? true : params.isActive,
+    isActive: typeof params.isActive === 'undefined' ? true : params.isActive,
     companyId: params.companyId,
     delegatedUserId: params.delegatedUserId,
     delegationStartDate: params.delegationStartDate,
