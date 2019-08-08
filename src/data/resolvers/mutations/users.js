@@ -228,7 +228,7 @@ const userMutations = {
 
     const newUser = await Users.createUser(args);
 
-    if (user) {
+    if (newUser) {
       await putCreateLog(
         {
           type: 'user',
@@ -240,7 +240,7 @@ const userMutations = {
       );
     }
 
-    return user;
+    return newUser;
   },
 
   /**
