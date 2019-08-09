@@ -4,6 +4,7 @@ import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
 
 const companyMutations = {
   async companiesEditCertificateInfo(root, args, { user }) {
+    const oldCompany = await Companies.findOne({ _id: user.companyId });
     const updatedCompany = await Companies.updateSection(
       user.companyId,
       'certificateInfo',
@@ -37,6 +38,16 @@ const companyMutations = {
           .replace('{supplier._id}', updatedCompany._id);
       },
     });
+
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: { certificateInfo: oldCompany.certificateInfo },
+        newData: JSON.stringify(args),
+        description: `Certificate info of company ${basicInfo.enName} has been edited`,
+      },
+      user,
+    );
 
     return updatedCompany;
   },
@@ -115,13 +126,52 @@ const companyMutations = {
   async companiesSendRegistrationInfo(root, args, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
 
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: {
+          isSentRegistrationInfo: company.isSentRegistrationInfo,
+          registrationInfoSentDate: company.registrationInfoSentDate,
+        },
+        newData: JSON.stringify({
+          isSentRegistrationInfo: true,
+          registrationInfoSentDate: new Date(),
+        }),
+        description: `${company.basicInfo.enName} company has sent registration info`,
+      },
+      user,
+    );
+
     return company.sendRegistrationInfo();
   },
 
   async companiesSkipPrequalification(root, { reason }, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
+    const skipped = await company.skipPrequalification(reason);
 
-    return company.skipPrequalification(reason);
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: {
+          isSkippedPrequalification: company.isSkippedPrequalification,
+          isSentPrequalificationInfo: company.isSentPrequalificationInfo,
+          prequalificationInfoSentDate: company.prequalificationInfoSentDate,
+          prequalificationSkippedReason: company.prequalificationSkippedReason,
+        },
+        newData: JSON.stringify({
+          isSkippedPrequalification: true,
+          isSentPrequalificationInfo: true,
+          prequalificationInfoSentDate: new Date(),
+          prequalificationSkippedReason: reason,
+        }),
+        description: `Prequalification info of company ${
+          company.basicInfo.enName
+        } has been skipped`,
+      },
+      user,
+    );
+
+    return skipped;
   },
 
   async companiesSendPrequalificationInfo(root, args, { user }) {
@@ -171,7 +221,8 @@ const companyMutations = {
     return updated;
   },
 
-  async companiesTogglePrequalificationState(root, { supplierId }) {
+  async companiesTogglePrequalificationState(root, { supplierId }, { user }) {
+    const oldCompany = await Companies.findOne({ _id: supplierId });
     const updatedCompany = await Companies.togglePrequalificationState(supplierId);
 
     const basicInfo = updatedCompany.basicInfo || {};
@@ -188,6 +239,22 @@ const companyMutations = {
         },
       });
     }
+
+    await putUpdateLog(
+      {
+        type: 'company',
+        object: {
+          isPrequalificationInfoEditable: oldCompany.isPrequalificationInfoEditable,
+          isPrequalified: oldCompany.isPrequalified,
+        },
+        newData: JSON.stringify({
+          isPrequalificationInfoEditable: !oldCompany.isPrequalificationInfoEditable,
+          isPrequalified: oldCompany.isPrequalified ? false : null,
+        }),
+        description: `Prequalification state of company ${basicInfo.enName} has been toggled`,
+      },
+      user,
+    );
 
     return updatedCompany;
   },
