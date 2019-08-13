@@ -4,6 +4,7 @@ import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/mod
 import tenderUtils from '../../../data/tenderUtils';
 import { readS3File, putCreateLog, putUpdateLog } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
+import { LOG_TYPES } from '../../constants';
 
 /**
  * Excludes encrypted tender fields from objects
@@ -58,10 +59,12 @@ const tenderMutations = {
 
     await putCreateLog(
       {
-        type: 'tender',
+        type: LOG_TYPES.TENDER,
         newData: JSON.stringify(excluded.doc),
         object: excluded.doc,
-        description: `Tender "${tender.name}" has been created`,
+        description: `Tender "${
+          tender.name
+        }" of type "${tender.type.toUpperCase()}" has been created`,
       },
       user,
     );
@@ -92,10 +95,12 @@ const tenderMutations = {
 
     await putUpdateLog(
       {
-        type: 'tender',
+        type: LOG_TYPES.TENDER,
         object: excluded.row,
         newData: JSON.stringify(excluded.doc),
-        description: `Tender "${oldTender.name}" has been edited`,
+        description: `Tender "${
+          oldTender.name
+        }" of type "${oldTender.type.toUpperCase()}" has been edited`,
       },
       user,
     );
@@ -218,10 +223,12 @@ const tenderMutations = {
 
     await putUpdateLog(
       {
-        type: 'tender',
+        type: LOG_TYPES.TENDER,
         object: oldTenderInfo,
         newData: JSON.stringify(changeDoc),
-        description: `Tender "${oldTender.name}" has been awarded to suppliers`,
+        description: `Tender "${
+          oldTender.name
+        }" of type "${oldTender.type.toUpperCase()}" has been awarded to suppliers`,
       },
       user,
     );
@@ -271,10 +278,12 @@ const tenderMutations = {
 
     await putUpdateLog(
       {
-        type: 'tender',
+        type: LOG_TYPES.TENDER,
         object: tender,
         newData: JSON.stringify({ sendRegretLetter: true }),
-        description: `Regret letters have been sent on tender "${tender.name}"`,
+        description: `Regret letters have been sent on tender "${
+          tender.name
+        }"of type "${tender.type.toUpperCase()}"`,
       },
       user,
     );
@@ -320,10 +329,12 @@ const tenderMutations = {
 
       await putUpdateLog(
         {
-          type: 'tender',
+          type: LOG_TYPES.TENDER,
           object: tender,
           newData: JSON.stringify(cancelDoc),
-          description: `Tender "${tender.name}" has been canceled`,
+          description: `Tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}" has been canceled`,
         },
         user,
       );

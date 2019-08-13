@@ -1,6 +1,7 @@
 import { TenderResponses, TenderResponseLogs, Tenders } from '../../../db/models';
 import { moduleRequireSupplier } from '../../permissions';
 import { putCreateLog, putUpdateLog } from '../../utils';
+import { LOG_TYPES } from '../../constants';
 
 const tenderResponseMutations = {
   /**
@@ -18,10 +19,12 @@ const tenderResponseMutations = {
     if (response && tender) {
       await putCreateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
           newData: JSON.stringify(doc),
-          description: `Response for tender "${tender.name}" has been created`,
+          description: `Response for tender "${tender.name}" of type "${
+            tender.type
+          }" has been created`,
         },
         user,
       );
@@ -49,10 +52,12 @@ const tenderResponseMutations = {
     if (oldResponse && tender) {
       await putUpdateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: oldResponse,
           newData: JSON.stringify(doc),
-          description: `Response has been edited for tender "${tender.name}"`,
+          description: `Response has been edited for tender "${tender.name}" of type "${
+            tender.type
+          }"`,
         },
         user,
       );
@@ -75,7 +80,7 @@ const tenderResponseMutations = {
 
       await putUpdateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: {
             status: oldResponse.status,
             isSent: oldResponse.isSent,
@@ -86,7 +91,9 @@ const tenderResponseMutations = {
             isSent: updatedResponse.isSent,
             sentDate: updatedResponse.sentDate,
           }),
-          description: `Response for tender "${tender.name}" has been edited`,
+          description: `Response for tender "${tender.name}" of type "${
+            tender.type
+          }" has been edited`,
         },
         user,
       );

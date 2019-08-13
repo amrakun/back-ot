@@ -160,3 +160,13 @@ export const MODULES_TO_TEXT = {
   'settings/manage-expiry-dates': 'Settings - Manage expiry dates',
   'user-list': 'Settings - Manage users',
 };
+
+export const LOG_TYPES = {
+  TENDER: 'tender',
+  TENDER_MESSAGE: 'tenderComposeMessage',
+  TENDER_RESPONSE: 'tenderResponse',
+  BLOCKED_COMPANY: 'blockedCompany',
+  COMPANY: 'company',
+  QUALIFICATION: 'qualification',
+  USER: 'user',
+};

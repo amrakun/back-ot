@@ -1,6 +1,7 @@
 import { Users, Companies } from '../../../db/models';
 import utils, { putCreateLog, putDeleteLog, putUpdateLog } from '../../../data/utils';
 import { requireLogin, requireLogout, requireBuyer } from '../../permissions';
+import { LOG_TYPES } from '../../constants';
 
 const registrationEmail = async user => {
   // send email ==============
@@ -231,7 +232,7 @@ const userMutations = {
     if (newUser) {
       await putCreateLog(
         {
-          type: 'user',
+          type: LOG_TYPES.USER,
           newData: JSON.stringify(args),
           description: `"${newUser.username}" has been added`,
           object: newUser,
@@ -264,7 +265,7 @@ const userMutations = {
     if (updatedUser) {
       await putUpdateLog(
         {
-          type: 'user',
+          type: LOG_TYPES.USER,
           object: oldUser,
           newData: JSON.stringify(args),
           description: `"${updatedUser.username}" has been edited`,
@@ -361,7 +362,7 @@ const userMutations = {
     if (found && removed) {
       await putDeleteLog(
         {
-          type: 'user',
+          type: LOG_TYPES.USER,
           object: found,
           description: `"${found.username}" has been removed`,
         },

@@ -13,6 +13,7 @@ import {
   buildActivityLogsExport,
 } from './logExports';
 import { fetchLogs } from '../../../data/utils';
+import { LOG_TYPES } from '../../constants';
 
 // schemas
 import { BlockedCompanySchema } from '../../../db/models/BlockedCompanies';
@@ -25,31 +26,31 @@ import { UserSchema } from '../../../db/models/Users';
 // Used to show field labels in action log
 const mappings = [
   {
-    name: 'blockedCompany',
+    name: LOG_TYPES.BLOCKED_COMPANY,
     schemas: [BlockedCompanySchema],
   },
   {
-    name: 'company',
+    name: LOG_TYPES.COMPANY,
     schemas: [...CompanyRelatedSchemas],
   },
   {
-    name: 'qualification',
+    name: LOG_TYPES.QUALIFICATION,
     schemas: [QualificationSchema, ...CompanyRelatedSchemas],
   },
   {
-    name: 'tenderResponse',
+    name: LOG_TYPES.TENDER_RESPONSE,
     schemas: [...TenderRelatedSchemas],
   },
   {
-    name: 'tender',
+    name: LOG_TYPES.TENDER,
     schemas: [...TenderRelatedSchemas],
   },
   {
-    name: 'tenderMessage',
+    name: LOG_TYPES.TENDER_MESSAGE,
     schemas: [tenderMessageSchema],
   },
   {
-    name: 'user',
+    name: LOG_TYPES.USER,
     schemas: [UserSchema],
   },
 ];
@@ -185,7 +186,7 @@ const logQueries = {
   },
 
   logs(root, params) {
-    const { start, end, userId, action, page, perPage } = params;
+    const { start, end, userId, action, page, perPage, type, desc } = params;
 
     return fetchLogs({
       start,
@@ -194,6 +195,8 @@ const logQueries = {
       action,
       page,
       perPage,
+      type,
+      desc,
     });
   },
 

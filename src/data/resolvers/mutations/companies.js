@@ -1,6 +1,7 @@
 import { Companies } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
+import { LOG_TYPES } from '../../constants';
 
 const companyMutations = {
   async companiesEditCertificateInfo(root, args, { user }) {
@@ -41,10 +42,10 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: { certificateInfo: oldCompany.certificateInfo },
         newData: JSON.stringify(args),
-        description: `Certificate info of company ${basicInfo.enName} has been edited`,
+        description: `Certificate info of company "${basicInfo.enName}" has been edited`,
       },
       user,
     );
@@ -103,7 +104,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           _id: company._id,
           productsInfoValidations: toBeValidated.productsInfoValidations,
@@ -128,7 +129,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isSentRegistrationInfo: company.isSentRegistrationInfo,
           registrationInfoSentDate: company.registrationInfoSentDate,
@@ -137,7 +138,7 @@ const companyMutations = {
           isSentRegistrationInfo: true,
           registrationInfoSentDate: new Date(),
         }),
-        description: `${company.basicInfo.enName} company has sent registration info`,
+        description: `"${company.basicInfo.enName}" company has sent registration info`,
       },
       user,
     );
@@ -151,7 +152,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isSkippedPrequalification: company.isSkippedPrequalification,
           isSentPrequalificationInfo: company.isSentPrequalificationInfo,
@@ -164,9 +165,9 @@ const companyMutations = {
           prequalificationInfoSentDate: new Date(),
           prequalificationSkippedReason: reason,
         }),
-        description: `Prequalification info of company ${
+        description: `Prequalification info of company "${
           company.basicInfo.enName
-        } has been skipped`,
+        }" has been skipped`,
       },
       user,
     );
@@ -210,7 +211,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: company,
         newData: JSON.stringify(prequalificationInfo),
         description: `Prequalification info of "${company.basicInfo.enName}" has been sent`,
@@ -242,7 +243,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isPrequalificationInfoEditable: oldCompany.isPrequalificationInfoEditable,
           isPrequalified: oldCompany.isPrequalified,
@@ -251,7 +252,7 @@ const companyMutations = {
           isPrequalificationInfoEditable: !oldCompany.isPrequalificationInfoEditable,
           isPrequalified: oldCompany.isPrequalified ? false : null,
         }),
-        description: `Prequalification state of company ${basicInfo.enName} has been toggled`,
+        description: `Prequalification state of company "${basicInfo.enName}" has been toggled`,
       },
       user,
     );
@@ -289,7 +290,7 @@ sections.forEach(section => {
     if (company && updated) {
       await putUpdateLog(
         {
-          type: 'company',
+          type: LOG_TYPES.COMPANY,
           object: { [subFieldName]: company[subFieldName] },
           newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
           description: `"${company.basicInfo.enName}" has been edited`,
