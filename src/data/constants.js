@@ -163,7 +163,7 @@ export const MODULES_TO_TEXT = {
 
 export const LOG_TYPES = {
   TENDER: 'tender',
-  TENDER_MESSAGE: 'tenderComposeMessage',
+  TENDER_MESSAGE: 'composeMessage',
   TENDER_RESPONSE: 'tenderResponse',
   BLOCKED_COMPANY: 'blockedCompany',
   COMPANY: 'company',

@@ -2,6 +2,7 @@ import { Companies, BlockedCompanies } from '../../../db/models';
 import { sendConfigEmail } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
 import { putCreateLog, putDeleteLog } from '../../utils';
+import { LOG_TYPES } from '../../constants';
 
 const blockedCompanyMutations = {
   async blockedCompaniesBlock(root, { supplierIds, ...doc }, { user }) {
@@ -9,25 +10,21 @@ const blockedCompanyMutations = {
 
     let supNames = '';
 
-    for (let supplierId of supplierIds) {
+    for (const supplierId of supplierIds) {
       const sup = await Companies.findOne({ _id: supplierId });
-      const blockedCompany = await BlockedCompanies.findOne({ supplierId });
+      const blockedCompany = await BlockedCompanies.block({ supplierId, ...doc }, user._id);
 
       supNames = `${supNames} ${supNames ? ',' : ''} ${sup.basicInfo.enName}`;
 
-      await BlockedCompanies.block({ supplierId, ...doc }, user._id);
-
-      if (blockedCompany) {
-        await putCreateLog(
-          {
-            type: 'blockedCompany',
-            object: blockedCompany,
-            newData: JSON.stringify({ supplierId, ...doc }),
-            description: `Company "${sup.basicInfo.enName}" has been blocked`,
-          },
-          user,
-        );
-      }
+      await putCreateLog(
+        {
+          type: LOG_TYPES.BLOCKED_COMPANY,
+          object: blockedCompany,
+          newData: JSON.stringify({ supplierId, ...doc }),
+          description: `Company "${sup.basicInfo.enName}" has been blocked`,
+        },
+        user,
+      );
     }
 
     const { BLOCK_NOTIFICATIONS_EMAILS = '' } = process.env;
@@ -59,7 +56,7 @@ const blockedCompanyMutations = {
       if (supplier && supplier.basicInfo) {
         await putDeleteLog(
           {
-            type: 'blockedCompany',
+            type: LOG_TYPES.BLOCKED_COMPANY,
             object: blocked,
             description: `Company "${supplier.basicInfo.enName}" has been unblocked`,
           },

@@ -126,7 +126,9 @@ const companyMutations = {
 
   async companiesSendRegistrationInfo(root, args, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
+    const updated = await company.sendRegistrationInfo();
 
+    // write log after updating
     await putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
@@ -143,13 +145,14 @@ const companyMutations = {
       user,
     );
 
-    return company.sendRegistrationInfo();
+    return updated;
   },
 
   async companiesSkipPrequalification(root, { reason }, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
     const skipped = await company.skipPrequalification(reason);
 
+    // write log after updating
     await putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
@@ -212,7 +215,12 @@ const companyMutations = {
     await putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
-        object: company,
+        object: {
+          isSentPrequalificationInfo: company.isSentPrequalificationInfo,
+          isPrequalificationInfoEditable: company.isPrequalificationInfoEditable,
+          prequalificationSubmittedCount: company.prequalificationSubmittedCount,
+          prequalificationInfoSentDate: company.prequalificationSentDate,
+        },
         newData: JSON.stringify(prequalificationInfo),
         description: `Prequalification info of "${company.basicInfo.enName}" has been sent`,
       },
@@ -287,13 +295,24 @@ sections.forEach(section => {
     const company = await Companies.findOne({ _id: user.companyId });
     const updated = await Companies.updateSection(user.companyId, subFieldName, args[subFieldName]);
 
+    let name = '';
+
+    if (company && company.basicInfo && company.basicInfo.enName) {
+      name = company.basicInfo.enName;
+    }
+
+    // company name doesn't exist when being registered for the first time
+    if (!company && subFieldName === 'basicInfo') {
+      name = args[subFieldName].enName;
+    }
+
     if (company && updated) {
       await putUpdateLog(
         {
           type: LOG_TYPES.COMPANY,
           object: { [subFieldName]: company[subFieldName] },
           newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
-          description: `"${company.basicInfo.enName}" has been edited`,
+          description: `"${name}" has been edited`,
         },
         user,
       );
