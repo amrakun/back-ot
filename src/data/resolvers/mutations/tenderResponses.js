@@ -10,21 +10,39 @@ const tenderResponseMutations = {
    * @returns {Promise} newly created tender reponse object
    */
   async tenderResponsesAdd(root, doc, { user }) {
-    const response = await TenderResponses.createTenderResponse({
+    const tender = await Tenders.findOne({ _id: doc.tenderId });
+    const data = {
       ...doc,
       supplierId: user.companyId,
-    });
-    const tender = await Tenders.findOne({ _id: doc.tenderId });
+    };
+
+    let exists;
+
+    if (tender && tender._id) {
+      exists = await TenderResponses.findBySupplierId({
+        tenderId: tender._id,
+        supplierId: user.companyId,
+      });
+    }
+
+    const response = await TenderResponses.createTenderResponse(data);
+
+    // some fields are set inside createTenderResponse()
+    if (!exists && response) {
+      data.createdAt = response.createdAt;
+      data.isSent = response.isSent;
+      data.sentDate = response.sentDate;
+    }
 
     if (response && tender) {
       await putCreateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
-          newData: JSON.stringify(doc),
-          description: `Response for tender "${tender.name}" of type "${
-            tender.type
-          }" has been created`,
+          newData: JSON.stringify(data),
+          description: `Response for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}" has been created`,
         },
         user,
       );
@@ -43,10 +61,9 @@ const tenderResponseMutations = {
       tenderId: doc.tenderId,
       supplierId: user.companyId,
     });
-    const updatedResponse = await TenderResponses.updateTenderResponse({
-      ...doc,
-      supplierId: user.companyId,
-    });
+    const data = { ...doc, supplierId: user.companyId };
+
+    const updatedResponse = await TenderResponses.updateTenderResponse(data);
     const tender = await Tenders.findOne({ _id: doc.tenderId });
 
     if (oldResponse && tender) {
@@ -54,10 +71,10 @@ const tenderResponseMutations = {
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: oldResponse,
-          newData: JSON.stringify(doc),
-          description: `Response has been edited for tender "${tender.name}" of type "${
-            tender.type
-          }"`,
+          newData: JSON.stringify(data),
+          description: `Response has been edited for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}"`,
         },
         user,
       );
@@ -91,9 +108,9 @@ const tenderResponseMutations = {
             isSent: updatedResponse.isSent,
             sentDate: updatedResponse.sentDate,
           }),
-          description: `Response for tender "${tender.name}" of type "${
-            tender.type
-          }" has been edited`,
+          description: `Response for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}" has been edited`,
         },
         user,
       );

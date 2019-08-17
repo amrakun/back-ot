@@ -1,5 +1,5 @@
 import { Qualifications, Companies, SuppliersByProductCodeLogs } from '../../../db/models';
-import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
+import { sendConfigEmail, putUpdateLog, putCreateLog } from '../../../data/utils';
 import { requireBuyer } from '../../permissions';
 import { LOG_TYPES } from '../../constants';
 
@@ -149,16 +149,33 @@ sections.forEach(section => {
     const value = args[sectionName];
     const qualification = await Qualifications.findOne({ supplierId: args.supplierId });
     const updated = await Qualifications.updateSection(args.supplierId, sectionName, value);
+    const companyName = await Companies.getName(args.supplierId);
 
-    if (qualification && updated) {
-      const companyName = await Companies.getName(args.supplierId);
-
+    /**
+     * If qualification exists, then updates it, else it creates a new one
+     * in model helper method. Depending on that, we write create or update log here.
+     */
+    if (qualification) {
       await putUpdateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: qualification[sectionName] || {},
           newData: JSON.stringify(value),
           description: `Qualification for "${companyName}" has been edited`,
+        },
+        user,
+      );
+    } else {
+      await putCreateLog(
+        {
+          type: LOG_TYPES.QUALIFICATION,
+          object: updated[sectionName] || {},
+          newData: JSON.stringify({
+            ...value,
+            supplierId: args.supplierId,
+            createdDate: new Date(),
+          }),
+          description: `Qualification for "${companyName}" has been created`,
         },
         user,
       );

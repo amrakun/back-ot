@@ -1,42 +1,11 @@
 import moment from 'moment';
 
 import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/models';
+import { decryptArray } from '../../../db/models/utils';
 import tenderUtils from '../../../data/tenderUtils';
 import { readS3File, putCreateLog, putUpdateLog } from '../../../data/utils';
 import { moduleRequireBuyer } from '../../permissions';
 import { LOG_TYPES } from '../../constants';
-
-/**
- * Excludes encrypted tender fields from objects
- * @param {Object} dbRow Actual tender row in db
- * @param {Object} doc Tender doc to be added or changed
- */
-const excludeEncryptedFields = (dbRow, doc) => {
-  // exclude these fields in log
-  const encryptedFieldNames = [
-    'name',
-    'number',
-    'supplierIds',
-    'winnerIds',
-    'bidderListedSupplierIds',
-  ];
-  const oldTender = { ...dbRow };
-  const logObject = { ...doc };
-
-  for (const field of encryptedFieldNames) {
-    if (oldTender[field]) {
-      delete oldTender[field];
-    }
-    if (logObject[field]) {
-      delete logObject[field];
-    }
-  }
-
-  return {
-    row: oldTender,
-    doc: logObject,
-  };
-};
 
 const tenderMutations = {
   /**
@@ -55,13 +24,11 @@ const tenderMutations = {
       description: 'Created',
     });
 
-    const excluded = excludeEncryptedFields(tender, doc);
-
     await putCreateLog(
       {
         type: LOG_TYPES.TENDER,
-        newData: JSON.stringify(excluded.doc),
-        object: excluded.doc,
+        object: tender,
+        newData: JSON.stringify(doc),
         description: `Tender "${
           tender.name
         }" of type "${tender.type.toUpperCase()}" has been created`,
@@ -79,9 +46,10 @@ const tenderMutations = {
    * @return {Promise} updated tender object
    */
   async tendersEdit(root, { _id, ...fields }, { user }) {
-    const oldTender = await Tenders.findById(_id);
+    const oldTender = await Tenders.findOne({ _id });
     const oldSupplierIds = await oldTender.getExactSupplierIds();
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
+    const updatedSupplierIds = updatedTender.getExactSupplierIds();
 
     // write edit log
     await TenderLogs.write({
@@ -91,13 +59,25 @@ const tenderMutations = {
       description: 'Edited',
     });
 
-    const excluded = excludeEncryptedFields(oldTender, fields);
+    // when js spread syntax was used, it wrapped the doc in _doc attr
+    // and added mongo specific fields
+    const oldData = Object.assign(oldTender);
+    oldData.supplierIds = oldSupplierIds;
 
+    /**
+     * Exact supplier ids needed for comparison since it encrypts it every update
+     * action & becomes uncomparable to old supplier ids.
+     */
     await putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
-        object: excluded.row,
-        newData: JSON.stringify(excluded.doc),
+        object: oldData,
+        newData: JSON.stringify({
+          ...fields,
+          updatedDate: updatedTender.updatedDate,
+          status: updatedTender.status,
+          supplierIds: updatedSupplierIds,
+        }),
         description: `Tender "${
           oldTender.name
         }" of type "${oldTender.type.toUpperCase()}" has been edited`,
@@ -210,15 +190,17 @@ const tenderMutations = {
       });
     } // end supplier for loop
 
-    // explicitly omitted supplierIds for security reason
+    // decrypt winnerIds for exact comparison
     const oldTenderInfo = {
       _id,
       awardNote: oldTender.awardNote,
       awardAttachments: oldTender.awardAttachments,
+      winnerIds: decryptArray(oldTender.winnerIds || []),
     };
     const changeDoc = {
       awardNote: note,
       awardAttachments: attachments,
+      winnerIds: supplierIds,
     };
 
     await putUpdateLog(

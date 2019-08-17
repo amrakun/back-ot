@@ -123,7 +123,9 @@ class Qualification {
    * @return Updated validation object
    */
   static async updateSection(supplierId, section, value) {
-    if (await this.findOne({ supplierId })) {
+    const qualification = await this.findOne({ supplierId });
+
+    if (qualification) {
       // update
       await this.update({ supplierId }, { $set: { [section]: value } });
     } else {

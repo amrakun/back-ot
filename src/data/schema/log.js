@@ -22,6 +22,8 @@ export const types = `
     removedData: String
     changedData: String
     unchangedData: String
+    oldData: String
+    newData: String
   }
 
   type LogList {

@@ -22,9 +22,9 @@ const tenderMessageMutations = {
           type: LOG_TYPES.TENDER_MESSAGE,
           object: tenderMessage,
           newData: JSON.stringify({ ...args, senderBuyerId: user._id }),
-          description: `Message has been created for tender "${tender.name}" of type "${
-            tender.type
-          }"`,
+          description: `Message has been created for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}"`,
         },
         user,
       );
@@ -49,7 +49,9 @@ const tenderMessageMutations = {
         type: LOG_TYPES.TENDER_MESSAGE,
         object: tenderMessage,
         newData: JSON.stringify({ ...args, senderSupplierId: user.companyId }),
-        description: `Message has been created for tender ${tender.name} of type "${tender.type}"`,
+        description: `Message has been created for tender ${
+          tender.name
+        } of type "${tender.type.toUpperCase()}"`,
       },
       user,
     );
