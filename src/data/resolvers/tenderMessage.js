@@ -42,9 +42,19 @@ export default {
 
     const rootMessage = await findRelatedMessages(message, relatedMessages);
 
+    const siblings = await TenderMessages.find({
+      replyToId: rootMessage._id,
+      _id: { $ne: message._id },
+      createdAt: { $lte: message.createdAt },
+      $or: [
+        { senderBuyerId: message.senderBuyerId },
+        { senderSupplierId: message.senderSupplierId },
+      ],
+    }).sort({ createdAt: -1 });
+
     return {
       rootMessage,
-      list: relatedMessages,
+      list: [...siblings, ...relatedMessages],
     };
   },
 };
