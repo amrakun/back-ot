@@ -131,7 +131,8 @@ app.post('/upload-file', async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, response) => {
-    const { size } = response.file;
+    const file = response.file || response.upload;
+    const { size } = file;
 
     // 20mb
     if (size > 20000000) {
@@ -139,7 +140,7 @@ app.post('/upload-file', async (req, res) => {
     }
 
     // read file
-    const buffer = await fs.readFileSync(response.file.path);
+    const buffer = await fs.readFileSync(file.path);
 
     // determine file type using magic numbers
     const { mime } = fileType(buffer);
@@ -159,14 +160,15 @@ app.post('/upload-file', async (req, res) => {
     ) {
       // check for virus
       try {
-        const stream = await fs.createReadStream(response.file.path);
+        const stream = await fs.createReadStream(file.path);
         await virusDetector(stream);
       } catch (e) {
         return res.status(500).send('Infected file');
       }
 
-      const url = await uploadFile(response.file);
-      return res.end(url);
+      const result = await uploadFile(file, response.upload ? true : false);
+
+      return res.send(result);
     }
 
     return res.status(500).send('Invalid file');

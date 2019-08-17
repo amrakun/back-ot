@@ -92,8 +92,8 @@ export const readS3File = async (key, user) => {
  * @param {Object} data - File binary data
  * @return {String} - Uploaded file url
  */
-export const uploadFile = async file => {
-  const { AWS_BUCKET, AWS_PREFIX = '' } = process.env;
+export const uploadFile = async (file, fromEditor = false) => {
+  const { DOMAIN, AWS_BUCKET, AWS_PREFIX = '' } = process.env;
 
   const s3 = createAWS();
 
@@ -120,6 +120,14 @@ export const uploadFile = async file => {
       },
     );
   });
+
+  if (fromEditor) {
+    return {
+      fileName: file.name,
+      uploaded: 1,
+      url: `${DOMAIN}/read-file?key=${fileName}`,
+    };
+  }
 
   return fileName;
 };
