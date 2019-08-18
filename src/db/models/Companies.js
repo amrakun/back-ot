@@ -1427,6 +1427,7 @@ class Company {
 
   static async getName(_id) {
     const company = await this.findOne({ _id });
+
     let name = '';
 
     if (company && company.basicInfo && company.basicInfo.enName) {
