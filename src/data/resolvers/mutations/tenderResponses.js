@@ -11,35 +11,17 @@ const tenderResponseMutations = {
    */
   async tenderResponsesAdd(root, doc, { user }) {
     const tender = await Tenders.findOne({ _id: doc.tenderId });
-    const data = {
+    const response = (await TenderResponses.createTenderResponse({
       ...doc,
       supplierId: user.companyId,
-    };
-
-    let exists;
-
-    if (tender && tender._id) {
-      exists = await TenderResponses.findBySupplierId({
-        tenderId: tender._id,
-        supplierId: user.companyId,
-      });
-    }
-
-    const response = await TenderResponses.createTenderResponse(data);
-
-    // some fields are set inside createTenderResponse()
-    if (!exists && response) {
-      data.createdAt = response.createdAt;
-      data.isSent = response.isSent;
-      data.sentDate = response.sentDate;
-    }
+    })).toObject();
 
     if (response && tender) {
       await putCreateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
-          newData: JSON.stringify(data),
+          newData: JSON.stringify(response),
           description: `Response for tender "${
             tender.name
           }" of type "${tender.type.toUpperCase()}" has been created`,
