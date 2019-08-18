@@ -2,6 +2,7 @@ import { TenderMessages, Tenders, Users } from '../../../db/models';
 import { putCreateLog } from '../../utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
+import { LOG_TYPES } from '../../constants';
 
 const tenderMessageMutations = {
   async tenderMessageBuyerSend(root, args, { user }) {
@@ -18,10 +19,12 @@ const tenderMessageMutations = {
     if (tender) {
       await putCreateLog(
         {
-          type: 'tenderMessage',
+          type: LOG_TYPES.TENDER_MESSAGE,
           object: tenderMessage,
           newData: JSON.stringify({ ...args, senderBuyerId: user._id }),
-          description: `Message has been created for tender "${tender.name}"`,
+          description: `Message has been created for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}"`,
         },
         user,
       );
@@ -43,10 +46,12 @@ const tenderMessageMutations = {
 
     await putCreateLog(
       {
-        type: 'tenderMessage',
+        type: LOG_TYPES.TENDER_MESSAGE,
         object: tenderMessage,
         newData: JSON.stringify({ ...args, senderSupplierId: user.companyId }),
-        description: `Message has been created for tender ${tender.name}`,
+        description: `Message has been created for tender ${
+          tender.name
+        } of type "${tender.type.toUpperCase()}"`,
       },
       user,
     );

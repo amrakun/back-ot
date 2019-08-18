@@ -22,6 +22,8 @@ export const types = `
     removedData: String
     changedData: String
     unchangedData: String
+    oldData: String
+    newData: String
   }
 
   type LogList {
@@ -59,7 +61,9 @@ export const queries = `
     userId: String,
     action: String,
     page: Int,
-    perPage: Int
+    perPage: Int,
+    type: String,
+    desc: String
   ): LogList
 
   getDbFieldLabels(type: String): [Field]

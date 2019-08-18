@@ -1,6 +1,7 @@
 import { TenderResponses, TenderResponseLogs, Tenders } from '../../../db/models';
 import { moduleRequireSupplier } from '../../permissions';
 import { putCreateLog, putUpdateLog } from '../../utils';
+import { LOG_TYPES } from '../../constants';
 
 const tenderResponseMutations = {
   /**
@@ -9,19 +10,21 @@ const tenderResponseMutations = {
    * @returns {Promise} newly created tender reponse object
    */
   async tenderResponsesAdd(root, doc, { user }) {
-    const response = await TenderResponses.createTenderResponse({
+    const tender = await Tenders.findOne({ _id: doc.tenderId });
+    const response = (await TenderResponses.createTenderResponse({
       ...doc,
       supplierId: user.companyId,
-    });
-    const tender = await Tenders.findOne({ _id: doc.tenderId });
+    })).toObject();
 
     if (response && tender) {
       await putCreateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
-          newData: JSON.stringify(doc),
-          description: `Response for tender "${tender.name}" has been created`,
+          newData: JSON.stringify(response),
+          description: `Response for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}" has been created`,
         },
         user,
       );
@@ -40,6 +43,7 @@ const tenderResponseMutations = {
       tenderId: doc.tenderId,
       supplierId: user.companyId,
     });
+
     const updatedResponse = await TenderResponses.updateTenderResponse({
       ...doc,
       supplierId: user.companyId,
@@ -49,10 +53,12 @@ const tenderResponseMutations = {
     if (oldResponse && tender) {
       await putUpdateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: oldResponse,
           newData: JSON.stringify(doc),
-          description: `Response has been edited for tender "${tender.name}"`,
+          description: `Response has been edited for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}"`,
         },
         user,
       );
@@ -75,7 +81,7 @@ const tenderResponseMutations = {
 
       await putUpdateLog(
         {
-          type: 'tenderResponse',
+          type: LOG_TYPES.TENDER_RESPONSE,
           object: {
             status: oldResponse.status,
             isSent: oldResponse.isSent,
@@ -86,7 +92,9 @@ const tenderResponseMutations = {
             isSent: updatedResponse.isSent,
             sentDate: updatedResponse.sentDate,
           }),
-          description: `Response for tender "${tender.name}" has been edited`,
+          description: `Response for tender "${
+            tender.name
+          }" of type "${tender.type.toUpperCase()}" has been edited`,
         },
         user,
       );

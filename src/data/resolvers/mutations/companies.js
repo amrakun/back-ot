@@ -1,6 +1,7 @@
 import { Companies } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
+import { LOG_TYPES } from '../../constants';
 
 const companyMutations = {
   async companiesEditCertificateInfo(root, args, { user }) {
@@ -41,10 +42,10 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: { certificateInfo: oldCompany.certificateInfo },
         newData: JSON.stringify(args),
-        description: `Certificate info of company ${basicInfo.enName} has been edited`,
+        description: `Certificate info of company "${basicInfo.enName}" has been edited`,
       },
       user,
     );
@@ -103,7 +104,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           _id: company._id,
           productsInfoValidations: toBeValidated.productsInfoValidations,
@@ -125,10 +126,12 @@ const companyMutations = {
 
   async companiesSendRegistrationInfo(root, args, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
+    const updated = await company.sendRegistrationInfo();
 
+    // write log after updating
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isSentRegistrationInfo: company.isSentRegistrationInfo,
           registrationInfoSentDate: company.registrationInfoSentDate,
@@ -137,21 +140,22 @@ const companyMutations = {
           isSentRegistrationInfo: true,
           registrationInfoSentDate: new Date(),
         }),
-        description: `${company.basicInfo.enName} company has sent registration info`,
+        description: `"${company.basicInfo.enName}" company has sent registration info`,
       },
       user,
     );
 
-    return company.sendRegistrationInfo();
+    return updated;
   },
 
   async companiesSkipPrequalification(root, { reason }, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
     const skipped = await company.skipPrequalification(reason);
 
+    // write log after updating
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isSkippedPrequalification: company.isSkippedPrequalification,
           isSentPrequalificationInfo: company.isSentPrequalificationInfo,
@@ -164,9 +168,9 @@ const companyMutations = {
           prequalificationInfoSentDate: new Date(),
           prequalificationSkippedReason: reason,
         }),
-        description: `Prequalification info of company ${
+        description: `Prequalification info of company "${
           company.basicInfo.enName
-        } has been skipped`,
+        }" has been skipped`,
       },
       user,
     );
@@ -210,8 +214,13 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
-        object: company,
+        type: LOG_TYPES.COMPANY,
+        object: {
+          isSentPrequalificationInfo: company.isSentPrequalificationInfo,
+          isPrequalificationInfoEditable: company.isPrequalificationInfoEditable,
+          prequalificationSubmittedCount: company.prequalificationSubmittedCount,
+          prequalificationInfoSentDate: company.prequalificationSentDate,
+        },
         newData: JSON.stringify(prequalificationInfo),
         description: `Prequalification info of "${company.basicInfo.enName}" has been sent`,
       },
@@ -242,7 +251,7 @@ const companyMutations = {
 
     await putUpdateLog(
       {
-        type: 'company',
+        type: LOG_TYPES.COMPANY,
         object: {
           isPrequalificationInfoEditable: oldCompany.isPrequalificationInfoEditable,
           isPrequalified: oldCompany.isPrequalified,
@@ -251,7 +260,7 @@ const companyMutations = {
           isPrequalificationInfoEditable: !oldCompany.isPrequalificationInfoEditable,
           isPrequalified: oldCompany.isPrequalified ? false : null,
         }),
-        description: `Prequalification state of company ${basicInfo.enName} has been toggled`,
+        description: `Prequalification state of company "${basicInfo.enName}" has been toggled`,
       },
       user,
     );
@@ -286,13 +295,24 @@ sections.forEach(section => {
     const company = await Companies.findOne({ _id: user.companyId });
     const updated = await Companies.updateSection(user.companyId, subFieldName, args[subFieldName]);
 
+    let name = '';
+
+    if (company && company.basicInfo && company.basicInfo.enName) {
+      name = company.basicInfo.enName;
+    }
+
+    // company name doesn't exist when being registered for the first time
+    if (!company && subFieldName === 'basicInfo') {
+      name = args.basicInfo.enName;
+    }
+
     if (company && updated) {
       await putUpdateLog(
         {
-          type: 'company',
+          type: LOG_TYPES.COMPANY,
           object: { [subFieldName]: company[subFieldName] },
           newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
-          description: `"${company.basicInfo.enName}" has been edited`,
+          description: `"${name}" has been edited`,
         },
         user,
       );

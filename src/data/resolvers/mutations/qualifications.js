@@ -1,6 +1,7 @@
 import { Qualifications, Companies, SuppliersByProductCodeLogs } from '../../../db/models';
-import { sendConfigEmail, putUpdateLog } from '../../../data/utils';
+import { sendConfigEmail, putUpdateLog, putCreateLog } from '../../../data/utils';
 import { requireBuyer } from '../../permissions';
+import { LOG_TYPES } from '../../constants';
 
 export const generateReplacer = async (supplier, qualified) => {
   const basicInfo = supplier.basicInfo || {};
@@ -63,21 +64,6 @@ export const generateReplacer = async (supplier, qualified) => {
   return replacer;
 };
 
-/**
- * @param {string} supplierId Supplier id
- * @returns Company name
- */
-const getCompanyName = async supplierId => {
-  let companyName = supplierId;
-  const company = await Companies.findOne({ _id: supplierId });
-
-  if (company && company.basicInfo && company.basicInfo.enName) {
-    companyName = company.basicInfo.enName;
-  }
-
-  return companyName;
-};
-
 const qualificationMutations = {
   /*
    * Save tier type
@@ -87,11 +73,11 @@ const qualificationMutations = {
     const updated = await Qualifications.saveTierType(supplierId, 'tierType', tierType);
 
     if (qualification) {
-      const companyName = await getCompanyName(supplierId);
+      const companyName = await Companies.getName(supplierId);
 
       await putUpdateLog(
         {
-          type: 'qualification',
+          type: LOG_TYPES.QUALIFICATION,
           object: { tierType: qualification.tierType },
           newData: JSON.stringify({ tierType }),
           description: `Tier type for company "${companyName}" has been changed`,
@@ -135,11 +121,11 @@ const qualificationMutations = {
       prequalifiedDate: new Date(),
       isPrequalificationInfoEditable: false,
     };
-    const companyName = await getCompanyName(supplierId);
+    const companyName = await Companies.getName(supplierId);
 
     await putUpdateLog(
       {
-        type: 'qualification',
+        type: LOG_TYPES.QUALIFICATION,
         object: oldInfo,
         newData: JSON.stringify(logDoc),
         description: `Prequalification status for company "${companyName}" has been changed`,
@@ -163,16 +149,33 @@ sections.forEach(section => {
     const value = args[sectionName];
     const qualification = await Qualifications.findOne({ supplierId: args.supplierId });
     const updated = await Qualifications.updateSection(args.supplierId, sectionName, value);
+    const companyName = await Companies.getName(args.supplierId);
 
-    if (qualification && updated) {
-      const companyName = await getCompanyName(args.supplierId);
-
+    /**
+     * If qualification exists, then updates it, else it creates a new one
+     * in model helper method. Depending on that, we write create or update log here.
+     */
+    if (qualification) {
       await putUpdateLog(
         {
-          type: 'qualification',
+          type: LOG_TYPES.QUALIFICATION,
           object: qualification[sectionName] || {},
           newData: JSON.stringify(value),
           description: `Qualification for "${companyName}" has been edited`,
+        },
+        user,
+      );
+    } else {
+      await putCreateLog(
+        {
+          type: LOG_TYPES.QUALIFICATION,
+          object: updated[sectionName] || {},
+          newData: JSON.stringify({
+            ...value,
+            supplierId: args.supplierId,
+            createdDate: new Date(),
+          }),
+          description: `Qualification for "${companyName}" has been created`,
         },
         user,
       );

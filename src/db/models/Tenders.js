@@ -54,7 +54,7 @@ const TenderSchema = mongoose.Schema({
   status: field({ type: String, label: 'Status' }),
   cancelReason: field({ type: String, optional: true, label: 'Cancel reason' }),
 
-  isDeleted: field({ type: Boolean, default: false, label: 'Is deleted' }),
+  isDeleted: field({ type: Boolean, default: false }),
 
   createdDate: field({ type: Date, label: 'Created date' }),
   createdUserId: field({ type: String, label: 'Created user' }),
