@@ -49,7 +49,6 @@ const tenderMutations = {
     const oldTender = await Tenders.findOne({ _id });
     const oldSupplierIds = await oldTender.getExactSupplierIds();
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
-    const updatedSupplierIds = updatedTender.getExactSupplierIds();
 
     // write edit log
     await TenderLogs.write({
@@ -59,10 +58,6 @@ const tenderMutations = {
       description: 'Edited',
     });
 
-    // use toObject() to get plain object without internal mongo fields
-    const oldData = oldTender.toObject();
-    oldData.supplierIds = oldSupplierIds;
-
     /**
      * Exact supplier ids needed for comparison since it encrypts it every update
      * action & becomes uncomparable to old supplier ids.
@@ -70,12 +65,12 @@ const tenderMutations = {
     await putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
-        object: oldData,
+        object: { ...oldTender.toObject(), supplierIds: oldSupplierIds },
         newData: JSON.stringify({
           ...fields,
           updatedDate: updatedTender.updatedDate,
           status: updatedTender.status,
-          supplierIds: updatedSupplierIds,
+          supplierIds: await updatedTender.getExactSupplierIds(),
         }),
         description: `Tender "${
           oldTender.name
