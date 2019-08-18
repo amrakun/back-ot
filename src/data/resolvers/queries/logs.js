@@ -216,9 +216,10 @@ const logQueries = {
 
         for (const name of names) {
           const field = schema.obj[name];
-          const label = field && field.label ? field.label : '';
 
-          fieldNames.push({ name, label });
+          if (field && field.label) {
+            fieldNames.push({ name, label: field.label });
+          }
 
           // nested object field names
           if (typeof field === 'object' && field.type && field.type.obj) {
