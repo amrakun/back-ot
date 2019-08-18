@@ -303,7 +303,7 @@ sections.forEach(section => {
 
     // company name doesn't exist when being registered for the first time
     if (!company && subFieldName === 'basicInfo') {
-      name = args[subFieldName].enName;
+      name = args.basicInfo.enName;
     }
 
     if (company && updated) {
