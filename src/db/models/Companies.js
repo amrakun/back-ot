@@ -970,7 +970,7 @@ const CompanySchema = mongoose.Schema({
   difotScores: field({ type: [DateAmountSchema], optional: true, label: 'Difot scores' }),
   averageDifotScore: field({ type: Number, optional: true, label: 'Average difot score' }),
 
-  isDeleted: field({ type: Boolean, default: false, label: 'Is deleted' }),
+  isDeleted: field({ type: Boolean, default: false }),
 });
 
 class Company {
