@@ -206,6 +206,7 @@ const logQueries = {
    */
   async getDbFieldLabels(root, { type }) {
     let fieldNames = [];
+
     const found = mappings.find(m => m.name === type);
 
     if (found) {
