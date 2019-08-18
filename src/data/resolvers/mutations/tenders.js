@@ -27,7 +27,7 @@ const tenderMutations = {
     await putCreateLog(
       {
         type: LOG_TYPES.TENDER,
-        object: tender,
+        object: tender.toObject(),
         newData: JSON.stringify(doc),
         description: `Tender "${
           tender.name
@@ -59,9 +59,8 @@ const tenderMutations = {
       description: 'Edited',
     });
 
-    // when js spread syntax was used, it wrapped the doc in _doc attr
-    // and added mongo specific fields
-    const oldData = Object.assign(oldTender);
+    // use toObject() to get plain object without internal mongo fields
+    const oldData = oldTender.toObject();
     oldData.supplierIds = oldSupplierIds;
 
     /**
