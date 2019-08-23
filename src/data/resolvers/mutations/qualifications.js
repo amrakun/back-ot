@@ -128,7 +128,7 @@ const qualificationMutations = {
         type: LOG_TYPES.QUALIFICATION,
         object: oldInfo,
         newData: JSON.stringify(logDoc),
-        description: `Prequalification status for company "${companyName}" has been changed`,
+        description: `Pre-qualification status for company "${companyName}" has been changed`,
       },
       user,
     );
@@ -161,7 +161,7 @@ sections.forEach(section => {
           type: LOG_TYPES.QUALIFICATION,
           object: qualification[sectionName] || {},
           newData: JSON.stringify(value),
-          description: `Qualification for "${companyName}" has been edited`,
+          description: `Pre-qualification info of "${companyName}" has been edited`,
         },
         user,
       );
@@ -175,7 +175,7 @@ sections.forEach(section => {
             supplierId: args.supplierId,
             createdDate: new Date(),
           }),
-          description: `Qualification for "${companyName}" has been created`,
+          description: `"${companyName}" has been pre-qualified`,
         },
         user,
       );
