@@ -1,4 +1,4 @@
-import { moduleRequireBuyer } from '../../permissions';
+import { moduleRequireBuyer, requireAdmin } from '../../permissions';
 import { TenderLogs } from '../../../db/models';
 
 import {
@@ -235,5 +235,8 @@ const logQueries = {
 };
 
 moduleRequireBuyer(logQueries);
+// only admins can view logs
+requireAdmin(logQueries, 'logs');
+requireAdmin(logQueries, 'getDbFieldLabels');
 
 export default logQueries;

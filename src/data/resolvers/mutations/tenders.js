@@ -58,6 +58,16 @@ const tenderMutations = {
       description: 'Edited',
     });
 
+    let description = `Tender "${
+      oldTender.name
+    }" of type "${oldTender.type.toUpperCase()}" has been`;
+
+    if (oldTender.status === 'closed' && fields.status !== 'closed') {
+      description = `${description} re-opened`;
+    } else {
+      description = `${description} edited`;
+    }
+
     /**
      * Exact supplier ids needed for comparison since it encrypts it every update
      * action & becomes uncomparable to old supplier ids.
@@ -72,9 +82,7 @@ const tenderMutations = {
           status: updatedTender.status,
           supplierIds: await updatedTender.getExactSupplierIds(),
         }),
-        description: `Tender "${
-          oldTender.name
-        }" of type "${oldTender.type.toUpperCase()}" has been edited`,
+        description,
       },
       user,
     );

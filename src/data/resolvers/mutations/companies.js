@@ -295,15 +295,15 @@ sections.forEach(section => {
     const company = await Companies.findOne({ _id: user.companyId });
     const updated = await Companies.updateSection(user.companyId, subFieldName, args[subFieldName]);
 
-    let name = '';
+    let companyName = '';
 
     if (company && company.basicInfo && company.basicInfo.enName) {
-      name = company.basicInfo.enName;
+      companyName = company.basicInfo.enName;
     }
 
     // company name doesn't exist when being registered for the first time
     if (!company && subFieldName === 'basicInfo') {
-      name = args.basicInfo.enName;
+      companyName = args.basicInfo.enName;
     }
 
     if (company && updated) {
@@ -312,7 +312,7 @@ sections.forEach(section => {
           type: LOG_TYPES.COMPANY,
           object: { [subFieldName]: company[subFieldName] },
           newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
-          description: `"${name}" has been edited`,
+          description: `"${companyName}" has been edited`,
         },
         user,
       );
