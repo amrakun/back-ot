@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Tenders, TenderResponses, Companies, TenderLogs } from '../../../db/models';
+import { Tenders, Companies, TenderLogs } from '../../../db/models';
 import { decryptArray } from '../../../db/models/utils';
 import tenderUtils from '../../../data/tenderUtils';
 import { readS3File, putCreateLog, putUpdateLog } from '../../../data/utils';
@@ -232,15 +232,7 @@ const tenderMutations = {
 
     await tender.sendRegretLetter();
 
-    // rfq
-    const notChosenResponses = await TenderResponses.find({
-      tenderId: _id,
-      supplierId: { $nin: tender.winnerIds },
-    });
-
-    let notChosenSuppliers = await Companies.find({
-      _id: { $in: notChosenResponses.map(r => r.supplierId) },
-    });
+    let notChosenSuppliers = await tender.getRfqNotChosenSuppliers();
 
     // eoi
     if (tender.type === 'eoi') {

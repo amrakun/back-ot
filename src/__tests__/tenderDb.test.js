@@ -4,7 +4,7 @@
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
 import { Users, Tenders, TenderResponses, Companies } from '../db/models';
-import dbUtils from '../db/models/utils';
+import dbUtils, { encrypt } from '../db/models/utils';
 import {
   userFactory,
   companyFactory,
@@ -575,5 +575,70 @@ describe('Tender db', () => {
     ]);
 
     expect(await Tenders.getPossibleTendersByUser(user3)).toEqual([t1._id.toString()]);
+  });
+
+  test('getRfqNotChosenSuppliers', async () => {
+    const supplier1 = await companyFactory({});
+    const supplier2 = await companyFactory({});
+    const supplier3 = await companyFactory({});
+    const supplier4 = await companyFactory({});
+
+    let tender = await tenderFactory({
+      type: 'rfq',
+      status: 'open',
+      supplierIds: [supplier1._id, supplier2._id, supplier3._id, supplier4._id],
+    });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier1._id,
+      isNotInterested: true,
+      isSent: true,
+    });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier2._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier3._id, isSent: false });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier4._id, isSent: true });
+
+    await Tenders.updateOne({ _id: tender._id }, { $set: { winnerIds: [encrypt(supplier4._id)] } });
+    tender = await Tenders.findOne({ _id: tender._id });
+
+    const notChosenSuppliers = await tender.getRfqNotChosenSuppliers();
+    const notChosenSupplierIds = notChosenSuppliers.map(supplier => supplier._id.toString());
+
+    expect(notChosenSupplierIds).toEqual([supplier2._id]);
+  });
+
+  test('getNotBidderListedSuppliers', async () => {
+    const supplier1 = await companyFactory({});
+    const supplier2 = await companyFactory({});
+    const supplier3 = await companyFactory({});
+    const supplier4 = await companyFactory({});
+
+    let tender = await tenderFactory({
+      type: 'eoi',
+      status: 'open',
+      supplierIds: [supplier1._id, supplier2._id, supplier3._id, supplier4._id],
+    });
+
+    await tenderResponseFactory({
+      tenderId: tender._id,
+      supplierId: supplier1._id,
+      isNotInterested: true,
+      isSent: true,
+    });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier2._id, isSent: true });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier3._id, isSent: false });
+    await tenderResponseFactory({ tenderId: tender._id, supplierId: supplier4._id, isSent: true });
+
+    await Tenders.updateOne(
+      { _id: tender._id },
+      { $set: { bidderListedSupplierIds: [encrypt(supplier4._id)] } },
+    );
+    tender = await Tenders.findOne({ _id: tender._id });
+
+    const notChosenSuppliers = await tender.getNotBidderListedSuppliers();
+    const notChosenSupplierIds = notChosenSuppliers.map(supplier => supplier._id.toString());
+
+    expect(notChosenSupplierIds).toEqual([supplier2._id]);
   });
 });

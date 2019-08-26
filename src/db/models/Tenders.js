@@ -336,17 +336,25 @@ class Tender extends StatusPublishClose {
     return decryptArray(this.bidderListedSupplierIds);
   }
 
-  async getNotBidderListedSuppliers() {
+  async getNotChosenSuppliers(modifier = {}) {
     const notChosenResponses = await TenderResponses.find({
       tenderId: this._id,
-      supplierId: { $nin: this.bidderListedSupplierIds },
       isSent: true,
       isNotInterested: { $ne: true },
+      ...modifier,
     });
 
     const supplierIds = notChosenResponses.map(response => response.supplierId);
 
     return Companies.find({ _id: { $in: supplierIds } });
+  }
+
+  async getRfqNotChosenSuppliers() {
+    return this.getNotChosenSuppliers({ supplierId: { $nin: this.winnerIds } });
+  }
+
+  async getNotBidderListedSuppliers() {
+    return this.getNotChosenSuppliers({ supplierId: { $nin: this.bidderListedSupplierIds } });
   }
 
   /*

@@ -331,9 +331,9 @@ describe('Tender mutations', () => {
 
     await tender.update({ winnerIds: encryptArray([supplierId]) });
 
-    const chosen = await tenderResponseFactory({ tenderId, supplierId });
-    const notAwarded1 = await tenderResponseFactory({ tenderId });
-    const notAwarded2 = await tenderResponseFactory({ tenderId });
+    const chosen = await tenderResponseFactory({ tenderId, supplierId, isSent: true });
+    const notAwarded1 = await tenderResponseFactory({ tenderId, isSent: true });
+    const notAwarded2 = await tenderResponseFactory({ tenderId, isSent: true });
 
     const args = { _id: tenderId, subject: 'subject', content: 'content' };
     const response = await graphqlRequest(
