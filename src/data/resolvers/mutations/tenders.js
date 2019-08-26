@@ -171,24 +171,25 @@ const tenderMutations = {
         a => a.supplierId === supplier._id.toString(),
       );
 
-      if (!attachmentBySupplier) {
-        continue;
+      let perAttachments = [];
+
+      if (attachmentBySupplier) {
+        const { attachment } = attachmentBySupplier;
+        const file = await readS3File(attachment.url, user);
+
+        perAttachments = [
+          {
+            filename: attachment.name,
+            content: file.Body,
+          },
+        ];
       }
-
-      const { attachment } = attachmentBySupplier;
-
-      const file = await readS3File(attachment.url, user);
 
       await tenderUtils.sendConfigEmail({
         kind: 'supplier__award',
         tender,
         toEmails: [supplier.basicInfo.email],
-        attachments: [
-          {
-            filename: attachment.name,
-            content: file.Body,
-          },
-        ],
+        attachments: perAttachments,
       });
     } // end supplier for loop
 
@@ -199,6 +200,7 @@ const tenderMutations = {
       awardAttachments: oldTender.awardAttachments,
       winnerIds: decryptArray(oldTender.winnerIds || []),
     };
+
     const changeDoc = {
       awardNote: note,
       awardAttachments: attachments,
