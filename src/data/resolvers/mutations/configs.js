@@ -1,30 +1,51 @@
 import { Configs } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
+import { resetConfigCache } from '../../utils';
 
 const configMutations = {
   // save basic info
-  configsSaveBasicInfo(root, args) {
-    return Configs.saveBasicInfo(args);
+  async configsSaveBasicInfo(root, args) {
+    const response = await Configs.saveBasicInfo(args);
+
+    resetConfigCache();
+
+    return response;
   },
 
   // save template
-  configsSaveTemplate(root, doc) {
-    return Configs.saveTemplate(doc);
+  async configsSaveTemplate(root, doc) {
+    const response = await Configs.saveTemplate(doc);
+
+    resetConfigCache();
+
+    return response;
   },
 
   // save prequalification duration of warranty
-  configsSavePrequalificationDow(root, { doc }) {
-    return Configs.savePrequalificationDow(doc);
+  async configsSavePrequalificationDow(root, { doc }) {
+    const response = await Configs.savePrequalificationDow(doc);
+
+    resetConfigCache();
+
+    return response;
   },
 
   // save audit duration of warranty
-  configsSaveAuditDow(root, { doc }) {
-    return Configs.saveAuditDow(doc);
+  async configsSaveAuditDow(root, { doc }) {
+    const response = await Configs.saveAuditDow(doc);
+
+    resetConfigCache();
+
+    return response;
   },
 
   // save improvementPlan duration of warranty
-  configsSaveImprovementPlanDow(root, { doc }) {
-    return Configs.saveImprovementPlanDow(doc);
+  async configsSaveImprovementPlanDow(root, { doc }) {
+    const response = await Configs.saveImprovementPlanDow(doc);
+
+    resetConfigCache();
+
+    return response;
   },
 };
 

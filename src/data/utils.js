@@ -246,6 +246,24 @@ export const sendEmail = async args => {
   });
 };
 
+let configCache;
+
+export const getConfig = async () => {
+  if (configCache) {
+    return configCache;
+  }
+
+  const config = await Configs.getConfig();
+
+  configCache = config;
+
+  return config;
+};
+
+export const resetConfigCache = () => {
+  configCache = null;
+};
+
 /*
  * Send email using config
  */
@@ -257,7 +275,7 @@ export const sendConfigEmail = async ({
   attachments,
   replacer,
 }) => {
-  const config = await Configs.getConfig();
+  const config = await getConfig();
   const templates = config[name] || {};
   const template = templateObject || templates[kind];
 
