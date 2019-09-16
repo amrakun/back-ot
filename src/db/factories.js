@@ -63,6 +63,7 @@ export const companyFactory = (params = {}) => {
       totalNumberOfUmnugoviEmployees: faker.random.number(),
     },
 
+    contactInfo: params.contactInfo,
     shareholderInfo: params.shareholderInfo,
     groupInfo: params.groupInfo,
     certificateInfo: params.certificateInfo,
@@ -842,6 +843,7 @@ export const configFactory = (params = {}) => {
     improvementPlanDow: params.improvementPlanDow,
     specificImprovementPlanDow: params.specificImprovementPlanDow,
     rfqTemplates: {
+      supplier__publish: commonTemplate,
       buyer__award: commonTemplate,
       supplier__award: commonTemplate,
       supplier__regretLetter: commonTemplate,

@@ -25,8 +25,9 @@ export const replacer = ({ text, tender }) => {
 };
 
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
-  const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
+  let emailSentCount = 0;
 
+  const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
   const suppliers = await Companies.find({ _id: { $in: filterIds } });
 
   for (const supplier of suppliers) {
@@ -53,6 +54,8 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
       toEmails: [userEmail],
     });
 
+    emailSentCount++;
+
     const { contactInfo } = supplier;
 
     if (contactInfo && contactInfo.email && contactInfo.email !== userEmail) {
@@ -60,8 +63,12 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
         ...options,
         toEmails: [contactInfo.email],
       });
+
+      emailSentCount++;
     }
   } // end supplier for loop
+
+  return emailSentCount;
 };
 
 export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) => {
