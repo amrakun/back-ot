@@ -515,6 +515,98 @@ export const getEnv = ({ name, defaultValue }) => {
   return value || '';
 };
 
+const quickSortSwap = (array, i, j) => {
+  const temp = array[i];
+
+  array[i] = array[j];
+
+  array[j] = temp;
+};
+
+const quickSortPartition = (array, checker, start, end) => {
+  let pivotIndex = start;
+
+  for (let i = start; i <= end - 1; i++) {
+    if (checker(array[i], array[end])) {
+      quickSortSwap(array, i, pivotIndex);
+
+      pivotIndex += 1;
+    }
+  }
+
+  quickSortSwap(array, pivotIndex, end);
+
+  return pivotIndex;
+};
+
+/*
+input = [7,2,1,6,8,5,3,4]
+
+pivot=4
+
+pIndex=0; i=0; 7^',2,1,6,8,5,3,4
+pIndex=0; i=1; 2,7^',1,6,8,5,3,4 pIndex=1
+pIndex=1; i=2; 2,1,7^',6,8,5,3,4 pIndex=2
+pIndex=2; i=3; 2,1,7^,6',8,5,3,4
+pIndex=2; i=4; 2,1,7^,6,8',5,3,4
+pIndex=2; i=5; 2,1,7^,6,8,5',3,4
+pIndex=2; i=6; 2,1,3,6^,8,5,7',4 pIndex=3
+
+2,1,3, 4^ ,8,5,7', 6
+return pIndex(3)
+=========================================
+
+input=2,1,3
+pivot=3
+
+pIndex=0; i=0; 2^',1,3 => 2',1^,3 pIndex=1
+pIndex=1; i=1; 2,1^',3 => 2,1',3^ pIndex=2
+
+2,1,3
+return pIndex(2)
+=========================================
+
+input=2,1
+pivot=1
+
+pIndex=0; i=0; 2^',1 => no need
+
+1,2
+return pIndex(0)
+=========================================
+
+input=1,2
+pivot=2
+
+pIndex=0; i=0; 1^',2 => 1'2^ pIndex=1
+
+1,2
+return pIndex(1)
+=========================================
+
+
+input=8,5,7,6
+pivot=6
+
+pIndex=0; i=0; 8^',5,7,6 => no need
+pIndex=0; i=1; 8^,5',7,6 => 5,8^',7,6 pIndex=1
+pIndex=1; i=2; 5,8^,7',6 => no need
+
+5,6,7,8
+return pIndex(1)
+=========================================
+*/
+export const quickSort = (array, checker, start, end) => {
+  if (end > start) {
+    const pIndex = quickSortPartition(array, checker, start, end);
+
+    quickSort(array, checker, start, pIndex - 1);
+    quickSort(array, checker, pIndex + 1, end);
+  }
+
+  return array;
+};
+
 export default {
   sendEmail,
   sendConfigEmail,

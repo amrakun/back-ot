@@ -1,7 +1,7 @@
 import cf from 'cellref';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
-import { encryptArray } from '../../../db/models/utils';
-import { readTemplate, generateXlsx } from '../../utils';
+import { encryptArray, decrypt } from '../../../db/models/utils';
+import { readTemplate, generateXlsx, quickSort } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const prepareReport = async ({ tenderId, supplierIds, template }) => {
@@ -10,7 +10,7 @@ const prepareReport = async ({ tenderId, supplierIds, template }) => {
   const responses = await TenderResponses.find({
     tenderId,
     supplierId: { $in: encryptArray(supplierIds) },
-  });
+  }).lean();
 
   // read template
   const { workbook, sheet } = await readTemplate(template);
@@ -32,13 +32,42 @@ const tenderResponseQueries = {
       template: 'rfq_bid',
     });
 
+    const requestedProducts = tender.requestedProducts;
+
+    const companiesMap = {};
+
+    for (const response of responses) {
+      companiesMap[response.supplierId] = await Companies.findOne({
+        _id: decrypt(response.supplierId),
+      });
+
+      let totalUnitPrice = 0;
+
+      for (const [index] of requestedProducts.entries()) {
+        const rp = response.respondedProducts[index];
+
+        if (rp && rp.unitPrice) {
+          totalUnitPrice += rp.unitPrice;
+        }
+      }
+
+      response.totalUnitPrice = totalUnitPrice;
+    }
+
+    quickSort(
+      responses,
+      (res1, res2) => res1.totalUnitPrice < res2.totalUnitPrice,
+      0,
+      responses.length - 1,
+    );
+
     // date
     sheet.cell(1, 6).value(new Date().toLocaleDateString());
 
     // rfq number
     sheet.cell(2, 7).value(`RFQ ${tender.number}`);
 
-    for (const [index, product] of tender.requestedProducts.entries()) {
+    for (const [index, product] of requestedProducts.entries()) {
       const rowIndex = 13 + index;
 
       // fill requested products section
@@ -52,7 +81,7 @@ const tenderResponseQueries = {
       let columnIndex = 3;
 
       for (const response of responses) {
-        const supplier = await Companies.findOne({ _id: response.supplierId });
+        const supplier = companiesMap[response.supplierId];
 
         // find response by product code
         const rp = response.respondedProducts[index] || {};
@@ -65,8 +94,8 @@ const tenderResponseQueries = {
         // fill suppliers section
         let total = 0;
 
-        if (product.quantity && rp.unitPrice) {
-          total = product.quantity * rp.unitPrice;
+        if (respondedProduct.quantity && rp.unitPrice) {
+          total = respondedProduct.quantity * rp.unitPrice;
         }
 
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
