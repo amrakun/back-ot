@@ -28,12 +28,18 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
   let emailSentCount = 0;
 
   const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
-  const suppliers = await Companies.find({ _id: { $in: filterIds } });
+  const suppliers = await Companies.find(
+    { _id: { $in: filterIds } },
+    { _id: 1, contactInfo: 1 },
+  ).lean();
+  const blockedSuppliers = await BlockedCompanies.find(
+    { supplierId: { $in: filterIds }, ...BlockedCompanies.blockedRangeQuery() },
+    { supplierId: 1 },
+  ).lean();
+  const blockedSupplierIds = blockedSuppliers.map(bl => bl.supplierId);
 
   for (const supplier of suppliers) {
-    const isBlocked = await BlockedCompanies.isBlocked(supplier._id);
-
-    if (isBlocked) {
+    if (blockedSupplierIds.includes(supplier._id.toString())) {
       continue;
     }
 
