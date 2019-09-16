@@ -28,22 +28,33 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
   let emailSentCount = 0;
 
   const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
+
   const suppliers = await Companies.find(
     { _id: { $in: filterIds } },
     { _id: 1, contactInfo: 1 },
   ).lean();
+
   const blockedSuppliers = await BlockedCompanies.find(
     { supplierId: { $in: filterIds }, ...BlockedCompanies.blockedRangeQuery() },
     { supplierId: 1 },
   ).lean();
+
   const blockedSupplierIds = blockedSuppliers.map(bl => bl.supplierId);
+
+  const users = await Users.find({ companyId: { $in: filterIds } }, { companyId: 1, email: 1 });
+  const userEmailsByCompanyId = {};
+
+  for (const user of users) {
+    userEmailsByCompanyId[user.companyId] = user.email;
+  }
 
   for (const supplier of suppliers) {
     if (blockedSupplierIds.includes(supplier._id.toString())) {
       continue;
     }
 
-    const user = await Users.findOne({ companyId: supplier._id });
+    const userEmail = userEmailsByCompanyId[supplier._id];
+
     const options = {
       name: `${tender.type}Templates`,
       kind,
@@ -52,8 +63,6 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
         return replacer({ text, tender });
       },
     };
-
-    const userEmail = user && user.email ? user.email : '';
 
     await utils.sendConfigEmail({
       ...options,

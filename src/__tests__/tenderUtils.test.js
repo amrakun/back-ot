@@ -34,19 +34,31 @@ describe('Tender utils', () => {
   test('send email to suppliers', async () => {
     const mock = sinon.stub(dataUtils, 'sendEmail').callsFake(() => 'sent');
 
-    const sup1 = await companyFactory({
+    const createSup = async doc => {
+      const sup = await companyFactory(doc);
+
+      await userFactory({ companyId: sup._id });
+
+      return sup;
+    };
+
+    const sup1 = await createSup({
       contactInfo: { email: 'sup1@gmail.com', name: '1', phone: 1 },
     });
-    const sup2 = await companyFactory({
+
+    const sup2 = await createSup({
       contactInfo: { email: 'sup2@gmail.com', name: '2', phone: 2 },
     });
-    const sup3 = await companyFactory({
+
+    const sup3 = await createSup({
       contactInfo: { email: 'sup3@gmail.com', name: '3', phone: 3 },
     });
-    const sup4 = await companyFactory({
+
+    const sup4 = await createSup({
       contactInfo: { email: 'sup4@gmail.com', name: '4', phone: 4 },
     });
-    const sup5 = await companyFactory({
+
+    const sup5 = await createSup({
       contactInfo: { email: 'sup5@gmail.com', name: '5', phone: 5 },
     });
 
