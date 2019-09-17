@@ -11,7 +11,6 @@ import {
   Tenders,
   TenderResponses,
   Configs,
-  MailDeliveries,
   AuditResponses,
   PhysicalAudits,
   TenderMessages,
@@ -215,34 +214,25 @@ export const sendEmail = async args => {
 
   const mailId = Math.random();
 
-  return toEmails.map(toEmail => {
-    const options = {
-      from: fromEmail || COMPANY_EMAIL_FROM,
-      to: toEmail,
-      subject: title,
-      html,
-    };
+  const options = {
+    from: fromEmail || COMPANY_EMAIL_FROM,
+    to: toEmails,
+    subject: title,
+    html,
+  };
 
-    const mailOptions = {
-      ...options,
-      attachments,
-      headers: {
-        'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
-        Mailid: mailId,
-      },
-    };
+  const mailOptions = {
+    ...options,
+    attachments,
+    headers: {
+      'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
+      Mailid: mailId,
+    },
+  };
 
-    // create mail delivery entry
-    MailDeliveries.createStatus({
-      ...options,
-      mailId,
-      status: 'pending',
-    });
-
-    return transporter.sendMail(mailOptions, (error, info) => {
-      console.log(error); // eslint-disable-line
-      console.log(info); // eslint-disable-line
-    });
+  return transporter.sendMail(mailOptions, (error, info) => {
+    console.log(error); // eslint-disable-line
+    console.log(info); // eslint-disable-line
   });
 };
 

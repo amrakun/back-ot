@@ -53,21 +53,21 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
     userEmailsByCompanyId[user.companyId] = user.email;
   }
 
+  const options = {
+    name: `${tender.type}Templates`,
+    kind,
+    attachments,
+    replacer: text => {
+      return replacer({ text, tender });
+    },
+  };
+
   for (const supplier of suppliers) {
     if (blockedSupplierIds.includes(supplier._id.toString())) {
       continue;
     }
 
     const userEmail = userEmailsByCompanyId[supplier._id];
-
-    const options = {
-      name: `${tender.type}Templates`,
-      kind,
-      attachments,
-      replacer: text => {
-        return replacer({ text, tender });
-      },
-    };
 
     await utils.sendConfigEmail({
       ...options,
