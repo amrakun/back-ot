@@ -24,11 +24,15 @@ export const replacer = ({ text, tender }) => {
   return result;
 };
 
+/*
+ * Send tender email to suppliers
+ */
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
   let emailSentCount = 0;
 
   const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
 
+  // preparing blocked suppliers cache =================
   const suppliers = await Companies.find(
     { _id: { $in: filterIds } },
     { _id: 1, contactInfo: 1 },
@@ -41,6 +45,7 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
 
   const blockedSupplierIds = blockedSuppliers.map(bl => bl.supplierId);
 
+  // preparing users cache =============================
   const users = await Users.find({ companyId: { $in: filterIds } }, { companyId: 1, email: 1 });
   const userEmailsByCompanyId = {};
 
