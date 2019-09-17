@@ -40,6 +40,7 @@
     "cors": "^2.8.1",
     "debug": "^4.1.1",
     "dotenv": "^4.0.0",
+    "elastic-apm-node": "^2.16.2",
     "express": "^4.15.2",
     "file-type": "^10.3.0",
     "formidable": "^1.1.1",

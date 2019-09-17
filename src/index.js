@@ -3,13 +3,18 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import apm from 'elastic-apm-node';
 
 import { debugInit } from './debuggers';
 
 // load environment variables
 dotenv.config();
 
-const { MAIN_APP_DOMAIN } = process.env;
+const { NODE_ENV, MAIN_APP_DOMAIN } = process.env;
+
+if (NODE_ENV === 'production') {
+  apm.start({});
+}
 
 import express from 'express';
 import { createServer } from 'http';
