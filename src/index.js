@@ -154,6 +154,7 @@ app.post('/upload-file', async (req, res) => {
         'image/gif',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/x-msi',
         'application/pdf',
         'application/zip',
         'application/x-rar-compressed',
