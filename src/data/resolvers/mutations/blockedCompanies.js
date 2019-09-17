@@ -16,7 +16,7 @@ const blockedCompanyMutations = {
 
       supNames = `${supNames} ${supNames ? ',' : ''} ${sup.basicInfo.enName}`;
 
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.BLOCKED_COMPANY,
           object: blockedCompany,
@@ -54,7 +54,7 @@ const blockedCompanyMutations = {
       await BlockedCompanies.unblock(supplierId);
 
       if (supplier && supplier.basicInfo) {
-        await putDeleteLog(
+        putDeleteLog(
           {
             type: LOG_TYPES.BLOCKED_COMPANY,
             object: blocked,

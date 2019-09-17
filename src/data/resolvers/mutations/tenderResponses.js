@@ -17,7 +17,7 @@ const tenderResponseMutations = {
     })).toObject();
 
     if (response && tender) {
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
@@ -51,7 +51,7 @@ const tenderResponseMutations = {
     const tender = await Tenders.findOne({ _id: doc.tenderId });
 
     if (oldResponse && tender) {
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: oldResponse,
@@ -79,7 +79,7 @@ const tenderResponseMutations = {
     if (oldResponse && tender) {
       const updatedResponse = await oldResponse.send();
 
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: {

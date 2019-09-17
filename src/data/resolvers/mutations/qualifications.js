@@ -75,7 +75,7 @@ const qualificationMutations = {
     if (qualification) {
       const companyName = await Companies.getName(supplierId);
 
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: { tierType: qualification.tierType },
@@ -123,7 +123,7 @@ const qualificationMutations = {
     };
     const companyName = await Companies.getName(supplierId);
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.QUALIFICATION,
         object: oldInfo,
@@ -156,7 +156,7 @@ sections.forEach(section => {
      * in model helper method. Depending on that, we write create or update log here.
      */
     if (qualification) {
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: qualification[sectionName] || {},
@@ -166,7 +166,7 @@ sections.forEach(section => {
         user,
       );
     } else {
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: updated[sectionName] || {},

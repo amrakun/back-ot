@@ -24,7 +24,7 @@ const tenderMutations = {
       description: 'Created',
     });
 
-    await putCreateLog(
+    putCreateLog(
       {
         type: LOG_TYPES.TENDER,
         object: tender.toObject(),
@@ -72,7 +72,7 @@ const tenderMutations = {
      * Exact supplier ids needed for comparison since it encrypts it every update
      * action & becomes uncomparable to old supplier ids.
      */
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
         object: { ...oldTender.toObject(), supplierIds: oldSupplierIds },
@@ -207,7 +207,7 @@ const tenderMutations = {
       winnerIds: supplierIds,
     };
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
         object: oldTenderInfo,
@@ -254,7 +254,7 @@ const tenderMutations = {
       });
     }
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
         object: tender,
@@ -305,7 +305,7 @@ const tenderMutations = {
         cancelReason: reason,
       };
 
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.TENDER,
           object: tender,

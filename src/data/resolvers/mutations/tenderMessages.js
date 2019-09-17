@@ -17,7 +17,7 @@ const tenderMessageMutations = {
     });
 
     if (tender) {
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.TENDER_MESSAGE,
           object: tenderMessage,
@@ -44,7 +44,7 @@ const tenderMessageMutations = {
       extraBuyerEmails: buyers.map(buyer => buyer.email),
     });
 
-    await putCreateLog(
+    putCreateLog(
       {
         type: LOG_TYPES.TENDER_MESSAGE,
         object: tenderMessage,

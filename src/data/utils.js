@@ -472,7 +472,7 @@ export const putDeleteLog = (params, user) => {
  * @param {Object} body Request
  * @param {Object} user User information from mutation context
  */
-const putLog = (body, user) => {
+const putLog = async (body, user) => {
   const LOGS_DOMAIN = getEnv({ name: 'LOGS_API_DOMAIN' });
 
   if (!LOGS_DOMAIN) {
@@ -489,10 +489,14 @@ const putLog = (body, user) => {
     Check whether LOGS_API_DOMAIN env is missing or logs api is not running
   `;
 
-  return sendRequest(
-    { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
-    msg,
-  );
+  try {
+    await sendRequest(
+      { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
+      msg,
+    );
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 /**

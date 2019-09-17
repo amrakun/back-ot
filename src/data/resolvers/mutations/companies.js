@@ -40,7 +40,7 @@ const companyMutations = {
       },
     });
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: { certificateInfo: oldCompany.certificateInfo },
@@ -102,7 +102,7 @@ const companyMutations = {
       files,
     });
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: {
@@ -129,7 +129,7 @@ const companyMutations = {
     const updated = await company.sendRegistrationInfo();
 
     // write log after updating
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: {
@@ -153,7 +153,7 @@ const companyMutations = {
     const skipped = await company.skipPrequalification(reason);
 
     // write log after updating
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: {
@@ -212,7 +212,7 @@ const companyMutations = {
       prequalificationInfoSentDate: new Date(),
     };
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: {
@@ -249,7 +249,7 @@ const companyMutations = {
       });
     }
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.COMPANY,
         object: {
@@ -307,7 +307,7 @@ sections.forEach(section => {
     }
 
     if (company && updated) {
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.COMPANY,
           object: { [subFieldName]: company[subFieldName] },
