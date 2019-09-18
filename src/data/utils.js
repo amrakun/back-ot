@@ -406,6 +406,28 @@ const putLog = async (body, user) => {
 };
 
 /**
+ * Sends a request to mailer api
+ * @param {Object} param0 Request
+ */
+export const fetchMailer = (path, params) => {
+  const MAILER_API_DOMAIN = getEnv({ name: 'MAILER_API_DOMAIN' });
+
+  const msg = `
+    Failed to connect to mailer api.
+    Check whether MAILER_API_DOMAIN env is missing or mailer api is not running
+  `;
+
+  return sendRequest(
+    {
+      url: `${MAILER_API_DOMAIN}/${path}`,
+      method: 'get',
+      body: { params: JSON.stringify(params) },
+    },
+    msg,
+  );
+};
+
+/**
  * Sends a request to logs api
  * @param {Object} param0 Request
  */
