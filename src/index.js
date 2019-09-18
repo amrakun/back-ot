@@ -10,7 +10,7 @@ import { debugInit } from './debuggers';
 // load environment variables
 dotenv.config();
 
-const { MAIN_APP_DOMAIN } = process.env;
+const { MAIN_APP_DOMAIN, MAILER_API_DOMAIN } = process.env;
 
 import express from 'express';
 import { createServer } from 'http';
@@ -19,6 +19,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import formidable from 'formidable';
 import fileType from 'file-type';
+import request from 'request';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
@@ -35,6 +36,23 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.post(`/service/ses/tracker`, (req, res) => {
+  return req.pipe(
+    request
+      .post(`${MAILER_API_DOMAIN}/service/ses/tracker`)
+      .on('response', response => {
+        if (response.statusCode !== 200) {
+          return next(response.statusMessage);
+        }
+
+        return response.pipe(res);
+      })
+      .on('error', e => {
+        next(e);
+      }),
+  );
+});
 
 app.use(userMiddleware);
 
