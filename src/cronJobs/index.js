@@ -1,5 +1,10 @@
 import bodyParser from 'body-parser';
+
 import dotenv from 'dotenv';
+
+// load environment variables
+dotenv.config();
+
 import express from 'express';
 import { connect } from '../db/connection';
 
@@ -8,9 +13,6 @@ import './audits';
 import './tenders';
 import './feedbacks';
 import './blockedCompanies';
-
-// load environment variables
-dotenv.config();
 
 // connect to mongo database
 connect();

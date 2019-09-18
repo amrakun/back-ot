@@ -76,14 +76,14 @@ describe('Tender utils', () => {
       supplierIds: [sup1._id, sup2._id, sup3._id, sup4._id, sup5._id],
     });
 
-    const emailSentCount = await sendEmailToSuppliers({
+    const receivers = await sendEmailToSuppliers({
       kind: 'supplier__publish',
       attachments: [],
       tender,
     });
 
     // sup4, sup5 must be excluded
-    expect(emailSentCount).toBe(6);
+    expect(receivers.length).toBe(6);
 
     mock.restore();
   });

@@ -25,7 +25,7 @@ import { userMiddleware } from './auth';
 import { uploadFile, readS3File, tokenize, virusDetector } from './data/utils';
 import { downloadFiles, downloadTenderMessageFiles } from './data/tenderUtils';
 import schema from './data';
-import { init } from './startup';
+import './messageBroker';
 
 // connect to mongo database
 connect();
@@ -187,9 +187,6 @@ const { PORT } = process.env;
 
 server.listen(PORT, () => {
   debugInit(`GraphQL Server is now running on ${PORT}`);
-
-  // execute startup actions
-  init(app);
 });
 
 if (process.env.NODE_ENV === 'development') {

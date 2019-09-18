@@ -28,8 +28,6 @@ export const replacer = ({ text, tender }) => {
  * Send tender email to suppliers
  */
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
-  let emailSentCount = 0;
-
   const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
 
   // preparing blocked suppliers cache =================
@@ -53,14 +51,7 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
     userEmailsByCompanyId[user.companyId] = user.email;
   }
 
-  const options = {
-    name: `${tender.type}Templates`,
-    kind,
-    attachments,
-    replacer: text => {
-      return replacer({ text, tender });
-    },
-  };
+  const receivers = [];
 
   for (const supplier of suppliers) {
     if (blockedSupplierIds.includes(supplier._id.toString())) {
@@ -69,26 +60,33 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
 
     const userEmail = userEmailsByCompanyId[supplier._id];
 
-    await utils.sendConfigEmail({
-      ...options,
-      toEmails: [userEmail],
-    });
-
-    emailSentCount++;
+    receivers.push(userEmail);
 
     const { contactInfo } = supplier;
 
     if (contactInfo && contactInfo.email && contactInfo.email !== userEmail) {
-      await utils.sendConfigEmail({
-        ...options,
-        toEmails: [contactInfo.email],
-      });
-
-      emailSentCount++;
+      receivers.push(contactInfo.email);
     }
-  } // end supplier for loop
+  }
 
-  return emailSentCount;
+  utils
+    .sendConfigEmail({
+      name: `${tender.type}Templates`,
+      kind,
+      attachments,
+      replacer: text => {
+        return replacer({ text, tender });
+      },
+      toEmails: receivers,
+    })
+    .then(() => {
+      console.log('Success');
+    })
+    .catch(e => {
+      console.log(e);
+    });
+
+  return receivers;
 };
 
 export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) => {

@@ -7,8 +7,13 @@ import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
-import MailDeliveries from './MailDeliveries';
-import { TenderLogs, SearchLogs, TenderResponseLogs, SuppliersByProductCodeLogs, ActivityLogs } from './Logs';
+import {
+  TenderLogs,
+  SearchLogs,
+  TenderResponseLogs,
+  SuppliersByProductCodeLogs,
+  ActivityLogs,
+} from './Logs';
 import TenderMessages from './TenderMessages';
 
 export {
@@ -30,6 +35,5 @@ export {
   TenderResponseLogs,
   SuppliersByProductCodeLogs,
   ActivityLogs,
-  MailDeliveries,
   TenderMessages,
 };
