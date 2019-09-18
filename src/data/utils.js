@@ -145,7 +145,7 @@ export const sendEmail = async args => {
   sendMessage('sendEmail', {
     template,
     from: fromEmail,
-    to: toEmails,
+    toEmails,
     subject: title,
     content,
     attachments,
