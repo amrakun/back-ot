@@ -1,4 +1,4 @@
-import { TenderResponses, TenderResponseLogs, Tenders } from '../../../db/models';
+import { TenderResponses, TenderResponseLogs, Tenders, Companies } from '../../../db/models';
 import { moduleRequireSupplier } from '../../permissions';
 import { putCreateLog, putUpdateLog } from '../../utils';
 import { LOG_TYPES } from '../../constants';
@@ -17,7 +17,10 @@ const tenderResponseMutations = {
     })).toObject();
 
     if (response && tender) {
-      await putCreateLog(
+      const companyName = await Companies.getName(user.companyId);
+      const extraDesc = [{ supplierId: user.companyId, name: companyName }];
+
+      putCreateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: response,
@@ -25,6 +28,7 @@ const tenderResponseMutations = {
           description: `Response for tender "${
             tender.name
           }" of type "${tender.type.toUpperCase()}" has been created`,
+          extraDesc: JSON.stringify(extraDesc),
         },
         user,
       );
@@ -51,7 +55,10 @@ const tenderResponseMutations = {
     const tender = await Tenders.findOne({ _id: doc.tenderId });
 
     if (oldResponse && tender) {
-      await putUpdateLog(
+      const companyName = await Companies.getName(user.companyId);
+      const extraDesc = [{ supplierId: user.companyId, name: companyName }];
+
+      putUpdateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: oldResponse,
@@ -59,6 +66,7 @@ const tenderResponseMutations = {
           description: `Response has been edited for tender "${
             tender.name
           }" of type "${tender.type.toUpperCase()}"`,
+          extraDesc: JSON.stringify(extraDesc),
         },
         user,
       );
@@ -79,7 +87,7 @@ const tenderResponseMutations = {
     if (oldResponse && tender) {
       const updatedResponse = await oldResponse.send();
 
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.TENDER_RESPONSE,
           object: {

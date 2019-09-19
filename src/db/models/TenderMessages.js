@@ -1,20 +1,20 @@
 import mongoose, { Schema } from 'mongoose';
 import { field } from './utils';
 
-const attachmentSchema = new Schema(
+export const attachmentSchema = new Schema(
   {
-    name: field({ type: String, label: 'File name' }),
-    url: field({ type: String, label: 'File url' }),
+    name: field({ type: String, label: 'Name' }),
+    url: field({ type: String, label: 'Url' }),
   },
   { _id: false },
 );
 
 export const tenderMessageSchema = new Schema(
   {
-    tenderId: field({ type: String, label: 'Tender id' }),
-    senderBuyerId: field({ type: String, optional: true, label: 'Buyer id' }),
+    tenderId: field({ type: String, label: 'Tender' }),
+    senderBuyerId: field({ type: String, optional: true, label: 'Buyer' }),
     recipientSupplierIds: field({ type: [String], label: 'Recipient suppliers', optional: true }),
-    senderSupplierId: field({ type: String, optional: true, label: 'Sender' }),
+    senderSupplierId: field({ type: String, optional: true, label: 'Supplier' }),
     replyToId: field({ type: String, optional: true, label: 'Reply' }),
     subject: field({ type: String, label: 'Message subject' }),
     body: field({ type: String, label: 'Message body' }),

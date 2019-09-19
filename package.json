@@ -11,7 +11,9 @@
   "private": true,
   "scripts": {
     "start": "node dist",
-    "dev": "NODE_ENV=development ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' DEBUG=ot-api:* nodemon src --exec babel-node",
+    "start-crons": "node dist/cronJobs",
+    "dev": "NODE_ENV=development ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' DEBUG=ot-api:* nodemon src --exec babel-node",
+    "dev-crons": "NODE_ENV=development ENCRYPTION_SECRET='9vApxLk5G3PAsJrM9vApxLk5G3PAsJrM' DEBUG=ot-crons:* nodemon src/cronJobs --exec babel-node",
     "build": "babel src --out-dir dist --ignore __tests__,tests --copy-files",
     "lint": "eslint src",
     "format": "prettier --write --print-width 100 --single-quote --trailing-comma all 'src/**/*.js'",
@@ -21,7 +23,6 @@
     "generateSecret": "openssl rand -base64 32",
     "customCommand": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/customCommand.js",
     "s3UrlFixer": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/s3UrlFixer.js",
-    "ses-subscriptions": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' babel-node ./src/scripts/sesSubscriptions.js",
     "migrate": "ENCRYPTION_SECRET='8dwvmJCceqdMryyFPCpkclKGz9q7j7rj/sDDwNZaiMk=' migrate up --compiler='js:babel-register'"
   },
   "lint-staged": {
@@ -31,6 +32,7 @@
     ]
   },
   "dependencies": {
+    "amqplib": "^0.5.5",
     "aws-sdk": "^2.373.0",
     "bcrypt": "^3.0.2",
     "body-parser": "^1.17.1",
@@ -40,6 +42,7 @@
     "cors": "^2.8.1",
     "debug": "^4.1.1",
     "dotenv": "^4.0.0",
+    "elastic-apm-node": "^2.16.2",
     "express": "^4.15.2",
     "file-type": "^10.3.0",
     "formidable": "^1.1.1",
@@ -57,9 +60,11 @@
     "node-schedule": "^1.2.5",
     "nodemailer": "^4.4.1",
     "password-validator": "^4.1.1",
+    "request": "^2.88.0",
     "requestify": "^0.2.5",
     "sha256": "^0.2.0",
     "strip": "^3.0.0",
+    "underscore": "^1.9.1",
     "xlsx-populate": "^1.11.0"
   },
   "devDependencies": {

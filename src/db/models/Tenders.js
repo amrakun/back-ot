@@ -302,16 +302,29 @@ class Tender extends StatusPublishClose {
     return Tenders.calculateSupplierIds(this, { createdDate: { $lte: this.updatedDate } });
   }
 
-  static async calculateSupplierIds(tender, selector = {}) {
+  static async calculateSupplierIds(tender, selector = {}, count = false) {
     let suppliers = [];
 
     if (tender.isToAll) {
+      if (count) {
+        return await Companies.find(selector, { _id: 1 }).count();
+      }
+
       suppliers = await Companies.find(selector, { _id: 1 });
     }
 
     if (tender.tierTypes && tender.tierTypes.length > 0) {
       selector.tierType = { $in: tender.tierTypes };
+
+      if (count) {
+        return await Companies.find(selector, { _id: 1 }).count();
+      }
+
       suppliers = await Companies.find(selector, { _id: 1 });
+    }
+
+    if (count) {
+      return tender.supplierIds.length;
     }
 
     if (suppliers.length > 0) {
@@ -326,6 +339,10 @@ class Tender extends StatusPublishClose {
    */
   getAllPossibleSupplierIds() {
     return Tenders.calculateSupplierIds(this);
+  }
+
+  getSupplierIds() {
+    return decryptArray(this.supplierIds);
   }
 
   getWinnerIds() {
@@ -403,10 +420,8 @@ class Tender extends StatusPublishClose {
   /*
    * total suppliers count
    */
-  async requestedCount() {
-    const supplierIds = await Tenders.calculateSupplierIds(this);
-
-    return supplierIds.length;
+  requestedCount() {
+    return Tenders.calculateSupplierIds(this, {}, true);
   }
 
   /*

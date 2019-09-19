@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+import apm from 'elastic-apm-node/start';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -9,7 +10,7 @@ import { debugInit } from './debuggers';
 // load environment variables
 dotenv.config();
 
-const { MAIN_APP_DOMAIN } = process.env;
+const { MAIN_APP_DOMAIN, MAILER_API_DOMAIN } = process.env;
 
 import express from 'express';
 import { createServer } from 'http';
@@ -18,13 +19,14 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import formidable from 'formidable';
 import fileType from 'file-type';
+import request from 'request';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { connect } from './db/connection';
 import { userMiddleware } from './auth';
 import { uploadFile, readS3File, tokenize, virusDetector } from './data/utils';
 import { downloadFiles, downloadTenderMessageFiles } from './data/tenderUtils';
 import schema from './data';
-import { init } from './startup';
+import './messageBroker';
 
 // connect to mongo database
 connect();
@@ -34,6 +36,23 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.post(`/service/ses/tracker`, (req, res) => {
+  return req.pipe(
+    request
+      .post(`${MAILER_API_DOMAIN}/service/ses/tracker`)
+      .on('response', response => {
+        if (response.statusCode !== 200) {
+          return next(response.statusMessage);
+        }
+
+        return response.pipe(res);
+      })
+      .on('error', e => {
+        next(e);
+      }),
+  );
+});
 
 app.use(userMiddleware);
 
@@ -153,6 +172,7 @@ app.post('/upload-file', async (req, res) => {
         'image/gif',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/x-msi',
         'application/pdf',
         'application/zip',
         'application/x-rar-compressed',
@@ -185,9 +205,6 @@ const { PORT } = process.env;
 
 server.listen(PORT, () => {
   debugInit(`GraphQL Server is now running on ${PORT}`);
-
-  // execute startup actions
-  init(app);
 });
 
 if (process.env.NODE_ENV === 'development') {

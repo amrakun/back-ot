@@ -19,7 +19,7 @@ import { LOG_TYPES } from '../../constants';
 import { BlockedCompanySchema } from '../../../db/models/BlockedCompanies';
 import { CompanyRelatedSchemas } from '../../../db/models/Companies';
 import { QualificationSchema } from '../../../db/models/Qualifications';
-import { tenderMessageSchema } from '../../../db/models/TenderMessages';
+import { tenderMessageSchema, attachmentSchema } from '../../../db/models/TenderMessages';
 import { TenderRelatedSchemas } from '../../../db/models/Tenders';
 import { UserSchema } from '../../../db/models/Users';
 
@@ -47,7 +47,7 @@ const mappings = [
   },
   {
     name: LOG_TYPES.TENDER_MESSAGE,
-    schemas: [tenderMessageSchema],
+    schemas: [tenderMessageSchema, attachmentSchema],
   },
   {
     name: LOG_TYPES.USER,

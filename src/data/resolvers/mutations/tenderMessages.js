@@ -1,7 +1,7 @@
-import { TenderMessages, Tenders, Users } from '../../../db/models';
+import { TenderMessages, Tenders, Users, Companies } from '../../../db/models';
 import { putCreateLog } from '../../utils';
 import { requireSupplier, requireBuyer } from '../../permissions';
-import { sendEmailToSuppliers, sendEmailToBuyer } from '../../tenderUtils';
+import tenderUtils from '../../tenderUtils';
 import { LOG_TYPES } from '../../constants';
 
 const tenderMessageMutations = {
@@ -9,15 +9,19 @@ const tenderMessageMutations = {
     const tenderMessage = await TenderMessages.tenderMessageBuyerSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
     const supplierIds = args.recipientSupplierIds;
+    const supplierNames = await tenderUtils.gatherSupplierNames(
+      supplierIds,
+      'recipientSupplierIds',
+    );
 
-    await sendEmailToSuppliers({
+    await tenderUtils.sendEmailToSuppliers({
       kind: 'supplier__message_notification',
       tender,
       supplierIds,
     });
 
     if (tender) {
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.TENDER_MESSAGE,
           object: tenderMessage,
@@ -25,6 +29,11 @@ const tenderMessageMutations = {
           description: `Message has been created for tender "${
             tender.name
           }" of type "${tender.type.toUpperCase()}"`,
+          extraDesc: JSON.stringify([
+            ...supplierNames,
+            { senderBuyerId: user._id, name: `${user.firstName} ${user.lastName}` },
+            { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
+          ]),
         },
         user,
       );
@@ -37,14 +46,15 @@ const tenderMessageMutations = {
     const tenderMessage = await TenderMessages.tenderMessageSupplierSend(args, user);
     const tender = await Tenders.findOne({ _id: args.tenderId });
     const buyers = await Users.find({ _id: { $in: tender.responsibleBuyerIds || [] } });
+    const companyName = await Companies.getName(user.companyId);
 
-    await sendEmailToBuyer({
+    await tenderUtils.sendEmailToBuyer({
       kind: 'buyer__message_notification',
       tender,
       extraBuyerEmails: buyers.map(buyer => buyer.email),
     });
 
-    await putCreateLog(
+    putCreateLog(
       {
         type: LOG_TYPES.TENDER_MESSAGE,
         object: tenderMessage,
@@ -52,6 +62,10 @@ const tenderMessageMutations = {
         description: `Message has been created for tender ${
           tender.name
         } of type "${tender.type.toUpperCase()}"`,
+        extraDesc: JSON.stringify([
+          { senderSupplierId: user.companyId, name: companyName },
+          { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
+        ]),
       },
       user,
     );

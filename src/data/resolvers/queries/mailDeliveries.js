@@ -1,26 +1,17 @@
-import { MailDeliveries } from '../../../db/models';
 import { moduleRequireBuyer } from '../../permissions';
-import { paginate } from './utils';
+import { fetchMailer } from '../../../data/utils';
 
 const mailDeliveryQueries = {
   /**
    * MailDeliveries list
    */
   mailDeliveries(root, args) {
-    const { search = '' } = args;
-    const reg = new RegExp(`.*${search}.*`, 'i');
-
-    const selector = {
-      $or: [{ from: reg }, { to: reg }, { subject: reg }, { content: reg }, { status: reg }],
-    };
-
-    const deliveries = paginate(MailDeliveries.find(selector), args);
-
-    return deliveries.sort({ createdDate: -1 });
+    return fetchMailer('deliveries', { search: args.search });
   },
 
-  mailDeliveriesTotalCount() {
-    return MailDeliveries.find({}).count();
+  async mailDeliveriesTotalCount() {
+    const response = await fetchMailer('deliveriesTotalCount');
+    return response.count;
   },
 };
 

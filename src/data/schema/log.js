@@ -24,6 +24,7 @@ export const types = `
     unchangedData: String
     oldData: String
     newData: String
+    extraDesc: String
   }
 
   type LogList {
@@ -71,4 +72,9 @@ export const queries = `
 
 export const mutations = `
   logsWrite(apiCall: String!): Boolean
+  logsWriteTenderLog(
+    tenderId: String!
+    action: String!
+    description: String
+  ): TenderLog
 `;

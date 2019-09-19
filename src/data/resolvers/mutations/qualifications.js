@@ -75,7 +75,7 @@ const qualificationMutations = {
     if (qualification) {
       const companyName = await Companies.getName(supplierId);
 
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: { tierType: qualification.tierType },
@@ -123,7 +123,7 @@ const qualificationMutations = {
     };
     const companyName = await Companies.getName(supplierId);
 
-    await putUpdateLog(
+    putUpdateLog(
       {
         type: LOG_TYPES.QUALIFICATION,
         object: oldInfo,
@@ -150,13 +150,12 @@ sections.forEach(section => {
     const qualification = await Qualifications.findOne({ supplierId: args.supplierId });
     const updated = await Qualifications.updateSection(args.supplierId, sectionName, value);
     const companyName = await Companies.getName(args.supplierId);
-
     /**
      * If qualification exists, then updates it, else it creates a new one
      * in model helper method. Depending on that, we write create or update log here.
      */
     if (qualification) {
-      await putUpdateLog(
+      putUpdateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: qualification[sectionName] || {},
@@ -166,7 +165,7 @@ sections.forEach(section => {
         user,
       );
     } else {
-      await putCreateLog(
+      putCreateLog(
         {
           type: LOG_TYPES.QUALIFICATION,
           object: updated[sectionName] || {},
@@ -176,6 +175,7 @@ sections.forEach(section => {
             createdDate: new Date(),
           }),
           description: `"${companyName}" has been pre-qualified`,
+          extraDesc: JSON.stringify([{ supplierId: args.supplierId, name: companyName }]),
         },
         user,
       );

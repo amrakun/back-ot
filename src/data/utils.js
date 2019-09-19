@@ -1,9 +1,6 @@
 import xlsxPopulate from 'xlsx-populate';
-import strip from 'strip';
 import AWS from 'aws-sdk';
 import fs from 'fs';
-import nodemailer from 'nodemailer';
-import Handlebars from 'handlebars';
 import clamav from 'clamav.js';
 import requestify from 'requestify';
 import {
@@ -11,12 +8,12 @@ import {
   Tenders,
   TenderResponses,
   Configs,
-  MailDeliveries,
   AuditResponses,
   PhysicalAudits,
   TenderMessages,
 } from '../db/models';
 import { debugExternalApi, debugBase } from '../debuggers';
+import { sendMessage } from '../messageBroker';
 
 export const createAWS = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } = process.env;
@@ -133,49 +130,6 @@ export const uploadFile = async (file, fromEditor = false) => {
 };
 
 /**
- * Read contents of a file
- * @param {string} filename - relative file path
- * @return {Promise} returns promise resolving file contents
- */
-export const readFile = filename => {
-  const filePath = `${__dirname}/../private/emailTemplates/${filename}.html`;
-
-  return fs.readFileSync(filePath, 'utf8');
-};
-
-/**
- * SendEmail template helper
- * @param {Object} data data
- * @param {String} templateName
- * @return email with template as text
- */
-const applyTemplate = async (data, templateName) => {
-  let template = await readFile(templateName);
-
-  template = Handlebars.compile(template.toString());
-
-  return template(data);
-};
-
-/**
- * Create transporter
- * @return nodemailer transporter
- */
-export const createTransporter = async () => {
-  const { AWS_SES_ACCESS_KEY_ID, AWS_SES_SECRET_ACCESS_KEY, AWS_REGION } = process.env;
-
-  AWS.config.update({
-    region: AWS_REGION,
-    accessKeyId: AWS_SES_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SES_SECRET_ACCESS_KEY,
-  });
-
-  return nodemailer.createTransport({
-    SES: new AWS.SES({ apiVersion: '2010-12-01' }),
-  });
-};
-
-/**
  * Send email
  * @param {Array} args.toEmails
  * @param {String} args.fromEmail
@@ -187,63 +141,33 @@ export const createTransporter = async () => {
  */
 export const sendEmail = async args => {
   const { toEmails, fromEmail, title, content = '', template, attachments = [] } = args;
-  const { COMPANY_EMAIL_FROM, NODE_ENV, AWS_SES_CONFIG_SET } = process.env;
 
-  // do not send email it is running in test mode
-  if (NODE_ENV == 'test') {
-    return;
-  }
-
-  if (!strip(title) && !strip(content)) {
-    return console.log('Empty subject and content');
-  }
-
-  const transporter = await createTransporter();
-
-  let html = await applyTemplate({ content }, 'base');
-
-  if (template) {
-    const { isCustom, data, name } = template;
-
-    // generate email content by given template
-    html = await applyTemplate(data, name);
-
-    if (!isCustom) {
-      html = await applyTemplate({ content: html }, 'base');
-    }
-  }
-
-  const mailId = Math.random();
-
-  return toEmails.map(toEmail => {
-    const options = {
-      from: fromEmail || COMPANY_EMAIL_FROM,
-      to: toEmail,
-      subject: title,
-      html,
-    };
-
-    const mailOptions = {
-      ...options,
-      attachments,
-      headers: {
-        'X-SES-CONFIGURATION-SET': AWS_SES_CONFIG_SET,
-        Mailid: mailId,
-      },
-    };
-
-    // create mail delivery entry
-    MailDeliveries.createStatus({
-      ...options,
-      mailId,
-      status: 'pending',
-    });
-
-    return transporter.sendMail(mailOptions, (error, info) => {
-      console.log(error); // eslint-disable-line
-      console.log(info); // eslint-disable-line
-    });
+  sendMessage('sendEmail', {
+    template,
+    from: fromEmail,
+    toEmails,
+    subject: title,
+    content,
+    attachments,
   });
+};
+
+let configCache;
+
+export const getConfig = async () => {
+  if (configCache) {
+    return configCache;
+  }
+
+  const config = await Configs.getConfig();
+
+  configCache = config;
+
+  return config;
+};
+
+export const resetConfigCache = () => {
+  configCache = null;
 };
 
 /*
@@ -257,7 +181,7 @@ export const sendConfigEmail = async ({
   attachments,
   replacer,
 }) => {
-  const config = await Configs.getConfig();
+  const config = await getConfig();
   const templates = config[name] || {};
   const template = templateObject || templates[kind];
 
@@ -406,8 +330,8 @@ export const sendRequest = async (param1, errorMessage) => {
       debugExternalApi(errorMessage);
       throw new Error(errorMessage);
     } else {
-      debugExternalApi(`Error occurred : ${e.body}`);
-      throw new Error(e.body);
+      debugExternalApi(`Error occurred : ${e.body || e.message || e}`);
+      throw new Error(e.body || e.message || e);
     }
   }
 };
@@ -454,7 +378,7 @@ export const putDeleteLog = (params, user) => {
  * @param {Object} body Request
  * @param {Object} user User information from mutation context
  */
-const putLog = (body, user) => {
+const putLog = async (body, user) => {
   const LOGS_DOMAIN = getEnv({ name: 'LOGS_API_DOMAIN' });
 
   if (!LOGS_DOMAIN) {
@@ -471,8 +395,34 @@ const putLog = (body, user) => {
     Check whether LOGS_API_DOMAIN env is missing or logs api is not running
   `;
 
+  try {
+    await sendRequest(
+      { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
+      msg,
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+/**
+ * Sends a request to mailer api
+ * @param {Object} param0 Request
+ */
+export const fetchMailer = (path, params) => {
+  const MAILER_API_DOMAIN = getEnv({ name: 'MAILER_API_DOMAIN' });
+
+  const msg = `
+    Failed to connect to mailer api.
+    Check whether MAILER_API_DOMAIN env is missing or mailer api is not running
+  `;
+
   return sendRequest(
-    { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
+    {
+      url: `${MAILER_API_DOMAIN}/${path}`,
+      method: 'get',
+      body: { params: JSON.stringify(params) },
+    },
     msg,
   );
 };
@@ -610,7 +560,5 @@ export const quickSort = (array, checker, start, end) => {
 export default {
   sendEmail,
   sendConfigEmail,
-  readFile,
   readS3File,
-  createTransporter,
 };

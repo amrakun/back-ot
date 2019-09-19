@@ -24,44 +24,69 @@ export const replacer = ({ text, tender }) => {
   return result;
 };
 
+/*
+ * Send tender email to suppliers
+ */
 export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachments }) => {
   const filterIds = supplierIds || (await tender.getAllPossibleSupplierIds());
 
-  const suppliers = await Companies.find({ _id: { $in: filterIds } });
+  // preparing blocked suppliers cache =================
+  const suppliers = await Companies.find(
+    { _id: { $in: filterIds } },
+    { _id: 1, contactInfo: 1 },
+  ).lean();
+
+  const blockedSuppliers = await BlockedCompanies.find(
+    { supplierId: { $in: filterIds }, ...BlockedCompanies.blockedRangeQuery() },
+    { supplierId: 1 },
+  ).lean();
+
+  const blockedSupplierIds = blockedSuppliers.map(bl => bl.supplierId);
+
+  // preparing users cache =============================
+  const users = await Users.find({ companyId: { $in: filterIds } }, { companyId: 1, email: 1 });
+  const userEmailsByCompanyId = {};
+
+  for (const user of users) {
+    userEmailsByCompanyId[user.companyId] = user.email;
+  }
+
+  const receivers = [];
 
   for (const supplier of suppliers) {
-    const isBlocked = await BlockedCompanies.isBlocked(supplier._id);
-
-    if (isBlocked) {
+    if (blockedSupplierIds.includes(supplier._id.toString())) {
       continue;
     }
 
-    const user = await Users.findOne({ companyId: supplier._id });
-    const options = {
+    const userEmail = userEmailsByCompanyId[supplier._id];
+
+    receivers.push(userEmail);
+
+    const { contactInfo } = supplier;
+
+    if (contactInfo && contactInfo.email && contactInfo.email !== userEmail) {
+      receivers.push(contactInfo.email);
+    }
+  }
+
+  utils
+    .sendConfigEmail({
       name: `${tender.type}Templates`,
       kind,
       attachments,
       replacer: text => {
         return replacer({ text, tender });
       },
-    };
-
-    const userEmail = user && user.email ? user.email : '';
-
-    await utils.sendConfigEmail({
-      ...options,
-      toEmails: [userEmail],
+      toEmails: receivers,
+    })
+    .then(() => {
+      console.log('Success');
+    })
+    .catch(e => {
+      console.log(e);
     });
 
-    const { contactInfo } = supplier;
-
-    if (contactInfo && contactInfo.email && contactInfo.email !== userEmail) {
-      await utils.sendConfigEmail({
-        ...options,
-        toEmails: [contactInfo.email],
-      });
-    }
-  } // end supplier for loop
+  return receivers;
 };
 
 export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) => {
@@ -249,6 +274,50 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
   return zip.generateAsync({ type: 'nodebuffer' });
 };
 
+/**
+ * Collects list of supplier names
+ * @param {string[]} supplierIds Supplier ids
+ * @param {string} idFieldName Id field name defined differently in schemas
+ */
+const gatherSupplierNames = async (supplierIds = [], idFieldName) => {
+  const supplierNames = [];
+
+  for (const id of supplierIds) {
+    const name = await Companies.getName(id);
+
+    if (name) {
+      // item must have field name declared in schemas
+      supplierNames.push({
+        [idFieldName]: id,
+        name,
+      });
+    }
+  }
+
+  return supplierNames;
+};
+
+/**
+ * Collects list of user names (responsibleBuyerIds)
+ * @param {string[]} userIds
+ */
+const gatherUserNames = async (userIds = []) => {
+  const names = [];
+
+  for (const id of userIds) {
+    const user = await Users.findOne({ _id: id });
+
+    if (user) {
+      names.push({
+        responsibleBuyerIds: id,
+        name: `${user.firstName} ${user.lastName}`,
+      });
+    }
+  }
+
+  return names;
+};
+
 export default {
   sendConfigEmail,
   sendEmailToSuppliers,
@@ -257,4 +326,6 @@ export default {
   getAttachments,
   downloadFiles,
   downloadTenderMessageFiles,
+  gatherSupplierNames,
+  gatherUserNames,
 };
