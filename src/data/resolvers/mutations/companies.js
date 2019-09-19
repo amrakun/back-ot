@@ -53,7 +53,7 @@ const companyMutations = {
     return updatedCompany;
   },
 
-  async companiesAddDifotScores(root, { difotScores }) {
+  async companiesAddDifotScores(root, { difotScores }, { user }) {
     for (let difotScore of difotScores) {
       let company = await Companies.findOne({
         'basicInfo.enName': difotScore.supplierName,
@@ -66,8 +66,27 @@ const companyMutations = {
       }
 
       if (company) {
+        const oldScoreDoc = {
+          _id: company._id,
+          difotScores: [...company.difotScores],
+          averageDifotScore: company.averageDifotScore,
+        };
+
         // add new score to every supplier
-        await company.addDifotScore(difotScore.date, difotScore.amount);
+        const updated = await company.addDifotScore(difotScore.date, difotScore.amount);
+
+        await putUpdateLog(
+          {
+            type: LOG_TYPES.COMPANY,
+            object: oldScoreDoc,
+            newData: JSON.stringify({
+              difotScores: updated.difotScores,
+              averageDifotScore: updated.averageDifotScore,
+            }),
+            description: `DIFOT score of company "${company.basicInfo.enName}" has been added`,
+          },
+          user,
+        );
       }
     }
   },
@@ -233,7 +252,6 @@ const companyMutations = {
   async companiesTogglePrequalificationState(root, { supplierId }, { user }) {
     const oldCompany = await Companies.findOne({ _id: supplierId });
     const updatedCompany = await Companies.togglePrequalificationState(supplierId);
-
     const basicInfo = updatedCompany.basicInfo || {};
 
     if (updatedCompany.isPrequalificationInfoEditable) {

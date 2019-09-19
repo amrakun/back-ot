@@ -274,6 +274,50 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
   return zip.generateAsync({ type: 'nodebuffer' });
 };
 
+/**
+ * Collects list of supplier names
+ * @param {string[]} supplierIds Supplier ids
+ * @param {string} idFieldName Id field name defined differently in schemas
+ */
+const gatherSupplierNames = async (supplierIds = [], idFieldName) => {
+  const supplierNames = [];
+
+  for (const id of supplierIds) {
+    const name = await Companies.getName(id);
+
+    if (name) {
+      // item must have field name declared in schemas
+      supplierNames.push({
+        [idFieldName]: id,
+        name,
+      });
+    }
+  }
+
+  return supplierNames;
+};
+
+/**
+ * Collects list of user names (responsibleBuyerIds)
+ * @param {string[]} userIds
+ */
+const gatherUserNames = async (userIds = []) => {
+  const names = [];
+
+  for (const id of userIds) {
+    const user = await Users.findOne({ _id: id });
+
+    if (user) {
+      names.push({
+        responsibleBuyerIds: id,
+        name: `${user.firstName} ${user.lastName}`,
+      });
+    }
+  }
+
+  return names;
+};
+
 export default {
   sendConfigEmail,
   sendEmailToSuppliers,
@@ -282,4 +326,6 @@ export default {
   getAttachments,
   downloadFiles,
   downloadTenderMessageFiles,
+  gatherSupplierNames,
+  gatherUserNames,
 };

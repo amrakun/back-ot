@@ -150,7 +150,6 @@ sections.forEach(section => {
     const qualification = await Qualifications.findOne({ supplierId: args.supplierId });
     const updated = await Qualifications.updateSection(args.supplierId, sectionName, value);
     const companyName = await Companies.getName(args.supplierId);
-
     /**
      * If qualification exists, then updates it, else it creates a new one
      * in model helper method. Depending on that, we write create or update log here.
@@ -176,6 +175,7 @@ sections.forEach(section => {
             createdDate: new Date(),
           }),
           description: `"${companyName}" has been pre-qualified`,
+          extraDesc: JSON.stringify([{ supplierId: args.supplierId, name: companyName }]),
         },
         user,
       );

@@ -361,9 +361,9 @@ export const FinancialInfoSchema = mongoose.Schema(
 // Business integrity & human resource =========
 const InvestigationSchema = mongoose.Schema(
   {
-    name: field({ type: String, label: 'Investigation name' }),
-    date: field({ type: String, label: 'Investigated date' }),
-    status: field({ type: String, label: 'Investigation status' }),
+    name: field({ type: String, label: 'Name' }),
+    date: field({ type: String, label: 'Date' }),
+    status: field({ type: String, label: 'Status' }),
     statusDate: field({ type: String, label: 'Status date' }),
   },
   { _id: false },
@@ -1161,11 +1161,11 @@ class Company {
     }
   }
 
-  /*
-   * Add new difot score
+  /**
+   * Adds new difot score
    * @param {Date} date
-   * @param {Number} amount
-   * @return updated company
+   * @param {number} amount
+   * @returns updated company
    */
   async addDifotScore(date, amount) {
     const difotScores = this.difotScores || [];
@@ -1460,6 +1460,10 @@ export const CompanyRelatedSchemas = [
   DueDiligenceSchema,
   ProductsInfoValidation,
   CompanySchema,
+  DateAmountSchema,
+  FileSchema,
+  YearAmountSchema,
+  DateFileSchema,
 ];
 
 export default Companies;

@@ -98,15 +98,13 @@ SuppliersByProductCodeLogSchema.loadClass(
         productCodes = productCodes.concat(factory.productCodes);
       }
 
-      let log = await this.create({
+      return await this.create({
         supplierId: supplier._id,
         registeredDate: supplier.createdDate,
         startDate: new Date(),
         createdDate: new Date(),
         productCodes,
       });
-
-      return log;
     }
   },
 );
@@ -136,10 +134,8 @@ ActivityLogSchema.loadClass(
   },
 );
 
-// Action	Date Created	User	Details
-
+// Action	Date Created User Details
 export const ActivityLogs = mongoose.model('activity_logs', ActivityLogSchema);
-
 
 // Tender logs
 const tenderLogSchema = new mongoose.Schema(
@@ -160,6 +156,8 @@ const tenderLogSchema = new mongoose.Schema(
         'remind',
         'remove',
         'reopen',
+        'view',
+        'download',
       ],
       required: true,
     },

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { _ } from 'underscore';
 
 import { Tenders, Companies, TenderLogs } from '../../../db/models';
 import { decryptArray } from '../../../db/models/utils';
@@ -15,6 +16,9 @@ const tenderMutations = {
    */
   async tendersAdd(root, doc, { user }) {
     const tender = await Tenders.createTender(doc, user._id);
+    // for showing company name in log list
+    const supplierNames = await tenderUtils.gatherSupplierNames(doc.supplierIds, 'supplierIds');
+    const userNames = await tenderUtils.gatherUserNames(doc.responsibleBuyerIds);
 
     // create log
     await TenderLogs.write({
@@ -28,10 +32,21 @@ const tenderMutations = {
       {
         type: LOG_TYPES.TENDER,
         object: tender.toObject(),
-        newData: JSON.stringify(doc),
+        newData: JSON.stringify({
+          ...doc,
+          createdUserId: user._id,
+          status: 'draft',
+          createdDate: new Date(),
+          updatedDate: new Date(),
+        }),
         description: `Tender "${
           tender.name
         }" of type "${tender.type.toUpperCase()}" has been created`,
+        extraDesc: JSON.stringify([
+          ...supplierNames,
+          ...userNames,
+          { createdUserId: user._id, name: `${user.firstName} ${user.lastName}` },
+        ]),
       },
       user,
     );
@@ -48,7 +63,26 @@ const tenderMutations = {
   async tendersEdit(root, { _id, ...fields }, { user }) {
     const oldTender = await Tenders.findOne({ _id });
     const oldSupplierIds = await oldTender.getExactSupplierIds();
+    const oldSupplierNames = await tenderUtils.gatherSupplierNames(oldSupplierIds, 'supplierIds');
+
+    // mongoose validator skips checking when undefined value comes
+    if (!fields.file) {
+      fields.file = null;
+    }
+
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
+    const updatedSupplierIds = await updatedTender.getExactSupplierIds();
+    const updatedSupplierNames = await tenderUtils.gatherSupplierNames(
+      updatedSupplierIds,
+      'supplierIds',
+    );
+    const userNames = await tenderUtils.gatherUserNames(fields.responsibleBuyerIds);
+
+    // prevent from saving duplicate names
+    let supplierNames = [];
+
+    supplierNames = oldSupplierNames.concat(updatedSupplierNames);
+    supplierNames = _.uniq(supplierNames, false, item => item.supplierIds);
 
     // write edit log
     await TenderLogs.write({
@@ -80,9 +114,10 @@ const tenderMutations = {
           ...fields,
           updatedDate: updatedTender.updatedDate,
           status: updatedTender.status,
-          supplierIds: await updatedTender.getExactSupplierIds(),
+          supplierIds: updatedSupplierIds,
         }),
         description,
+        extraDesc: JSON.stringify([...supplierNames, ...userNames]),
       },
       user,
     );
@@ -152,6 +187,7 @@ const tenderMutations = {
   async tendersAward(root, { _id, supplierIds, note, attachments }, { user }) {
     const oldTender = await Tenders.findOne({ _id });
     const tender = await Tenders.award({ _id, supplierIds, note, attachments }, user._id);
+    const supplierNames = await tenderUtils.gatherSupplierNames(supplierIds, 'winnerIds');
 
     // write awarded log
     await TenderLogs.write({
@@ -215,6 +251,7 @@ const tenderMutations = {
         description: `Tender "${
           oldTender.name
         }" of type "${oldTender.type.toUpperCase()}" has been awarded to suppliers`,
+        extraDesc: JSON.stringify(supplierNames),
       },
       user,
     );

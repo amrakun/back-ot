@@ -22,6 +22,7 @@ const blockedCompanyMutations = {
           object: blockedCompany,
           newData: JSON.stringify({ supplierId, ...doc }),
           description: `Company "${sup.basicInfo.enName}" has been blocked`,
+          extraDesc: JSON.stringify([{ supplierId, name: sup.basicInfo.enName }]),
         },
         user,
       );
@@ -59,6 +60,7 @@ const blockedCompanyMutations = {
             type: LOG_TYPES.BLOCKED_COMPANY,
             object: blocked,
             description: `Company "${supplier.basicInfo.enName}" has been unblocked`,
+            extraDesc: JSON.stringify([{ supplierId, name: supplier.basicInfo.enName }]),
           },
           user,
         );
