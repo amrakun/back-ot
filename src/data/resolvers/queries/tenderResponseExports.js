@@ -94,8 +94,8 @@ const tenderResponseQueries = {
         // fill suppliers section
         let total = 0;
 
-        if (respondedProduct.quantity && rp.unitPrice) {
-          total = respondedProduct.quantity * rp.unitPrice;
+        if (rp.quantity && rp.unitPrice) {
+          total = rp.quantity * rp.unitPrice;
         }
 
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
