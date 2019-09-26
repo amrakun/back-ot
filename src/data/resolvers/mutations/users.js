@@ -11,7 +11,7 @@ const registrationEmail = async user => {
 
   utils.sendEmail({
     toEmails: [user.email],
-    title: 'Registration',
+    subject: 'Registration',
     template: {
       name: 'registration',
       data: {
@@ -176,7 +176,7 @@ const userMutations = {
 
     utils.sendEmail({
       toEmails: [email],
-      title: 'Reset password',
+      subject: 'Reset password',
       template: {
         name: 'resetPassword',
         data: {
@@ -303,7 +303,7 @@ const userMutations = {
 
       utils.sendEmail({
         toEmails: [userOnDb.email],
-        title: 'Confirm profile edition',
+        subject: 'Confirm profile edition',
         template: {
           name: 'profileEditConfirmation',
           data: {
@@ -335,7 +335,7 @@ const userMutations = {
 
     utils.sendEmail({
       toEmails: [receivedUser.email],
-      title: 'Delegation',
+      subject: 'Delegation',
       template: {
         name: 'delegation',
         data: {

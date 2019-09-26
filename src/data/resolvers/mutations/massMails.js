@@ -25,7 +25,7 @@ const mutations = {
       sendEmail({
         fromEmail: FROM_EMAIL_MASS,
         toEmails: [email],
-        title: subject,
+        subject,
         content,
       });
     }
