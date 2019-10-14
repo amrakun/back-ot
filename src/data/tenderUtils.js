@@ -159,7 +159,7 @@ const generateFileName = name => {
 /*
  * Download tender supplier responded files
  */
-export const downloadFiles = async (tenderId, user) => {
+export const downloadFiles = async (tenderId, selectedCompanies, user) => {
   const tender = await Tenders.findOne({ _id: tenderId });
 
   if (!tender || tender.status === 'open') {
@@ -181,6 +181,10 @@ export const downloadFiles = async (tenderId, user) => {
   const attachments = zip.folder(tender.number);
 
   for (const response of responses) {
+    if (!selectedCompanies.includes(response.supplierId)) {
+      continue;
+    }
+
     const supplier = await Companies.findOne({ _id: response.supplierId });
 
     let filesDoc = [];

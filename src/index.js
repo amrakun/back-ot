@@ -113,10 +113,10 @@ app.get('/read-file', async (req, res) => {
 
 // download tender files
 app.get('/download-tender-files', async (req, res) => {
-  const tenderId = req.query.tenderId;
+  const { tenderId, selectedCompanies } = req.query;
 
   try {
-    const response = await downloadFiles(tenderId, req.user);
+    const response = await downloadFiles(tenderId, selectedCompanies, req.user);
 
     res.attachment('files.zip');
 
