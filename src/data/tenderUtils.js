@@ -210,7 +210,10 @@ export const downloadFiles = async (tenderId, user) => {
       continue;
     }
 
-    const subFolder = attachments.folder(supplier.basicInfo.sapNumber);
+    const subFolderName = supplier.basicInfo.enName;
+    const subFolder = attachments.folder(subFolderName);
+
+    let fileCount = 0;
 
     for (const { file } of filesDoc) {
       if (!file) {
@@ -220,6 +223,12 @@ export const downloadFiles = async (tenderId, user) => {
       const response = await utils.readS3File(file.url, user);
 
       subFolder.file(generateFileName(file.name), response.Body);
+
+      fileCount += 1;
+    }
+
+    if (fileCount === 0) {
+      attachments.remove(subFolderName);
     }
   }
 
@@ -250,7 +259,7 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
       continue;
     }
 
-    const subFolder = supplier.basicInfo.sapNumber;
+    const subFolder = supplier.basicInfo.enName;
 
     if (!folders[subFolder]) {
       folders[subFolder] = attachments.folder(subFolder);
