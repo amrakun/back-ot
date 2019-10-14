@@ -39,7 +39,7 @@ describe('User mutations', async () => {
 
     expect.assertions(4);
 
-    const mutations = ['registerViaBuyer', 'usersAdd', 'usersEdit', 'usersRemove'];
+    const mutations = ['registerViaBuyer', 'usersAdd', 'usersEdit', 'usersToggleState'];
 
     const user = await userFactory({ isSupplier: true });
 
@@ -264,10 +264,13 @@ describe('User mutations', async () => {
 
     await Companies.remove({});
 
-    await Users.update({ _id: user._id }, {
-      resetPasswordToken: token,
-      resetPasswordExpires: Date.now() + 86400000,
-    });
+    await Users.update(
+      { _id: user._id },
+      {
+        resetPasswordToken: token,
+        resetPasswordExpires: Date.now() + 86400000,
+      },
+    );
 
     const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
@@ -282,11 +285,14 @@ describe('User mutations', async () => {
 
     await Companies.remove({});
 
-    await Users.update({ _id: user._id }, {
-      companyId: null,
-      resetPasswordToken: token,
-      resetPasswordExpires: Date.now() + 86400000,
-    });
+    await Users.update(
+      { _id: user._id },
+      {
+        companyId: null,
+        resetPasswordToken: token,
+        resetPasswordExpires: Date.now() + 86400000,
+      },
+    );
 
     const doc = { token: '2424920429402', newPassword: 'Password$123' };
 
@@ -334,7 +340,7 @@ describe('User mutations', async () => {
     checkLogin(userMutations.usersEditProfile, {});
 
     // users remove
-    checkLogin(userMutations.usersRemove, {});
+    checkLogin(userMutations.usersToggleState, {});
   });
 
   test(`test if Error('Current action is forbidden') error is working as intended`, async () => {
@@ -349,7 +355,7 @@ describe('User mutations', async () => {
     expect.assertions(3);
 
     // admin required actions
-    checkLogin(userMutations.usersRemove);
+    checkLogin(userMutations.usersToggleState);
     checkLogin(userMutations.usersAdd);
     checkLogin(userMutations.usersEdit);
   });
@@ -562,7 +568,7 @@ describe('User mutations', async () => {
     const removeUser = await userFactory({});
     const removeUserId = removeUser._id;
 
-    await userMutations.usersRemove({}, { _id: removeUserId }, { user: _adminUser });
+    await userMutations.usersToggleState({}, { _id: removeUserId }, { user: _adminUser });
 
     // ensure removed
     const deactivatedUser = await Users.findOne({ _id: removeUserId });

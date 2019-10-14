@@ -126,7 +126,7 @@ describe('User db utils', () => {
     expect(bcrypt.compare(testPassword, userObj.password)).toBeTruthy();
   });
 
-  test('Remove user', async () => {
+  test('Toggle user state', async () => {
     expect.assertions(3);
 
     // audit usage ===================
@@ -140,7 +140,7 @@ describe('User db utils', () => {
     await Users.update({ _id: _user._id }, { $set: { isSupplier: true } });
 
     try {
-      await Users.removeUser(_user._id);
+      await Users.toggleState(_user._id);
     } catch (e) {
       expect(e.message).toBe('Can not remove supplier');
     }
@@ -152,7 +152,7 @@ describe('User db utils', () => {
     const aboutToDeactivateUser = await Users.findOne({ _id: _user._id });
     expect(aboutToDeactivateUser.isActive).toBe(true);
 
-    const deactivedUser = await Users.removeUser(_user._id);
+    const deactivedUser = await Users.toggleState(_user._id);
 
     // deactived user
     expect(deactivedUser.isActive).toBe(false);

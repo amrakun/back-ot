@@ -351,33 +351,34 @@ const userMutations = {
   },
 
   /**
-   * Removes a user
+   * Active or deactive a user
    * @param {string} _id - User _id
    * @returns {Promise} - Remove user response
    */
-  async usersRemove(root, { _id }, { user }) {
+  async usersToggleState(root, { _id }, { user }) {
     const found = await Users.findOne({ _id });
-    const removed = await Users.removeUser(_id);
 
-    if (found && removed) {
+    const updatedUser = await Users.toggleState(_id);
+
+    if (found) {
       await putDeleteLog(
         {
           type: LOG_TYPES.USER,
           object: found,
-          description: `"${found.username}" has been removed`,
+          description: `"${found.username}" has been ${found.isActive ? 'deactived' : 'activated'}`,
         },
         user,
       );
     }
 
-    return removed;
+    return updatedUser;
   },
 };
 
 requireBuyer(userMutations, 'registerViaBuyer');
 requireBuyer(userMutations, 'usersAdd');
 requireBuyer(userMutations, 'usersEdit');
-requireBuyer(userMutations, 'usersRemove');
+requireBuyer(userMutations, 'usersToggleState');
 requireBuyer(userMutations, 'usersDelegate');
 
 requireLogin(userMutations, 'logout');

@@ -2,9 +2,13 @@ import { Users } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
 import { paginate } from './utils';
 
-const listFilterSelector = (args) => {
-  const { search } = args;
-  const selector = { isSupplier: false, isActive: true };
+const listFilterSelector = args => {
+  const { search, isActive } = args;
+  const selector = { isSupplier: false, isActive };
+
+  if (isActive === undefined || isActive === null) {
+    selector.isActive = true;
+  }
 
   if (search) {
     selector.$or = [
@@ -16,7 +20,7 @@ const listFilterSelector = (args) => {
   }
 
   return selector;
-}
+};
 
 const userQueries = {
   /**
