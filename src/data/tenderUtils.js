@@ -181,7 +181,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
   const attachments = zip.folder(tender.number);
 
   for (const response of responses) {
-    if (!selectedCompanies.includes(response.supplierId)) {
+    if (!(selectedCompanies || []).includes(response.supplierId)) {
       continue;
     }
 
