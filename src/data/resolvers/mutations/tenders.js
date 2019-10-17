@@ -45,7 +45,7 @@ const tenderMutations = {
         extraDesc: JSON.stringify([
           ...supplierNames,
           ...userNames,
-          { createdUserId: user._id, name: `${user.firstName} ${user.lastName}` },
+          { createdUserId: user._id, name: user.username },
         ]),
       },
       user,
@@ -117,7 +117,11 @@ const tenderMutations = {
           supplierIds: updatedSupplierIds,
         }),
         description,
-        extraDesc: JSON.stringify([...supplierNames, ...userNames]),
+        extraDesc: JSON.stringify([
+          ...supplierNames,
+          ...userNames,
+          { createdUserId: user._id, name: user.username },
+        ]),
       },
       user,
     );
