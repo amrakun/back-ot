@@ -159,7 +159,7 @@ const generateFileName = name => {
 /*
  * Download tender supplier responded files
  */
-export const downloadFiles = async (tenderId, user) => {
+export const downloadFiles = async (tenderId, selectedCompanies, user) => {
   const tender = await Tenders.findOne({ _id: tenderId });
 
   if (!tender || tender.status === 'open') {
@@ -178,9 +178,13 @@ export const downloadFiles = async (tenderId, user) => {
 
   const type = tender.type;
   const zip = new JSZip();
-  const attachments = zip.folder(tender.name);
+  const attachments = zip.folder(tender.number);
 
   for (const response of responses) {
+    if (!(selectedCompanies || []).includes(response.supplierId)) {
+      continue;
+    }
+
     const supplier = await Companies.findOne({ _id: response.supplierId });
 
     let filesDoc = [];
@@ -206,28 +210,28 @@ export const downloadFiles = async (tenderId, user) => {
       }));
     }
 
-    if (filesDoc.length === 0) {
+    if (filesDoc.length === 0 || !supplier.basicInfo) {
       continue;
     }
 
     const subFolderName = supplier.basicInfo.enName;
     const subFolder = attachments.folder(subFolderName);
-    let filesCount = 0;
 
-    for (const { file, name } of filesDoc) {
+    let fileCount = 0;
+
+    for (const { file } of filesDoc) {
       if (!file) {
         continue;
       }
 
       const response = await utils.readS3File(file.url, user);
-      const filesFolder = subFolder.folder((name || '').replace(/\//g, ' '));
 
-      filesFolder.file(generateFileName(file.name), response.Body);
+      subFolder.file(generateFileName(file.name), response.Body);
 
-      filesCount++;
+      fileCount += 1;
     }
 
-    if (filesCount === 0) {
+    if (fileCount === 0) {
       attachments.remove(subFolderName);
     }
   }
@@ -248,27 +252,27 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
   });
 
   const zip = new JSZip();
-  const attachments = zip.folder(tender.name);
+  const attachments = zip.folder(tender.number);
   const folders = {};
 
   for (const message of messages) {
     const { attachment, senderSupplierId } = message;
     const supplier = await Companies.findOne({ _id: senderSupplierId });
 
-    if (!supplier || !attachment || !supplier.basicInfo || !supplier.basicInfo.enName) {
+    if (!supplier || !attachment || !supplier.basicInfo) {
       continue;
     }
 
-    const supplierName = supplier.basicInfo.enName;
+    const subFolder = supplier.basicInfo.enName;
 
-    if (!folders[supplierName]) {
-      folders[supplierName] = attachments.folder(supplierName);
+    if (!folders[subFolder]) {
+      folders[subFolder] = attachments.folder(subFolder);
     }
 
     // download file from s3
     const response = await utils.readS3File(attachment.url, user);
 
-    folders[supplierName].file(generateFileName(attachment.name), response.Body);
+    folders[subFolder].file(generateFileName(attachment.name), response.Body);
   }
 
   return zip.generateAsync({ type: 'nodebuffer' });

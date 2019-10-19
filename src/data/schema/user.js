@@ -34,9 +34,9 @@ export const types = `
 `;
 
 export const queries = `
-  users(page: Int, perPage: Int, search: String): [User]
+  users(page: Int, perPage: Int, search: String, isActive: String): [User]
   userDetail(_id: String): User
-  usersTotalCount(search: String): Int
+  usersTotalCount(search: String, isActive: String): Int
   currentUser: User
 `;
 
@@ -100,7 +100,7 @@ export const mutations = `
   ): User
 
   usersChangePassword(currentPassword: String!, newPassword: String!): User
-  usersRemove(_id: String!): String
+  usersToggleState(_id: String!): String
 
   usersDelegate(
     userId: String!,

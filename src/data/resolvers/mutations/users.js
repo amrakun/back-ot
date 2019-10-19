@@ -11,7 +11,7 @@ const registrationEmail = async user => {
 
   utils.sendEmail({
     toEmails: [user.email],
-    title: 'Registration',
+    subject: 'Registration',
     template: {
       name: 'registration',
       data: {
@@ -176,7 +176,7 @@ const userMutations = {
 
     utils.sendEmail({
       toEmails: [email],
-      title: 'Reset password',
+      subject: 'Reset password',
       template: {
         name: 'resetPassword',
         data: {
@@ -303,7 +303,7 @@ const userMutations = {
 
       utils.sendEmail({
         toEmails: [userOnDb.email],
-        title: 'Confirm profile edition',
+        subject: 'Confirm profile edition',
         template: {
           name: 'profileEditConfirmation',
           data: {
@@ -335,7 +335,7 @@ const userMutations = {
 
     utils.sendEmail({
       toEmails: [receivedUser.email],
-      title: 'Delegation',
+      subject: 'Delegation',
       template: {
         name: 'delegation',
         data: {
@@ -351,33 +351,34 @@ const userMutations = {
   },
 
   /**
-   * Removes a user
+   * Active or deactive a user
    * @param {string} _id - User _id
    * @returns {Promise} - Remove user response
    */
-  async usersRemove(root, { _id }, { user }) {
+  async usersToggleState(root, { _id }, { user }) {
     const found = await Users.findOne({ _id });
-    const removed = await Users.removeUser(_id);
 
-    if (found && removed) {
+    const updatedUser = await Users.toggleState(_id);
+
+    if (found) {
       await putDeleteLog(
         {
           type: LOG_TYPES.USER,
           object: found,
-          description: `"${found.username}" has been removed`,
+          description: `"${found.username}" has been ${found.isActive ? 'deactived' : 'activated'}`,
         },
         user,
       );
     }
 
-    return removed;
+    return updatedUser;
   },
 };
 
 requireBuyer(userMutations, 'registerViaBuyer');
 requireBuyer(userMutations, 'usersAdd');
 requireBuyer(userMutations, 'usersEdit');
-requireBuyer(userMutations, 'usersRemove');
+requireBuyer(userMutations, 'usersToggleState');
 requireBuyer(userMutations, 'usersDelegate');
 
 requireLogin(userMutations, 'logout');

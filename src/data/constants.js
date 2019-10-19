@@ -22,7 +22,7 @@ export const PERMISSION_LIST = [
   'companyRegistrationExport',
   'usersAdd',
   'usersEdit',
-  'usersRemove',
+  'usersToggleState',
   'tenderResponsesEoiShortList',
   'tenderResponsesEoiBidderList',
   'feedbacksAdd',
@@ -89,7 +89,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Settings',
-    permissions: ['usersAdd', 'usersEdit', 'usersRemove'],
+    permissions: ['usersAdd', 'usersEdit', 'usersToggleState'],
   },
 ];
 

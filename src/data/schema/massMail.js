@@ -18,5 +18,5 @@ export const mutations = `
 
 export const queries = `
   mailDeliveries(page: Int, perPage: Int, search: String): [MailDelivery]
-  mailDeliveriesTotalCount: Int
+  mailDeliveriesTotalCount(search: String): Int
 `;

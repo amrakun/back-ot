@@ -228,18 +228,18 @@ class User {
   }
 
   /*
-   * Remove user
+   * Toggle user state
    * @param {String} _id - User id
-   * @return {Promise} - remove method response
+   * @return {Promise} - updated user
    */
-  static async removeUser(_id) {
+  static async toggleState(_id) {
     const user = await this.findOne({ _id });
 
     if (user.isSupplier) {
       throw new Error('Can not remove supplier');
     }
 
-    await Users.update({ _id }, { $set: { isActive: false } });
+    await Users.update({ _id }, { $set: { isActive: !user.isActive } });
 
     return this.findOne({ _id });
   }

@@ -6,11 +6,11 @@ const mailDeliveryQueries = {
    * MailDeliveries list
    */
   mailDeliveries(root, args) {
-    return fetchMailer('deliveries', { search: args.search });
+    return fetchMailer('deliveries', args);
   },
 
-  async mailDeliveriesTotalCount() {
-    const response = await fetchMailer('deliveriesTotalCount');
+  async mailDeliveriesTotalCount(root, args) {
+    const response = await fetchMailer('deliveriesTotalCount', { search: args.search });
     return response.count;
   },
 };
