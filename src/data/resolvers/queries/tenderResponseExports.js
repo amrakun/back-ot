@@ -62,23 +62,24 @@ const tenderResponseQueries = {
     );
 
     // date
-    sheet.cell(1, 6).value(new Date().toLocaleDateString());
+    sheet.cell(1, 7).value(new Date().toLocaleDateString());
 
     // rfq number
     sheet.cell(2, 7).value(`RFQ ${tender.number}`);
 
     for (const [index, product] of requestedProducts.entries()) {
-      const rowIndex = 13 + index;
+      const rowIndex = 8 + index;
 
       // fill requested products section
       sheet.cell(rowIndex, 2).value(product.code);
-      sheet.cell(rowIndex, 3).value(product.shortText);
-      sheet.cell(rowIndex, 4).value(product.quantity);
-      sheet.cell(rowIndex, 5).value(product.uom);
-      sheet.cell(rowIndex, 6).value(product.manufacturer);
-      sheet.cell(rowIndex, 7).value(product.manufacturerPartNumber);
+      sheet.cell(rowIndex, 3).value(product.purchaseRequestNumber);
+      sheet.cell(rowIndex, 4).value(product.shortText);
+      sheet.cell(rowIndex, 5).value(product.quantity);
+      sheet.cell(rowIndex, 6).value(product.uom);
+      sheet.cell(rowIndex, 7).value(product.manufacturer);
+      sheet.cell(rowIndex, 8).value(product.manufacturerPartNumber);
 
-      let columnIndex = 3;
+      let columnIndex = 2;
 
       for (const response of responses) {
         const supplier = companiesMap[response.supplierId];
@@ -86,23 +87,25 @@ const tenderResponseQueries = {
         // find response by product code
         const rp = response.respondedProducts[index] || {};
 
-        columnIndex += 5;
+        columnIndex += 7;
 
         // title
-        sheet.cell(10, columnIndex).value(supplier.basicInfo.enName);
+        sheet.cell(5, columnIndex).value(supplier.basicInfo.enName);
 
         // fill suppliers section
         let total = 0;
 
-        if (rp.quantity && rp.unitPrice) {
-          total = rp.quantity * rp.unitPrice;
+        if (product.quantity && rp.unitPrice) {
+          total = product.quantity * rp.unitPrice;
         }
 
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
         sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
         sheet.cell(rowIndex, columnIndex + 2).value(total);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
-        sheet.cell(rowIndex, columnIndex + 4).value(rp.shippingTerms);
+        sheet.cell(rowIndex, columnIndex + 4).value(rp.suggestedManufacturer);
+        sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
+        sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
       }
     }
 
