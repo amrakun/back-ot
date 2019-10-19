@@ -42,15 +42,18 @@ const tenderResponseQueries = {
       });
 
       let totalUnitPrice = 0;
+      let completeNessScore = 0;
 
       for (const [index] of requestedProducts.entries()) {
         const rp = response.respondedProducts[index];
 
         if (rp && rp.unitPrice) {
+          completeNessScore++;
           totalUnitPrice += rp.unitPrice;
         }
       }
 
+      response.completeNessScore = completeNessScore;
       response.totalUnitPrice = totalUnitPrice;
     }
 
