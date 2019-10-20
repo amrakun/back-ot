@@ -76,6 +76,8 @@ const TenderSchema = mongoose.Schema({
   tierTypes: field({ type: [String], optional: true, label: 'Tier types' }),
   isToAll: field({ type: Boolean, default: false, label: 'Invite all suppliers' }),
 
+  productCodes: field({ type: String, optional: true, label: 'Product codes' }),
+
   requestedProducts: field({ type: [ProductSchema], optional: true, label: 'Requested products' }),
 
   // winners for eoi

@@ -225,6 +225,7 @@ const commonParams = `
   reminderDay: Float
   supplierIds: [String]
   tierTypes: [String]
+  productCodes: String
   isToAll: Boolean
   requestedProducts: [TenderRequestedProductInput]
   requestedDocuments: [String]
