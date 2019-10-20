@@ -48,6 +48,7 @@ const tenderResponseQueries = {
       .split(',')
       .map(code => productsMap[code] || '')
       .join(',');
+
     sheet
       .cell(2, 13)
       .value(
@@ -95,6 +96,8 @@ const tenderResponseQueries = {
       sheet.cell(rowIndex, 8).value(product.manufacturerPartNumber);
 
       let columnIndex = 2;
+      let minUnitPriceIndex;
+      let minUnitPrice;
 
       for (const response of responses) {
         const supplier = companiesMap[response.supplierId];
@@ -115,7 +118,20 @@ const tenderResponseQueries = {
         }
 
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
-        sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
+
+        const unitPriceCell = sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
+
+        if (!minUnitPrice || rp.unitPrice < minUnitPrice) {
+          if (minUnitPriceIndex) {
+            sheet.cell(rowIndex, minUnitPriceIndex).style({ fill: 'ffffff' });
+          }
+
+          minUnitPriceIndex = columnIndex + 1;
+          minUnitPrice = rp.unitPrice;
+
+          unitPriceCell.style({ fill: '92D050' });
+        }
+
         sheet.cell(rowIndex, columnIndex + 2).value(total);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
         sheet.cell(rowIndex, columnIndex + 4).value(rp.suggestedManufacturer);
