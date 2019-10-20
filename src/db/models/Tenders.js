@@ -274,6 +274,7 @@ class Tender extends StatusPublishClose {
       isNotInterested: { $ne: true },
       isSent: true,
     });
+
     const supplierIds = responses.map(response => response.supplierId);
 
     if (onlyIds) {

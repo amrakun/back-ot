@@ -2,6 +2,7 @@ import cf from 'cellref';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { encryptArray, decrypt } from '../../../db/models/utils';
 import { readTemplate, generateXlsx, quickSort } from '../../utils';
+import { productsMap } from '../../constants';
 import { moduleRequireBuyer } from '../../permissions';
 
 const prepareReport = async ({ tenderId, supplierIds, template }) => {
@@ -36,6 +37,23 @@ const tenderResponseQueries = {
 
     const companiesMap = {};
 
+    // date
+    sheet.cell(1, 7).value(new Date().toLocaleDateString());
+
+    // rfq number
+    sheet.cell(2, 7).value(`RFQ ${tender.number}`);
+
+    // info
+    const products = (tender.productCodes || '')
+      .split(',')
+      .map(code => productsMap[code] || '')
+      .join(',');
+    sheet
+      .cell(2, 13)
+      .value(
+        `A tender was announced via OYU SQMS to ${await tender.requestedCount()} suppliers in selected categories (${products}). ${await tender.submittedCount()} suppliers responded to the tender on time. Highlighted by green are the suppliers recommended to award PO to for specific items as shown in below for offering cheapest price and shortest lead time.`,
+      );
+
     for (const response of responses) {
       companiesMap[response.supplierId] = await Companies.findOne({
         _id: decrypt(response.supplierId),
@@ -63,12 +81,6 @@ const tenderResponseQueries = {
       0,
       responses.length - 1,
     );
-
-    // date
-    sheet.cell(1, 7).value(new Date().toLocaleDateString());
-
-    // rfq number
-    sheet.cell(2, 7).value(`RFQ ${tender.number}`);
 
     for (const [index, product] of requestedProducts.entries()) {
       const rowIndex = 8 + index;
