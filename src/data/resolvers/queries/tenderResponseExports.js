@@ -10,6 +10,7 @@ const prepareReport = async ({ tenderId, supplierIds, template }) => {
 
   const responses = await TenderResponses.find({
     tenderId,
+    isSent: true,
     supplierId: { $in: encryptArray(supplierIds) },
   });
 
