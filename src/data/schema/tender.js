@@ -181,6 +181,7 @@ export const queries = `
   tenderResponsesRfqBidSummaryReport(
     tenderId: String!
     supplierIds: [String!]!
+    sort: String
   ): String
 
   tenderResponsesEoiShortList(

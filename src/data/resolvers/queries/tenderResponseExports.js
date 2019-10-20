@@ -26,7 +26,11 @@ const tenderResponseQueries = {
    * @param {[String]} supplierIds - Selected supplier ids
    * @return {String} generated file link
    */
-  async tenderResponsesRfqBidSummaryReport(root, { tenderId, supplierIds }, { user }) {
+  async tenderResponsesRfqBidSummaryReport(
+    root,
+    { tenderId, supplierIds, sort = 'minTotalPrice' },
+    { user },
+  ) {
     const { tender, responses, workbook, sheet } = await prepareReport({
       tenderId,
       supplierIds,
@@ -78,7 +82,13 @@ const tenderResponseQueries = {
 
     quickSort(
       responses,
-      (res1, res2) => res1.totalUnitPrice < res2.totalUnitPrice,
+      (res1, res2) => {
+        if (sort === 'minTotalPrice') {
+          return res1.totalUnitPrice < res2.totalUnitPrice;
+        }
+
+        return res1.completeNessScore < res2.completeNessScore;
+      },
       0,
       responses.length - 1,
     );
@@ -121,6 +131,7 @@ const tenderResponseQueries = {
 
         const unitPriceCell = sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
 
+        // highlight min unit price cell and reset previous one
         if (!minUnitPrice || rp.unitPrice < minUnitPrice) {
           if (minUnitPriceIndex) {
             sheet.cell(rowIndex, minUnitPriceIndex).style({ fill: 'ffffff' });
