@@ -149,6 +149,9 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 4).value(rp.suggestedManufacturer);
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
         sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
+
+        // shipping terms
+        sheet.cell(114, columnIndex).value(rp.shippingTerms);
       }
     }
 
