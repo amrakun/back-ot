@@ -61,7 +61,7 @@ const tenderResponseQueries = {
 
     for (const response of responses) {
       companiesMap[response.supplierId] = await Companies.findOne({
-        _id: decrypt(response.supplierId),
+        _id: response.supplierId,
       });
 
       let totalUnitPrice = 0;
