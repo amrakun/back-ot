@@ -13,6 +13,7 @@ dotenv.config();
 const { MAIN_APP_DOMAIN, MAILER_API_DOMAIN } = process.env;
 
 import express from 'express';
+import helmet from 'helmet';
 import { createServer } from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -36,6 +37,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use(helmet.xssFilter());
 
 app.post(`/service/ses/tracker`, (req, res) => {
   return req.pipe(
