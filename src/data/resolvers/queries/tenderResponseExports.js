@@ -94,6 +94,8 @@ const tenderResponseQueries = {
       responses.length - 1,
     );
 
+    const totalsMap = {};
+
     for (const [index, product] of requestedProducts.entries()) {
       const rowIndex = 8 + index;
 
@@ -128,6 +130,17 @@ const tenderResponseQueries = {
           total = product.quantity * rp.unitPrice;
         }
 
+        // collect totals by response id
+        if (!totalsMap[response._id]) {
+          totalsMap[response._id] = { mnt: 0, usd: 0 };
+        }
+
+        const currency = (rp.currency || '').toLowerCase();
+
+        if (['mnt', 'usd'].includes(currency)) {
+          totalsMap[response._id][currency] += total;
+        }
+
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
 
         const unitPriceCell = sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
@@ -153,6 +166,18 @@ const tenderResponseQueries = {
         // shipping terms
         sheet.cell(114, columnIndex).value(rp.shippingTerms);
       }
+    }
+
+    // fill totals
+    let columnIndex = 9;
+
+    for (const response of responses) {
+      const { mnt, usd } = totalsMap[response._id];
+
+      sheet.cell(109, columnIndex).value(mnt);
+      sheet.cell(109, columnIndex + 2).value(usd);
+
+      columnIndex += 7;
     }
 
     return generateXlsx(user, workbook, `rfq_bid_summary_${tender._id}`);
