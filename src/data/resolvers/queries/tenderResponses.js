@@ -1,5 +1,5 @@
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
-import { decrypt, encrypt, decryptArray } from '../../../db/models/utils';
+import { decrypt, encrypt } from '../../../db/models/utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
 import { paginate, supplierFilter } from './utils';
 

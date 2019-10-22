@@ -98,6 +98,8 @@ const TenderSchema = mongoose.Schema({
 
   // eoi documents
   requestedDocuments: field({ type: [String], optional: true, label: 'EOI documents' }),
+  // used to show supplier count in logs if too many suppliers are selected
+  supplierCount: field({ type: Number, label: 'Count of suppliers', optional: true }),
 });
 
 class Tender extends StatusPublishClose {
@@ -144,6 +146,8 @@ class Tender extends StatusPublishClose {
       createdUserId: userId,
       updatedDate: new Date(),
       supplierIds: encryptArray(supplierIds),
+      // validation above empties supplierIds if isToAll: true
+      supplierCount: supplierIds.length,
     };
 
     if (doc.type === 'rfq' && !['goods', 'service'].includes(doc.rfqType)) {
@@ -169,6 +173,8 @@ class Tender extends StatusPublishClose {
       throw new Error('Permission denied');
     }
 
+    const supplierCount = doc.supplierIds.length;
+
     Tender.validateSuppliers(doc);
 
     if (tender.status === 'awarded') {
@@ -182,7 +188,13 @@ class Tender extends StatusPublishClose {
       doc.status = 'draft';
     }
 
-    await this.update({ _id }, { $set: doc }, { runValidators: true });
+    const extendedDoc = { ...doc, supplierCount };
+
+    if (extendedDoc.isToAll) {
+      extendedDoc.supplierCount = await this.calculateSupplierIds(extendedDoc, {}, true);
+    }
+
+    await this.update({ _id }, { $set: extendedDoc }, { runValidators: true });
 
     return this.findOne({ _id });
   }
