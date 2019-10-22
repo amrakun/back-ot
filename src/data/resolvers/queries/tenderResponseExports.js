@@ -29,7 +29,7 @@ const tenderResponseQueries = {
    */
   async tenderResponsesRfqBidSummaryReport(
     root,
-    { tenderId, supplierIds, sort = 'minTotalPrice' },
+    { tenderId, supplierIds, sort = 'minTotalPrice', exchangeRate },
     { user },
   ) {
     const { tender, responses, workbook, sheet } = await prepareReport({
@@ -163,8 +163,12 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
         sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
 
+        // exchange rate
+        console.log(columnIndex, exchangeRate);
+        sheet.cell(112, columnIndex).value(exchangeRate.toString());
+
         // shipping terms
-        sheet.cell(114, columnIndex).value(rp.shippingTerms);
+        sheet.cell(113, columnIndex).value(rp.shippingTerms);
       }
     }
 
@@ -176,6 +180,9 @@ const tenderResponseQueries = {
 
       sheet.cell(109, columnIndex).value(mnt);
       sheet.cell(109, columnIndex + 2).value(usd);
+
+      sheet.cell(111, columnIndex).value(0);
+      sheet.cell(111, columnIndex + 2).value(0);
 
       columnIndex += 7;
     }
