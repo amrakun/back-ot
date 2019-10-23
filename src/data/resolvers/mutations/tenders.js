@@ -28,6 +28,11 @@ const tenderMutations = {
       description: 'Created',
     });
 
+    // unnecessary undefined value comes
+    if (!doc.file) {
+      delete doc.file;
+    }
+
     putCreateLog(
       {
         type: LOG_TYPES.TENDER,
@@ -67,7 +72,7 @@ const tenderMutations = {
 
     // mongoose validator skips checking when undefined value comes
     if (!fields.file) {
-      fields.file = null;
+      delete fields.file;
     }
 
     const updatedTender = await Tenders.updateTender(_id, { ...fields }, user._id);
@@ -102,25 +107,54 @@ const tenderMutations = {
       description = `${description} edited`;
     }
 
+    const oldTenderObject = oldTender.toObject();
+    let bidderListedSupplierIds = [];
+    let bidderNames = [];
+
+    // find bidder list suppliers
+    if (oldTenderObject.bidderListedSupplierIds) {
+      bidderListedSupplierIds = decryptArray(oldTenderObject.bidderListedSupplierIds);
+
+      bidderNames = await tenderUtils.gatherSupplierNames(
+        bidderListedSupplierIds,
+        'bidderListedSupplierIds',
+      );
+
+      oldTenderObject.bidderListedSupplierIds = bidderListedSupplierIds;
+    }
+
     /**
      * Exact supplier ids needed for comparison since it encrypts it every update
      * action & becomes uncomparable to old supplier ids.
      */
+    if (!oldTenderObject.isToAll) {
+      oldTenderObject.supplierIds = oldSupplierIds;
+    }
+
+    // updated data to be written to log
+    const newData = {
+      ...fields,
+      updatedDate: updatedTender.updatedDate,
+      status: updatedTender.status,
+      supplierIds: updatedSupplierIds,
+      supplierCount: updatedTender.supplierCount,
+    };
+
+    if (fields.isToAll) {
+      newData.supplierIds = [];
+    }
+
     putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
-        object: { ...oldTender.toObject(), supplierIds: oldSupplierIds },
-        newData: JSON.stringify({
-          ...fields,
-          updatedDate: updatedTender.updatedDate,
-          status: updatedTender.status,
-          supplierIds: updatedSupplierIds,
-        }),
+        object: oldTenderObject,
+        newData: JSON.stringify(newData),
         description,
         extraDesc: JSON.stringify([
           ...supplierNames,
           ...userNames,
           { createdUserId: user._id, name: user.username },
+          ...bidderNames,
         ]),
       },
       user,
