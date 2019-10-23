@@ -163,8 +163,6 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
         sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
 
-        // exchange rate
-        console.log(columnIndex, exchangeRate);
         sheet.cell(112, columnIndex).value(exchangeRate.toString());
 
         // shipping terms
