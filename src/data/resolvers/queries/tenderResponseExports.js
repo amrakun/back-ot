@@ -170,16 +170,10 @@ const tenderResponseQueries = {
       }
     }
 
-    // fill totals
-    const grandTotals = { mnt: 0, usd: 0 };
-
     let columnIndex = 9;
 
     for (const response of responses) {
       const { mnt, usd } = totalsMap[response._id];
-
-      grandTotals.mnt += mnt;
-      grandTotals.usd += usd;
 
       sheet.cell(109, columnIndex).value(usd ? usd * exchangeRate : mnt);
       sheet.cell(109, columnIndex + 2).value(mnt ? mnt / exchangeRate : usd);
@@ -189,10 +183,6 @@ const tenderResponseQueries = {
 
       columnIndex += 7;
     }
-
-    sheet
-      .cell(2, 4)
-      .value(`${grandTotals.mnt.toLocaleString()} MNT, ${grandTotals.usd.toLocaleString()} USD`);
 
     return generateXlsx(user, workbook, `rfq_bid_summary_${tender._id}`);
   },
