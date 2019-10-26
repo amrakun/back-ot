@@ -46,7 +46,7 @@ const tenderResponseQueries = {
     sheet.cell(1, 7).value(new Date().toLocaleDateString());
 
     // rfq number
-    sheet.cell(2, 7).value(`RFQ ${tender.number}`);
+    sheet.cell(2, 7).value(`${tender.number}`);
 
     // info
     const products = (tender.productCodes || '')
