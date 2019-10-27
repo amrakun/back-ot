@@ -1,0 +1,20 @@
+Sub DynamicRange()
+'Best used when you want to include all data stored on the spreadsheet
+
+Dim sht As Worksheet
+
+Set sht = Worksheets("MainSheet")
+
+Dim ColIndex As Integer
+
+ColIndex = 15
+
+While ColIndex < 900
+    Range(Columns(ColIndex), Columns(ColIndex)).ColumnWidth = 80
+    Range(Columns(ColIndex - 1), Columns(ColIndex - 1)).ColumnWidth = 60
+    Range(Columns(ColIndex - 2), Columns(ColIndex - 2)).ColumnWidth = 60
+    
+    ColIndex = ColIndex + 7
+Wend
+
+End Sub
