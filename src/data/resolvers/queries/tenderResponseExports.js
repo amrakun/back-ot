@@ -146,7 +146,7 @@ const tenderResponseQueries = {
         const unitPriceCell = sheet.cell(rowIndex, columnIndex + 1).value(rp.unitPrice);
 
         // highlight min unit price cell and reset previous one
-        if (!minUnitPrice || rp.unitPrice < minUnitPrice) {
+        if (!minUnitPrice || (rp.unitPrice && rp.unitPrice < minUnitPrice)) {
           if (minUnitPriceIndex) {
             sheet.cell(rowIndex, minUnitPriceIndex).style({ fill: 'ffffff' });
           }
