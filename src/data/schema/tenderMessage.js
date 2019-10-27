@@ -20,6 +20,7 @@ export const types = `
     tender:              Tender!
     senderBuyer:         User
     recipientSuppliers:  [Company]
+    eoiTargets:          String
     senderSupplier:      Company
     replyTo:             TenderMessage
     subject:             String!
@@ -48,7 +49,8 @@ export const queries = `
 export const mutations = `
   tenderMessageBuyerSend(
     tenderId:              String!,
-    recipientSupplierIds: [String!]!,
+    recipientSupplierIds: [String!],
+    eoiTargets:            String,
     subject:               String!,
     body:                  String!,
     attachment:            TenderMessageAttachmentInput

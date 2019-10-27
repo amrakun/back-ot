@@ -14,6 +14,7 @@ export const tenderMessageSchema = new Schema(
     tenderId: field({ type: String, label: 'Tender' }),
     senderBuyerId: field({ type: String, optional: true, label: 'Buyer' }),
     recipientSupplierIds: field({ type: [String], label: 'Recipient suppliers', optional: true }),
+    eoiTargets: field({ type: String, optional: true, label: 'Eoi targets' }),
     senderSupplierId: field({ type: String, optional: true, label: 'Supplier' }),
     replyToId: field({ type: String, optional: true, label: 'Reply' }),
     subject: field({ type: String, label: 'Message subject' }),
