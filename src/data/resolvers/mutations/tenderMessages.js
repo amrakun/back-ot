@@ -7,18 +7,40 @@ import { LOG_TYPES } from '../../constants';
 const tenderMessageMutations = {
   async tenderMessageBuyerSend(root, args, { user }) {
     const tenderMessage = await TenderMessages.tenderMessageBuyerSend(args, user);
-    const tender = await Tenders.findOne({ _id: args.tenderId });
-    const supplierIds = args.recipientSupplierIds;
+
+    const { tenderId, eoiTargets } = args;
+
+    let supplierIds = args.recipientSupplierIds;
+
+    const tender = await Tenders.findOne({ _id: tenderId });
+
+    if (tender.type === 'eoi') {
+      if (eoiTargets === 'toAll') {
+        supplierIds = await tender.getExactSupplierIds();
+      }
+
+      if (eoiTargets === 'toParticipated') {
+        supplierIds = await tender.participatedSuppliers({ onlyIds: true });
+      }
+    }
+
     const supplierNames = await tenderUtils.gatherSupplierNames(
       supplierIds,
       'recipientSupplierIds',
     );
 
-    await tenderUtils.sendEmailToSuppliers({
-      kind: 'supplier__message_notification',
-      tender,
-      supplierIds,
-    });
+    tenderUtils
+      .sendEmailToSuppliers({
+        kind: 'supplier__message_notification',
+        tender,
+        supplierIds,
+      })
+      .then(() => {
+        console.log('Successfully sent');
+      })
+      .catch(e => {
+        console.log(`Error while sending tender message emails ${tenderId}: ${e.message}`);
+      });
 
     if (tender) {
       putCreateLog(

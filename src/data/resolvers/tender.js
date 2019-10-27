@@ -1,5 +1,4 @@
 import { Users, TenderResponses, Companies } from '../../db/models';
-import { relativeTimeThreshold } from 'moment';
 
 export default {
   createdUser(tender) {
