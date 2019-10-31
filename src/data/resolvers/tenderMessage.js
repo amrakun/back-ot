@@ -37,6 +37,25 @@ export default {
     return TenderMessages.findOne({ _id: replyToId });
   },
 
+  isRead(message, {}, { user }) {
+    const userId = user._id.toString();
+
+    if (message.senderBuyerId === userId || message.senderSupplierId === user.companyId) {
+      return true;
+    }
+
+    // TODO: Remove this check after removing isRead field
+    if (message.isRead) {
+      return true;
+    }
+
+    if ((message.readUserIds || []).includes(userId)) {
+      return true;
+    }
+
+    return false;
+  },
+
   async relatedMessages(message) {
     const relatedMessages = [];
 

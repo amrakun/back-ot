@@ -21,7 +21,8 @@ export const tenderMessageSchema = new Schema(
     body: field({ type: String, label: 'Message body' }),
     attachment: field({ type: attachmentSchema, label: 'Attachment', optional: true }),
     isAuto: field({ type: Boolean, default: false, label: 'Is automatically sent' }),
-    isRead: field({ type: Boolean, default: false, label: 'Is read' }),
+    isRead: field({ type: Boolean, default: false, label: 'Is read' }), // TODO: remove
+    readUserIds: field({ type: [String], optional: true }),
     isReplySent: field({ type: Boolean, default: false, label: 'Is reply sent' }),
   },
   {
@@ -66,13 +67,18 @@ class TenderMessage {
   }
 
   static async tenderMessageSetAsRead({ _id }, user) {
-    const query = { _id };
+    const selector = { _id };
+    const message = await this.findOne(selector);
 
-    if (user.isSupplier) {
-      query.recipientSupplierIds = user.companyId;
+    if (!message) {
+      throw new Error('Message not found');
     }
-    await this.update(query, { $set: { isRead: true } });
-    return this.findOne(query);
+
+    const readUserIds = message.readUserIds || [];
+
+    await this.update(selector, { $set: { readUserIds: [...readUserIds, user._id] } });
+
+    return this.findOne(selector);
   }
 }
 
