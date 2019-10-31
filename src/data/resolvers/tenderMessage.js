@@ -56,20 +56,25 @@ export default {
     return false;
   },
 
-  async relatedMessages(message) {
+  async relatedMessages(message, {}, { user }) {
     const relatedMessages = [];
 
     const rootMessage = await findRelatedMessages(message, relatedMessages);
 
-    const siblings = await TenderMessages.find({
+    const selector = {
       replyToId: rootMessage._id,
       _id: { $ne: message._id },
       createdAt: { $lte: message.createdAt },
-      $or: [
-        { senderBuyerId: message.senderBuyerId },
-        { senderSupplierId: message.senderSupplierId },
-      ],
-    }).sort({ createdAt: -1 });
+    };
+
+    if (user.isSupplier) {
+      selector.senderSupplierId = user.supplierId;
+    } else {
+      selector.senderBuyerId = message.senderBuyerId;
+      selector.senderSupplierId = message.senderSupplierId;
+    }
+
+    const siblings = await TenderMessages.find(selector).sort({ createdAt: -1 });
 
     return {
       rootMessage,
