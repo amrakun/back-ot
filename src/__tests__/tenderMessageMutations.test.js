@@ -123,7 +123,7 @@ describe('Tender mutations', () => {
 
     await mutations.tenderMessageSetAsRead({}, { _id: adminToSupplier._id }, { user: _supplier });
     const updated = await TenderMessages.findOne({ _id: adminToSupplier._id });
-    expect(updated.isRead).toBeTruthy();
+    expect(updated.readUserIds.includes(_supplier._id)).toBeTruthy();
   });
 
   test('Buyer can set as read', async () => {
@@ -140,24 +140,6 @@ describe('Tender mutations', () => {
 
     await mutations.tenderMessageSetAsRead({}, { _id: supplierToAdmin._id }, { user: _admin });
     const updated = await TenderMessages.findOne({ _id: supplierToAdmin._id });
-    expect(updated.isRead).toBeTruthy();
-  });
-
-  test('Supplier cannot set as read on behalf of buyer', async () => {
-    const supplierToAdmin = await mutations.tenderMessageSupplierSend(
-      {},
-      {
-        tenderId: _tender._id,
-        subject: 'test',
-        body: 'test',
-        senderSupplierId: _supplier.companyId,
-      },
-      { user: _supplier },
-    );
-
-    await mutations.tenderMessageSetAsRead({}, { _id: supplierToAdmin._id }, { user: _supplier });
-
-    const updated = await TenderMessages.findOne({ _id: supplierToAdmin._id });
-    expect(updated.isRead).toBeFalsy();
+    expect(updated.readUserIds.includes(_admin._id)).toBeTruthy();
   });
 });
