@@ -43,6 +43,7 @@ const tenderMutations = {
           status: 'draft',
           createdDate: new Date(),
           updatedDate: new Date(),
+          supplierCount: tender.supplierCount,
         }),
         description: `Tender "${
           tender.name
