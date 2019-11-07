@@ -101,7 +101,7 @@ const TenderSchema = mongoose.Schema({
   // eoi documents
   requestedDocuments: field({ type: [String], optional: true, label: 'EOI documents' }),
   // used to show supplier count in logs if too many suppliers are selected
-  supplierCount: field({ type: Number, label: 'Count of suppliers', optional: true }),
+  supplierCount: field({ type: Number, label: 'Supplier count', optional: true }),
 });
 
 class Tender extends StatusPublishClose {
