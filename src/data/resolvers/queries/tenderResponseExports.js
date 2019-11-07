@@ -181,6 +181,8 @@ const tenderResponseQueries = {
       sheet.cell(111, columnIndex).value(0);
       sheet.cell(111, columnIndex + 2).value(0);
 
+      sheet.cell(114, columnIndex).value('EOAP 45');
+
       columnIndex += 7;
     }
 
