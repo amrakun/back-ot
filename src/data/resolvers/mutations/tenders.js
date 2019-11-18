@@ -307,7 +307,7 @@ const tenderMutations = {
    */
   async tendersSendRegretLetter(root, { _id, subject, content }, { user }) {
     const tender = await Tenders.findOne({ _id });
-
+    const sentRegretLetter = tender.sentRegretLetter;
     await tender.sendRegretLetter();
 
     let notChosenSuppliers = await tender.getRfqNotChosenSuppliers();
@@ -333,8 +333,8 @@ const tenderMutations = {
     putUpdateLog(
       {
         type: LOG_TYPES.TENDER,
-        object: tender,
-        newData: JSON.stringify({ sendRegretLetter: true }),
+        object: { sentRegretLetter },
+        newData: JSON.stringify({ sentRegretLetter: true }),
         description: `Regret letters have been sent on tender "${
           tender.name
         }"of type "${tender.type.toUpperCase()}"`,

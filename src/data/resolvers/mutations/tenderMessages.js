@@ -8,9 +8,9 @@ const tenderMessageMutations = {
   async tenderMessageBuyerSend(root, args, { user }) {
     const tenderMessage = await TenderMessages.tenderMessageBuyerSend(args, user);
 
-    const { tenderId, eoiTargets } = args;
+    const { tenderId, eoiTargets, recipientSupplierIds, replyToId } = args;
 
-    let supplierIds = args.recipientSupplierIds;
+    let supplierIds = recipientSupplierIds;
 
     const tender = await Tenders.findOne({ _id: tenderId });
 
@@ -42,6 +42,18 @@ const tenderMessageMutations = {
         console.log(`Error while sending tender message emails ${tenderId}: ${e.message}`);
       });
 
+    const extraDesc = [
+      ...supplierNames,
+      { senderBuyerId: user._id, name: `${user.firstName} ${user.lastName}` },
+      { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
+    ];
+
+    const initialMessage = await TenderMessages.findOne({ _id: replyToId });
+
+    if (initialMessage) {
+      extraDesc.push({ replyToId, name: initialMessage.subject });
+    }
+
     if (tender) {
       putCreateLog(
         {
@@ -51,11 +63,7 @@ const tenderMessageMutations = {
           description: `Message has been created for tender "${
             tender.name
           }" of type "${tender.type.toUpperCase()}"`,
-          extraDesc: JSON.stringify([
-            ...supplierNames,
-            { senderBuyerId: user._id, name: `${user.firstName} ${user.lastName}` },
-            { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
-          ]),
+          extraDesc: JSON.stringify(extraDesc),
         },
         user,
       );
@@ -69,12 +77,22 @@ const tenderMessageMutations = {
     const tender = await Tenders.findOne({ _id: args.tenderId });
     const buyers = await Users.find({ _id: { $in: tender.responsibleBuyerIds || [] } });
     const companyName = await Companies.getName(user.companyId);
+    const initialMessage = await TenderMessages.findOne({ _id: args.replyToId });
 
     await tenderUtils.sendEmailToBuyer({
       kind: 'buyer__message_notification',
       tender,
       extraBuyerEmails: buyers.map(buyer => buyer.email),
     });
+
+    const extraDesc = [
+      { senderSupplierId: user.companyId, name: companyName },
+      { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
+    ];
+
+    if (initialMessage) {
+      extraDesc.push({ replyToId: args.replyToId, name: initialMessage.subject });
+    }
 
     putCreateLog(
       {
@@ -84,10 +102,7 @@ const tenderMessageMutations = {
         description: `Message has been created for tender ${
           tender.name
         } of type "${tender.type.toUpperCase()}"`,
-        extraDesc: JSON.stringify([
-          { senderSupplierId: user.companyId, name: companyName },
-          { tenderId: tender._id, name: `${tender.name} (${tender.number})` },
-        ]),
+        extraDesc: JSON.stringify(extraDesc),
       },
       user,
     );
