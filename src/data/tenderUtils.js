@@ -231,8 +231,8 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
 
         fileCount += 1;
       } catch (e) {
-        continue;
         console.log(e);
+        continue;
       }
     }
 
