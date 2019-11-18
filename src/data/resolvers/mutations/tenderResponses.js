@@ -18,7 +18,10 @@ const tenderResponseMutations = {
 
     if (response && tender) {
       const companyName = await Companies.getName(user.companyId);
-      const extraDesc = [{ supplierId: user.companyId, name: companyName }];
+      const extraDesc = [
+        { supplierId: user.companyId, name: companyName },
+        { tenderId: tender._id, name: tender.name },
+      ];
 
       putCreateLog(
         {
@@ -56,7 +59,10 @@ const tenderResponseMutations = {
 
     if (oldResponse && tender) {
       const companyName = await Companies.getName(user.companyId);
-      const extraDesc = [{ supplierId: user.companyId, name: companyName }];
+      const extraDesc = [
+        { supplierId: user.companyId, name: companyName },
+        { tenderId: tender._id, name: tender.name },
+      ];
 
       putUpdateLog(
         {
