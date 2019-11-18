@@ -224,11 +224,16 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
         continue;
       }
 
-      const response = await utils.readS3File(file.url, user);
+      try {
+        const response = await utils.readS3File(file.url, user);
 
-      subFolder.file(generateFileName(file.name), response.Body);
+        subFolder.file(generateFileName(file.name), response.Body);
 
-      fileCount += 1;
+        fileCount += 1;
+      } catch (e) {
+        continue;
+        console.log(e);
+      }
     }
 
     if (fileCount === 0) {
