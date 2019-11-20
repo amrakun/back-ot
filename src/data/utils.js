@@ -70,7 +70,7 @@ export const readS3File = async (key, user) => {
     s3.getObject(
       {
         Bucket: AWS_BUCKET,
-        Key: key,
+        Key: encodeURI(key),
       },
       (error, response) => {
         if (error) {
