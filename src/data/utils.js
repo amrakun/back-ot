@@ -35,7 +35,7 @@ export const createAWS = () => {
  * @param {String} key - File name
  * @return {String} - file
  */
-export const readS3File = async (key, user) => {
+export const readS3File = async (key, user, encoder = 'encodeURI') => {
   const { NODE_ENV } = process.env;
 
   // do not read file in test mode
@@ -70,11 +70,17 @@ export const readS3File = async (key, user) => {
     s3.getObject(
       {
         Bucket: AWS_BUCKET,
-        Key: decodeURIComponent(key),
+        Key: encoder === 'encodeURI' ? encodeURI(key) : decodeURIComponent(key),
       },
       (error, response) => {
         if (error) {
-          return reject(error);
+          if (encoder === 'encodeURI') {
+            readS3File(key, user, 'decodeURIComponent')
+              .then(res => resolve(res))
+              .catch(error => reject(error));
+          } else {
+            return reject(error);
+          }
         }
 
         return resolve(response);
