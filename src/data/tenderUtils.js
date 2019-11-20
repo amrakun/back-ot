@@ -291,7 +291,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
 
         fileCount += 1;
       } catch (e) {
-        console.log(`${file.url}: e.message`);
+        console.log(`${file.url}: ${e.message}`);
         continue;
       }
     }
@@ -334,10 +334,15 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
       folders[subFolder] = attachments.folder(subFolder);
     }
 
-    // download file from s3
-    const response = await utils.readS3File(attachment.url, user);
+    try {
+      // download file from s3
+      const response = await utils.readS3File(attachment.url, user);
 
-    folders[subFolder].file(generateFileName(attachment.name), response.Body);
+      folders[subFolder].file(generateFileName(attachment.name), response.Body);
+    } catch (e) {
+      console.log(`${attachment.url}: ${e.message}`);
+      continue;
+    }
   }
 
   return zip.generateAsync({ type: 'nodebuffer' });
