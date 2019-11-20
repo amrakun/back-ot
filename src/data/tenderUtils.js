@@ -187,6 +187,10 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
 
     const supplier = await Companies.findOne({ _id: response.supplierId });
 
+    if (!supplier.basicInfo) {
+      continue;
+    }
+
     let filesDoc = [];
 
     if (type === 'eoi') {
@@ -194,6 +198,62 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
         file: document.file,
         name: document.name,
       }));
+
+      const certificateOfRegistration = supplier.basicInfo.certificateOfRegistration;
+
+      if (certificateOfRegistration) {
+        filesDoc.push({
+          file: {
+            url: certificateOfRegistration.url,
+            name: `State_registration_certifcate___${certificateOfRegistration.name}`,
+          },
+          name: 'State_registration_certifcate',
+        });
+      }
+
+      if (supplier.healthInfo) {
+        const file = supplier.healthInfo.areHSEResourcesClearlyIdentified;
+
+        if (file) {
+          filesDoc.push({
+            file: {
+              url: file.url,
+              name: `HSE_policy_&_procedures___${file.name}`,
+            },
+            name: 'HSE_policy_&_procedures',
+          });
+        }
+      }
+
+      if (supplier.businessInfo) {
+        const file = supplier.businessInfo.doesHaveCodeEthicsFile;
+
+        if (file) {
+          filesDoc.push({
+            file: {
+              url: file.url,
+              name: `Business_Code_of_Conduct___${file.name}`,
+            },
+            name: 'Business_Code_of_Conduct',
+          });
+        }
+      }
+
+      if (supplier.shareholderInfo) {
+        const attachments = supplier.shareholderInfo.attachments;
+
+        if (attachments) {
+          for (const attachment of attachments) {
+            filesDoc.push({
+              file: {
+                url: attachment.url,
+                name: `Ownership_shareholder_information___${attachment.name}`,
+              },
+              name: 'Ownership_shareholder_information',
+            });
+          }
+        }
+      }
     }
 
     if (type === 'rfq') {
@@ -210,7 +270,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
       }));
     }
 
-    if (filesDoc.length === 0 || !supplier.basicInfo) {
+    if (filesDoc.length === 0) {
       continue;
     }
 
@@ -220,7 +280,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
     let fileCount = 0;
 
     for (const { file } of filesDoc) {
-      if (!file) {
+      if (!file || !file.url) {
         continue;
       }
 
@@ -231,7 +291,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
 
         fileCount += 1;
       } catch (e) {
-        console.log(e);
+        console.log(`${file.url}: e.message`);
         continue;
       }
     }
