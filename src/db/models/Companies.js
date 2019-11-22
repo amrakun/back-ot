@@ -978,7 +978,9 @@ class Company {
    * Sort by date and get last entry from products info validation
    */
   sortAndGetLast(fieldName) {
-    const sorted = (this[fieldName] || []).sort((prev, next) => prev.date > next.date);
+    const sorted = (this[fieldName] || []).sort(
+      (prev, next) => new Date(prev.date) - new Date(next.date),
+    );
 
     return sorted.pop();
   }

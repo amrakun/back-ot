@@ -48,7 +48,7 @@ export const companiesExport = async (user, companies) => {
     const contactInfo = company.contactInfo || {};
     const financialInfo = company.financialInfo || {};
     const salesRevenue = financialInfo.annualTurnover || [];
-    const [rev1, rev2, rev3] = salesRevenue.sort((r1, r2) => r1.year > r2.year);
+    const [rev1, rev2, rev3] = salesRevenue.sort((r1, r2) => r1.year - r2.year);
 
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);

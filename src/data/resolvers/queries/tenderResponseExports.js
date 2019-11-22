@@ -222,7 +222,7 @@ const tenderResponseQueries = {
       const basicInfo = supplier.basicInfo || {};
       const financialInfo = supplier.financialInfo || {};
       const annualTurnover = financialInfo.annualTurnover || [];
-      const sortedAnnualTurnover = annualTurnover.sort((p, n) => p.year > n.year);
+      const sortedAnnualTurnover = annualTurnover.sort((p, n) => p.year - n.year);
       const lastAnnualTurnover = sortedAnnualTurnover.pop() || {};
 
       sheet.cell(3, 3 + index).value(basicInfo.enName);
