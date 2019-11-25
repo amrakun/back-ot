@@ -212,7 +212,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
       }
 
       if (supplier.healthInfo) {
-        const file = supplier.healthInfo.areHSEResourcesClearlyIdentified;
+        const file = supplier.healthInfo.areHSEResourcesClearlyIdentifiedFile;
 
         if (file) {
           filesDoc.push({
