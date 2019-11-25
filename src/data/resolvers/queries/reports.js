@@ -178,9 +178,19 @@ const reportsQuery = {
         sheet.cell(rowIndex, 9).value(it.publishDate.toLocaleDateString());
         sheet.cell(rowIndex, 10).value(it.closeDate.toLocaleDateString());
         sheet.cell(rowIndex, 11).value(it.status);
-        sheet
-          .cell(rowIndex, 12)
-          .value(it.sentRegretLetter && !winnerIds.includes(supId) ? 'yes' : 'no');
+
+        let isSentRegretLetter = 'no';
+
+        if (
+          it.sentRegretLetter &&
+          particatedSupplierIds.includes(supId) &&
+          !winnerIds.includes(supId)
+        ) {
+          isSentRegretLetter = 'yes';
+        }
+
+        sheet.cell(rowIndex, 12).value(isSentRegretLetter);
+
         sheet.cell(rowIndex, 13).value(it.cancelReason || '');
       }
     }
