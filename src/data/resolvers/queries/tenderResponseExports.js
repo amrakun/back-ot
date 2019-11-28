@@ -173,6 +173,10 @@ const tenderResponseQueries = {
     let columnIndex = 9;
 
     for (const response of responses) {
+      if (!totalsMap[response._id]) {
+        continue;
+      }
+
       const { mnt, usd } = totalsMap[response._id];
 
       sheet.cell(109, columnIndex).value(usd ? usd * exchangeRate : mnt);
