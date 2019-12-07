@@ -331,13 +331,24 @@ describe('Companies model tests', () => {
   });
 
   test('Validate product info', async () => {
+    expect.assertions(14);
+
     let company = await companyFactory({ productsInfo: ['code1', 'code2', 'code3'] });
     company = await Companies.findOne({ _id: company._id });
 
+    let updatedCompany;
+
     // checking isProductsInfoValidated
-    let updatedCompany = await company.validateProductsInfo({ checkedItems: [] });
-    expect(updatedCompany.isProductsInfoValidated).toBe(false);
-    expect(updatedCompany.productsInfoValidations.length).toBe(0);
+    try {
+      await company.validateProductsInfo({ checkedItems: [] });
+    } catch (e) {
+      expect(e.message).toBe('Please select at least one product');
+
+      updatedCompany = await Companies.findOne({ _id: company._id });
+
+      expect(updatedCompany.isProductsInfoValidated).toBe(undefined);
+      expect(updatedCompany.productsInfoValidations.length).toBe(0);
+    }
 
     updatedCompany = await company.validateProductsInfo({
       checkedItems: ['code1', 'code2', 'code3'],

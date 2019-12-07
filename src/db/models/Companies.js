@@ -1220,27 +1220,23 @@ class Company {
     const productsInfoValidations = this.productsInfoValidations || [];
     const filteredCheckedItems = checkedItems.filter(code => productsInfo.includes(code));
 
-    let validatedProductsInfo = [];
-    let isProductsInfoValidated = false;
-
-    if (filteredCheckedItems.length > 0) {
-      productsInfoValidations.push({
-        date: new Date(),
-        checkedItems,
-        files,
-        personName,
-        justification,
-      });
-
-      isProductsInfoValidated = filteredCheckedItems.length === productsInfo.length;
-      validatedProductsInfo = filteredCheckedItems;
+    if (checkedItems.length === 0) {
+      throw new Error('Please select at least one product');
     }
+
+    productsInfoValidations.push({
+      date: new Date(),
+      checkedItems,
+      files,
+      personName,
+      justification,
+    });
 
     // update fields
     await this.update({
       productsInfoValidations,
-      isProductsInfoValidated,
-      validatedProductsInfo,
+      isProductsInfoValidated: true,
+      validatedProductsInfo: filteredCheckedItems,
     });
 
     return Companies.findOne({ _id: this._id });
