@@ -166,6 +166,7 @@ describe('Company queries', () => {
     const company1 = await companyFactory({
       mnName: 'mn name',
       productsInfo: ['code1', 'code2'],
+      validatedProductsInfo: ['code1', 'code2'],
       isProductsInfoValidated: true,
     });
 

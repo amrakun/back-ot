@@ -55,7 +55,7 @@ const companiesFilter = async args => {
 
   // product & services filter
   if (productCodes) {
-    selector.productsInfo = { $in: productCodes.split(',') };
+    selector.validatedProductsInfo = { $in: productCodes.split(',') };
   }
 
   // tier types
