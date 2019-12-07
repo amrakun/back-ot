@@ -178,7 +178,6 @@ app.post('/upload-file', async (req, res) => {
         'application/x-msi',
         'application/pdf',
         'application/zip',
-        'application/x-rar-compressed',
       ].includes(mime)
     ) {
       // check for virus
