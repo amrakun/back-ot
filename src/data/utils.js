@@ -164,7 +164,7 @@ export const uploadFile = async (file, fromEditor = false) => {
 export const sendEmail = async args => {
   const { toEmails, fromEmail, subject, content = '', template, attachments = [] } = args;
 
-  sendMessage('sendEmail', {
+  return sendMessage('sendEmail', {
     template,
     from: fromEmail,
     toEmails,
@@ -401,30 +401,11 @@ export const putDeleteLog = (params, user) => {
  * @param {Object} user User information from mutation context
  */
 const putLog = async (body, user) => {
-  const LOGS_DOMAIN = getEnv({ name: 'LOGS_API_DOMAIN' });
-
-  if (!LOGS_DOMAIN) {
-    return;
-  }
-
-  const doc = {
+  return sendMessage('putLog', {
     ...body,
     createdBy: user._id,
     unicode: user.username || user.email || user._id,
-  };
-  const msg = `
-    Failed to connect to logs api.
-    Check whether LOGS_API_DOMAIN env is missing or logs api is not running
-  `;
-
-  try {
-    await sendRequest(
-      { url: `${LOGS_DOMAIN}/logs/create`, method: 'post', body: { params: JSON.stringify(doc) } },
-      msg,
-    );
-  } catch (e) {
-    console.log(e);
-  }
+  });
 };
 
 /**
