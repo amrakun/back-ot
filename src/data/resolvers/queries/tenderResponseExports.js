@@ -160,10 +160,12 @@ const tenderResponseQueries = {
           minUnitPriceIndex = columnIndex + 1;
           minUnitPrice = rp.unitPrice;
 
-          unitPriceCell.style({ fill: '92D050' });
+          if (minUnitPrice) {
+            unitPriceCell.style({ fill: '92D050' });
+          }
         }
 
-        sheet.cell(rowIndex, columnIndex + 2).value(total);
+        sheet.cell(rowIndex, columnIndex + 2).value(total ? total : null);
         sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
         sheet.cell(rowIndex, columnIndex + 4).value(rp.suggestedManufacturer);
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
