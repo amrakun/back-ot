@@ -78,6 +78,10 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
         return replacer({ text, tender });
       },
       toEmails: receivers,
+      data: {
+        source: 'tender',
+        tenderId: tender._id.toString(),
+      },
     })
     .then(() => {
       console.log('Success');
@@ -98,6 +102,10 @@ export const sendEmailToBuyer = async ({ kind, tender, extraBuyerEmails = [] }) 
     toEmails: [...extraBuyerEmails, createdUser.email],
     replacer: text => {
       return replacer({ text, tender });
+    },
+    data: {
+      source: 'tender',
+      tenderId: tender._id.toString(),
     },
   });
 };

@@ -27,6 +27,7 @@ const mutations = {
         toEmails: [email],
         subject,
         content,
+        data: { source: 'massMail' },
       });
     }
   },
