@@ -182,7 +182,7 @@ export const queries = `
     tenderId: String!
     supplierIds: [String!]!
     sort: String
-    exchangeRate: Int
+    exchangeRate: Float
   ): String
 
   tenderResponsesEoiShortList(
