@@ -30,6 +30,7 @@ describe('Tender response db', () => {
 
   const respondedProducts = [
     {
+      id: 'id',
       code: 'code',
       suggestedManufacturer: 'suggestedManufacturer',
       suggestedManufacturerPartNumber: '10',
@@ -192,6 +193,7 @@ describe('Tender response db', () => {
       supplierId: response.supplierId,
       respondedProducts: [
         {
+          id: 'id',
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
           suggestedManufacturerPartNumber: '10',
@@ -236,8 +238,8 @@ describe('Tender response db', () => {
         { file: { url: 's1_rd2.png', name: '/s1_rd2' } },
       ],
       respondedProducts: [
-        { file: { url: 's1_rp1.png', name: '/s1_rp1' } },
-        { file: { url: 's1_rp2.png', name: '/s1_rp2' } },
+        { id: Math.random().toString(), file: { url: 's1_rp1.png', name: '/s1_rp1' } },
+        { id: Math.random().toString(), file: { url: 's1_rp2.png', name: '/s1_rp2' } },
       ],
       respondedFiles: [
         { url: 's1_rs1.png', name: '/s1_rs1' },

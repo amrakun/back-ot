@@ -79,6 +79,7 @@ describe('Tender mutations', () => {
       isNotInterested: false,
       respondedProducts: [
         {
+          id: 'id',
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
           suggestedManufacturerPartNumber: '1',
@@ -105,6 +106,7 @@ describe('Tender mutations', () => {
           _id
           isNotInterested
           respondedProducts {
+            id
             code
             suggestedManufacturer
             suggestedManufacturerPartNumber
@@ -145,6 +147,7 @@ describe('Tender mutations', () => {
       isNotInterested: false,
       respondedProducts: [
         {
+          id: 'id',
           code: 'code',
           suggestedManufacturer: 'suggestedManufacturer',
           suggestedManufacturerPartNumber: '1',
@@ -171,6 +174,7 @@ describe('Tender mutations', () => {
           tenderResponsesEdit(${commonValues}) {
             _id
             respondedProducts {
+              id
               code
               suggestedManufacturer
               suggestedManufacturerPartNumber

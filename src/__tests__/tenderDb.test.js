@@ -513,6 +513,7 @@ describe('Tender db', () => {
     const tender = await tenderFactory({
       requestedProducts: [
         {
+          id: 'id',
           code: 'code',
           purchaseRequestNumber: 10000,
           shortText: 'desc',
