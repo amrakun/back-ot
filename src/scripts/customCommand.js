@@ -23,7 +23,9 @@ export const customCommand = async () => {
 
   for (const tender of tenders) {
     const requestedProducts = tender.requestedProducts || [];
-    const requestedProductsUniqueCodes = uniq(requestedProducts.map(rp => rp.code));
+    const requestedProductsUniqueCodes = uniq(
+      requestedProducts.map(rp => rp.purchaseRequestNumber),
+    );
     const isAllProductsHaveUniqueCode =
       requestedProducts.length === requestedProductsUniqueCodes.length;
 
@@ -54,31 +56,31 @@ export const customCommand = async () => {
 
   console.log(totalInvalid, totalInvalidWithUniqueCodes);
 
-  for (const tender of completeInvalidTenders) {
-    const requestedProducts = tender.requestedProducts || [];
+  // for (const tender of completeInvalidTenders) {
+  //   const requestedProducts = tender.requestedProducts || [];
 
-    console.log(
-      `Requested products ========================== ${tender.number} ${JSON.stringify(
-        requestedProducts,
-      )}`,
-    );
+  //   console.log(
+  //     `Requested products ========================== ${tender.number} ${JSON.stringify(
+  //       requestedProducts,
+  //     )}`,
+  //   );
 
-    const responses = await TenderResponses.find({ tenderId: tender._id });
+  //   const responses = await TenderResponses.find({ tenderId: tender._id });
 
-    for (const response of responses) {
-      if (response.respondedProducts.length === 0) {
-        continue;
-      }
+  //   for (const response of responses) {
+  //     if (response.respondedProducts.length === 0) {
+  //       continue;
+  //     }
 
-      if (response.respondedProducts.length !== requestedProducts.length) {
-        console.log(
-          `Invalid response ========================================: ${JSON.stringify(
-            response.respondedProducts,
-          )}`,
-        );
-      }
-    }
-  }
+  //     if (response.respondedProducts.length !== requestedProducts.length) {
+  //       console.log(
+  //         `Invalid response ========================================: ${JSON.stringify(
+  //           response.respondedProducts,
+  //         )}`,
+  //       );
+  //     }
+  //   }
+  // }
 
   mongoose.connection.close();
 };
