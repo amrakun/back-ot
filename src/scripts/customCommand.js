@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { Tenders, TenderResponses } from '../db/models';
+import { Tenders, TenderResponses, Companies } from '../db/models';
 
 dotenv.config();
 
@@ -9,7 +9,7 @@ mongoose.Promise = global.Promise;
 export const customCommand = async () => {
   mongoose.connect(process.env.MONGO_URL);
 
-  const tenders = await Tenders.find({});
+  const tenders = await Tenders.find({ createdDate: { $gt: new Date('2019-11-01') } });
 
   let count = 0;
 
@@ -18,6 +18,8 @@ export const customCommand = async () => {
 
     if (requestedProducts.length > 0) {
       let status = 'valid';
+      let isInvalidResponseAwarded = false;
+      const invalidResponses = [];
 
       const responses = await TenderResponses.find({ tenderId: tender._id });
 
@@ -26,11 +28,20 @@ export const customCommand = async () => {
 
         if (respondedProducts.length > 0 && requestedProducts.length !== respondedProducts.length) {
           status = 'invalid';
-          break;
+
+          const supplier = await Companies.findOne({ _id: response.supplierId });
+          invalidResponses.push(supplier.basicInfo.enName);
+
+          if (tender.getWinnerIds().includes(response._id.toString())) {
+            isInvalidResponseAwarded = true;
+
+            console.log('danger ...................');
+          }
         }
       }
 
       if (status === 'invalid') {
+        console.log(tender._id, tender.number, tender.status, invalidResponses);
         count++;
       }
     }
