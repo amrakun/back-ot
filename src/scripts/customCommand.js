@@ -9,7 +9,10 @@ mongoose.Promise = global.Promise;
 export const customCommand = async () => {
   mongoose.connect(process.env.MONGO_URL);
 
-  const tenders = await Tenders.find({ createdDate: { $gt: new Date('2019-11-01') } });
+  const tenders = await Tenders.find({
+    createdDate: { $gt: new Date('2019-11-01') },
+    status: 'closed',
+  });
 
   let count = 0;
 
@@ -18,7 +21,6 @@ export const customCommand = async () => {
 
     if (requestedProducts.length > 0) {
       let status = 'valid';
-      let isInvalidResponseAwarded = false;
       const invalidResponses = [];
 
       const responses = await TenderResponses.find({ tenderId: tender._id });
@@ -31,12 +33,6 @@ export const customCommand = async () => {
 
           const supplier = await Companies.findOne({ _id: response.supplierId });
           invalidResponses.push(supplier.basicInfo.enName);
-
-          if (tender.getWinnerIds().includes(response._id.toString())) {
-            isInvalidResponseAwarded = true;
-
-            console.log('danger ...................');
-          }
         }
       }
 
