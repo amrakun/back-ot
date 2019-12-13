@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { uniq } from 'underscore';
 import { Tenders, TenderResponses, Companies } from '../db/models';
 
 dotenv.config();
@@ -7,21 +8,27 @@ dotenv.config();
 mongoose.Promise = global.Promise;
 
 export const customCommand = async () => {
-  mongoose.connect(process.env.MONGO_URL);
+  const { MONGO_URL = '' } = process.env;
+
+  await mongoose.connect(MONGO_URL);
 
   const tenders = await Tenders.find({
     createdDate: { $gt: new Date('2019-11-01') },
     status: 'closed',
   });
 
-  let count = 0;
+  let totalInvalid = 0;
+  let totalInvalidWithUniqueCodes = 0;
+  let completeInvalidTenders = [];
 
   for (const tender of tenders) {
     const requestedProducts = tender.requestedProducts || [];
+    const requestedProductsUniqueCodes = uniq(requestedProducts.map(rp => rp.code));
+    const isAllProductsHaveUniqueCode =
+      requestedProducts.length === requestedProductsUniqueCodes.length;
 
     if (requestedProducts.length > 0) {
       let status = 'valid';
-      const invalidResponses = [];
 
       const responses = await TenderResponses.find({ tenderId: tender._id });
 
@@ -30,20 +37,48 @@ export const customCommand = async () => {
 
         if (respondedProducts.length > 0 && requestedProducts.length !== respondedProducts.length) {
           status = 'invalid';
-
-          const supplier = await Companies.findOne({ _id: response.supplierId });
-          invalidResponses.push(supplier.basicInfo.enName);
         }
       }
 
       if (status === 'invalid') {
-        console.log(tender._id, tender.number, tender.status, invalidResponses);
-        count++;
+        totalInvalid++;
+
+        if (isAllProductsHaveUniqueCode) {
+          totalInvalidWithUniqueCodes++;
+        } else {
+          completeInvalidTenders.push(tender);
+        }
       }
     }
   }
 
-  console.log(count);
+  console.log(totalInvalid, totalInvalidWithUniqueCodes);
+
+  for (const tender of completeInvalidTenders) {
+    const requestedProducts = tender.requestedProducts || [];
+
+    console.log(
+      `Requested products ========================== ${tender.number} ${JSON.stringify(
+        requestedProducts,
+      )}`,
+    );
+
+    const responses = await TenderResponses.find({ tenderId: tender._id });
+
+    for (const response of responses) {
+      if (response.respondedProducts.length === 0) {
+        continue;
+      }
+
+      if (response.respondedProducts.length !== requestedProducts.length) {
+        console.log(
+          `Invalid response ========================================: ${JSON.stringify(
+            response.respondedProducts,
+          )}`,
+        );
+      }
+    }
+  }
 
   mongoose.connection.close();
 };
