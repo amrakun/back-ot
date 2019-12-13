@@ -100,8 +100,8 @@ const tenderResponseQueries = {
       const rowIndex = 8 + index;
 
       // fill requested products section
-      sheet.cell(rowIndex, 2).value(product.code);
-      sheet.cell(rowIndex, 3).value(product.purchaseRequestNumber);
+      sheet.cell(rowIndex, 2).value(product.purchaseRequestNumber);
+      sheet.cell(rowIndex, 3).value(product.code);
       sheet.cell(rowIndex, 4).value(product.shortText);
       sheet.cell(rowIndex, 5).value(product.quantity);
       sheet.cell(rowIndex, 6).value(product.uom);
