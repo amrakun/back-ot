@@ -333,7 +333,7 @@ export const userFactory = async (params = {}) => {
 
 export const tenderDoc = async (params = {}) => {
   const requestedProduct = {
-    id: Math.random().toString(),
+    productId: Math.random().toString(),
     code: faker.random.word(),
     purchaseRequestNumber: faker.random.number(),
     shortText: faker.random.word(),

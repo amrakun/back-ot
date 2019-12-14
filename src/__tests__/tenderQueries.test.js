@@ -781,6 +781,7 @@ describe('Tender queries', () => {
       isSent: true,
       respondedProducts: [
         {
+          productId: 'productId1',
           code: 'code1',
           unitPrice: 300,
           totalPrice: 1000,
@@ -788,6 +789,7 @@ describe('Tender queries', () => {
         },
         {
           code: 'code2',
+          productId: 'productId2',
           unitPrice: 200,
           totalPrice: 2000,
           leadTime: 3000,
@@ -800,12 +802,14 @@ describe('Tender queries', () => {
       isSent: true,
       respondedProducts: [
         {
+          productId: 'productId1',
           code: 'code1',
           unitPrice: 200,
           totalPrice: 100,
           leadTime: 200,
         },
         {
+          productId: 'productId2',
           code: 'code2',
           unitPrice: 20,
           totalPrice: 200,
@@ -819,12 +823,14 @@ describe('Tender queries', () => {
       isSent: true,
       respondedProducts: [
         {
+          productId: 'productId1',
           code: 'code1',
           unitPrice: 100,
           totalPrice: 300,
           leadTime: 300,
         },
         {
+          productId: 'productId2',
           code: 'code2',
           unitPrice: 40,
           totalPrice: 500,

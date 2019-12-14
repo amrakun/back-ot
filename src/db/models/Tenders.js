@@ -15,7 +15,7 @@ const FileSchema = mongoose.Schema(
 
 const ProductSchema = mongoose.Schema(
   {
-    id: field({ type: String }),
+    productId: field({ type: String }),
     code: field({ type: String, optional: true, label: 'OT material code' }),
     purchaseRequestNumber: field({
       type: Number,
@@ -559,7 +559,7 @@ const Tenders = mongoose.model('tenders', TenderSchema);
 // Tender responses =====================
 const RespondedProductSchema = mongoose.Schema(
   {
-    id: field({ type: String }),
+    productId: field({ type: String }),
     code: field({ type: String, optional: true, label: 'OT Material code' }),
     suggestedManufacturer: field({ type: String, optional: true, label: 'Suggested manufacturer' }),
     suggestedManufacturerPartNumber: field({

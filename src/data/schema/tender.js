@@ -1,5 +1,5 @@
 const requestedProductFields = `
-  id: String
+  productId: String
   code: String
   purchaseRequestNumber: Float
   shortText: String
@@ -10,7 +10,7 @@ const requestedProductFields = `
 `;
 
 const respondedProductFields = `
-  id: String
+  productId: String
   code: String
   suggestedManufacturer: String
   suggestedManufacturerPartNumber: String

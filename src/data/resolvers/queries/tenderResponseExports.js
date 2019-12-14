@@ -116,7 +116,7 @@ const tenderResponseQueries = {
         const supplier = companiesMap[response.supplierId];
 
         // find response by product code
-        const rp = response.respondedProducts.find(rp => rp.id === product.id) || {};
+        const rp = response.respondedProducts.find(rp => rp.productId === product.productId) || {};
 
         columnIndex += 7;
 
