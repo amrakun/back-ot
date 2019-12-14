@@ -184,7 +184,7 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
     return Promise.reject(new Error('No responses found'));
   }
 
-  const type = tender.type;
+  const { type, rfqType } = tender;
   const zip = new JSZip();
   const attachments = zip.folder(tender.number);
 
@@ -265,10 +265,17 @@ export const downloadFiles = async (tenderId, selectedCompanies, user) => {
     }
 
     if (type === 'rfq') {
-      filesDoc = (response.respondedProducts || []).map(product => ({
-        file: product.file,
-        name: product.code,
-      }));
+      if (rfqType === 'service') {
+        filesDoc = (response.respondedFiles || []).map(file => ({
+          file,
+          name: 'Attachments',
+        }));
+      } else {
+        filesDoc = (response.respondedProducts || []).map(product => ({
+          file: product.file,
+          name: product.code,
+        }));
+      }
     }
 
     if (type === 'trfq') {
