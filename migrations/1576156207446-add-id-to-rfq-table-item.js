@@ -23,7 +23,7 @@ module.exports.up = async next => {
     }
 
     const updatedRequestedProducts = requestedProducts.map(rp => ({
-      id: Math.random().toString(),
+      productId: Math.random().toString(),
       ...rp.toObject(),
     }));
 
@@ -43,7 +43,7 @@ module.exports.up = async next => {
 
         if (respondedProduct) {
           updatedRespondedProducts.push({
-            id: requestedProduct.id,
+            productId: requestedProduct.productId,
             ...respondedProduct.toObject(),
           });
         }
