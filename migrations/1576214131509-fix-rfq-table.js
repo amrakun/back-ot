@@ -12,33 +12,43 @@ module.exports.up = async next => {
 
   await mongoose.connect(MONGO_URL);
 
-  const tenders = await Tenders.find({
-    createdDate: { $gt: new Date('2019-11-01') },
-    status: 'closed',
-  });
+  const tenders = await Tenders.find({});
 
-  let count = 0;
+  // const tenders = await Tenders.find({
+  //   createdDate: { $gt: new Date('2019-11-01') },
+  //   status: 'closed',
+  // });
+
+  let allInvalid = 0;
+  let withUniqueCodes = 0;
 
   for (const tender of tenders) {
     const requestedProducts = tender.requestedProducts || [];
+
+    if (requestedProducts.length === 0) {
+      continue;
+    }
+
     const requestedProductsUniqueCodes = uniq(requestedProducts.map(rp => rp.code));
     const isAllProductsHaveUniqueCode =
       requestedProducts.length === requestedProductsUniqueCodes.length;
 
-    if (requestedProducts.length > 0) {
-      let status = 'valid';
+    let status = 'valid';
 
-      const responses = await TenderResponses.find({ tenderId: tender._id });
+    const responses = await TenderResponses.find({ tenderId: tender._id });
 
-      for (const response of responses) {
-        const respondedProducts = response.respondedProducts || [];
+    for (const response of responses) {
+      const respondedProducts = response.respondedProducts || [];
 
-        if (respondedProducts.length > 0 && requestedProducts.length !== respondedProducts.length) {
-          status = 'invalid';
-        }
+      if (respondedProducts.length > 0 && requestedProducts.length !== respondedProducts.length) {
+        status = 'invalid';
       }
+    }
 
-      if (status === 'invalid' && isAllProductsHaveUniqueCode) {
+    if (status === 'invalid') {
+      allInvalid++;
+
+      if (isAllProductsHaveUniqueCode) {
         for (const response of responses) {
           const respondedProducts = response.respondedProducts || [];
           const fixedRespondedProducts = [];
@@ -54,18 +64,18 @@ module.exports.up = async next => {
             });
           }
 
-          await TenderResponses.update(
-            { _id: response._id },
-            { $set: { respondedProducts: fixedRespondedProducts } },
-          );
+          // await TenderResponses.update(
+          //   { _id: response._id },
+          //   { $set: { respondedProducts: fixedRespondedProducts } },
+          // );
         }
 
-        count++;
+        withUniqueCodes++;
       }
     }
   }
 
-  console.log(count);
+  console.log('All invalid: ', allInvalid, 'With unique codes: ', withUniqueCodes);
 
   mongoose.connection.close();
 
