@@ -542,6 +542,24 @@ class Tender extends StatusPublishClose {
 
     return false;
   }
+
+  static isValidPrFormat(value) {
+    value = (value || '').toString();
+
+    return (
+      value &&
+      (value.startsWith('25') ||
+        value.startsWith('26') ||
+        value.startsWith('27') ||
+        value.startsWith('28'))
+    );
+  }
+
+  static isValidMaterialCodeFormat(value) {
+    value = (value || '').toString();
+
+    return value && (value.startsWith('20') || value.startsWith('40'));
+  }
 }
 
 const { ENCRYPTION_SECRET } = process.env;
