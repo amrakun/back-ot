@@ -119,7 +119,7 @@ module.exports.up = async next => {
           }
         }
 
-        const supplier = await Companies.findOne({ _id: response._id });
+        const supplier = await Companies.findOne({ _id: response.supplierId });
 
         console.log('Total RES count:', totalRCount, '  Fix needed count:', fixNeededRCount);
         console.log('--------', supplier.basicInfo.enName);
@@ -131,6 +131,8 @@ module.exports.up = async next => {
           { $set: { respondedProducts: fixedRespondedProducts } },
         );
       }
+    } else {
+      console.log('Not fixable', tender.number);
     }
   }
 
