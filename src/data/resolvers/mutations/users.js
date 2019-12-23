@@ -70,10 +70,7 @@ const userMutations = {
       throw new Error('Company already exists');
     }
 
-    const { user } = await register(contactPersonEmail);
-
-    // create company for new user
-    const company = await Companies.createCompany(user._id, {
+    const companyDoc = {
       basicInfo: {
         enName: companyName,
       },
@@ -83,7 +80,36 @@ const userMutations = {
         phone: contactPersonPhone,
         email: contactPersonEmail,
       },
-    });
+    };
+
+    const prevUser = await Users.findOne({ email: contactPersonEmail });
+
+    // check user duplication
+    if (prevUser) {
+      let hasIncompleteData = false;
+      let company = await Companies.findOne({ _id: prevUser.companyId });
+
+      if (company && !company.basicInfo && !company.contactInfo) {
+        hasIncompleteData = true;
+
+        await Companies.update({ _id: company._id }, { $set: companyDoc });
+
+        company = await Companies.findOne({ _id: company._id });
+      }
+
+      if (hasIncompleteData) {
+        return {
+          user: prevUser,
+          company,
+          warning: `The user with "${contactPersonEmail}" email already exists`,
+        };
+      }
+    }
+
+    const { user } = await register(contactPersonEmail);
+
+    // create company for new user
+    const company = await Companies.createCompany(user._id, companyDoc);
 
     return { user, company };
   },

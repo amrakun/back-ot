@@ -3,15 +3,9 @@
 
 import moment from 'moment';
 import { connect, disconnect } from '../db/connection';
-import { Users, Audits, BlockedCompanies, Feedbacks, Tenders } from '../db/models';
+import { Users, BlockedCompanies, Tenders } from '../db/models';
 
-import {
-  userFactory,
-  auditFactory,
-  blockedCompanyFactory,
-  feedbackFactory,
-  tenderFactory,
-} from '../db/factories';
+import { userFactory, auditFactory, feedbackFactory } from '../db/factories';
 
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';

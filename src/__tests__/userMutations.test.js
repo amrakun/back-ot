@@ -616,41 +616,42 @@ describe('User mutations', async () => {
     expect(response.delegationEndDate).toBeDefined();
   });
 
-  test('Register via buyer', async () => {
-    const mutation = `
-      mutation registerViaBuyer(
-        $companyName: String!,
-        $contactPersonName: String!,
-        $contactPersonPhone: String!,
-        $contactPersonEmail: String!,
+  const registerViaBuyerMutation = `
+    mutation registerViaBuyer(
+      $companyName: String!,
+      $contactPersonName: String!,
+      $contactPersonPhone: String!,
+      $contactPersonEmail: String!,
+    ) {
+      registerViaBuyer(
+        companyName: $companyName,
+        contactPersonName: $contactPersonName,
+        contactPersonPhone: $contactPersonPhone,
+        contactPersonEmail: $contactPersonEmail,
       ) {
-        registerViaBuyer(
-          companyName: $companyName,
-          contactPersonName: $contactPersonName,
-          contactPersonPhone: $contactPersonPhone,
-          contactPersonEmail: $contactPersonEmail,
-        ) {
-          user {
-            _id
+        user {
+          _id
+        }
+
+        company {
+          _id
+
+          basicInfo {
+            enName
           }
 
-          company {
-            _id
-
-            basicInfo {
-              enName
-            }
-
-            contactInfo {
-              name
-              phone
-              email
-            }
+          contactInfo {
+            name
+            phone
+            email
           }
         }
+        warning
       }
-    `;
+    }
+  `;
 
+  test('Register via buyer', async () => {
     const doc = {
       companyName: 'company',
       contactPersonName: 'fullName',
@@ -658,7 +659,7 @@ describe('User mutations', async () => {
       contactPersonEmail: 'test@gmail.com',
     };
 
-    const doMutation = () => graphqlRequest(mutation, 'registerViaBuyer', doc);
+    const doMutation = () => graphqlRequest(registerViaBuyerMutation, 'registerViaBuyer', doc);
 
     // check user email existance ========
     await userFactory({ email: doc.contactPersonEmail });
@@ -687,6 +688,30 @@ describe('User mutations', async () => {
 
     expect(response.user._id).toBeDefined();
 
+    expect(response.company._id).toBeDefined();
+    expect(response.company.basicInfo.enName).toBe(doc.companyName);
+    expect(response.company.contactInfo.name).toBe(doc.contactPersonName);
+    expect(response.company.contactInfo.phone).toBe(doc.contactPersonPhone);
+    expect(response.company.contactInfo.email).toBe(doc.contactPersonEmail);
+  });
+
+  test('Register via buyer: hasIncompleteData', async () => {
+    const doc = {
+      companyName: 'company',
+      contactPersonName: 'fullName',
+      contactPersonPhone: 242424242,
+      contactPersonEmail: 'test@gmail.com',
+    };
+
+    const doMutation = () => graphqlRequest(registerViaBuyerMutation, 'registerViaBuyer', doc);
+
+    const company = await Companies.create({ createdDate: new Date() });
+    await userFactory({ email: doc.contactPersonEmail, companyId: company._id });
+
+    const response = await doMutation();
+
+    expect(response.warning).toBe(`The user with "${doc.contactPersonEmail}" email already exists`);
+    expect(response.user._id).toBeDefined();
     expect(response.company._id).toBeDefined();
     expect(response.company.basicInfo.enName).toBe(doc.companyName);
     expect(response.company.contactInfo.name).toBe(doc.contactPersonName);

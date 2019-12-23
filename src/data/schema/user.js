@@ -30,6 +30,7 @@ export const types = `
   type RegisterViaBuyerPayload {
     user: User
     company: Company
+    warning: String
   }
 `;
 
