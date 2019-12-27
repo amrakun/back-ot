@@ -110,6 +110,7 @@ const tenderResponseQueries = {
     );
 
     const totalsMap = {};
+    const totalCellIndexesMap = {};
 
     for (const [index, product] of requestedProducts.entries()) {
       const rowIndex = 8 + index;
@@ -129,6 +130,7 @@ const tenderResponseQueries = {
 
       for (const response of responses) {
         const supplier = companiesMap[response.supplierId];
+        const responseId = response._id.toString();
 
         // find response by product code
         const rp = response.respondedProducts.find(rp => rp.productId === product.productId) || {};
@@ -139,7 +141,7 @@ const tenderResponseQueries = {
         sheet.cell(5, columnIndex).value(supplier.basicInfo.enName);
 
         // bidder number
-        sheet.cell(6, columnIndex).value(`BIDDER#${orderMap[response._id.toString()]}`);
+        sheet.cell(6, columnIndex).value(`BIDDER#${orderMap[responseId]}`);
 
         // fill suppliers section
         let total = 0;
@@ -149,14 +151,14 @@ const tenderResponseQueries = {
         }
 
         // collect totals by response id
-        if (!totalsMap[response._id]) {
-          totalsMap[response._id] = { mnt: 0, usd: 0 };
+        if (!totalsMap[responseId]) {
+          totalsMap[responseId] = { mnt: 0, usd: 0 };
         }
 
         const currency = (rp.currency || '').toLowerCase();
 
         if (['mnt', 'usd'].includes(currency)) {
-          totalsMap[response._id][currency] += total;
+          totalsMap[responseId][currency] += total;
         }
 
         sheet.cell(rowIndex, columnIndex).value(rp.leadTime);
@@ -177,6 +179,12 @@ const tenderResponseQueries = {
           }
         }
 
+        if (!totalCellIndexesMap[responseId]) {
+          totalCellIndexesMap[responseId] = [];
+        }
+
+        totalCellIndexesMap[responseId].push(cf(`R${rowIndex}C${columnIndex + 2}`));
+
         if (total) {
           sheet
             .cell(rowIndex, columnIndex + 2)
@@ -188,7 +196,7 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
         sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
 
-        sheet.cell(113, columnIndex).value(exchangeRate.toString());
+        sheet.cell(113, columnIndex).value(exchangeRate);
 
         // shipping terms
         sheet.cell(114, columnIndex).value(rp.shippingTerms);
@@ -198,14 +206,31 @@ const tenderResponseQueries = {
     let columnIndex = 9;
 
     for (const response of responses) {
-      if (!totalsMap[response._id]) {
+      const responseId = response._id.toString();
+
+      if (!totalsMap[responseId] || !totalCellIndexesMap[responseId]) {
         continue;
       }
 
-      const { mnt, usd } = totalsMap[response._id];
+      const { mnt, usd } = totalsMap[responseId];
 
-      sheet.cell(110, columnIndex).value(usd ? usd * exchangeRate : mnt);
-      sheet.cell(110, columnIndex + 3).value(mnt ? mnt / exchangeRate : usd);
+      if (usd) {
+        sheet
+          .cell(110, columnIndex + 3)
+          .formula(`SUM(${totalCellIndexesMap[responseId].join(',')})`);
+
+        sheet
+          .cell(110, columnIndex)
+          .formula(`${cf(`R113C${columnIndex}`)}*${cf(`R110C${columnIndex + 3}`)}`);
+      }
+
+      if (mnt) {
+        sheet.cell(110, columnIndex).formula(`SUM(${totalCellIndexesMap[responseId].join(',')})`);
+
+        sheet
+          .cell(110, columnIndex + 3)
+          .formula(`${cf(`R110C${columnIndex}`)} / ${cf(`R113C${columnIndex}`)}`);
+      }
 
       sheet.cell(112, columnIndex).value(0);
       sheet.cell(112, columnIndex + 3).value(0);
