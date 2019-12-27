@@ -5,12 +5,17 @@ import { readTemplate, generateXlsx, quickSort } from '../../utils';
 import { productsMap } from '../../constants';
 import { moduleRequireBuyer } from '../../permissions';
 
+const generateSentSelector = tenderId => ({
+  tenderId,
+  isSent: true,
+  isNotInterested: { $ne: true },
+});
+
 const prepareReport = async ({ tenderId, supplierIds, template }) => {
   const tender = await Tenders.findOne({ _id: tenderId });
 
   const responses = await TenderResponses.find({
-    tenderId,
-    isSent: true,
+    ...generateSentSelector(tenderId),
     supplierId: { $in: encryptArray(supplierIds) },
   });
 
@@ -58,15 +63,22 @@ const tenderResponseQueries = {
         `A tender was announced via OYU SQMS to ${await tender.requestedCount()} suppliers in selected categories (${products}). ${await tender.submittedCount()} suppliers responded to the tender on time. Highlighted by green are the suppliers recommended to award PO to for specific items as shown in below for offering cheapest price and shortest lead time.`,
       );
 
-    const companiesMap = {};
+    // calculate order map
     const orderMap = {};
 
-    for (const [index, response] of responses.entries()) {
+    const allSentResponses = await TenderResponses.find(generateSentSelector(tenderId), { _id: 1 });
+
+    for (const [index, response] of allSentResponses.entries()) {
+      orderMap[response._id.toString()] = index + 1;
+    }
+    // end of calculate order map
+
+    const companiesMap = {};
+
+    for (const response of responses) {
       companiesMap[response.supplierId] = await Companies.findOne({
         _id: response.supplierId,
       });
-
-      orderMap[response._id.toString()] = index + 1;
 
       let totalUnitPrice = 0;
       let completeNessScore = 0;
