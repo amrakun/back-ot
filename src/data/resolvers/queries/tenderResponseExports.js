@@ -91,7 +91,7 @@ const tenderResponseQueries = {
           return res1.totalUnitPrice < res2.totalUnitPrice;
         }
 
-        return res1.completeNessScore < res2.completeNessScore;
+        return res1.completeNessScore > res2.completeNessScore;
       },
       0,
       responses.length - 1,
