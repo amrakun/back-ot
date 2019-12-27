@@ -188,10 +188,10 @@ const tenderResponseQueries = {
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
         sheet.cell(rowIndex, columnIndex + 6).value(rp.comment);
 
-        sheet.cell(112, columnIndex).value(exchangeRate.toString());
+        sheet.cell(113, columnIndex).value(exchangeRate.toString());
 
         // shipping terms
-        sheet.cell(113, columnIndex).value(rp.shippingTerms);
+        sheet.cell(114, columnIndex).value(rp.shippingTerms);
       }
     }
 
@@ -204,13 +204,13 @@ const tenderResponseQueries = {
 
       const { mnt, usd } = totalsMap[response._id];
 
-      sheet.cell(109, columnIndex).value(usd ? usd * exchangeRate : mnt);
-      sheet.cell(109, columnIndex + 2).value(mnt ? mnt / exchangeRate : usd);
+      sheet.cell(110, columnIndex).value(usd ? usd * exchangeRate : mnt);
+      sheet.cell(110, columnIndex + 3).value(mnt ? mnt / exchangeRate : usd);
 
-      sheet.cell(111, columnIndex).value(0);
-      sheet.cell(111, columnIndex + 2).value(0);
+      sheet.cell(112, columnIndex).value(0);
+      sheet.cell(112, columnIndex + 3).value(0);
 
-      sheet.cell(114, columnIndex).value('EOAP 45');
+      sheet.cell(115, columnIndex).value('EOAP 45');
 
       columnIndex += 7;
     }
