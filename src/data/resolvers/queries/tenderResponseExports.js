@@ -1,6 +1,6 @@
 import cf from 'cellref';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
-import { encryptArray, decrypt } from '../../../db/models/utils';
+import { encryptArray } from '../../../db/models/utils';
 import { readTemplate, generateXlsx, quickSort } from '../../utils';
 import { productsMap } from '../../constants';
 import { moduleRequireBuyer } from '../../permissions';
@@ -177,7 +177,12 @@ const tenderResponseQueries = {
           }
         }
 
-        sheet.cell(rowIndex, columnIndex + 2).value(total ? total : null);
+        if (total) {
+          sheet
+            .cell(rowIndex, columnIndex + 2)
+            .formula(`${cf(`R${rowIndex}C${columnIndex + 1}`)}*${cf(`R${rowIndex}C5`)}`);
+        }
+
         sheet.cell(rowIndex, columnIndex + 3).value(rp.alternative);
         sheet.cell(rowIndex, columnIndex + 4).value(rp.suggestedManufacturer);
         sheet.cell(rowIndex, columnIndex + 5).value(rp.suggestedManufacturerPartNumber);
