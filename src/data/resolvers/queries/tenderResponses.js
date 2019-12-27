@@ -70,7 +70,12 @@ const tenderResponseQueries = {
 
     const { page, perPage } = args;
     const _page = Number(page || '1');
-    const _limit = Number(perPage || '15');
+
+    let _limit = 1000;
+
+    if (tender.type === 'eoi') {
+      _limit = Number(perPage || '15');
+    }
 
     if (sortName && sortProductCode) {
       aggregations = [
