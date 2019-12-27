@@ -40,8 +40,6 @@ const tenderResponseQueries = {
 
     const requestedProducts = tender.requestedProducts;
 
-    const companiesMap = {};
-
     // date
     sheet.cell(1, 7).value(new Date().toLocaleDateString());
 
@@ -60,10 +58,15 @@ const tenderResponseQueries = {
         `A tender was announced via OYU SQMS to ${await tender.requestedCount()} suppliers in selected categories (${products}). ${await tender.submittedCount()} suppliers responded to the tender on time. Highlighted by green are the suppliers recommended to award PO to for specific items as shown in below for offering cheapest price and shortest lead time.`,
       );
 
-    for (const response of responses) {
+    const companiesMap = {};
+    const orderMap = {};
+
+    for (const [index, response] of responses.entries()) {
       companiesMap[response.supplierId] = await Companies.findOne({
         _id: response.supplierId,
       });
+
+      orderMap[response._id.toString()] = index + 1;
 
       let totalUnitPrice = 0;
       let completeNessScore = 0;
@@ -122,6 +125,9 @@ const tenderResponseQueries = {
 
         // title
         sheet.cell(5, columnIndex).value(supplier.basicInfo.enName);
+
+        // bidder number
+        sheet.cell(6, columnIndex).value(`BIDDER#${orderMap[response._id.toString()]}`);
 
         // fill suppliers section
         let total = 0;
