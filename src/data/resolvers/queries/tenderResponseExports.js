@@ -43,7 +43,11 @@ const tenderResponseQueries = {
       template: 'rfq_bid',
     });
 
-    const requestedProducts = tender.requestedProducts;
+    let requestedProducts = tender.requestedProducts;
+
+    if (tender.rfqType === 'service') {
+      requestedProducts = [{}];
+    }
 
     // date
     sheet.cell(1, 7).value(new Date().toLocaleDateString());
