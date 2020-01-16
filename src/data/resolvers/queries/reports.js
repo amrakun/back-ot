@@ -1,6 +1,6 @@
 import { readTemplate, generateXlsx } from '../../utils';
 import { Companies, Tenders, TenderResponses, Audits } from '../../../db/models';
-import { decryptArray } from '../../../db/models/utils';
+import { decryptArray, decrypt } from '../../../db/models/utils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const reportsQuery = {
@@ -165,7 +165,7 @@ const reportsQuery = {
 
       const supplierIds = decryptArray(tender.supplierIds);
 
-      return companies.filter(c => supplierIds.includes(c._id));
+      return companies.filter(c => supplierIds.includes(c._id.toString()));
     };
 
     const responses = await TenderResponses.find(
@@ -179,11 +179,13 @@ const reportsQuery = {
     const participatedSupplierIdsByTenderId = {};
 
     for (const response of responses) {
-      if (!participatedSupplierIdsByTenderId[response.tenderId]) {
-        participatedSupplierIdsByTenderId[response.tenderId] = [];
+      const tenderId = response.tenderId.toString();
+
+      if (!participatedSupplierIdsByTenderId[tenderId]) {
+        participatedSupplierIdsByTenderId[tenderId] = [];
       }
 
-      participatedSupplierIdsByTenderId[response.tenderId].push(response.supplierId);
+      participatedSupplierIdsByTenderId[tenderId].push(decrypt(response.supplierId));
     }
 
     const { workbook, sheet } = await readTemplate('reports_tenders');
@@ -192,7 +194,7 @@ const reportsQuery = {
 
     for (const it of tenders) {
       const invitedSuppliers = calculateInvitedSuppliers(it);
-      const particatedSupplierIds = participatedSupplierIdsByTenderId[it._id] || [];
+      const particatedSupplierIds = participatedSupplierIdsByTenderId[it._id.toString()] || [];
       const winnerIds = it.getWinnerIds();
 
       for (const supplier of invitedSuppliers) {
