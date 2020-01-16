@@ -1,5 +1,6 @@
 import { readTemplate, generateXlsx } from '../../utils';
-import { Companies, Tenders, Audits } from '../../../db/models';
+import { Companies, Tenders, TenderResponses, Audits } from '../../../db/models';
+import { decryptArray } from '../../../db/models/utils';
 import { moduleRequireBuyer } from '../../permissions';
 
 const reportsQuery = {
@@ -146,19 +147,53 @@ const reportsQuery = {
 
     const tenders = await Tenders.find(filter);
 
+    const companies = await Companies.find(
+      {},
+      { createdDate: 1, tierType: 1, 'basicInfo.enName': 1, 'basicInfo.mnName': 1 },
+    );
+
+    const calculateInvitedSuppliers = tender => {
+      if (tender.isToAll) {
+        return companies.filter(c => c.createdDate <= tender.updatedDate);
+      }
+
+      if (tender.tierTypes && tender.tierTypes.length > 0) {
+        return companies.filter(
+          c => c.createdDate <= tender.updatedDate && tender.tierTypes.includes(c.tierType),
+        );
+      }
+
+      const supplierIds = decryptArray(tender.supplierIds);
+
+      return companies.filter(c => supplierIds.includes(c._id));
+    };
+
+    const responses = await TenderResponses.find(
+      {
+        isNotInterested: { $ne: true },
+        isSent: true,
+      },
+      { tenderId: 1, supplierId: 1 },
+    );
+
+    const participatedSupplierIdsByTenderId = {};
+
+    for (const response of responses) {
+      if (!participatedSupplierIdsByTenderId[response.tenderId]) {
+        participatedSupplierIdsByTenderId[response.tenderId] = [];
+      }
+
+      participatedSupplierIdsByTenderId[response.tenderId].push(response.supplierId);
+    }
+
     const { workbook, sheet } = await readTemplate('reports_tenders');
 
     let rowIndex = 4;
 
     for (const it of tenders) {
-      const invitedSupplierIds = await it.getExactSupplierIds();
-      const particatedSupplierIds = await it.participatedSuppliers({ onlyIds: true });
+      const invitedSuppliers = calculateInvitedSuppliers(it);
+      const particatedSupplierIds = participatedSupplierIdsByTenderId[it._id] || [];
       const winnerIds = it.getWinnerIds();
-
-      const invitedSuppliers = await Companies.find(
-        { _id: { $in: invitedSupplierIds } },
-        { basicInfo: 1 },
-      );
 
       for (const supplier of invitedSuppliers) {
         rowIndex++;
