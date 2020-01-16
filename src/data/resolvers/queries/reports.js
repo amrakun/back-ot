@@ -148,7 +148,7 @@ const reportsQuery = {
     const tenders = await Tenders.find(filter);
 
     const companies = await Companies.find(
-      {},
+      { basicInfo: { $ne: null } },
       { createdDate: 1, tierType: 1, 'basicInfo.enName': 1, 'basicInfo.mnName': 1 },
     );
 
