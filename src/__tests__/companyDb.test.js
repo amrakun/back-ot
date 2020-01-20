@@ -38,12 +38,16 @@ describe('Companies model tests', () => {
 
   test('Create', async () => {
     const user = await userFactory({});
-    const company = await Companies.createCompany(user._id);
+    const company = await Companies.createCompany(user._id, {
+      basicInfo: { enName: 'enName ', mnName: 'mnName ' },
+    });
 
     expect(company).toBeDefined();
     expect(company._id).toBeDefined();
     expect(company.isSentRegistrationInfo).toBe(false);
     expect(company.isSentPrequalificationInfo).toBe(false);
+    expect(company.basicInfo.enName).toBe('enName');
+    expect(company.basicInfo.mnName).toBe('mnName');
 
     const [difotScore] = company.difotScores;
 
@@ -53,6 +57,16 @@ describe('Companies model tests', () => {
     const updatedUser = await Users.findOne({ _id: user._id });
 
     expect(updatedUser.companyId).toBe(company._id.toString());
+  });
+
+  test('Update basic info: trim names', async () => {
+    const company = await Companies.updateBasicInfo(_company._id, {
+      enName: 'enName ',
+      mnName: 'mnName ',
+    });
+
+    expect(company.basicInfo.enName).toBe('enName');
+    expect(company.basicInfo.mnName).toBe('mnName');
   });
 
   test('Update basic info: validations', async () => {

@@ -1022,12 +1022,28 @@ class Company {
     return feedbacks.pop();
   }
 
+  static async trimNames(basicInfo) {
+    if (basicInfo.enName) {
+      basicInfo.enName = basicInfo.enName.trim();
+    }
+
+    if (basicInfo.mnName) {
+      basicInfo.mnName = basicInfo.mnName.trim();
+    }
+
+    return basicInfo;
+  }
+
   /**
    * Create a company
    * @param userId - Permforming user id
    * @return {Promise} Newly created company object
    */
   static async createCompany(userId, doc = {}) {
+    if (doc && doc.basicInfo) {
+      Companies.trimNames(doc.basicInfo);
+    }
+
     const company = await this.create({
       createdDate: new Date(),
       ...doc,
@@ -1048,6 +1064,8 @@ class Company {
    * @return {Promise} Updated company object
    */
   static async updateBasicInfo(_id, basicInfo) {
+    Companies.trimNames(basicInfo);
+
     const { enName, mnName } = basicInfo;
 
     // validations
