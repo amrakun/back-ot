@@ -1,4 +1,5 @@
 import cf from 'cellref';
+import { _ } from 'underscore';
 import { Companies, Tenders, TenderResponses } from '../../../db/models';
 import { encryptArray } from '../../../db/models/utils';
 import { readTemplate, generateXlsx, quickSort } from '../../utils';
@@ -34,7 +35,7 @@ const tenderResponseQueries = {
    */
   async tenderResponsesRfqBidSummaryReport(
     root,
-    { tenderId, supplierIds, sort = 'minTotalPrice', exchangeRate },
+    { tenderId, supplierIds, sort = 'minTotalPrice', first, last, exchangeRate },
     { user },
   ) {
     const { tender, responses, workbook, sheet } = await prepareReport({
@@ -47,6 +48,14 @@ const tenderResponseQueries = {
 
     if (tender.rfqType === 'service') {
       requestedProducts = [{}];
+    }
+
+    if (first) {
+      requestedProducts = _.first(requestedProducts, first);
+    }
+
+    if (last) {
+      requestedProducts = _.last(requestedProducts, last);
     }
 
     // date
