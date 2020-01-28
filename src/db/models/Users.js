@@ -72,7 +72,7 @@ export const UserSchema = mongoose.Schema({
 
 class User {
   static getSecret() {
-    return 'dfjklsafjjekjtejifjidfjsfd';
+    return process.env.JWT_TOKEN_SECRET || '';
   }
 
   static validatePassword(password) {
