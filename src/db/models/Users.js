@@ -531,7 +531,7 @@ class User {
    */
   static async login({ email, password, loginAs }) {
     let user = await Users.findOne({
-      email: { $regex: new RegExp(email, 'i') },
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
     });
 
     if (!user) {
