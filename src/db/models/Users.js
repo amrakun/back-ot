@@ -72,7 +72,7 @@ export const UserSchema = mongoose.Schema({
 
 class User {
   static getSecret() {
-    return 'dfjklsafjjekjtejifjidfjsfd';
+    return process.env.JWT_TOKEN_SECRET || '';
   }
 
   static validatePassword(password) {
@@ -531,7 +531,7 @@ class User {
    */
   static async login({ email, password, loginAs }) {
     let user = await Users.findOne({
-      email: { $regex: new RegExp(email, 'i') },
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
     });
 
     if (!user) {
