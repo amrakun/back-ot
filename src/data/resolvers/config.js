@@ -21,4 +21,25 @@ export default {
       suppliers,
     };
   },
+
+  async specificAuditDow(config) {
+    const { specificAuditDow } = config;
+
+    if (!specificAuditDow) {
+      return specificAuditDow;
+    }
+
+    const { supplierIds } = specificAuditDow;
+
+    if (!supplierIds) {
+      return specificAuditDow;
+    }
+
+    const suppliers = await Companies.find({ _id: { $in: supplierIds } });
+
+    return {
+      ...specificAuditDow,
+      suppliers,
+    };
+  },
 };
