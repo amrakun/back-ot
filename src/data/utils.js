@@ -162,7 +162,16 @@ export const uploadFile = async (file, fromEditor = false) => {
  * @return {Promise}
  */
 export const sendEmail = async args => {
-  const { toEmails, fromEmail, subject, content = '', template, attachments = [], data } = args;
+  const {
+    toEmails,
+    fromEmail,
+    subject,
+    content = '',
+    template,
+    attachments = [],
+    bulk,
+    data,
+  } = args;
 
   return sendMessage('sendEmail', {
     template,
@@ -171,6 +180,7 @@ export const sendEmail = async args => {
     subject,
     content,
     attachments,
+    bulk,
     data,
   });
 };
@@ -203,6 +213,7 @@ export const sendConfigEmail = async ({
   toEmails,
   attachments,
   replacer,
+  bulk,
   data,
 }) => {
   const config = await getConfig();
@@ -233,6 +244,7 @@ export const sendConfigEmail = async ({
     subject: `${subjectEn} ${subjectMn}`,
     content: `${contentEn} ${contentMn}`,
     attachments,
+    bulk,
     data,
   });
 };
