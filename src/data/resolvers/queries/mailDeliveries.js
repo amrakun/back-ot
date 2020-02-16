@@ -10,7 +10,8 @@ const mailDeliveryQueries = {
   },
 
   async mailDeliveriesTotalCount(root, args) {
-    const response = await fetchMailer('deliveriesTotalCount', { search: args.search });
+    const response = await fetchMailer('deliveriesTotalCount', args);
+
     return response.count;
   },
 };
