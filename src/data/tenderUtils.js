@@ -78,6 +78,7 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
         return replacer({ text, tender });
       },
       toEmails: receivers,
+      bulk: tender.type === 'eoi',
       data: {
         source: 'tender',
         tenderId: tender._id.toString(),
@@ -370,14 +371,15 @@ export const downloadTenderMessageFiles = async (tenderId, user) => {
  */
 const gatherSupplierNames = async (supplierIds = [], idFieldName) => {
   const supplierNames = [];
+  const suppliers = await Companies.find({ _id: { $in: supplierIds } }, { 'basicInfo.enName': 1 });
 
-  for (const id of supplierIds) {
-    const name = await Companies.getName(id);
+  for (const supplier of suppliers) {
+    const name = (supplier.basicInfo || {}).enName || '';
 
     if (name) {
       // item must have field name declared in schemas
       supplierNames.push({
-        [idFieldName]: id,
+        [idFieldName]: supplier._id.toString(),
         name,
       });
     }

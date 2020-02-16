@@ -17,6 +17,6 @@ export const mutations = `
 `;
 
 export const queries = `
-  mailDeliveries(page: Int, perPage: Int, search: String): [MailDelivery]
-  mailDeliveriesTotalCount(search: String): Int
+  mailDeliveries(page: Int, perPage: Int, search: String, old: Boolean): [MailDelivery]
+  mailDeliveriesTotalCount(search: String, old: Boolean): Int
 `;
