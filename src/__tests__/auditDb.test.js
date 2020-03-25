@@ -196,33 +196,6 @@ describe('Audit response db', () => {
     await checkCommonReplyRecommentSection('businessInfo');
   });
 
-  test('Evidence info', async () => {
-    expect.assertions(2);
-
-    const doc = auditResponseDocs.evidenceInfo();
-
-    const response = await AuditResponses.saveEvidenceInfo({
-      auditId: _audit._id,
-      supplierId: _company._id,
-      doc,
-    });
-
-    expect(response.evidenceInfo.toJSON()).toEqual(doc);
-
-    // check isEditable validation
-    await AuditResponses.update({ _id: response._id }, { $set: { isEditable: false } });
-
-    try {
-      await AuditResponses.saveEvidenceInfo({
-        auditId: _audit._id,
-        supplierId: _company._id,
-        doc,
-      });
-    } catch (e) {
-      expect(e.message).toBe('Not editable');
-    }
-  });
-
   test('Publish drafts', async () => {
     // mocking datetime now
     dbUtils.getNow = jest.fn(() => new Date('2040-02-01 01:01'));

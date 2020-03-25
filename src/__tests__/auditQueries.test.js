@@ -184,36 +184,6 @@ describe('Company queries', () => {
               doesHaveDocumentedPolicyToCorruption { supplierComment }
               whoIsResponsibleForPolicy { supplierComment }
             }
-
-            evidenceInfo {
-              doesHaveHealthSafety
-              doesHaveDrugPolicy
-              doesPerformPreemployment
-              workProceduresConform
-              doesHaveFormalProcessForHSE
-              doesHaveSystemForTracking
-              doesHaveValidCertifications
-              doesHaveSystemForReporting
-              doesHaveLiabilityInsurance
-              doesHaveFormalProcessForHealth
-              isThereCurrentContract
-              doesHaveJobDescription
-              doesHaveTraining
-              doesHaveEmployeeRelatedProcedure
-              doesHaveTimeKeeping
-              doesHavePerformancePolicy
-              doesHaveProcessToSupport
-              employeesAwareOfRights
-              doesHaveSystemToEnsureSafeWork
-              doesHaveEmployeeSelectionProcedure
-              doesHaveEmployeeLaborProcedure
-              doesHaveGrievancePolicy
-              proccessToEnsurePolicesCompany
-              proccessToEnsurePolicesSupplyChain
-              hasBeenSubjectToInvestigation
-              doesHaveCorruptionPolicy
-              whoIsResponsibleForCorruptionPolicy
-            }
           }
         }
       }

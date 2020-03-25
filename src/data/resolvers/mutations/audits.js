@@ -24,21 +24,6 @@ const auditMutations = {
     return response;
   },
 
-  // save evidence info
-  async auditsSupplierSaveEvidenceInfo(root, { auditId, evidenceInfo }, { user }) {
-    const supplierId = user.companyId;
-
-    const response = await AuditResponses.saveEvidenceInfo({
-      auditId: auditId,
-      supplierId: user.companyId,
-      doc: evidenceInfo,
-    });
-
-    await AuditResponses.markAsSupplierNotified({ auditId, supplierId });
-
-    return response;
-  },
-
   // mark response as sent
   async auditsSupplierSendResponse(root, { auditId }, { user }) {
     const audit = await Audits.findOne({ _id: auditId });
@@ -200,7 +185,6 @@ requireBuyer(auditMutations, 'auditsBuyerSaveFiles');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
-requireSupplier(auditMutations, 'auditsSupplierSaveEvidenceInfo');
 requireSupplier(auditMutations, 'auditsSupplierSendResponse');
 
 export default auditMutations;

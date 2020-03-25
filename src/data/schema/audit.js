@@ -4,36 +4,6 @@ const basicInfoFields = `
   otExperience: String
 `;
 
-const evidenceInfoFields = `
-  doesHaveHealthSafety: Boolean
-  doesHaveDrugPolicy: Boolean
-  doesPerformPreemployment: Boolean
-  workProceduresConform: Boolean
-  doesHaveFormalProcessForHSE: Boolean
-  doesHaveSystemForTracking: Boolean
-  doesHaveValidCertifications: Boolean
-  doesHaveSystemForReporting: Boolean
-  doesHaveLiabilityInsurance: Boolean
-  doesHaveFormalProcessForHealth: Boolean
-  isThereCurrentContract: Boolean
-  doesHaveJobDescription: Boolean
-  doesHaveTraining: Boolean
-  doesHaveEmployeeRelatedProcedure: Boolean
-  doesHaveTimeKeeping: Boolean
-  doesHavePerformancePolicy: Boolean
-  doesHaveProcessToSupport: Boolean
-  employeesAwareOfRights: Boolean
-  doesHaveSystemToEnsureSafeWork: Boolean
-  doesHaveEmployeeSelectionProcedure: Boolean
-  doesHaveEmployeeLaborProcedure: Boolean
-  doesHaveGrievancePolicy: Boolean
-  proccessToEnsurePolicesCompany: Boolean
-  proccessToEnsurePolicesSupplyChain: Boolean
-  hasBeenSubjectToInvestigation: Boolean
-  doesHaveCorruptionPolicy: Boolean
-  whoIsResponsibleForCorruptionPolicy: Boolean
-`;
-
 const generateCoreHseqFields = type => `
   doesHaveHealthSafety: ${type}
   doesHaveDocumentedPolicy: ${type}
@@ -117,11 +87,6 @@ export const types = `
     ${generateBusinessFields('Answer')}
   }
 
-  # evidence info
-  input AuditSupplierEvidenceInfoInput {
-    ${evidenceInfoFields}
-  }
-
   # buyer ======================
   # core hseq info
   input AuditBuyerCoreHseqInfoInput {
@@ -176,10 +141,6 @@ export const types = `
     ${generateBusinessFields('AnswerRecommendation')}
   }
 
-  type AuditEvidenceInfo {
-    ${evidenceInfoFields}
-  }
-
   type Audit {
     _id: String!
     createdUserId: String
@@ -208,7 +169,6 @@ export const types = `
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
     businessInfo: AuditBusinessInfo
-    evidenceInfo: AuditEvidenceInfo
 
     isSent: Boolean
     submittedCount: Float
@@ -313,11 +273,6 @@ export const mutations = `
   auditsSupplierSaveBusinessInfo(
     auditId: String,
     businessInfo: AuditSupplierBusinessInfoInput
-  ): Audit
-
-  auditsSupplierSaveEvidenceInfo(
-    auditId: String,
-    evidenceInfo: AuditSupplierEvidenceInfoInput
   ): Audit
 
   auditsSupplierSendResponse(auditId: String): AuditResponse
