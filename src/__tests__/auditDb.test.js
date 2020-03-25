@@ -44,6 +44,7 @@ describe('Audit response db', () => {
       {
         publishDate: new Date(),
         closeDate: new Date(),
+        content: 'content',
         supplierIds,
       },
       user._id,

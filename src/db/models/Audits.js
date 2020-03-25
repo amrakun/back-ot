@@ -6,9 +6,12 @@ import { Configs, Companies } from './';
 // Audit schema
 const AuditSchema = mongoose.Schema({
   status: field({ type: String }),
+
   publishDate: field({ type: Date }),
   closeDate: field({ type: Date }),
   supplierIds: field({ type: [String] }),
+  responsibleBuyerIds: field({ type: [String], optional: true, label: 'Responsible buyers' }),
+  content: field({ type: String, label: 'Email content' }),
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),

@@ -177,10 +177,13 @@ export const types = `
   type Audit {
     _id: String!
     createdUserId: String
-    supplierIds: [String]
     status: String
+
+    supplierIds: [String]
     publishDate: Date
     closeDate: Date
+    responsibleBuyerIds: [String]
+    content: String
 
     createdUser: User
     suppliers: [Company]
@@ -278,7 +281,13 @@ export const queries = `
 `;
 
 export const mutations = `
-  auditsAdd(publishDate: Date!, closeDate: Date!, supplierIds: [String]!): Audit
+  auditsAdd(
+    publishDate: Date!,
+    closeDate: Date!,
+    supplierIds: [String]!
+    responsibleBuyerIds: [String],
+    content: String!,
+  ): Audit
 
   auditsSupplierSaveBasicInfo(
     auditId: String,

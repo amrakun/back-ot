@@ -542,6 +542,7 @@ export const auditFactory = async (params = {}) => {
     supplierIds: params.supplierIds,
     publishDate: params.publishDate || new Date(),
     closeDate: params.closeDate || new Date(),
+    content: params.content || 'content',
     createdDate: new Date(),
     createdUserId: params.createdUserId,
   });

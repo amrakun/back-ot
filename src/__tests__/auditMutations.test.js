@@ -100,6 +100,7 @@ describe('Audit mutations', () => {
     const args = {
       supplierIds: [_company._id],
       publishDate: new Date(),
+      content: 'content',
       closeDate: new Date(),
     };
 
@@ -107,11 +108,13 @@ describe('Audit mutations', () => {
       mutation auditsAdd(
         $supplierIds: [String]!
         $publishDate: Date!
+        $content: String!
         $closeDate: Date!
       ) {
         auditsAdd(
           supplierIds: $supplierIds
           publishDate: $publishDate
+          content: $content
           closeDate: $closeDate
         ) {
           _id
