@@ -74,6 +74,7 @@ export const types = `
   input Answer {
     supplierComment: String
     supplierAnswer: Boolean
+    supplierFile: JSON
   }
 
   input Recommendation {
@@ -85,6 +86,7 @@ export const types = `
   input HrAnswer {
     supplierComment: String
     supplierAnswer: Int
+    supplierFile: JSON
   }
 
   input HrRecommendation {
@@ -141,6 +143,8 @@ export const types = `
   type AnswerRecommendation {
     supplierComment: String
     supplierAnswer: Boolean
+    supplierFile: JSON
+
     auditorComment: String
     auditorRecommendation: String
     auditorScore: Boolean
@@ -149,6 +153,8 @@ export const types = `
   type HrAnswerRecommendation {
     supplierComment: String
     supplierAnswer: Int
+    supplierFile: JSON
+
     auditorComment: String
     auditorRecommendation: String
     auditorScore: Int

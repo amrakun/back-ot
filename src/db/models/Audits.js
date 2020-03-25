@@ -3,6 +3,14 @@ import mongoose from 'mongoose';
 import { field, StatusPublishClose } from './utils';
 import { Configs, Companies } from './';
 
+const FileSchema = mongoose.Schema(
+  {
+    name: field({ type: String, label: 'Name' }),
+    url: field({ type: String, label: 'File url' }),
+  },
+  { _id: false },
+);
+
 // Audit schema
 const AuditSchema = mongoose.Schema({
   status: field({ type: String }),
@@ -58,6 +66,7 @@ const ReplyRecommendSchema = mongoose.Schema(
   {
     supplierComment: field({ type: String, optional: true }),
     supplierAnswer: field({ type: Boolean, optional: true }),
+    supplierFile: field({ type: FileSchema, optional: true }),
 
     auditorComment: field({ type: String, optional: true }),
     auditorRecommendation: field({ type: String, optional: true }),
@@ -153,6 +162,7 @@ const HrReplyRecommendSchema = mongoose.Schema(
   {
     supplierComment: field({ type: String, optional: true }),
     supplierAnswer: field({ type: Number, optional: true }),
+    supplierFile: field({ type: FileSchema, optional: true }),
 
     auditorComment: field({ type: String, optional: true }),
     auditorRecommendation: field({ type: String, optional: true }),
