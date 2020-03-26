@@ -277,6 +277,8 @@ export const mutations = `
 
   auditsSupplierSendResponse(auditId: String): AuditResponse
 
+  auditsSupplierSendResubmitRequest(description: String!): String
+
   auditsBuyerSaveCoreHseqInfo(
     auditId: String,
     supplierId: String,

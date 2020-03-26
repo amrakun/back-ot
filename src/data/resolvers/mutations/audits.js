@@ -1,7 +1,9 @@
 import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmail } from '../../../data/auditUtils';
+import { sendConfigEmail, putCreateLog } from '../../../data/utils';
 import { readS3File } from '../../../data/utils';
+import { LOG_TYPES } from '../../constants';
 
 const auditMutations = {
   // create new audit
@@ -49,6 +51,38 @@ const auditMutations = {
     });
 
     return updatedResponse;
+  },
+
+  async auditsSupplierSendResubmitRequest(root, { description }, { user }) {
+    const company = await Companies.findOne({ _id: user.companyId });
+
+    const basicInfo = company.basicInfo || {};
+
+    // send notification email to buyer
+    const { MAIN_AUDITOR_EMAIL } = process.env;
+
+    await sendConfigEmail({
+      name: 'desktopAuditTemplates',
+      kind: 'supplier__send_resubmission_request',
+      toEmails: [MAIN_AUDITOR_EMAIL],
+      replacer: text => {
+        return text
+          .replace('{supplier.name}', basicInfo.enName)
+          .replace('{supplier._id}', company._id);
+      },
+    });
+
+    putCreateLog(
+      {
+        type: LOG_TYPES.DESKTOP_AUDIT,
+        object: { description },
+        newData: JSON.stringify({ description }),
+        description: `"${basicInfo.enName}" sent audit resubmission request`,
+      },
+      user,
+    );
+
+    return 'received';
   },
 
   /**
@@ -186,5 +220,6 @@ requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSendResponse');
+requireSupplier(auditMutations, 'auditsSupplierSendResubmitRequest');
 
 export default auditMutations;

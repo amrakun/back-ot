@@ -169,6 +169,7 @@ export const LOG_TYPES = {
   COMPANY: 'company',
   QUALIFICATION: 'qualification',
   USER: 'user',
+  DESKTOP_AUDIT: 'desktop_audit',
 };
 
 export const productsMap = {
