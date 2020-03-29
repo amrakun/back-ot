@@ -152,6 +152,20 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       label: `Does the organisation have a formal process for Health Safety \
         and Environmental risk management`,
     }),
+
+    // Special license of importing chemicals and dangerous goods* (subject to scope of work)
+    specialLicenseOfImporting: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Special license of importing chemicals and dangerous goods* (subject to scope of work)`,
+    }),
+
+    // Waste management plan on General and Dangerous waste (Policy and principles on segregating, recycling, re-using and disposing of wastes, relevant permits and operational management plans including transporting wastes)
+    wasteManagementPlan: field({
+      type: ReplyRecommendSchema,
+      optional: true,
+      label: `Waste management plan on General and Dangerous waste (Policy and principles on segregating, recycling, re-using and disposing of wastes, relevant permits and operational management plans including transporting wastes)`,
+    }),
   },
   { _id: false },
 );

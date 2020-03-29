@@ -15,6 +15,8 @@ const generateCoreHseqFields = type => `
   doesHaveFormalProcessForReporting: ${type}
   doesHaveLiabilityInsurance: ${type}
   doesHaveFormalProcessForHealth: ${type}
+  specialLicenseOfImporting: ${type}
+  wasteManagementPlan: ${type}
 `;
 
 const generateHrFields = type => `
