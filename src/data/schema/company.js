@@ -413,6 +413,8 @@ export const types = `
     hasNewAudit: Boolean
     audits: [Audit]
     auditImprovementPlanNotification: AuditResponse
+
+    qualificationState: JSON
   }
 `;
 

@@ -444,6 +444,26 @@ class AuditResponse {
     }
   }
 
+  static async toggleState(supplierId) {
+    const openAudit = await Audits.findOne({ status: 'open', supplierIds: { $in: [supplierId] } });
+
+    if (!openAudit) {
+      throw new Error('No open audit found');
+    }
+
+    const oldResponse = await this.findOne({ auditId: openAudit._id, supplierId });
+
+    if (!oldResponse) {
+      throw new Error('Response not found with supplierId: ', supplierId);
+    }
+
+    await this.update({ _id: oldResponse._id }, { $set: { isEditable: !oldResponse.isEditable } });
+
+    const updatedResponse = await this.findOne({ _id: oldResponse._id });
+
+    return { oldResponse, updatedResponse };
+  }
+
   /*
    * Save basic info
    */

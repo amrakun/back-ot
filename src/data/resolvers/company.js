@@ -115,6 +115,28 @@ export default {
     return result;
   },
 
+  async qualificationState(company) {
+    const openAudit = await Audits.findOne({
+      supplierIds: { $in: [company._id] },
+      status: 'open',
+    });
+
+    if (!openAudit) {
+      return { isEditable: false, showToggleButton: false };
+    }
+
+    const response = await AuditResponses.findOne({
+      auditId: openAudit._id,
+      supplierId: company._id,
+    });
+
+    if (!response) {
+      return { isEditable: false, showToggleButton: false };
+    }
+
+    return { isEditable: response.isEditable, showToggleButton: true };
+  },
+
   async prequalifiedStatus(company) {
     const qualif = await Qualifications.findOne({ supplierId: company._id });
 

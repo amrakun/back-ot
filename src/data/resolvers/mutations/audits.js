@@ -1,7 +1,7 @@
 import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmail } from '../../../data/auditUtils';
-import { sendConfigEmail, putCreateLog } from '../../../data/utils';
+import { sendConfigEmail, putCreateLog, putUpdateLog } from '../../../data/utils';
 import { readS3File } from '../../../data/utils';
 import { LOG_TYPES } from '../../constants';
 
@@ -83,6 +83,38 @@ const auditMutations = {
     );
 
     return 'received';
+  },
+
+  async auditsBuyerToggleState(root, { supplierId }, { user }) {
+    const company = await Companies.getCompany({ _id: supplierId });
+    const basicInfo = company.basicInfo || {};
+
+    const { oldResponse, updatedResponse } = await AuditResponses.toggleState(supplierId);
+
+    if (updatedResponse.isEditable) {
+      await sendConfigEmail({
+        name: 'desktopAuditTemplates',
+        kind: 'supplier__enable',
+        toEmails: [basicInfo.email],
+        replacer: text => {
+          return text
+            .replace('{supplier.name}', basicInfo.enName)
+            .replace('{supplier._id}', company._id);
+        },
+      });
+    }
+
+    putUpdateLog(
+      {
+        type: LOG_TYPES.DESKTOP_AUDIT,
+        object: oldResponse,
+        newData: updatedResponse,
+        description: `Audit state of company "${basicInfo.enName}" has been toggled`,
+      },
+      user,
+    );
+
+    return updatedResponse;
   },
 
   /**
@@ -217,6 +249,7 @@ sections.forEach(section => {
 requireBuyer(auditMutations, 'auditsAdd');
 requireBuyer(auditMutations, 'auditsBuyerSaveFiles');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
+requireBuyer(auditMutations, 'auditsBuyerToggleState');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSendResponse');

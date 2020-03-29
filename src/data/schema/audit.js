@@ -309,4 +309,6 @@ export const mutations = `
     improvementPlan: Boolean,
     report: Boolean,
   ): [AuditResponse]
+
+  auditsBuyerToggleState(supplierId: String!): AuditResponse
 `;

@@ -1034,6 +1034,16 @@ class Company {
     return basicInfo;
   }
 
+  static async getCompany(selector) {
+    const company = await Companies.findOne(selector);
+
+    if (!company) {
+      throw new Error('Company not found');
+    }
+
+    return company;
+  }
+
   /**
    * Create a company
    * @param userId - Permforming user id
