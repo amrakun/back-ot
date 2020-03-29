@@ -106,7 +106,7 @@ export default {
         supplierId: company._id,
       });
 
-      if (!response) {
+      if (response.status === 'invited') {
         result = true;
         break;
       }
