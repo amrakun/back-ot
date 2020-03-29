@@ -586,6 +586,8 @@ export const auditResponseDocs = {
         'doesHaveFormalProcessForReporting',
         'doesHaveLiabilityInsurance',
         'doesHaveFormalProcessForHealth',
+        'specialLicenseOfImporting',
+        'wasteManagementPlan',
       ],
       supplier,
       buyer,

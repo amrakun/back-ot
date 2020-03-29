@@ -268,19 +268,13 @@ describe('Company queries', () => {
       $supplierSearch: String
       $publishDate: Date
       $closeDate: Date
-      $status: String
-      $isQualified: Boolean
-      $isNew: Boolean
-      $isSentImprovementPlan: Boolean
+      $supplierStatus: String
     ) {
       auditResponses(
         supplierSearch: $supplierSearch
         publishDate: $publishDate
         closeDate: $closeDate
-        status: $status
-        isQualified: $isQualified
-        isNew: $isNew
-        isSentImprovementPlan: $isSentImprovementPlan
+        supplierStatus: $supplierStatus
       ) {
         _id
         auditId
@@ -296,43 +290,6 @@ describe('Company queries', () => {
   `;
 
   const doResponsesQuery = args => graphqlRequest(auditResponsesQuery, 'auditResponses', args);
-
-  test('audit responses: qualified, new, sent improvement plan', async () => {
-    await auditResponseFactory({ isSent: true });
-    await auditResponseFactory({ isSent: true });
-
-    // qualified ==========
-    const qualified = await auditResponseFactory({ isSent: true, isQualified: true });
-
-    let response = await doResponsesQuery({ isQualified: true });
-
-    expect(response.length).toBe(1);
-
-    let [firstItem] = response;
-
-    expect(firstItem._id).toBe(qualified._id.toString());
-
-    // sent improvement plan ==========
-    const sip = await auditResponseFactory({
-      isSent: true,
-      improvementPlanSentDate: new Date(),
-    });
-
-    response = await doResponsesQuery({ isSentImprovementPlan: true });
-
-    expect(response.length).toBe(1);
-
-    [firstItem] = response;
-
-    expect(firstItem._id).toBe(sip._id.toString());
-
-    // isNew ==========
-    await auditResponseFactory({ isSent: true, isBuyerNotified: true });
-
-    response = await doResponsesQuery({ isNew: true });
-
-    expect(response.length).toBe(4);
-  });
 
   test('audit responses', async () => {
     const supplier = await companyFactory({
@@ -383,7 +340,7 @@ describe('Company queries', () => {
     expect(response.length).toBe(1);
 
     // status search ===================
-    args = { status: 'onTime' };
+    args = { supplierStatus: 'onTime' };
     response = await doResponsesQuery(args);
 
     expect(response.length).toBe(1);

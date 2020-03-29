@@ -209,10 +209,8 @@ const responsesParams = `
   supplierSearch: String
   publishDate: Date
   closeDate: Date
-  status: String
-  isQualified: Boolean
-  isNew: Boolean
-  isSentImprovementPlan: Boolean
+  qualStatus: String
+  supplierStatus: String
 `;
 
 export const queries = `

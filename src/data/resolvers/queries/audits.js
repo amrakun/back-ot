@@ -6,40 +6,19 @@ import { supplierFilter } from './utils';
  * Common audit responses filter
  */
 const responsesFilter = async args => {
-  const {
-    status,
-    supplierSearch,
-    isFileGenerated,
-    publishDate,
-    closeDate,
-    isQualified,
-    isSentImprovementPlan,
-    isNew,
-  } = args;
+  const { supplierSearch, publishDate, closeDate, qualStatus, supplierStatus } = args;
 
   const query = {
     $and: [await supplierFilter({}, supplierSearch)],
-    isSent: true,
   };
 
-  // qualified
-  if (isQualified !== undefined) {
-    query.isQualified = isQualified;
+  if (qualStatus) {
+    const audits = await Audits.find({ status: qualStatus }, { _id: 1 });
+    query.auditId = { $in: audits.map(a => a._id) };
   }
 
-  // is sent improvement plan
-  if (isSentImprovementPlan !== undefined) {
-    query.improvementPlanSentDate = { $ne: null };
-  }
-
-  // is new
-  if (isNew) {
-    query.isBuyerNotified = { $ne: true };
-  }
-
-  // status filter
-  if (status) {
-    query.status = status;
+  if (supplierStatus) {
+    query.status = supplierStatus;
   }
 
   // date filter

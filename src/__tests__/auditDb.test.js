@@ -24,7 +24,9 @@ describe('Audit response db', () => {
 
   beforeEach(async () => {
     // Creating test data
+
     _audit = await auditFactory();
+
     _company = await companyFactory();
   });
 

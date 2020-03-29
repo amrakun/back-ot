@@ -32,13 +32,43 @@ class Audit extends StatusPublishClose {
    * @param {Object} userId - Creating user
    * @return {Promise} newly created audit object
    */
-  static createAudit(doc, userId) {
-    return this.create({
+  static async createAudit(doc, userId) {
+    const supplierIds = [];
+
+    for (const supplierId of doc.supplierIds || []) {
+      const prevOpenAudit = await Audits.findOne({
+        status: 'open',
+        supplierIds: { $in: [supplierId] },
+      });
+
+      if (prevOpenAudit) {
+        continue;
+      }
+
+      supplierIds.push(supplierId);
+    }
+
+    if (supplierIds.length === 0) {
+      throw new Error('Please choose available suppliers');
+    }
+
+    const audit = await this.create({
       ...doc,
+      supplierIds,
       status: 'draft',
       createdUserId: userId,
       createdDate: new Date(),
     });
+
+    for (const supplierId of supplierIds) {
+      await AuditResponses.createResponse({
+        auditId: audit._id,
+        supplierId,
+        status: 'invited',
+      });
+    }
+
+    return audit;
   }
 }
 
@@ -338,6 +368,13 @@ const AuditResponseSchema = mongoose.Schema({
 });
 
 class AuditResponse {
+  static createResponse(doc) {
+    return this.create({
+      createdDate: new Date(),
+      ...doc,
+    });
+  }
+
   /*
    * Check that given section has no invalid answers
    *
@@ -544,8 +581,8 @@ class AuditResponse {
     }
 
     return this.create({
-      auditId,
       createdDate: new Date(),
+      auditId,
       isSent: false,
       isSupplierNotified: true,
       supplierId,
