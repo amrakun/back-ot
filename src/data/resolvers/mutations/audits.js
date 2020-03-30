@@ -118,22 +118,6 @@ const auditMutations = {
   },
 
   /**
-   * Save report files & reset dates
-   * @param {Boolean} improvementPlan - File path
-   * @param {Boolean} report - File path
-   * @return - Updated response
-   */
-  async auditsBuyerSaveFiles(root, { auditId, supplierId, improvementPlan, report }) {
-    const response = await AuditResponses.findOne({ auditId: auditId, supplierId });
-
-    // save files
-    return response.saveFiles({
-      improvementPlanFile: improvementPlan,
-      reportFile: report,
-    });
-  },
-
-  /**
    * Send report files to supplier via email
    * @param {[String]} responseIds - Audit response ids
    * @param {Boolean} improvementPlan - Is sent improvementPlan email
@@ -247,7 +231,6 @@ sections.forEach(section => {
 });
 
 requireBuyer(auditMutations, 'auditsAdd');
-requireBuyer(auditMutations, 'auditsBuyerSaveFiles');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 requireBuyer(auditMutations, 'auditsBuyerToggleState');
 

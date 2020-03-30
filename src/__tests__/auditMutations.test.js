@@ -75,14 +75,13 @@ describe('Audit mutations', () => {
       }
     };
 
-    expect.assertions(6);
+    expect.assertions(5);
 
     const mutations = [
       'auditsAdd',
       'auditsBuyerSaveCoreHseqInfo',
       'auditsBuyerSaveHrInfo',
       'auditsBuyerSaveBusinessInfo',
-      'auditsBuyerSaveFiles',
       'auditsBuyerSendFiles',
     ];
 
@@ -351,47 +350,6 @@ describe('Audit mutations', () => {
     );
 
     expect(response.isSent).toBe(true);
-  });
-
-  test('Save files', async () => {
-    await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id });
-
-    const mutation = `
-      mutation auditsBuyerSaveFiles(
-        $auditId: String!,
-        $supplierId: String!,
-        $improvementPlan: String,
-        $report: String
-      ) {
-
-        auditsBuyerSaveFiles(
-          auditId: $auditId,
-          supplierId: $supplierId,
-          improvementPlan: $improvementPlan,
-          report: $report
-        ) {
-          improvementPlanFile,
-          reportFile
-        }
-      }
-    `;
-
-    const user = await userFactory({ isSupplier: false });
-
-    const response = await graphqlRequest(
-      mutation,
-      'auditsBuyerSaveFiles',
-      {
-        supplierId: _company._id,
-        auditId: _audit._id,
-        improvementPlan: '/improvementPlanPath',
-        report: '/reportPath',
-      },
-      { user: user },
-    );
-
-    expect(response.improvementPlanFile).toBe('/improvementPlanPath');
-    expect(response.reportFile).toBe('/reportPath');
   });
 
   test('Send files', async () => {

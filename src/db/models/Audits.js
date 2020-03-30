@@ -641,30 +641,6 @@ class AuditResponse {
   }
 
   /**
-   * Save improvement plan, report files & reset dates
-   * @param {Boolean} improvementPlanFile - File path
-   * @param {Boolean} reportFile - File path
-   * @return - Updated response
-   */
-  async saveFiles({ improvementPlanFile, reportFile }) {
-    const doc = {};
-
-    if (improvementPlanFile) {
-      doc.improvementPlanFile = improvementPlanFile;
-      doc.improvementPlanSentDate = null;
-    }
-
-    if (reportFile) {
-      doc.reportFile = reportFile;
-      doc.reportSentDate = null;
-    }
-
-    await this.update(doc);
-
-    return AuditResponses.findOne({ _id: this._id });
-  }
-
-  /**
    * Save files & email sent dates for improvement plan, report
    * @param {Boolean} improvementPlan - Is sent improvementPlan email
    * @param {Boolean} report - Is sent report email

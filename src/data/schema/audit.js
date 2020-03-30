@@ -233,7 +233,7 @@ export const queries = `
     auditDate: Date!,
     auditResult: Boolean!,
     reassessmentDate: Date!,
-    auditorName: String!
+    auditor: String!
   ): String
 
   auditReport(
@@ -258,22 +258,22 @@ export const mutations = `
   auditsSupplierSaveBasicInfo(
     auditId: String,
     basicInfo: AuditSupplierBasicInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsSupplierSaveCoreHseqInfo(
     auditId: String,
     coreHseqInfo: AuditSupplierCoreHseqInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsSupplierSaveHrInfo(
     auditId: String,
     hrInfo: AuditSupplierHrInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsSupplierSaveBusinessInfo(
     auditId: String,
     businessInfo: AuditSupplierBusinessInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsSupplierSendResponse(auditId: String): AuditResponse
 
@@ -283,25 +283,18 @@ export const mutations = `
     auditId: String,
     supplierId: String,
     coreHseqInfo: AuditBuyerCoreHseqInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsBuyerSaveHrInfo(
     auditId: String,
     supplierId: String,
     hrInfo: AuditBuyerHrInfoInput
-  ): Audit
+  ): AuditResponse
 
   auditsBuyerSaveBusinessInfo(
     auditId: String,
     supplierId: String,
     businessInfo: AuditBuyerBusinessInfoInput
-  ): Audit
-
-  auditsBuyerSaveFiles(
-    auditId: String!,
-    supplierId: String!,
-    improvementPlan: String,
-    report: String,
   ): AuditResponse
 
   auditsBuyerSendFiles(
