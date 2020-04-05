@@ -56,6 +56,8 @@ const auditMutations = {
   async auditsSupplierSendResubmitRequest(root, { description }, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
 
+    await AuditResponses.saveResubmitRequest({ supplierId: user.companyId, description });
+
     const basicInfo = company.basicInfo || {};
 
     // send notification email to buyer
@@ -68,7 +70,8 @@ const auditMutations = {
       replacer: text => {
         return text
           .replace('{supplier.name}', basicInfo.enName)
-          .replace('{supplier._id}', company._id);
+          .replace('{supplier._id}', company._id)
+          .replace('{description}', description);
       },
     });
 

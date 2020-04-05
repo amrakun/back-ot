@@ -186,6 +186,7 @@ export const types = `
     reportFile: String
     reportSentDate: Date
 
+    isSentResubmitRequest: Boolean
 
     supplier: Company
     audit: Audit

@@ -134,7 +134,7 @@ export default {
       return { isEditable: false, showToggleButton: false };
     }
 
-    return { isEditable: response.isEditable, showToggleButton: true };
+    return { isEditable: response.isEditable, showToggleButton: response.isSentResubmitRequest };
   },
 
   async prequalifiedStatus(company) {

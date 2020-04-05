@@ -365,6 +365,9 @@ const AuditResponseSchema = mongoose.Schema({
 
   // Supplier saved something on this response
   isSupplierNotified: field({ type: Boolean, optional: true }),
+
+  isSentResubmitRequest: field({ type: Boolean, optional: true }),
+  lastResubmitDescription: field({ type: String, optional: true }),
 });
 
 class AuditResponse {
@@ -495,6 +498,19 @@ class AuditResponse {
     }
   }
 
+  static async saveResubmitRequest({ description, supplierId }) {
+    const openAudit = await Audits.findOne({ status: 'open', supplierIds: { $in: [supplierId] } });
+
+    if (!openAudit) {
+      return;
+    }
+
+    return this.updateOne(
+      { auditId: openAudit._id, supplierId },
+      { $set: { lastResubmitDescription: description, isSentResubmitRequest: true } },
+    );
+  }
+
   static async toggleState(supplierId) {
     const openAudit = await Audits.findOne({ status: 'open', supplierIds: { $in: [supplierId] } });
 
@@ -611,6 +627,7 @@ class AuditResponse {
       submittedCount: (this.submittedCount || 0) + 1,
       status,
       isEditable: false,
+      isSentResubmitRequest: false,
     });
 
     return AuditResponses.findOne({ _id: this._id });
