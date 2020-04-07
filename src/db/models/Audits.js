@@ -65,6 +65,7 @@ class Audit extends StatusPublishClose {
         auditId: audit._id,
         supplierId,
         status: 'invited',
+        isEditable: true,
       });
     }
 
