@@ -23,7 +23,6 @@ const auditResponseQueries = {
     const { workbook, sheet } = await readTemplate('auditor_improvement_plan');
 
     let rIndex = 1;
-    let cellPointer;
 
     // Fill main info =========================
     const basicInfo = company.basicInfo || {};
@@ -37,7 +36,7 @@ const auditResponseQueries = {
     fillMainInfoCell(basicInfo.enName);
 
     // Result
-    fillMainInfoCell('Not qualified');
+    fillMainInfoCell('Not qualified with improvement plan');
 
     // Audit date
     fillMainInfoCell(auditDate.toLocaleDateString());
@@ -190,7 +189,7 @@ const auditResponseQueries = {
       sheet
         .range(`${cf(row)}:${cf(col)}`)
         .merged(true)
-        .style({ horizontalAlignment: aligment })
+        .style({ horizontalAlignment: aligment, wrapText: true })
         .value(fixValue(value));
 
     const fillCell = (rIndex, colIndex, value, aligment = 'left') =>
@@ -200,60 +199,47 @@ const auditResponseQueries = {
         .value(fixValue(value));
 
     // Supplier name
-    fillRange('R19C3', 'R19C9', bi.enName, 'center');
+    fillRange('R2C5', 'R2C10', bi.enName, 'center');
 
     // Audit date
-    fillRange('R26C6', 'R26C7', auditDate.toLocaleDateString());
+    fillRange('R4C5', 'R4C10', auditDate.toLocaleDateString());
 
     // Audit name
-    fillRange('R28C6', 'R28C10', auditor);
-
-    // Report no
-    fillRange('R56C4', 'R56C6', reportNo);
-
-    // Company name
-    fillRange('R56C9', 'R56C10', bi.enName);
-
-    // Auditor
-    fillRange('R57C4', 'R59C6', auditor);
-
-    // Audit date
-    fillRange('R60C4', 'R60C6', auditDate.toLocaleDateString());
+    fillRange('R5C5', 'R5C10', auditor);
 
     // Tier type
-    fillCell(64, 10, company.tierType);
+    fillRange('R7C5', 'R7C10', company.tierType);
 
     // number of employees
-    fillCell(67, 10, bi.totalNumberOfEmployees);
+    fillRange('R10C5', 'R10C10', bi.totalNumberOfEmployees);
+
+    // experience
+    fillRange('R12C5', 'R12C10', (auditResponse.basicInfo || {}).otExperience);
 
     // sotri
-    fillCell(70, 10, (auditResponse.basicInfo || {}).sotri);
+    fillRange('R13C5', 'R13C10', (auditResponse.basicInfo || {}).sotri);
 
     // sotie
-    fillCell(71, 10, (auditResponse.basicInfo || {}).sotie);
+    fillRange('R14C5', 'R14C10', (auditResponse.basicInfo || {}).sotie);
 
-    // short =======================
-
-    const titleStyle = { verticalAlignment: 'center', fill: 'FDE9D9', bold: true };
-
-    // core hseq
-    let rIndex = 77;
+    let rIndex = 14;
 
     // main result
     let isQualified = true;
 
     const renderSection = (sectionName, sectionTitle, schema, extraAction) => {
-      rIndex += 2;
+      rIndex += 1;
 
-      fillRange(`R${rIndex}C2`, `R${rIndex + 1}C5`, sectionTitle, 'center').style(titleStyle);
+      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, sectionTitle, 'left').style({
+        verticalAlignment: 'center',
+        fill: '31869B',
+        fontColor: 'ffffff',
+        bold: true,
+        fontSize: 16,
+      });
 
-      fillRange(`R${rIndex}C6`, `R${rIndex + 1}C8`, 'Supplier Assessment', 'center').style(
-        titleStyle,
-      );
+      sheet.row(rIndex).height(30);
 
-      fillRange(`R${rIndex}C9`, `R${rIndex + 1}C10`, 'Auditor Assessment', 'center').style(
-        titleStyle,
-      );
       const paths = schema.paths;
 
       // doesHaveHealthSafety, doesHaveDocumentedPolicy ...
@@ -261,8 +247,6 @@ const auditResponseQueries = {
 
       // doesHaveHealthSafety: {...},  doesHaveDocumentedPolicy: {...},
       const sectionValue = auditResponse[sectionName] || {};
-
-      rIndex++;
 
       fieldNames.forEach(fieldName => {
         rIndex++;
@@ -286,9 +270,57 @@ const auditResponseQueries = {
 
         const label = fieldOptions.label.replace(/\s\s/g, '');
 
-        fillRange(`R${rIndex}C2`, `R${rIndex}C5`, label);
-        fillRange(`R${rIndex}C6`, `R${rIndex}C8`, supplierAnswer, 'center');
-        fillRange(`R${rIndex}C9`, `R${rIndex}C10`, auditorScore), 'center';
+        const titleStyle = {
+          wrapText: true,
+          fill: 'F79646',
+          verticalAlignment: 'center',
+          border: true,
+        };
+
+        sheet.row(rIndex).height(30);
+
+        fillRange(`R${rIndex}C2`, `R${rIndex}C4`, label, 'left').style(titleStyle);
+
+        fillRange(`R${rIndex}C5`, `R${rIndex}C7`, 'Supplier Score', 'center').style(titleStyle);
+
+        fillRange(`R${rIndex}C8`, `R${rIndex}C10`, 'Auditor Score', 'center').style(titleStyle);
+
+        const fillAnswers = value => {
+          rIndex++;
+
+          fillRange(`R${rIndex}C2`, `R${rIndex}C4`, value, 'left').style({
+            verticalAlignment: 'top',
+            border: true,
+          });
+
+          sheet.row(rIndex).height(50);
+        };
+
+        fillAnswers(`Supplier comment: ${fieldValue.supplierComment}`);
+        fillAnswers(`Auditor comment: ${fieldValue.auditorComment}`);
+        fillAnswers(`Recommendation: ${fieldValue.recommendation}`);
+
+        fillRange(
+          `R${rIndex - 2}C5`,
+          `R${rIndex}C7`,
+          fixValue(fieldValue.supplierAnswer),
+          'center',
+        ).style({
+          verticalAlignment: 'center',
+          fontSize: 16,
+          border: true,
+        });
+
+        fillRange(
+          `R${rIndex - 2}C8`,
+          `R${rIndex}C10`,
+          fixValue(fieldValue.auditorScore),
+          'center',
+        ).style({
+          verticalAlignment: 'center',
+          fontSize: 16,
+          border: true,
+        });
 
         if (extraAction) {
           extraAction({
@@ -305,53 +337,8 @@ const auditResponseQueries = {
     renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema);
     renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema);
 
-    // Audit result: not qualified
-    if (!isQualified) {
-      fillCell(72, 6, 'Not qualified with improvement plan').style({
-        fill: 'ff0000',
-        fontColor: 'ffffff',
-      });
-    }
-
-    rIndex += 2;
-
-    // third section ============================
-    fillRange(
-      `R${rIndex}C2`,
-      `R${rIndex}C10`,
-      'Rio Tinto - Oyu Tolgoi LLC - Supplier Qualification',
-      'center',
-    );
-
-    rIndex += 2;
-
-    const extraAction = ({ supplierComment, auditorComment, auditorRecommendation }) => {
-      rIndex += 3;
-      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, 'Supplier comments').style({ bold: true });
-      fillRange(`R${rIndex + 1}C2`, `R${rIndex + 2}C10`, supplierComment).style({ border: true });
-
-      rIndex += 4;
-      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, 'Auditor comment').style({ bold: true });
-      fillRange(`R${rIndex + 1}C2`, `R${rIndex + 2}C10`, auditorComment).style({ border: true });
-
-      rIndex += 4;
-      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, 'Auditor recommendation').style({ bold: true });
-      fillRange(`R${rIndex + 1}C2`, `R${rIndex + 2}C10`, auditorRecommendation).style({
-        border: true,
-      });
-
-      rIndex += 4;
-      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, 'Evidence').style({ bold: true });
-      fillRange(`R${rIndex + 1}C2`, `R${rIndex + 2}C10`, '').style({ border: true });
-
-      rIndex += 4;
-    };
-
-    renderSection('coreHseqInfo', 'Core HSEQ Criteria', CoreHseqInfoSchema, extraAction);
-
-    renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema, extraAction);
-
-    renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema, extraAction);
+    // Audit result
+    fillRange('R3C5', 'R3C10', isQualified ? 'qualified' : 'Not qualified with improvement plan');
 
     // generate file
     const path = await generateXlsx(user, workbook, `auditor_report_${auditId}_${supplierId}`);
