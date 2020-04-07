@@ -339,9 +339,9 @@ const auditResponseQueries = {
       });
     };
 
-    renderSection('coreHseqInfo', 'Core HSEQ Criteria', CoreHseqInfoSchema);
+    renderSection('coreHseqInfo', 'HSEQ Criteria ', CoreHseqInfoSchema);
+    renderSection('hrInfo', 'HR Criteria', HrInfoSchema);
     renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema);
-    renderSection('hrInfo', 'Human resource management  Criteria', HrInfoSchema);
 
     // Audit result
     fillRange('R3C5', 'R3C10', isQualified ? 'qualified' : 'Not qualified with improvement plan');
