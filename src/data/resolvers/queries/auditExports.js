@@ -70,7 +70,7 @@ const auditResponseQueries = {
         const fieldOptions = paths[fieldName].options;
 
         // collect only wrong answers
-        if (!fieldValue.supplierAnswer) {
+        if (!fieldValue.auditorScore) {
           invalidAnswers.push({
             label: fieldOptions.label.replace(/\s\s/g, ''),
             recommendation: fieldValue.auditorRecommendation,
