@@ -88,6 +88,8 @@ const BasicInfoSchema = mongoose.Schema(
     // Share of OT included employment
     sotie: field({ type: String }),
 
+    sotieFile: field({ type: FileSchema, optional: true }),
+
     otExperience: field({ type: String, optional: true }),
   },
   { _id: false },

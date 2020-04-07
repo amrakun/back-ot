@@ -2,6 +2,7 @@ const basicInfoFields = `
   sotri: String
   sotie: String
   otExperience: String
+  sotieFile: JSON
 `;
 
 const generateCoreHseqFields = type => `
