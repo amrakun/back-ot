@@ -245,6 +245,7 @@ export const queries = `
     auditResult: Boolean!,
     auditor: String!,
     reportNo: String!
+    reportLanguage: String
   ): String
 `;
 

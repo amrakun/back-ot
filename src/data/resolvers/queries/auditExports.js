@@ -176,12 +176,12 @@ const auditResponseQueries = {
    * @return {String} generated file link
    */
   async auditReport(root, args, { user }) {
-    const { auditId, supplierId, auditDate, auditor, reportNo } = args;
+    const { auditId, supplierId, auditDate, auditor, reportLanguage } = args;
 
     const company = await Companies.findOne({ _id: supplierId });
     const auditResponse = await AuditResponses.findOne({ auditId, supplierId });
 
-    const { workbook, sheet } = await readTemplate('auditor_report');
+    const { workbook, sheet } = await readTemplate(`auditor_report_${reportLanguage}`);
 
     const bi = company.basicInfo || {};
 
@@ -192,11 +192,16 @@ const auditResponseQueries = {
         .style({ horizontalAlignment: aligment, wrapText: true })
         .value(fixValue(value));
 
-    const fillCell = (rIndex, colIndex, value, aligment = 'left') =>
-      sheet
-        .cell(rIndex, colIndex)
-        .style({ horizontalAlignment: aligment })
-        .value(fixValue(value));
+    const translations = {
+      coreHseqInfo: { en: 'HSEQ Criteria', mn: 'ЭМААБОЧ-ын шалгуур' },
+      hrInfo: { en: 'HR Criteria', mn: 'Хүний нөөцийн шалгуур' },
+      businessInfo: { en: 'Supplier Score', mn: 'Бизнесийн ёс зүйн шалгуур' },
+      supplierScore: { en: 'Supplier score', mn: 'Нийлүүлэгчийн оноо' },
+      auditorScore: { en: 'Auditor score', mn: 'Аудиторын оноо' },
+      supplierComment: { en: 'Supplier comment', mn: 'Нийлүүлэгчийн тайлбар' },
+      auditorComment: { en: 'Auditor comment', mn: 'Аудиторын тайлбар' },
+      recommendation: { en: 'Recommendation', mn: 'Зөвлөмж' },
+    };
 
     // Supplier name
     fillRange('R2C5', 'R2C10', bi.enName, 'center');
@@ -227,10 +232,15 @@ const auditResponseQueries = {
     // main result
     let isQualified = true;
 
-    const renderSection = (sectionName, sectionTitle, schema, extraAction) => {
+    const renderSection = (sectionName, schema, extraAction) => {
       rIndex += 1;
 
-      fillRange(`R${rIndex}C2`, `R${rIndex}C10`, sectionTitle, 'left').style({
+      fillRange(
+        `R${rIndex}C2`,
+        `R${rIndex}C10`,
+        translations[sectionName][reportLanguage],
+        'left',
+      ).style({
         verticalAlignment: 'center',
         fill: '31869B',
         fontColor: 'ffffff',
@@ -268,7 +278,10 @@ const auditResponseQueries = {
 
         const fieldOptions = paths[fieldName].options;
 
-        const label = fieldOptions.label.replace(/\s\s/g, '');
+        const label = fieldOptions[`label${reportLanguage === 'mn' ? 'Mn' : ''}`].replace(
+          /\s\s/g,
+          '',
+        );
 
         const titleStyle = {
           wrapText: true,
@@ -288,8 +301,18 @@ const auditResponseQueries = {
           border: false,
         });
         fillRange(`R${rIndex}C2`, `R${rIndex}C4`, label, 'left').style(titleStyle);
-        fillRange(`R${rIndex}C5`, `R${rIndex}C7`, 'Supplier Score', 'center').style(titleStyle);
-        fillRange(`R${rIndex}C8`, `R${rIndex}C10`, 'Auditor Score', 'center').style(titleStyle);
+        fillRange(
+          `R${rIndex}C5`,
+          `R${rIndex}C7`,
+          translations.supplierScore[reportLanguage],
+          'center',
+        ).style(titleStyle);
+        fillRange(
+          `R${rIndex}C8`,
+          `R${rIndex}C10`,
+          translations.auditorScore[reportLanguage],
+          'center',
+        ).style(titleStyle);
 
         const fillAnswers = value => {
           rIndex++;
@@ -302,9 +325,11 @@ const auditResponseQueries = {
           sheet.row(rIndex).height(50);
         };
 
-        fillAnswers(`Supplier comment: ${fieldValue.supplierComment}`);
-        fillAnswers(`Auditor comment: ${fieldValue.auditorComment}`);
-        fillAnswers(`Recommendation: ${fieldValue.recommendation}`);
+        fillAnswers(
+          `${translations.supplierComment[reportLanguage]}: ${fieldValue.supplierComment}`,
+        );
+        fillAnswers(`${translations.auditorComment[reportLanguage]}: ${fieldValue.auditorComment}`);
+        fillAnswers(`${translations.recommendation[reportLanguage]}: ${fieldValue.recommendation}`);
 
         fillRange(
           `R${rIndex - 2}C5`,
@@ -339,9 +364,9 @@ const auditResponseQueries = {
       });
     };
 
-    renderSection('coreHseqInfo', 'HSEQ Criteria ', CoreHseqInfoSchema);
-    renderSection('hrInfo', 'HR Criteria', HrInfoSchema);
-    renderSection('businessInfo', 'Business integrity Criteria', BusinessInfoSchema);
+    renderSection('coreHseqInfo', CoreHseqInfoSchema);
+    renderSection('hrInfo', HrInfoSchema);
+    renderSection('businessInfo', BusinessInfoSchema);
 
     // Audit result
     fillRange('R3C5', 'R3C10', isQualified ? 'qualified' : 'Not qualified with improvement plan');
