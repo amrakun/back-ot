@@ -390,7 +390,7 @@ class AuditResponse {
    */
   static isSectionPassed({ name, schemaValue }) {
     if (!schemaValue) {
-      return false;
+      return null;
     }
 
     const value = schemaValue.toJSON();
