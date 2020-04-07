@@ -248,7 +248,7 @@ const auditResponseQueries = {
       // doesHaveHealthSafety: {...},  doesHaveDocumentedPolicy: {...},
       const sectionValue = auditResponse[sectionName] || {};
 
-      fieldNames.forEach(fieldName => {
+      fieldNames.forEach((fieldName, fieldIndex) => {
         rIndex++;
 
         // supplierComment: comment
@@ -279,10 +279,16 @@ const auditResponseQueries = {
 
         sheet.row(rIndex).height(30);
 
+        fillRange(`R${rIndex}C1`, `R${rIndex}C1`, fieldIndex + 1, 'left').style({
+          verticalAlignment: 'center',
+          horizontalAlignment: 'center',
+          bold: true,
+          fill: 'ffffff',
+          fontSize: 16,
+          border: false,
+        });
         fillRange(`R${rIndex}C2`, `R${rIndex}C4`, label, 'left').style(titleStyle);
-
         fillRange(`R${rIndex}C5`, `R${rIndex}C7`, 'Supplier Score', 'center').style(titleStyle);
-
         fillRange(`R${rIndex}C8`, `R${rIndex}C10`, 'Auditor Score', 'center').style(titleStyle);
 
         const fillAnswers = value => {
