@@ -26,7 +26,12 @@ describe('Audit mutations', () => {
 
   beforeEach(async () => {
     // Creating test data
-    _company = await companyFactory();
+    _company = await companyFactory({
+      isSentRegistrationInfo: true,
+      isSentPrequalificationInfo: true,
+      isPrequalified: true,
+    });
+
     _user = await userFactory({ companyId: _company._id, isSupplier: true });
     _audit = await auditFactory();
     await configFactory();

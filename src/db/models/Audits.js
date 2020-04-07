@@ -550,6 +550,20 @@ class AuditResponse {
     const selector = { auditId, supplierId };
     const previousEntry = await this.findOne(selector);
 
+    const supplier = await Companies.getCompany({ _id: supplierId });
+
+    if (!supplier.isSentRegistrationInfo) {
+      throw Error('Registration stage is not complete');
+    }
+
+    if (!supplier.isSentPrequalificationInfo) {
+      throw Error('Prequalification stage is not complete');
+    }
+
+    if (!supplier.isPrequalified) {
+      throw Error('Not prequalified');
+    }
+
     // update previous entry if exists
     if (previousEntry) {
       await updater({ ...args, selector });

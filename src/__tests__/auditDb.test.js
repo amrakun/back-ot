@@ -27,7 +27,11 @@ describe('Audit response db', () => {
 
     _audit = await auditFactory();
 
-    _company = await companyFactory();
+    _company = await companyFactory({
+      isSentRegistrationInfo: true,
+      isSentPrequalificationInfo: true,
+      isPrequalified: true,
+    });
   });
 
   afterEach(async () => {
@@ -148,6 +152,47 @@ describe('Audit response db', () => {
 
     expect(sectionValue).toEqual(doc);
   };
+
+  test('Check supplier validations', async () => {
+    expect.assertions(3);
+
+    const company = await companyFactory({
+      isSentRegistrationInfo: false,
+      isSentPrequalificationInfo: false,
+    });
+
+    const modifier = {
+      auditId: _audit._id,
+      supplierId: company._id,
+      name: 'coreHseqInfo',
+      doc: auditResponseDocs.coreHseqInfo(),
+    };
+
+    // registration info ==========
+    try {
+      await AuditResponses.saveReplyRecommentSection(modifier);
+    } catch (e) {
+      expect(e.message).toBe('Registration stage is not complete');
+    }
+
+    // prequalification info ==========
+    await Companies.update({ _id: company._id }, { $set: { isSentRegistrationInfo: true } });
+
+    try {
+      await AuditResponses.saveReplyRecommentSection(modifier);
+    } catch (e) {
+      expect(e.message).toBe('Prequalification stage is not complete');
+    }
+
+    // isPrequalified
+    await Companies.update({ _id: company._id }, { $set: { isSentPrequalificationInfo: true } });
+
+    try {
+      await AuditResponses.saveReplyRecommentSection(modifier);
+    } catch (e) {
+      expect(e.message).toBe('Not prequalified');
+    }
+  });
 
   test('Basic info', async () => {
     expect.assertions(4);
@@ -272,29 +317,6 @@ describe('Audit response db', () => {
 
     expect(auditResponse.isSent).toBe(true);
     expect(auditResponse.status).toBe('late');
-  });
-
-  test('Save files', async () => {
-    let auditResponse = await auditResponseFactory({
-      improvementPlanSentDate: new Date(),
-      reportSentDate: new Date(),
-    });
-
-    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
-
-    const doc = {
-      improvementPlanFile: '/improvementPlanFile',
-      reportFile: '/reportFile',
-    };
-
-    await auditResponse.saveFiles(doc);
-
-    auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
-
-    expect(auditResponse.improvementPlanFile).toBe(doc.improvementPlanFile);
-    expect(auditResponse.reportFile).toBe(doc.reportFile);
-    expect(auditResponse.improvementPlanSentDate).toBe(null);
-    expect(auditResponse.reportSentDate).toBe(null);
   });
 
   test('Send files', async () => {
