@@ -72,7 +72,7 @@ const auditResponseQueries = {
         // collect only wrong answers
         if (!fieldValue.auditorScore) {
           invalidAnswers.push({
-            label: fieldOptions.label.replace(/\s\s/g, ''),
+            label: (fieldOptions.labelMn || '').replace(/\s\s/g, ''),
             recommendation: fieldValue.auditorRecommendation,
             supplierAnswer: fieldValue.supplierAnswer,
             auditorScore: fieldValue.auditorScore,
@@ -114,7 +114,7 @@ const auditResponseQueries = {
           border: false,
         });
 
-        fill(`${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C4`)}`, answer.label);
+        fill(`${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C4`)}`, answer.label, { wrapText: true });
 
         // supplier point
         fill(`${cf(`R${rIndex}C5`)}:${cf(`R${rIndex}C7`)}`, 'Нийлүүлэгчийн оноо', {

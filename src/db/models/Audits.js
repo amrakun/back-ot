@@ -115,12 +115,16 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       type: ReplyRecommendSchema,
       optional: true,
       label: 'Does the organization have a health safety & environment management system',
+      labelMn:
+        'Танай байгууллага Эрүүл мэнд Аюулгүй Ажиллагаа, Байгаль орчны (ЭМААБО) удирдлагын системтэй юу?',
     }),
 
     doesHaveDocumentedPolicy: field({
       type: ReplyRecommendSchema,
       optional: true,
       label: 'Does the organization have a documented drug and alcohol policy',
+      labelMn:
+        'Танай байгууллагад бичиж баримтжуулсан мансууруулах бодис, согтууруулах ундааны тухай бодлого байдаг уу?',
     }),
 
     doesPerformPreemployment: field({
@@ -129,6 +133,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       label: `Does the organisation perform pre-employment medical screening, \
         fitness for work evaluations, background checks and verification of \
         competence for employees, contractors and sub-contractors`,
+      labelMn:
+        'Байгууллага нь ажилд орохоос өмнө ажилтан, гэрээлэгч, туслан гүйцэтгэгч нарыг эмнэлгийн үзлэгт оруулж, эрүүл мэндийн хувьд ажилдаа тэнцэх эсэхийг нь болон тухайн ажилтны өмнөх түүхийг нь урьдчилан шалгаж тогтоодог уу?',
     }),
 
     doWorkProceduresConform: field({
@@ -136,6 +142,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       optional: true,
       label: `Do the organisations work procedures conform to local statutory, \
         legislative or regulatory codes and standards`,
+      labelMn:
+        'Байгууллагын ажил гүйцэтгэх журмууд нь Монгол улсын хууль эрхзүйн акт, дүрэм, стандартуудтай нийцтэй юу?',
     }),
 
     doesHaveFormalProcess: field({
@@ -144,6 +152,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       label: `Does the organisation have a formal process for HSE induction \
         and orientation of new hire employees, contractors and sub-contractors
       `,
+      labelMn:
+        'Байгууллагад шинэ ажилтан, гэрээлэгч болон туслан гүйцэтгэгч нарт ЭМААБО-ны танилцуулах сургалт хийдэг албан ёсны үйл явц байгаа юу?',
     }),
 
     doesHaveTrackingSystem: field({
@@ -152,6 +162,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       label: `Does the organisation have a system or process for tracking \
         current employee, contractor and sub-contractor qualifications and \
         competencies`,
+      labelMn:
+        'Байгууллагад шинэ ажилтан, гэрээлэгч болон туслан гүйцэтгэгч нарт ЭМААБО-ны танилцуулах сургалт хийдэг албан ёсны үйл явц байгаа юу?',
     }),
 
     doesHaveValidIndustry: field({
@@ -159,6 +171,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       optional: true,
       label: `Does the organisation have valid industry certifications \
         and/or licenses if required by the type of services provided`,
+      labelMn:
+        'Байгууллагад тухайн үйлчилгээг үзүүлэхэд шаардлагатай тухайн салбарын хүчинтэй зөвшөөрөл, гэрчилгээ эсвэл лиценз байгаа юу?',
     }),
 
     doesHaveFormalProcessForReporting: field({
@@ -166,6 +180,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       optional: true,
       label: `Does the organisation have a formal process for reporting and \
         investigating incidents (including near-hits/near misses)`,
+      labelMn:
+        'Байгууллагад осол зөрчлийг (осолд дөхсөн тохиолдлыг оруулан) мэдээлэх, судлан бүртгэх албан ёсны үйл явц бий юу?',
     }),
 
     doesHaveLiabilityInsurance: field({
@@ -175,6 +191,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
         Tolgoi’s minimum requirements and valid worker compensation insurance \
         or enrolment in an applicable occupational injury/illness
         insurance programme`,
+      labelMn:
+        'Байгууллагад "Оюу толгой" ХХК-ийн наад захын шаардлагатай нийцсэн хариуцлагын даатгал тухайлбал ажилтны нөхөн олговор, мэргэжлээс шалтгаалсан өвчин/ гэмтлийн даатгал бүхий даатгалын хөтөлбөр байдаг уу?',
     }),
 
     // Does the organization have formal process for health safetiy
@@ -184,6 +202,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       optional: true,
       label: `Does the organisation have a formal process for Health Safety \
         and Environmental risk management`,
+      labelMn:
+        'Танай байгууллагад эрүүл мэнд, аюулгүй ажиллагаа, байгаль орчны эрсдлийн менежментийг хэрэгжүүлдэг албаны ёсны үйл явц, тогтолцоо байдаг уу?',
     }),
 
     // Special license of importing chemicals and dangerous goods* (subject to scope of work)
@@ -191,6 +211,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       type: ReplyRecommendSchema,
       optional: true,
       label: `Special license of importing chemicals and dangerous goods* (subject to scope of work)`,
+      labelMn:
+        'Химийн болон аюултай хог хаягдал үүсгэх бараа бүтээгдэхүүн импортлох тусгай зөвшөөрөл* (ажлын нэмэлт цар хүрээнээс шалтгаалах) байгаа эсэх?',
     }),
 
     // Waste management plan on General and Dangerous waste (Policy and principles on segregating, recycling, re-using and disposing of wastes, relevant permits and operational management plans including transporting wastes)
@@ -198,6 +220,8 @@ export const CoreHseqInfoSchema = mongoose.Schema(
       type: ReplyRecommendSchema,
       optional: true,
       label: `Waste management plan on General and Dangerous waste (Policy and principles on segregating, recycling, re-using and disposing of wastes, relevant permits and operational management plans including transporting wastes)`,
+      labelMn:
+        'Энгийн болон Аюултай хог хаягдлын менежментийн төлөвлөгөө (бүтээгдэхүүн үйлчилгээнээс үүсэх хог хаягдлаа хэрхэн ангилах, ялгах, дахин боловсруулах, устгах талаар баримтлах бодлого, эрх бүхий байгууллагын зөвшөөрөл, хог хаягдлын тээвэрлэлтийн болон үйл ажиллагааны төлөвлөгөө ) байгаа эсэх?',
     }),
   },
   { _id: false },
@@ -224,66 +248,77 @@ export const HrInfoSchema = mongoose.Schema(
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Work Contract Management',
+      labelMn: 'Хөдөлмөрийн гэрээ',
     }),
 
     jobDescriptionProcedure: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Job Description Procedure',
+      labelMn: 'Ажлын байрны тодорхойлолт',
     }),
 
     trainingDevelopment: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Training and Development Policy',
+      labelMn: 'Ажилтны сургалт, хөгжлийн бодлого',
     }),
 
     employeePerformanceManagement: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Employee Performance Management',
+      labelMn: 'Ажилтны гүйцэтгэлийн менежмент',
     }),
 
     timeKeepingManagement: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Time-Keeping Management',
+      labelMn: 'Цаг бүртгэлийн менежмент',
     }),
 
     managementOfPractises: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Management of Practices related to conduct',
+      labelMn: 'Хөдөлмөрийн дотоод журам',
     }),
 
     managementOfWorkforce: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Management of workforce engagement',
+      labelMn: 'Ажилтнуудтай харилцах, мэдээлэл солилцох',
     }),
 
     employeeAwareness: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Employee Awareness of their rights to association',
+      labelMn: 'Ажилчдын эвлэлдэн нэгдэх, эрх ашигаа хамгаалах эрх',
     }),
 
     employeeSelection: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Employee selection and recruitment process',
+      labelMn: 'Ажилтан сонгон шалгаруулж ажилд авах',
     }),
 
     employeeExitManagement: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Employee exit management',
+      labelMn: 'Хөдөлмөрийг гэрээг дуусгавар болгох',
     }),
 
     grievanceAndFairTreatment: field({
       type: HrReplyRecommendSchema,
       optional: true,
       label: 'Grievance and Fair treatment',
+      labelMn: 'Гомдол санал гаргах, түүнийг зохистой шийдвэрлэх',
     }),
   },
   { _id: false },
@@ -297,6 +332,8 @@ export const BusinessInfoSchema = mongoose.Schema(
       optional: true,
       label: `Does your company have in place a policy statement or code of \
         conduct relating to the Business Integrity and Ethics`,
+      labelMn:
+        'Танай компанид бизнесийн ёс зүйтэй холбоотой бичиж баримтжуулсан бодлого эсвэл дагаж мөрдөх дүрэм байдаг уу?',
     }),
 
     ensureThroughoutCompany: field({
@@ -304,6 +341,8 @@ export const BusinessInfoSchema = mongoose.Schema(
       optional: true,
       label: `Are there processes and procedures in place to ensure that your \
         policies or codes of conduct are effectively implemented throughout your company?`,
+      labelMn:
+        'Танай компанид бодлого, ёс зүйн дүрэм компани даяар үр дүнтэй хэрэгжиж байгаа эсэхийг хянах журам, процесс байдаг уу?',
     }),
 
     ensureThroughoutSupplyChain: field({
@@ -311,6 +350,8 @@ export const BusinessInfoSchema = mongoose.Schema(
       optional: true,
       label: `Are there processes and procedures in place to ensure that your \
         policies or codes of conduct are effectively implemented throughout your Supply Chain`,
+      labelMn:
+        'Танай бодлого, ёс зүйн дүрэм танай компанийн ханган нийлүүлэгчдийн хүрээнд үр дүнтэй хэрэгжиж байгаа эсэхийг хянах журам, процесс байдаг уу?',
     }),
 
     haveBeenSubjectToInvestigation: field({
@@ -318,12 +359,15 @@ export const BusinessInfoSchema = mongoose.Schema(
       optional: true,
       label: `Has your company been subject to any external investigation \
         regarding corruption within the past five years`,
+      labelMn:
+        'Танай компани сүүлийн таван жилд авилгатай холбоотой асуудлаар хөндлөнгийн хууль, хяналтын байгууллагаар шалгагдаж байсан уу?',
     }),
 
     doesHaveDocumentedPolicyToCorruption: field({
       type: ReplyRecommendSchema,
       optional: true,
       label: `Does your company have a documented policy in place to prevent corruption`,
+      labelMn: 'Танай компанид авилгаас сэргийлэх талаар бичиж баримтжуулсан бодлого бий юу?',
     }),
 
     whoIsResponsibleForPolicy: field({
@@ -331,6 +375,8 @@ export const BusinessInfoSchema = mongoose.Schema(
       optional: true,
       label: `If yes to above question, who is responsible person/function for \
         the compliance/anti-corruption program`,
+      labelMn:
+        'Дээрх асуултанд тийм гэж хариулсан бол ёс зүйн дүрмийн хэрэгжилт болон авилгын эсрэг хөтөлбөрийг ямар хэлтэс эсвэл албан тушаалтан хариуцан ажилладаг вэ?',
     }),
   },
   { _id: false },
