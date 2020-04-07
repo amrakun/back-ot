@@ -10,7 +10,8 @@ export const sendEmail = async ({ kind, toEmails, supplier, audit, attachments }
       return text
         .replace('{publishDate}', audit.publishDate.toLocaleString())
         .replace('{closeDate}', audit.closeDate.toLocaleString())
-        .replace('{supplier.name}', supplier.basicInfo.enName);
+        .replace('{supplier.name}', supplier.basicInfo.enName)
+        .replace('{content}', audit.content);
     },
   });
 };
