@@ -11,18 +11,18 @@ const auditResponseQueries = {
    * @param {String} auditId - Audit id
    * @param {String} supplierId - Selected supplier id
    * @param {Date} auditDate - Audit date
-   * @param {String} auditorName - Auditor name
+   * @param {String} auditor - Auditor name
    * @return {String} generated file link
    */
   async auditImprovementPlan(root, args, { user }) {
-    const { auditId, supplierId, auditDate, reassessmentDate, auditorName } = args;
+    const { auditId, supplierId, auditDate, reassessmentDate, auditor } = args;
 
     const company = await Companies.findOne({ _id: supplierId });
     const auditResponse = await AuditResponses.findOne({ auditId, supplierId });
 
     const { workbook, sheet } = await readTemplate('auditor_improvement_plan');
 
-    let rIndex = 5;
+    let rIndex = 1;
     let cellPointer;
 
     // Fill main info =========================
@@ -36,6 +36,9 @@ const auditResponseQueries = {
     // Supplier name
     fillMainInfoCell(basicInfo.enName);
 
+    // Result
+    fillMainInfoCell('Not qualified');
+
     // Audit date
     fillMainInfoCell(auditDate.toLocaleDateString());
 
@@ -43,12 +46,12 @@ const auditResponseQueries = {
     fillMainInfoCell(reassessmentDate.toLocaleDateString());
 
     // QUALIFICATION AUDITOR(S) NAME(S)
-    fillMainInfoCell(auditorName);
+    fillMainInfoCell(auditor);
 
     // fill invalid answers =======================
-    const invalidAnswers = [];
+    const collectInvalidAnswers = (sectionName, title, schema) => {
+      const invalidAnswers = [];
 
-    const collectInvalidAnswers = (sectionName, schema) => {
       const paths = schema.paths;
 
       // doesHaveHealthSafety, doesHaveDocumentedPolicy ...
@@ -71,40 +74,86 @@ const auditResponseQueries = {
           invalidAnswers.push({
             label: fieldOptions.label.replace(/\s\s/g, ''),
             recommendation: fieldValue.auditorRecommendation,
+            supplierAnswer: fieldValue.supplierAnswer,
+            auditorScore: fieldValue.auditorScore,
           });
         }
       });
+
+      if (invalidAnswers.lenght === 0) {
+        return;
+      }
+
+      rIndex++;
+
+      // title
+      sheet
+        .range(`${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C10`)}`)
+        .merged(true)
+        .style({ fill: '31869B', fontColor: 'ffffff', fontSize: 16 })
+        .value(title);
+
+      invalidAnswers.forEach((answer, answerIndex) => {
+        const fill = (cellPointer, value, style = {}) =>
+          sheet
+            .range(cellPointer)
+            .merged(true)
+            .style({ verticalAlignment: 'center', fill: 'F79646', border: true, ...style })
+            .value(value);
+
+        // CRITERIA ( SHORT QUESTION DESCRIPTION)
+        rIndex++;
+
+        sheet.row(rIndex).height(30);
+
+        // index
+        fill(`${cf(`R${rIndex}C1`)}:${cf(`R${rIndex}C1`)}`, answerIndex + 1, {
+          horizontalAlignment: 'center',
+          fill: 'ffffff',
+          fontSize: 16,
+          border: false,
+        });
+
+        fill(`${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C4`)}`, answer.label);
+
+        // supplier point
+        fill(`${cf(`R${rIndex}C5`)}:${cf(`R${rIndex}C7`)}`, 'Нийлүүлэгчийн оноо', {
+          horizontalAlignment: 'center',
+        });
+
+        // auditor point
+        fill(`${cf(`R${rIndex}C8`)}:${cf(`R${rIndex}C10`)}`, 'Аудиторын оноо', {
+          horizontalAlignment: 'center',
+        });
+
+        // RECOMMENDATION ========
+        rIndex++;
+
+        sheet.row(rIndex).height(50);
+
+        // recommendation
+        fill(`${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C4`)}`, `Зөвлөмж: ${answer.recommendation}`, {
+          fill: 'ffffff',
+          verticalAlignment: 'top',
+        });
+
+        // supplier point
+        fill(`${cf(`R${rIndex}C5`)}:${cf(`R${rIndex}C7`)}`, fixValue(answer.supplierAnswer), {
+          fill: 'ffffff',
+          horizontalAlignment: 'center',
+        });
+
+        // auditro point
+        fill(`${cf(`R${rIndex}C8`)}:${cf(`R${rIndex}C10`)}`, fixValue(answer.auditorScore), {
+          fill: 'ffffff',
+          horizontalAlignment: 'center',
+        });
+      });
     };
 
-    collectInvalidAnswers('coreHseqInfo', CoreHseqInfoSchema);
-    collectInvalidAnswers('hrInfo', HrInfoSchema);
-    collectInvalidAnswers('businessInfo', BusinessInfoSchema);
-
-    rIndex += 3;
-
-    invalidAnswers.forEach(answer => {
-      // CRITERIA ( SHORT QUESTION DESCRIPTION)
-      rIndex++;
-      cellPointer = `${cf(`R${rIndex}C2`)}:${cf(`R${rIndex}C3`)}`;
-      sheet
-        .range(cellPointer)
-        .merged(true)
-        .value(answer.label);
-
-      // IMPROVEMENT ACTION (USE VERBS)
-      cellPointer = `${cf(`R${rIndex}C4`)}:${cf(`R${rIndex}C7`)}`;
-      sheet
-        .range(cellPointer)
-        .merged(true)
-        .value(answer.recommendation);
-
-      // REQUIRED ACTION
-      cellPointer = `${cf(`R${rIndex}C9`)}:${cf(`R${rIndex}C10`)}`;
-      sheet
-        .range(cellPointer)
-        .merged(true)
-        .value('Send evindences');
-    });
+    collectInvalidAnswers('coreHseqInfo', 'ЭМААБОЧ-ын шалгуур', CoreHseqInfoSchema);
+    collectInvalidAnswers('hrInfo', 'Хүний нөөцийн шалгуур', HrInfoSchema);
+    collectInvalidAnswers('businessInfo', 'Бизнесийн ёс зүйн шалгуур', BusinessInfoSchema);
 
     // generate file
     const path = await generateXlsx(
