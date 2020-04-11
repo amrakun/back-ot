@@ -1,7 +1,7 @@
 import cf from 'cellref';
 import { Companies, AuditResponses } from '../../../db/models';
 import { CoreHseqInfoSchema, BusinessInfoSchema, HrInfoSchema } from '../../../db/models/Audits';
-import { readTemplate, generateXlsx } from '../../utils';
+import { readTemplate, generateXlsx, uploadToS3 } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
 import { fixValue } from './utils';
 
@@ -154,16 +154,15 @@ const auditResponseQueries = {
     collectInvalidAnswers('hrInfo', 'Хүний нөөцийн шалгуур', HrInfoSchema);
     collectInvalidAnswers('businessInfo', 'Бизнесийн ёс зүйн шалгуур', BusinessInfoSchema);
 
-    // generate file
-    const path = await generateXlsx(
-      user,
-      workbook,
-      `auditor_improvement_plan_${auditId}_${supplierId}`,
-    );
+    const key = `audits/auditor_improvement_plan_${auditId}_${supplierId}.xlsx`;
 
-    await auditResponse.update({ improvementPlanFile: path });
+    // save to s3
+    const file = await workbook.outputAsync('buffer');
+    await uploadToS3(key, file);
 
-    return path;
+    await auditResponse.update({ improvementPlanFile: key });
+
+    return key;
   },
 
   /**
@@ -371,12 +370,15 @@ const auditResponseQueries = {
     // Audit result
     fillRange('R3C5', 'R3C10', isQualified ? 'qualified' : 'Not qualified with improvement plan');
 
-    // generate file
-    const path = await generateXlsx(user, workbook, `auditor_report_${auditId}_${supplierId}`);
+    const key = `audits/auditor_report_${auditId}_${supplierId}.xlsx`;
 
-    await auditResponse.update({ reportFile: path });
+    // save to s3
+    const file = await workbook.outputAsync('buffer');
+    await uploadToS3(key, file);
 
-    return path;
+    await auditResponse.update({ reportFile: key });
+
+    return key;
   },
 };
 

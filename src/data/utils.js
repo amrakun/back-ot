@@ -112,9 +112,7 @@ export const readS3File = async (key, user, encoder = '') => {
  * @return {String} - Uploaded file url
  */
 export const uploadFile = async (file, fromEditor = false) => {
-  const { DOMAIN, AWS_BUCKET, AWS_PREFIX = '' } = process.env;
-
-  const s3 = createAWS();
+  const { DOMAIN, AWS_PREFIX = '' } = process.env;
 
   // generate unique name
   const fileName = `${AWS_PREFIX}${Math.random()}${file.name}`;
@@ -122,8 +120,26 @@ export const uploadFile = async (file, fromEditor = false) => {
   // read file
   const buffer = await fs.readFileSync(file.path);
 
+  await uploadToS3(fileName, buffer);
+
+  if (fromEditor) {
+    return {
+      fileName: file.name,
+      uploaded: 1,
+      url: `${DOMAIN}/read-file?key=${fileName}`,
+    };
+  }
+
+  return fileName;
+};
+
+export const uploadToS3 = async (fileName, buffer) => {
+  const { AWS_BUCKET } = process.env;
+
+  const s3 = createAWS();
+
   // upload to s3
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     s3.putObject(
       {
         Bucket: AWS_BUCKET,
@@ -139,16 +155,6 @@ export const uploadFile = async (file, fromEditor = false) => {
       },
     );
   });
-
-  if (fromEditor) {
-    return {
-      fileName: file.name,
-      uploaded: 1,
-      url: `${DOMAIN}/read-file?key=${fileName}`,
-    };
-  }
-
-  return fileName;
 };
 
 /**

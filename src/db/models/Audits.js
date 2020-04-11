@@ -832,7 +832,27 @@ class AuditResponse {
    * if given file is stored in audit_responses collection
    */
   static async isAuthorizedToDownload(key, user) {
-    return !user.isSupplier;
+    if (!user.isSupplier) {
+      return true;
+    }
+
+    const check = async selector => {
+      const response = await AuditResponses.findOne(selector);
+
+      if (!response) {
+        return false;
+      }
+
+      return response.supplierId === user.companyId;
+    };
+
+    if (await check({ reportFile: key })) {
+      return true;
+    }
+
+    if (await check({ improvementPlanFile: key })) {
+      return true;
+    }
   }
 }
 
