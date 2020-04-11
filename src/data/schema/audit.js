@@ -174,6 +174,7 @@ export const types = `
     businessInfo: AuditBusinessInfo
 
     isSent: Boolean
+    sentDate: Date
     submittedCount: Float
     isEditable: Boolean
     isBuyerNotified: Boolean
