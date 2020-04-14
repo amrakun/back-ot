@@ -276,12 +276,13 @@ describe('Audit response db', () => {
   });
 
   test('Send', async () => {
-    expect.assertions(7);
+    expect.assertions(6);
 
     const audit = await auditFactory({ status: 'open' });
 
     let auditResponse = await auditResponseFactory({
       auditId: audit._id,
+      isEditable: true,
     });
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
@@ -294,7 +295,6 @@ describe('Audit response db', () => {
 
     expect(auditResponse.isSent).toBe(true);
     expect(auditResponse.isBuyerNotified).toBe(false);
-    expect(auditResponse.isEditable).toBe(false);
     expect(auditResponse.sentDate).toBeDefined();
     expect(auditResponse.submittedCount).toBe(1);
     expect(auditResponse.status).toBe('onTime');
@@ -305,6 +305,7 @@ describe('Audit response db', () => {
 
     let auditResponse = await auditResponseFactory({
       auditId: audit._id,
+      isEditable: true,
     });
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
@@ -335,6 +336,19 @@ describe('Audit response db', () => {
 
     expect(auditResponse.improvementPlanSentDate).toBeDefined();
     expect(auditResponse.reportSentDate).not.toBeDefined();
+  });
+
+  test('Get last audit', async () => {
+    const supplier = await companyFactory({});
+    const supplierId = supplier._id;
+
+    await auditFactory({ supplierIds: [supplierId] });
+    await auditFactory({ supplierIds: [supplierId] });
+    const expectedlastAudit = await auditFactory({ supplierIds: [supplierId] });
+
+    const lastAudit = await Audits.getLastAudit(supplierId);
+
+    expect(expectedlastAudit._id.toString()).toBe(lastAudit._id.toString());
   });
 
   test('Qualified status', async () => {

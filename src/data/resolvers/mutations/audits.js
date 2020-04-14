@@ -88,11 +88,14 @@ const auditMutations = {
     return 'received';
   },
 
-  async auditsBuyerToggleState(root, { supplierId }, { user }) {
+  async auditsBuyerToggleState(root, { supplierId, editableDate }, { user }) {
     const company = await Companies.getCompany({ _id: supplierId });
     const basicInfo = company.basicInfo || {};
 
-    const { oldResponse, updatedResponse } = await AuditResponses.toggleState(supplierId);
+    const { oldResponse, updatedResponse } = await AuditResponses.toggleState(
+      supplierId,
+      editableDate,
+    );
 
     if (updatedResponse.isEditable) {
       await sendConfigEmail({

@@ -22,6 +22,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   }
 
   await Audits.closeOpens();
+  await AuditResponses.disabledEditableResponses();
 
   console.log('Checked audit status'); // eslint-disable-line
 });

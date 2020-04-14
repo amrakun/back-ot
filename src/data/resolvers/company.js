@@ -116,23 +116,20 @@ export default {
   },
 
   async qualificationState(company) {
-    const openAudit = await Audits.findOne({
-      supplierIds: { $in: [company._id] },
-      status: 'open',
-    });
+    let lastAudit;
 
-    if (!openAudit) {
-      return { isEditable: false, showToggleButton: false };
+    try {
+      lastAudit = await Audits.getLastAudit(company._id);
+    } catch (e) {
+      if (e.message === 'No audit found') {
+        return { isEditable: false, showToggleButton: false };
+      }
     }
 
     const response = await AuditResponses.findOne({
-      auditId: openAudit._id,
+      auditId: lastAudit._id,
       supplierId: company._id,
     });
-
-    if (!response) {
-      return { isEditable: false, showToggleButton: false };
-    }
 
     return { isEditable: response.isEditable, showToggleButton: response.isSentResubmitRequest };
   },

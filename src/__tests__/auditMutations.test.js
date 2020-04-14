@@ -336,7 +336,7 @@ describe('Audit mutations', () => {
   });
 
   test('Send response', async () => {
-    await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id });
+    await auditResponseFactory({ supplierId: _company._id, auditId: _audit._id, isEditable: true });
 
     const mutation = `
       mutation auditsSupplierSendResponse($auditId: String!) {

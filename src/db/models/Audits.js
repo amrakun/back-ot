@@ -1,6 +1,6 @@
 import moment from 'moment';
 import mongoose from 'mongoose';
-import { field, StatusPublishClose } from './utils';
+import { field, StatusPublishClose, isReached } from './utils';
 import { Configs, Companies } from './';
 
 const FileSchema = mongoose.Schema(
@@ -70,6 +70,20 @@ class Audit extends StatusPublishClose {
     }
 
     return audit;
+  }
+
+  static async getLastAudit(supplierId) {
+    const lastAudits = await Audits.find({ supplierIds: { $in: [supplierId] } }).sort({
+      createdDate: -1,
+    });
+
+    if (lastAudits.length === 0) {
+      throw new Error('No audit found');
+    }
+
+    const [lastAudit] = lastAudits;
+
+    return lastAudit;
   }
 }
 
@@ -406,6 +420,7 @@ const AuditResponseSchema = mongoose.Schema({
   submittedCount: field({ type: Number, optional: true }),
 
   isEditable: field({ type: Boolean, optional: true }),
+  editableDate: field({ type: Date, optional: true }),
 
   isQualified: field({ type: Boolean, optional: true }),
 
@@ -421,8 +436,11 @@ const AuditResponseSchema = mongoose.Schema({
 
 class AuditResponse {
   static createResponse(doc) {
+    const now = new Date();
+
     return this.create({
-      createdDate: new Date(),
+      createdDate: now,
+      editableDate: now,
       ...doc,
     });
   }
@@ -548,32 +566,28 @@ class AuditResponse {
   }
 
   static async saveResubmitRequest({ description, supplierId }) {
-    const openAudit = await Audits.findOne({ status: 'open', supplierIds: { $in: [supplierId] } });
-
-    if (!openAudit) {
-      return;
-    }
+    const lastAudit = await Audits.getLastAudit(supplierId);
 
     return this.updateOne(
-      { auditId: openAudit._id, supplierId },
+      { auditId: lastAudit._id, supplierId },
       { $set: { lastResubmitDescription: description, isSentResubmitRequest: true } },
     );
   }
 
-  static async toggleState(supplierId) {
-    const openAudit = await Audits.findOne({ status: 'open', supplierIds: { $in: [supplierId] } });
+  static async toggleState(supplierId, editableDate) {
+    const lastAudit = await Audits.getLastAudit(supplierId);
 
-    if (!openAudit) {
-      throw new Error('No open audit found');
+    const oldResponse = await this.findOne({ auditId: lastAudit._id, supplierId });
+
+    const modifier = { isEditable: false };
+
+    // enabling
+    if (editableDate) {
+      modifier.isEditable = true;
+      modifier.editableDate = editableDate;
     }
 
-    const oldResponse = await this.findOne({ auditId: openAudit._id, supplierId });
-
-    if (!oldResponse) {
-      throw new Error('Response not found with supplierId: ', supplierId);
-    }
-
-    await this.update({ _id: oldResponse._id }, { $set: { isEditable: !oldResponse.isEditable } });
+    await this.update({ _id: oldResponse._id }, { $set: modifier });
 
     const updatedResponse = await this.findOne({ _id: oldResponse._id });
 
@@ -678,6 +692,10 @@ class AuditResponse {
 
     const audit = await Audits.findOne({ _id: this.auditId });
 
+    if (!this.isEditable) {
+      throw new Error('Not editable');
+    }
+
     // if closeDate is reached, mark status as late
     if (audit.status === 'closed') {
       status = 'late';
@@ -689,7 +707,6 @@ class AuditResponse {
       sentDate: new Date(),
       submittedCount: (this.submittedCount || 0) + 1,
       status,
-      isEditable: false,
       isSentResubmitRequest: false,
     });
 
@@ -853,6 +870,26 @@ class AuditResponse {
     if (await check({ improvementPlanFile: key })) {
       return true;
     }
+  }
+
+  /*
+   * Disable editable responses
+   */
+  static async disabledEditableResponses() {
+    const editables = await this.find({ isEditable: true });
+
+    const results = [];
+
+    for (let editable of editables) {
+      // editable date is reached
+      if (isReached(editable.editableDate)) {
+        await this.update({ _id: editable._id }, { $set: { isEditable: false } });
+
+        results.push(editable._id);
+      }
+    }
+
+    return results;
   }
 }
 
