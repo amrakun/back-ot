@@ -1,14 +1,26 @@
 import { Companies, Audits, AuditResponses } from '../../../db/models';
 import { requireSupplier, requireBuyer } from '../../permissions';
 import { sendEmail } from '../../../data/auditUtils';
-import { sendConfigEmail, putCreateLog, putUpdateLog } from '../../../data/utils';
+import { sendConfigEmail, putCreateLog, putUpdateLog, putDeleteLog } from '../../../data/utils';
 import { readS3File } from '../../../data/utils';
 import { LOG_TYPES } from '../../constants';
 
 const auditMutations = {
   // create new audit
-  auditsAdd(root, args, { user }) {
-    return Audits.createAudit(args, user._id);
+  async auditsAdd(root, args, { user }) {
+    const audit = await Audits.createAudit(args, user._id);
+
+    putCreateLog(
+      {
+        type: LOG_TYPES.DESKTOP_AUDIT,
+        object: audit,
+        newData: JSON.stringify(audit),
+        description: 'Created desktop audit',
+      },
+      user,
+    );
+
+    return audit;
   },
 
   // save basic info
@@ -51,6 +63,50 @@ const auditMutations = {
     });
 
     return updatedResponse;
+  },
+
+  async auditsBuyerCancelResponse(root, { responseId }, { user }) {
+    const response = await AuditResponses.findOne({
+      _id: responseId,
+    });
+
+    if (!response) {
+      throw new Error('Not found');
+    }
+
+    const supplier = await Companies.findOne({ _id: response.supplierId });
+    const basicInfo = supplier.basicInfo || {};
+    const contactInfo = supplier.contactInfo || {};
+    const audit = await Audits.findOne({ _id: response.auditId });
+
+    // send email to supplier ===================
+    sendEmail({
+      kind: 'supplier__cancel',
+      toEmails: [contactInfo.email],
+      supplier,
+      audit,
+    });
+
+    // send email to buyer ===================
+    sendEmail({
+      kind: 'buyer__cancel',
+      toEmails: [process.env.MAIN_AUDITOR_EMAIL],
+      supplier,
+      audit,
+    });
+
+    putDeleteLog(
+      {
+        type: LOG_TYPES.DESKTOP_AUDIT,
+        object: response,
+        description: `Canceled audit response of "${basicInfo.enName}"`,
+      },
+      user,
+    );
+
+    await AuditResponses.remove({ _id: responseId });
+
+    return 'canceled';
   },
 
   async auditsSupplierSendResubmitRequest(root, { description }, { user }) {
@@ -239,6 +295,7 @@ sections.forEach(section => {
 requireBuyer(auditMutations, 'auditsAdd');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 requireBuyer(auditMutations, 'auditsBuyerToggleState');
+requireBuyer(auditMutations, 'auditsBuyerCancelResponse');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSendResponse');

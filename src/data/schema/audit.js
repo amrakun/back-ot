@@ -307,5 +307,7 @@ export const mutations = `
     report: Boolean,
   ): [AuditResponse]
 
+  auditsBuyerCancelResponse(responseId: String!): JSON
+
   auditsBuyerToggleState(supplierId: String!, editableDate: Date): AuditResponse
 `;
