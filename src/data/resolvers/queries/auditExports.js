@@ -328,7 +328,9 @@ const auditResponseQueries = {
           `${translations.supplierComment[reportLanguage]}: ${fieldValue.supplierComment}`,
         );
         fillAnswers(`${translations.auditorComment[reportLanguage]}: ${fieldValue.auditorComment}`);
-        fillAnswers(`${translations.recommendation[reportLanguage]}: ${fieldValue.recommendation}`);
+        fillAnswers(
+          `${translations.recommendation[reportLanguage]}: ${fieldValue.auditorRecommendation}`,
+        );
 
         fillRange(
           `R${rIndex - 2}C5`,
