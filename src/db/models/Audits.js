@@ -688,17 +688,8 @@ class AuditResponse {
    * @return - Updated response object
    */
   async send() {
-    let status = 'onTime';
-
-    const audit = await Audits.findOne({ _id: this.auditId });
-
     if (!this.isEditable) {
       throw new Error('Not editable');
-    }
-
-    // if closeDate is reached, mark status as late
-    if (audit.status === 'closed') {
-      status = 'late';
     }
 
     await this.update({
@@ -706,7 +697,7 @@ class AuditResponse {
       isBuyerNotified: false,
       sentDate: new Date(),
       submittedCount: (this.submittedCount || 0) + 1,
-      status,
+      status: this.isSentResubmitRequest ? 'late' : 'onTime',
       isSentResubmitRequest: false,
     });
 

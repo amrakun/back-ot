@@ -306,6 +306,7 @@ describe('Audit response db', () => {
     let auditResponse = await auditResponseFactory({
       auditId: audit._id,
       isEditable: true,
+      isSentResubmitRequest: true,
     });
 
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
