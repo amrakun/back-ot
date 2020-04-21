@@ -10,6 +10,8 @@ let channel;
 
 export const sendMessage = async (queueName, data) => {
   if (channel) {
+    console.log(`Sending message to ${queueName} with data ${JSON.stringify(data)}`);
+
     await channel.assertQueue(queueName);
     await channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data || {})));
   }
