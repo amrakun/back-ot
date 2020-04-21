@@ -74,26 +74,33 @@ const auditMutations = {
       throw new Error('Not found');
     }
 
+    const audit = await Audits.findOne({ _id: response.auditId });
+
+    if (audit.status === 'closed') {
+      throw new Error('Closed');
+    }
+
     const supplier = await Companies.findOne({ _id: response.supplierId });
     const basicInfo = supplier.basicInfo || {};
     const contactInfo = supplier.contactInfo || {};
-    const audit = await Audits.findOne({ _id: response.auditId });
 
-    // send email to supplier ===================
-    sendEmail({
-      kind: 'supplier__cancel',
-      toEmails: [contactInfo.email],
-      supplier,
-      audit,
-    });
+    if (audit.status === 'open') {
+      // send email to supplier ===================
+      sendEmail({
+        kind: 'supplier__cancel',
+        toEmails: [contactInfo.email],
+        supplier,
+        audit,
+      });
 
-    // send email to buyer ===================
-    sendEmail({
-      kind: 'buyer__cancel',
-      toEmails: [process.env.MAIN_AUDITOR_EMAIL],
-      supplier,
-      audit,
-    });
+      // send email to buyer ===================
+      sendEmail({
+        kind: 'buyer__cancel',
+        toEmails: [process.env.MAIN_AUDITOR_EMAIL],
+        supplier,
+        audit,
+      });
+    }
 
     putDeleteLog(
       {
