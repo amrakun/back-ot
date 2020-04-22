@@ -131,6 +131,10 @@ export default {
       supplierId: company._id,
     });
 
+    if (!response) {
+      return { isEditable: false, showToggleButton: false };
+    }
+
     return { isEditable: response.isEditable, showToggleButton: response.isSentResubmitRequest };
   },
 
