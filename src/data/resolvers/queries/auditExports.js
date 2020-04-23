@@ -4,6 +4,7 @@ import { CoreHseqInfoSchema, BusinessInfoSchema, HrInfoSchema } from '../../../d
 import { readTemplate, generateXlsx, uploadToS3 } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
 import { fixValue } from './utils';
+import { responsesFilter } from './audits';
 
 const auditResponseQueries = {
   /**
@@ -387,7 +388,7 @@ const auditResponseQueries = {
     // read template
     const { workbook, sheet } = await readTemplate('audit_responses');
 
-    const responses = await AuditResponses.find({});
+    const responses = await responsesFilter({});
 
     let rowIndex = 4;
 

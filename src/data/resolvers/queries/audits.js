@@ -5,7 +5,7 @@ import { supplierFilter } from './utils';
 /*
  * Common audit responses filter
  */
-const responsesFilter = async args => {
+export const responsesFilter = async args => {
   const { supplierSearch, publishDate, closeDate, qualStatus, supplierStatus } = args;
 
   const query = {
