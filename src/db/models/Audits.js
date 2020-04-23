@@ -575,7 +575,7 @@ class AuditResponse {
         $set: {
           lastResubmitDescription: description,
           isSentResubmitRequest: true,
-          notificationForBuyer: 'resubmitRequest',
+          notificationForBuyer: 'resubmit request',
         },
       },
     );
