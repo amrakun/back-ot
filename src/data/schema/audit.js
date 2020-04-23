@@ -247,6 +247,8 @@ export const queries = `
     reportNo: String!
     reportLanguage: String
   ): String
+
+  auditExportResponses: String
 `;
 
 export const mutations = `

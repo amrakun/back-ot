@@ -1,5 +1,5 @@
 import cf from 'cellref';
-import { Companies, AuditResponses } from '../../../db/models';
+import { Companies, AuditResponses, Audits } from '../../../db/models';
 import { CoreHseqInfoSchema, BusinessInfoSchema, HrInfoSchema } from '../../../db/models/Audits';
 import { readTemplate, generateXlsx, uploadToS3 } from '../../utils';
 import { moduleRequireBuyer } from '../../permissions';
@@ -381,6 +381,42 @@ const auditResponseQueries = {
     await auditResponse.update({ reportFile: key });
 
     return key;
+  },
+
+  async auditExportResponses(root, args, { user }) {
+    // read template
+    const { workbook, sheet } = await readTemplate('audit_responses');
+
+    const responses = await AuditResponses.find({});
+
+    let rowIndex = 4;
+
+    for (let [index, response] of responses.entries()) {
+      rowIndex++;
+
+      const audit = await Audits.findOne({ _id: response.auditId });
+      const supplier = await Companies.findOne({ _id: response.supplierId });
+
+      sheet.cell(rowIndex, 1).value(index + 1);
+      sheet.cell(rowIndex, 2).value(audit.status);
+      sheet.cell(rowIndex, 3).value(supplier.basicInfo.enName);
+      sheet.cell(rowIndex, 4).value(supplier.basicInfo.sapNumber);
+      sheet.cell(rowIndex, 5).value(supplier.tierType);
+
+      sheet.cell(rowIndex, 6).value(supplier.qualificationStatusDisplay());
+      sheet.cell(rowIndex, 7).value(response.status === 'invited' ? 'invited' : 'submitted');
+      sheet.cell(rowIndex, 8).value(audit.publishDate.toLocaleDateString());
+      sheet.cell(rowIndex, 9).value(audit.closeDate.toLocaleDateString());
+      sheet
+        .cell(rowIndex, 10)
+        .value(response.sentDate ? response.sentDate.toLocaleDateString() : '');
+      sheet.cell(rowIndex, 11).value(response.status ? response.status : 'Not responeded');
+      sheet.cell(rowIndex, 12).value(response.reportFile);
+      sheet.cell(rowIndex, 13).value(response.improvementPlanFile);
+    }
+
+    // Write to file.
+    return generateXlsx(user, workbook, 'audit_responses');
   },
 };
 
