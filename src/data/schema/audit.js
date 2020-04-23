@@ -178,7 +178,6 @@ export const types = `
     submittedCount: Float
     isEditable: Boolean
     isBuyerNotified: Boolean
-    isSupplierNotified: Boolean
 
     isQualified: Boolean
     qualifiedStatus: JSON

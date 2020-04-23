@@ -67,52 +67,17 @@ export default {
     });
   },
 
-  async auditImprovementPlanNotification(company) {
-    const openAudits = await Audits.find({
-      supplierIds: { $in: [company._id] },
-      status: 'open',
+  async auditNotification(company) {
+    const notNotifiedResponse = await AuditResponses.findOne({
+      supplierId: company._id,
+      notificationForSupplier: { $exists: true, $nin: ['', null] },
     });
 
-    let result;
-
-    for (const audit of openAudits) {
-      const response = await AuditResponses.findOne({
-        auditId: audit._id,
-        supplierId: company._id,
-        isQualified: false,
-        isSupplierNotified: false,
-      });
-
-      if (response) {
-        result = response;
-        break;
-      }
+    if (!notNotifiedResponse) {
+      return null;
     }
 
-    return result;
-  },
-
-  async hasNewAudit(company) {
-    const openAudits = await Audits.find({
-      supplierIds: { $in: [company._id] },
-      status: 'open',
-    });
-
-    let result = false;
-
-    for (const openAudit of openAudits) {
-      const response = await AuditResponses.findOne({
-        auditId: openAudit._id,
-        supplierId: company._id,
-      });
-
-      if (response.status === 'invited') {
-        result = true;
-        break;
-      }
-    }
-
-    return result;
+    return { type: notNotifiedResponse.notificationForSupplier, response: notNotifiedResponse };
   },
 
   async qualificationState(company) {

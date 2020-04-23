@@ -195,7 +195,7 @@ describe('Audit response db', () => {
   });
 
   test('Basic info', async () => {
-    expect.assertions(4);
+    expect.assertions(3);
 
     const doc = {
       sotri: 'sotri',
@@ -210,7 +210,6 @@ describe('Audit response db', () => {
     });
 
     expect(response.createdDate).toBeDefined();
-    expect(response.isSupplierNotified).toBe(true);
     expect(response.basicInfo.toJSON()).toEqual(doc);
 
     // check isEditable validation
@@ -502,6 +501,6 @@ describe('Audit response db', () => {
     response = await AuditResponses.findOne({ _id: response._id });
 
     expect(response.isEditable).toBe(true);
-    expect(response.isSupplierNotified).toBe(false);
+    expect(response.notificationForSupplier).toBe('improvementPlanDueDate');
   });
 });

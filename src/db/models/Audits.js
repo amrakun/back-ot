@@ -66,6 +66,8 @@ class Audit extends StatusPublishClose {
         supplierId,
         status: 'invited',
         isEditable: true,
+        editableDate: audit.closeDate,
+        notificationForSupplier: 'invited',
       });
     }
 
@@ -428,7 +430,7 @@ const AuditResponseSchema = mongoose.Schema({
   isBuyerNotified: field({ type: Boolean, optional: true }),
 
   // Supplier saved something on this response
-  isSupplierNotified: field({ type: Boolean, optional: true }),
+  notificationForSupplier: field({ type: String, optional: true }),
 
   isSentResubmitRequest: field({ type: Boolean, optional: true }),
   lastResubmitDescription: field({ type: String, optional: true }),
@@ -440,7 +442,6 @@ class AuditResponse {
 
     return this.create({
       createdDate: now,
-      editableDate: now,
       ...doc,
     });
   }
@@ -585,6 +586,7 @@ class AuditResponse {
     if (editableDate) {
       modifier.isEditable = true;
       modifier.editableDate = editableDate;
+      modifier.notificationForSupplier = 'enabled';
     }
 
     await this.update({ _id: oldResponse._id }, { $set: modifier });
@@ -677,7 +679,6 @@ class AuditResponse {
       createdDate: new Date(),
       auditId,
       isSent: false,
-      isSupplierNotified: true,
       supplierId,
       [name]: doc,
     });
@@ -723,7 +724,7 @@ class AuditResponse {
   static async markAsSupplierNotified({ auditId, supplierId }) {
     const selector = { auditId, supplierId };
 
-    await AuditResponses.update(selector, { $set: { isSupplierNotified: true } });
+    await AuditResponses.update(selector, { $set: { notificationForSupplier: '' } });
 
     return AuditResponses.findOne(selector);
   }
@@ -828,7 +829,7 @@ class AuditResponse {
     if (moment(deadline).diff(now, 'days') === 14) {
       return this.update(
         { _id: responseId },
-        { $set: { isEditable: true, isSupplierNotified: false } },
+        { $set: { isEditable: true, notificationForSupplier: 'improvementPlanDueDate' } },
       );
     }
 
@@ -864,9 +865,9 @@ class AuditResponse {
   }
 
   /*
-   * Disable editable responses
+   * Disable editabled responses
    */
-  static async disabledEditableResponses() {
+  static async disableEditabledResponses() {
     const editables = await this.find({ isEditable: true });
 
     const results = [];

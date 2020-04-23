@@ -410,9 +410,8 @@ export const types = `
     isBlocked: String
     openTendersCount: Int
 
-    hasNewAudit: Boolean
+    auditNotification: JSON
     audits: [Audit]
-    auditImprovementPlanNotification: AuditResponse
 
     qualificationState: JSON
   }
