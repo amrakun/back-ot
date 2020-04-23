@@ -177,7 +177,7 @@ export const types = `
     sentDate: Date
     submittedCount: Float
     isEditable: Boolean
-    isBuyerNotified: Boolean
+    notificationForBuyer: String
 
     isQualified: Boolean
     qualifiedStatus: JSON
@@ -307,6 +307,6 @@ export const mutations = `
   ): [AuditResponse]
 
   auditsBuyerCancelResponse(responseId: String!): JSON
-
+  auditsBuyerNotificationMarkAsRead(responseId: String!): JSON
   auditsBuyerToggleState(supplierId: String!, editableDate: Date): AuditResponse
 `;

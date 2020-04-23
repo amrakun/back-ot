@@ -202,7 +202,7 @@ describe('Audit mutations', () => {
     });
 
     if (!isSupplier) {
-      expect(auditResponse.isBuyerNotified).toBe(true);
+      expect(auditResponse.notificationForBuyer).not.toBeDefined();
     }
 
     for (const fieldName of Object.keys(args[name])) {

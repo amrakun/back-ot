@@ -116,6 +116,10 @@ const auditMutations = {
     return 'canceled';
   },
 
+  async auditsBuyerNotificationMarkAsRead(root, { responseId }) {
+    return AuditResponses.markAsBuyerNotified(responseId);
+  },
+
   async auditsSupplierSendResubmitRequest(root, { description }, { user }) {
     const company = await Companies.findOne({ _id: user.companyId });
 
@@ -283,11 +287,6 @@ sections.forEach(section => {
   const buyerName = `auditsBuyerSave${capsedName}`;
 
   auditMutations[buyerName] = async (root, args) => {
-    await AuditResponses.markAsBuyerNotified({
-      auditId: args.auditId,
-      supplierId: args.supplierId,
-    });
-
     return AuditResponses.saveReplyRecommentSection({
       auditId: args.auditId,
       supplierId: args.supplierId,
@@ -303,6 +302,7 @@ requireBuyer(auditMutations, 'auditsAdd');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 requireBuyer(auditMutations, 'auditsBuyerToggleState');
 requireBuyer(auditMutations, 'auditsBuyerCancelResponse');
+requireBuyer(auditMutations, 'auditsBuyerNotificationMarkAsRead');
 
 requireSupplier(auditMutations, 'auditsSupplierSaveBasicInfo');
 requireSupplier(auditMutations, 'auditsSupplierSendResponse');

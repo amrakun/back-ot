@@ -147,7 +147,7 @@ const auditQueries = {
 
       qualified += responses.filter(r => r.isQualified).length;
       sentImprovementPlan += responses.filter(r => r.improvementPlanSentDate).length;
-      notNotified += responses.filter(r => !r.isBuyerNotified).length;
+      notNotified += responses.filter(r => r.notificationForBuyer).length;
     }
 
     return {

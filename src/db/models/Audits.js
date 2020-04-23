@@ -427,7 +427,7 @@ const AuditResponseSchema = mongoose.Schema({
   isQualified: field({ type: Boolean, optional: true }),
 
   // Buyer saved something on this response
-  isBuyerNotified: field({ type: Boolean, optional: true }),
+  notificationForBuyer: field({ type: String, optional: true }),
 
   // Supplier saved something on this response
   notificationForSupplier: field({ type: String, optional: true }),
@@ -571,7 +571,13 @@ class AuditResponse {
 
     return this.updateOne(
       { auditId: lastAudit._id, supplierId },
-      { $set: { lastResubmitDescription: description, isSentResubmitRequest: true } },
+      {
+        $set: {
+          lastResubmitDescription: description,
+          isSentResubmitRequest: true,
+          notificationForBuyer: 'resubmitRequest',
+        },
+      },
     );
   }
 
@@ -695,7 +701,7 @@ class AuditResponse {
 
     await this.update({
       isSent: true,
-      isBuyerNotified: false,
+      notificationForBuyer: 'sent',
       sentDate: new Date(),
       submittedCount: (this.submittedCount || 0) + 1,
       status: this.isSentResubmitRequest ? 'late' : 'onTime',
@@ -709,12 +715,8 @@ class AuditResponse {
    * Mark as buyer notified
    * @return - Updated response
    */
-  static async markAsBuyerNotified({ auditId, supplierId }) {
-    const selector = { auditId, supplierId };
-
-    await AuditResponses.update(selector, { $set: { isBuyerNotified: true } });
-
-    return AuditResponses.findOne(selector);
+  static markAsBuyerNotified(responseId) {
+    return AuditResponses.update({ _id: responseId }, { $set: { notificationForBuyer: '' } });
   }
 
   /**

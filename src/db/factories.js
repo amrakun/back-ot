@@ -676,7 +676,8 @@ export const auditResponseFactory = async (params = {}) => {
     isSent: params.isSent || false,
     isEditable: params.isEditable || false,
     isQualified: params.isQualified || false,
-    isBuyerNotified: params.isBuyerNotified || false,
+    notificationForBuyer:
+      typeof params.notificationForBuyer !== 'undefined' ? params.notificationForBuyer : 'sent',
     isSentResubmitRequest: params.isSentResubmitRequest || false,
 
     coreHseqInfo: params.coreHseqInfo || auditResponseDocs.coreHseqInfo,

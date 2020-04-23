@@ -381,19 +381,19 @@ describe('Company queries', () => {
 
     await auditResponseFactory({
       isQualified: true,
-      isBuyerNotified: true,
+      notificationForBuyer: '',
       isSent: true,
     });
 
     await auditResponseFactory({
       isQualified: true,
-      isBuyerNotified: true,
+      notificationForBuyer: '',
       isSent: true,
     });
 
     await auditResponseFactory({
       improvementPlanSentDate: new Date(),
-      isBuyerNotified: true,
+      notificationForBuyer: '',
       isSent: true,
     });
 

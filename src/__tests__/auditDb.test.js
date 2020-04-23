@@ -293,7 +293,7 @@ describe('Audit response db', () => {
     auditResponse = await AuditResponses.findOne({ _id: auditResponse._id });
 
     expect(auditResponse.isSent).toBe(true);
-    expect(auditResponse.isBuyerNotified).toBe(false);
+    expect(auditResponse.notificationForBuyer).toBe('sent');
     expect(auditResponse.sentDate).toBeDefined();
     expect(auditResponse.submittedCount).toBe(1);
     expect(auditResponse.status).toBe('onTime');
