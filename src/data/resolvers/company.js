@@ -68,7 +68,13 @@ export default {
   },
 
   async auditNotification(company) {
+    const openAudits = await Audits.find({
+      supplierIds: { $in: [company._id] },
+      status: 'open',
+    });
+
     const notNotifiedResponse = await AuditResponses.findOne({
+      auditId: { $in: openAudits.map(a => a._id) },
       supplierId: company._id,
       notificationForSupplier: { $exists: true, $nin: ['', null] },
     });
