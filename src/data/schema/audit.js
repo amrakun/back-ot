@@ -177,6 +177,7 @@ export const types = `
     sentDate: Date
     submittedCount: Float
     isEditable: Boolean
+    editableDate: Date
     notificationForBuyer: String
 
     isQualified: Boolean
