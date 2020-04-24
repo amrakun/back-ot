@@ -111,7 +111,10 @@ const auditMutations = {
       user,
     );
 
-    await AuditResponses.remove({ _id: responseId });
+    await AuditResponses.updateOne(
+      { _id: responseId },
+      { $set: { status: 'canceled', isEditable: false } },
+    );
 
     return 'canceled';
   },

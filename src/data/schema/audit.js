@@ -167,6 +167,7 @@ export const types = `
     supplierId: String
 
     status: String
+    auditStatus: String
 
     basicInfo: AuditBasicInfo
     coreHseqInfo: AuditCoreHseqInfo

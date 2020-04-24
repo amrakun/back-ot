@@ -399,7 +399,7 @@ const auditResponseQueries = {
       const supplier = await Companies.findOne({ _id: response.supplierId });
 
       sheet.cell(rowIndex, 1).value(index + 1);
-      sheet.cell(rowIndex, 2).value(audit.status);
+      sheet.cell(rowIndex, 2).value(await response.auditStatus());
       sheet.cell(rowIndex, 3).value(supplier.basicInfo.enName);
       sheet.cell(rowIndex, 4).value(supplier.basicInfo.sapNumber);
       sheet.cell(rowIndex, 5).value(supplier.tierType);

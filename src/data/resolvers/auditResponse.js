@@ -9,6 +9,10 @@ export default {
     return Audits.findOne({ _id: auditResponse.auditId });
   },
 
+  auditStatus(auditResponse) {
+    return auditResponse.auditStatus();
+  },
+
   async qualifiedStatus(response) {
     return {
       coreHseqInfo: AuditResponses.isSectionPassed({

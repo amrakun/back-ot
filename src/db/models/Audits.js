@@ -690,6 +690,16 @@ class AuditResponse {
     });
   }
 
+  async auditStatus() {
+    if (this.status === 'canceled') {
+      return 'canceled';
+    }
+
+    const audit = await Audits.findOne({ _id: this.auditId });
+
+    return audit.status;
+  }
+
   /**
    * Mark this response as sent
    * @return - Updated response object
