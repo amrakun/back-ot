@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 
-import apm from 'elastic-apm-node/start';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';

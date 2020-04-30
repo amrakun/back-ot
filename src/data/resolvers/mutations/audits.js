@@ -158,6 +158,15 @@ const auditMutations = {
     return 'received';
   },
 
+  async auditsBuyerSaveResultForm(root, args) {
+    const responseId = args.responseId;
+    delete args.responseId;
+
+    await AuditResponses.updateOne({ _id: responseId }, { $set: { resultForm: args } });
+
+    return AuditResponses.findOne({ _id: responseId });
+  },
+
   async auditsBuyerToggleState(root, { supplierId, editableDate }, { user }) {
     const company = await Companies.getCompany({ _id: supplierId });
     const basicInfo = company.basicInfo || {};
@@ -304,6 +313,7 @@ sections.forEach(section => {
 requireBuyer(auditMutations, 'auditsAdd');
 requireBuyer(auditMutations, 'auditsBuyerSendFiles');
 requireBuyer(auditMutations, 'auditsBuyerToggleState');
+requireBuyer(auditMutations, 'auditsBuyerSaveResultForm');
 requireBuyer(auditMutations, 'auditsBuyerCancelResponse');
 requireBuyer(auditMutations, 'auditsBuyerNotificationMarkAsRead');
 

@@ -144,6 +144,15 @@ export const types = `
     ${generateBusinessFields('AnswerRecommendation')}
   }
 
+  type AuditResultForm {
+    reportLanguage: String,
+    auditDate: Date,
+    reassessmentDate: Date,
+    reportNo: String,
+    auditor: String,
+    content: String,
+  }
+
   type Audit {
     _id: String!
     createdUserId: String
@@ -173,6 +182,7 @@ export const types = `
     coreHseqInfo: AuditCoreHseqInfo
     hrInfo: AuditHrInfo
     businessInfo: AuditBusinessInfo
+    resultForm: AuditResultForm
 
     isSent: Boolean
     sentDate: Date
@@ -312,5 +322,16 @@ export const mutations = `
 
   auditsBuyerCancelResponse(responseId: String!): JSON
   auditsBuyerNotificationMarkAsRead(responseId: String!): JSON
+
   auditsBuyerToggleState(supplierId: String!, editableDate: Date): AuditResponse
+
+  auditsBuyerSaveResultForm(
+    responseId: String!
+    reportLanguage: String,
+    auditDate: Date,
+    reassessmentDate: Date,
+    reportNo: String,
+    auditor: String,
+    content: String,
+  ): AuditResponse
 `;

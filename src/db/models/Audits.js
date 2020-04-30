@@ -398,6 +398,18 @@ export const BusinessInfoSchema = mongoose.Schema(
   { _id: false },
 );
 
+const ResultFormSchema = mongoose.Schema(
+  {
+    reportLanguage: field({ type: String }),
+    auditDate: field({ type: Date }),
+    reassessmentDate: field({ type: Date }),
+    reportNo: field({ type: String }),
+    auditor: field({ type: String }),
+    content: field({ type: String }),
+  },
+  { _id: false },
+);
+
 const AuditResponseSchema = mongoose.Schema({
   createdDate: field({ type: Date }),
   auditId: field({ type: String }),
@@ -434,6 +446,8 @@ const AuditResponseSchema = mongoose.Schema({
 
   isSentResubmitRequest: field({ type: Boolean, optional: true }),
   lastResubmitDescription: field({ type: String, optional: true }),
+
+  resultForm: ResultFormSchema,
 });
 
 class AuditResponse {
@@ -693,6 +707,10 @@ class AuditResponse {
   async auditStatus() {
     if (this.status === 'canceled') {
       return 'canceled';
+    }
+
+    if (this.isEditable) {
+      return 'open';
     }
 
     const audit = await Audits.findOne({ _id: this.auditId });
