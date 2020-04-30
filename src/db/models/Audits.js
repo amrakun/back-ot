@@ -765,13 +765,17 @@ class AuditResponse {
    * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
-  async sendFiles({ improvementPlan, report }) {
+  async sendFiles({ reassessmentDate, improvementPlan, report }) {
     if (improvementPlan) {
       await this.update({ improvementPlanSentDate: new Date() });
     }
 
     if (report) {
       await this.update({ reportSentDate: new Date() });
+    }
+
+    if (reassessmentDate) {
+      await this.update({ isEditable: true, editableDate: reassessmentDate });
     }
 
     return AuditResponses.findOne({ _id: this._id });

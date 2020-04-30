@@ -209,7 +209,11 @@ const auditMutations = {
    * @param {Boolean} report - Is sent report email
    * @return - Updated response
    */
-  async auditsBuyerSendFiles(root, { responseIds, improvementPlan, report }, { user }) {
+  async auditsBuyerSendFiles(
+    root,
+    { responseIds, reassessmentDate, improvementPlan, report },
+    { user },
+  ) {
     for (const responseId of responseIds) {
       const response = await AuditResponses.findOne({ _id: responseId });
       const audit = await Audits.findOne({ _id: response.auditId });
@@ -256,7 +260,7 @@ const auditMutations = {
       });
 
       // save dates
-      await response.sendFiles({ improvementPlan, report });
+      await response.sendFiles({ improvementPlan, report, reassessmentDate });
     }
   },
 };
