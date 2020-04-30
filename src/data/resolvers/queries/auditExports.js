@@ -185,10 +185,7 @@ const auditResponseQueries = {
     const shareholders = shareholderInfo.shareholders || [];
     const owner = shareholders[0] || {};
     const shareholdersList = shareholders.map(
-      (shareholder, i) =>
-        `${shareholder.name} ${(shareholder.jobTitle, shareholder.percentage)}%${
-          i < shareholders.length - 1 ? ', ' : ''
-        }`,
+      (shareholder, i) => `${shareholder.name} ${(shareholder.jobTitle, shareholder.percentage)}%`,
     );
 
     const { workbook, sheet } = await readTemplate(`auditor_report_${reportLanguage}`);
@@ -229,7 +226,7 @@ const auditResponseQueries = {
     fillRange('R8C5', 'R8C10', owner.name);
 
     // Shareholders
-    fillRange('R9C5', 'R9C10', shareholdersList);
+    fillRange('R9C5', 'R9C10', shareholdersList.join(','));
 
     // number of employees
     fillRange('R10C5', 'R10C10', bi.totalNumberOfEmployees);
