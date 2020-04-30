@@ -104,7 +104,7 @@ const auditResponseQueries = {
         // CRITERIA ( SHORT QUESTION DESCRIPTION)
         rIndex++;
 
-        sheet.row(rIndex).height(30);
+        sheet.row(rIndex).height(50);
 
         // index
         fill(`${cf(`R${rIndex}C1`)}:${cf(`R${rIndex}C1`)}`, answerIndex + 1, {
@@ -306,7 +306,7 @@ const auditResponseQueries = {
           border: true,
         };
 
-        sheet.row(rIndex).height(30);
+        sheet.row(rIndex).height(50);
 
         fillRange(`R${rIndex}C1`, `R${rIndex}C1`, fieldIndex + 1, 'left').style({
           verticalAlignment: 'center',
