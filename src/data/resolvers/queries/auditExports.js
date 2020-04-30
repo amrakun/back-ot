@@ -181,6 +181,16 @@ const auditResponseQueries = {
     const company = await Companies.findOne({ _id: supplierId });
     const auditResponse = await AuditResponses.findOne({ auditId, supplierId });
 
+    const shareholderInfo = company.shareholderInfo || {};
+    const shareholders = shareholderInfo.shareholders || [];
+    const owner = shareholders[0] || {};
+    const shareholdersList = shareholders.map(
+      (shareholder, i) =>
+        `${shareholder.name} ${(shareholder.jobTitle, shareholder.percentage)}%${
+          i < shareholders.length - 1 ? ', ' : ''
+        }`,
+    );
+
     const { workbook, sheet } = await readTemplate(`auditor_report_${reportLanguage}`);
 
     const bi = company.basicInfo || {};
@@ -214,6 +224,12 @@ const auditResponseQueries = {
 
     // Tier type
     fillRange('R7C5', 'R7C10', company.tierType);
+
+    // Ownership
+    fillRange('R8C5', 'R8C10', owner.name);
+
+    // Shareholders
+    fillRange('R9C5', 'R9C10', shareholdersList);
 
     // number of employees
     fillRange('R10C5', 'R10C10', bi.totalNumberOfEmployees);
