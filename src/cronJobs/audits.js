@@ -4,6 +4,8 @@ import { sendEmail } from '../data/auditUtils';
 
 // every 1 minute
 schedule.scheduleJob('*/1 * * * *', async () => {
+  const { MAIN_AUDITOR_EMAIL } = process.env;
+
   const publishedAuditIds = await Audits.publishDrafts();
   const publishedAudits = await Audits.find({ _id: { $in: publishedAuditIds } });
 
@@ -19,6 +21,12 @@ schedule.scheduleJob('*/1 * * * *', async () => {
         supplier,
       });
     }
+
+    await sendEmail({
+      kind: 'buyer__invitation',
+      toEmails: [MAIN_AUDITOR_EMAIL],
+      audit,
+    });
   }
 
   await Audits.closeOpens();

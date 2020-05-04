@@ -1,6 +1,8 @@
 import { sendConfigEmail } from './utils';
 
 export const sendEmail = async ({ kind, toEmails, supplier, audit, attachments }) => {
+  const basicInfo = (supplier && supplier.basicInfo) || {};
+
   return sendConfigEmail({
     name: 'desktopAuditTemplates',
     kind,
@@ -10,7 +12,7 @@ export const sendEmail = async ({ kind, toEmails, supplier, audit, attachments }
       return text
         .replace('{publishDate}', audit.publishDate.toLocaleString())
         .replace('{closeDate}', audit.closeDate.toLocaleString())
-        .replace('{supplier.name}', supplier.basicInfo.enName)
+        .replace('{supplier.name}', basicInfo.enName)
         .replace('{content}', audit.content);
     },
   });
