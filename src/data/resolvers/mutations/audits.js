@@ -54,14 +54,6 @@ const auditMutations = {
       updatedResponse = await response.send();
     }
 
-    // send email ===================
-    sendEmail({
-      kind: 'buyer__submit',
-      toEmails: [process.env.MAIN_AUDITOR_EMAIL],
-      supplier,
-      audit,
-    });
-
     return updatedResponse;
   },
 
