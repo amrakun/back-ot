@@ -232,20 +232,19 @@ const auditMutations = {
         });
       }
 
-      // send notification ==============
-      let kind = 'supplier__failed';
-
-      if (response.isQualified) {
-        if (improvementPlan) {
-          kind = 'supplier__approved_with_improvement_plan';
-        } else {
-          kind = 'supplier__approved';
-        }
-      }
-
+      // send notification to supplier ==============
       await sendEmail({
-        kind,
+        kind: response.isQualified ? 'supplier__approved' : 'supplier__failed',
         toEmails: [supplier.basicInfo.email],
+        attachments,
+        audit,
+        supplier,
+      });
+
+      // send notification to buyer ==============
+      await sendEmail({
+        kind: response.isQualified ? 'buyer__approved' : 'buyer__failed',
+        toEmails: [process.env.MAIN_AUDITOR_EMAIL],
         attachments,
         audit,
         supplier,

@@ -886,8 +886,9 @@ export const configFactory = (params = {}) => {
     desktopAuditTemplates: {
       supplier__invitation: commonTemplate,
       supplier__failed: commonTemplate,
-      supplier__approved_with_improvement_plan: commonTemplate,
       supplier__approved: commonTemplate,
+      buyer__failed: commonTemplate,
+      buyer__approved: commonTemplate,
     },
   });
 
