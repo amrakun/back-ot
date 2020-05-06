@@ -194,10 +194,6 @@ export const sendEmail = async args => {
 let configCache;
 
 export const getConfig = async () => {
-  if (configCache) {
-    return configCache;
-  }
-
   const config = await Configs.getConfig();
 
   configCache = config;
