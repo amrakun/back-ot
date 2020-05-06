@@ -36,9 +36,9 @@ class Audit extends StatusPublishClose {
     const supplierIds = [];
 
     for (const supplierId of doc.supplierIds || []) {
-      const prevOpenAudit = await Audits.findOne({
-        status: 'open',
-        supplierIds: { $in: [supplierId] },
+      const prevOpenAudit = await AuditResponses.findOne({
+        status: 'invited',
+        supplierId,
       });
 
       if (prevOpenAudit) {
