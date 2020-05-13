@@ -203,7 +203,7 @@ const auditMutations = {
    */
   async auditsBuyerSendFiles(
     root,
-    { responseIds, reassessmentDate, improvementPlan, report },
+    { responseIds, reassessmentDate, reminderDay, improvementPlan, report },
     { user },
   ) {
     for (const responseId of responseIds) {
@@ -251,7 +251,7 @@ const auditMutations = {
       });
 
       // save dates
-      await response.sendFiles({ improvementPlan, report, reassessmentDate });
+      await response.sendFiles({ improvementPlan, report, reassessmentDate, reminderDay });
     }
   },
 };

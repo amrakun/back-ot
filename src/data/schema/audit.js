@@ -319,6 +319,7 @@ export const mutations = `
   auditsBuyerSendFiles(
     responseIds: [String]!,
     reassessmentDate: Date,
+    reminderDay: Float,
     improvementPlan: Boolean,
     report: Boolean,
   ): [AuditResponse]
