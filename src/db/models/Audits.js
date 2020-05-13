@@ -409,6 +409,7 @@ const ResultFormSchema = mongoose.Schema(
     reportNo: field({ type: String }),
     auditor: field({ type: String }),
     content: field({ type: String }),
+    reminderDay: field({ type: Number, optional: true }),
   },
   { _id: false },
 );

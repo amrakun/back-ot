@@ -151,6 +151,7 @@ export const types = `
     reportNo: String,
     auditor: String,
     content: String,
+    reminderDay: Float,
   }
 
   type Audit {
@@ -335,5 +336,6 @@ export const mutations = `
     reportNo: String,
     auditor: String,
     content: String,
+    reminderDay: Float
   ): AuditResponse
 `;
