@@ -23,6 +23,8 @@ const AuditSchema = mongoose.Schema({
 
   createdDate: field({ type: Date }),
   createdUserId: field({ type: String }),
+
+  reminderDay: field({ type: Number, optional: true, label: 'Reminder day' }),
 });
 
 class Audit extends StatusPublishClose {
@@ -68,6 +70,7 @@ class Audit extends StatusPublishClose {
         isEditable: true,
         editableDate: audit.closeDate,
         notificationForSupplier: 'invited',
+        reminderDay: audit.reminderDay,
       });
     }
 
@@ -422,6 +425,8 @@ const AuditResponseSchema = mongoose.Schema({
   coreHseqInfo: CoreHseqInfoSchema,
   hrInfo: HrInfoSchema,
   businessInfo: BusinessInfoSchema,
+
+  reminderDay: field({ type: Number, optional: true, label: 'Reminder day' }),
 
   improvementPlanFile: field({ type: String, optional: true }),
   improvementPlanSentDate: field({ type: Date, optional: true }),

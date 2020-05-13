@@ -270,6 +270,7 @@ export const mutations = `
     supplierIds: [String]!
     responsibleBuyerIds: [String],
     content: String!,
+    reminderDay: Float
   ): Audit
 
   auditsSupplierSaveBasicInfo(
