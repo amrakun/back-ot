@@ -39,6 +39,27 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   await AuditResponses.disableEditabledResponses();
 
   console.log('Checked audit status'); // eslint-disable-line
+
+  // send reminder ================
+  const responsesToRemind = await AuditResponses.responsesToRemind();
+
+  for (const response of responsesToRemind) {
+    const audit = await Audits.findOne({ _id: response.auditId });
+    const supplier = await Companies.findOne({ _id: response.supplierId });
+
+    try {
+      await sendEmail({
+        kind: response.reassessmentDate
+          ? 'supplier__due_reassessmentDate'
+          : 'supplier__due_closeDate',
+        toEmails: [supplier.basicInfo.email],
+        audit,
+        supplier,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
 });
 
 // every day at 23 45

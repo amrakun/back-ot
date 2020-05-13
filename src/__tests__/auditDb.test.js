@@ -503,4 +503,49 @@ describe('Audit response db', () => {
     expect(response.isEditable).toBe(true);
     expect(response.notificationForSupplier).toBe('improvementPlanDueDate');
   });
+
+  test('responses to remind', async () => {
+    // check isEditable ============
+    await auditResponseFactory({
+      reminderDay: 3,
+      editableDate: moment().add(3, 'days'),
+    });
+
+    let responses = await AuditResponses.responsesToRemind();
+    expect(responses.length).toBe(0);
+    await AuditResponses.remove({});
+
+    // check editableDate ==================
+    const now = new Date();
+
+    const options = { isEditable: true, reminderDay: 3 };
+
+    await auditResponseFactory({ ...options, editableDate: moment(now).subtract(1, 'days') });
+    await auditResponseFactory({ ...options, editableDate: moment(now).add(10, 'days') });
+
+    // only this will be included
+    const response = await auditResponseFactory({
+      ...options,
+      editableDate: moment(now).add(3, 'days'),
+    });
+
+    await auditResponseFactory({
+      ...options,
+      editableDate: moment(now)
+        .add(3, 'days')
+        .add(1, 'minutes'),
+    });
+
+    await auditResponseFactory({
+      ...options,
+      editableDate: moment(now)
+        .add(3, 'days')
+        .subtract(1, 'minutes'),
+    });
+
+    responses = await AuditResponses.responsesToRemind();
+
+    expect(responses.length).toBe(1);
+    expect(responses[0]._id.toString()).toBe(response._id.toString());
+  });
 });

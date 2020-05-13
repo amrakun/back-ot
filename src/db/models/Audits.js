@@ -442,6 +442,9 @@ const AuditResponseSchema = mongoose.Schema({
   isEditable: field({ type: Boolean, optional: true }),
   editableDate: field({ type: Date, optional: true }),
 
+  // Using only to track reassesment date notification
+  reassessmentDate: field({ type: Date, optional: true }),
+
   isQualified: field({ type: Boolean, optional: true }),
 
   // Buyer saved something on this response
@@ -781,7 +784,12 @@ class AuditResponse {
     }
 
     if (reassessmentDate) {
-      await this.update({ isEditable: true, editableDate: reassessmentDate, reminderDay });
+      await this.update({
+        isEditable: true,
+        reassessmentDate,
+        editableDate: reassessmentDate,
+        reminderDay,
+      });
     }
 
     return AuditResponses.findOne({ _id: this._id });
@@ -922,6 +930,28 @@ class AuditResponse {
     }
 
     return results;
+  }
+
+  static async responsesToRemind() {
+    const editableResponses = await this.find({
+      reminderDay: { $exists: true },
+      isEditable: true,
+    });
+
+    return editableResponses.filter(response => {
+      const editableDate = response.editableDate;
+      const remindDate = moment(editableDate)
+        .subtract(response.reminderDay, 'days')
+        .toDate();
+      const now = new Date();
+
+      return (
+        now.getFullYear() === remindDate.getFullYear() &&
+        now.getMonth() === remindDate.getMonth() &&
+        now.getDate() === remindDate.getDate() &&
+        now.getMinutes() === remindDate.getMinutes()
+      );
+    });
   }
 }
 

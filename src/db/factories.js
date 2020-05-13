@@ -671,6 +671,7 @@ export const auditResponseFactory = async (params = {}) => {
 
   const auditResponse = new AuditResponses({
     createdDate: new Date(),
+    editableDate: params.editableDate,
     auditId: params.auditId,
     supplierId: params.supplierId,
     isSent: params.isSent || false,
@@ -687,6 +688,7 @@ export const auditResponseFactory = async (params = {}) => {
     improvementPlanFile: params.improvementPlanFile,
     improvementPlanSentDate: params.improvementPlanSentDate,
     reportFile: params.reportFile,
+    reminderDay: params.reminderDay,
   });
 
   const savedResponse = await save(auditResponse);
