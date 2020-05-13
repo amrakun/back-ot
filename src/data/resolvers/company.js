@@ -75,6 +75,7 @@ export default {
     const notNotifiedResponse = await AuditResponses.findOne({
       auditId: { $in: audits.map(a => a._id) },
       supplierId: company._id,
+      isEditable: true,
       notificationForSupplier: { $exists: true, $nin: ['', null] },
     });
 

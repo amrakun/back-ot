@@ -67,7 +67,7 @@ class Audit extends StatusPublishClose {
         auditId: audit._id,
         supplierId,
         status: 'invited',
-        isEditable: true,
+        isEditable: false,
         editableDate: audit.closeDate,
         notificationForSupplier: 'invited',
         reminderDay: audit.reminderDay,

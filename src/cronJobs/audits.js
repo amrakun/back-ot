@@ -9,6 +9,12 @@ schedule.scheduleJob('*/1 * * * *', async () => {
   const publishedAuditIds = await Audits.publishDrafts();
   const publishedAudits = await Audits.find({ _id: { $in: publishedAuditIds } });
 
+  // make responses editable
+  await AuditResponses.updateMany(
+    { auditId: { $in: publishedAuditIds } },
+    { $set: { isEditable: true } },
+  );
+
   // send published email to suppliers
   for (const audit of publishedAudits) {
     for (const supplierId of audit.supplierIds) {
