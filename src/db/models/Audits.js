@@ -949,6 +949,7 @@ class AuditResponse {
         now.getFullYear() === remindDate.getFullYear() &&
         now.getMonth() === remindDate.getMonth() &&
         now.getDate() === remindDate.getDate() &&
+        now.getHours() === remindDate.getHours() &&
         now.getMinutes() === remindDate.getMinutes()
       );
     });

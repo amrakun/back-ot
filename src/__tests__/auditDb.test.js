@@ -522,6 +522,12 @@ describe('Audit response db', () => {
 
     await auditResponseFactory({ ...options, editableDate: moment(now).subtract(1, 'days') });
     await auditResponseFactory({ ...options, editableDate: moment(now).add(10, 'days') });
+    await auditResponseFactory({
+      ...options,
+      editableDate: moment(now)
+        .add(3, 'days')
+        .add(1, 'hours'),
+    });
 
     // only this will be included
     const response = await auditResponseFactory({
