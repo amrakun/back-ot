@@ -245,7 +245,13 @@ export const sendConfigEmail = async ({
     toEmails,
     subject: `${subjectEn} ${subjectMn}`,
     content: `${contentEn} ${contentMn}`,
-    attachments,
+    attachments: (attachments || []).map(attachment => {
+      if (attachment.content) {
+        attachment.content = attachment.content.toString('hex');
+      }
+
+      return attachment;
+    }),
     bulk,
     data,
   });

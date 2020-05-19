@@ -219,7 +219,7 @@ const auditMutations = {
 
         attachments.push({
           filename: 'improvement_plan.xlsx',
-          content: file.Body.Body.toString(),
+          content: file.Body.Body,
         });
       }
 
@@ -228,7 +228,7 @@ const auditMutations = {
 
         attachments.push({
           filename: 'report.xlsx',
-          content: file.Body.toString(),
+          content: file.Body,
         });
       }
 
