@@ -276,12 +276,15 @@ sections.forEach(section => {
       throw new Error('Not editable');
     }
 
-    const response = await AuditResponses.saveReplyRecommentSection({
-      auditId,
-      supplierId,
-      name: section,
-      doc: args[section],
-    });
+    const response = await AuditResponses.saveReplyRecommentSection(
+      {
+        auditId,
+        supplierId,
+        name: section,
+        doc: args[section],
+      },
+      true,
+    );
 
     await AuditResponses.markAsSupplierNotified({ auditId, supplierId });
 

@@ -154,7 +154,7 @@ describe('Audit response db', () => {
   };
 
   test('Check supplier validations', async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     const company = await companyFactory({
       isSentRegistrationInfo: false,
@@ -192,10 +192,22 @@ describe('Audit response db', () => {
     } catch (e) {
       expect(e.message).toBe('Not prequalified');
     }
+
+    // do not set isQualified field when supplier ============
+    await Companies.update(
+      { _id: company._id },
+      { $set: { isQualified: undefined, isPrequalified: true, isSentPrequalificationInfo: true } },
+    );
+    await AuditResponses.saveReplyRecommentSection(modifier, true);
+    await AuditResponses.saveReplyRecommentSection(modifier, true); // calling second time to check prev section
+
+    const updatedCompany = await Companies.findOne({ _id: company._id });
+
+    expect(updatedCompany.isQualified).toBe(null);
   });
 
   test('Basic info', async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     const doc = {
       sotri: 'sotri',
@@ -224,6 +236,18 @@ describe('Audit response db', () => {
     } catch (e) {
       expect(e.message).toBe('Not editable');
     }
+
+    // do not set isQualified field when save basic info
+    await AuditResponses.update({ _id: response._id }, { $set: { isEditable: true } });
+    await AuditResponses.saveBasicInfo({
+      auditId: _audit._id,
+      supplierId: _company._id,
+      doc,
+    });
+
+    const updatedCompany = await Companies.findOne({ _id: _company._id });
+
+    expect(updatedCompany.isQualified).toBe(undefined);
   });
 
   test('Core HSEQ info', async () => {

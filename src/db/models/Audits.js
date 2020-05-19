@@ -552,31 +552,35 @@ class AuditResponse {
    *
    * @return Created or updated response object
    */
-  static saveReplyRecommentSection(args) {
-    return this.saveSection(args, async ({ name, doc, selector }) => {
-      // Generating update query to only peace of information in given
-      // section
-      const updateQuery = {};
+  static saveReplyRecommentSection(args, isSupplier) {
+    return this.saveSection(
+      args,
+      async ({ name, doc, selector }) => {
+        // Generating update query to only peace of information in given
+        // section
+        const updateQuery = {};
 
-      // doesHaveHealthSafety, doesHaveDocumentedPolicy ...
-      const fieldNames = Object.keys(doc);
+        // doesHaveHealthSafety, doesHaveDocumentedPolicy ...
+        const fieldNames = Object.keys(doc);
 
-      for (let fieldName of fieldNames) {
-        // supplierComment, supplierAnswer, auditorComment ...
-        const subFieldNames = Object.keys(doc[fieldName]);
+        for (let fieldName of fieldNames) {
+          // supplierComment, supplierAnswer, auditorComment ...
+          const subFieldNames = Object.keys(doc[fieldName]);
 
-        for (let subFieldName of subFieldNames) {
-          // 'comment' true, 'answer' ...
-          const subFieldValue = doc[fieldName][subFieldName];
+          for (let subFieldName of subFieldNames) {
+            // 'comment' true, 'answer' ...
+            const subFieldValue = doc[fieldName][subFieldName];
 
-          // coreHseqInfo.doesHaveHealthSafety.supplierComment = 'comment' ...
-          updateQuery[`${name}.${fieldName}.${subFieldName}`] = subFieldValue;
+            // coreHseqInfo.doesHaveHealthSafety.supplierComment = 'comment' ...
+            updateQuery[`${name}.${fieldName}.${subFieldName}`] = subFieldValue;
+          }
         }
-      }
 
-      // do not override whole section values
-      await this.update(selector, { $set: updateQuery });
-    });
+        // do not override whole section values
+        await this.update(selector, { $set: updateQuery });
+      },
+      isSupplier,
+    );
   }
 
   static async checkEditable(args) {
@@ -631,15 +635,17 @@ class AuditResponse {
   static async saveBasicInfo(args) {
     await this.checkEditable(args);
 
-    return this.saveSection({ ...args, name: 'basicInfo' }, ({ doc, selector }) =>
-      this.update(selector, { $set: { basicInfo: doc } }),
+    return this.saveSection(
+      { ...args, name: 'basicInfo' },
+      ({ doc, selector }) => this.update(selector, { $set: { basicInfo: doc } }),
+      true,
     );
   }
 
   /*
    * Common helper that checks previous entry
    */
-  static async saveSection(args, updater) {
+  static async saveSection(args, updater, isSupplier) {
     const { auditId, supplierId, name, doc } = args;
     const selector = { auditId, supplierId };
     const previousEntry = await this.findOne(selector);
@@ -665,41 +671,43 @@ class AuditResponse {
       // updated object
       const response = await this.findOne({ _id: previousEntry._id });
 
-      // check is qualifed ==============
-      // All those section's auditorScore field values must be True or greater
-      // than 0
-      const sections = [
-        { name: 'coreHseqInfo', schema: CoreHseqInfoSchema },
-        { name: 'businessInfo', schema: BusinessInfoSchema },
-        { name: 'hrInfo', schema: HrInfoSchema },
-      ];
+      if (!isSupplier) {
+        // check is qualifed ==============
+        // All those section's auditorScore field values must be True or greater
+        // than 0
+        const sections = [
+          { name: 'coreHseqInfo', schema: CoreHseqInfoSchema },
+          { name: 'businessInfo', schema: BusinessInfoSchema },
+          { name: 'hrInfo', schema: HrInfoSchema },
+        ];
 
-      let isQualified = true;
+        let isQualified = true;
 
-      for (let section of sections) {
-        const sectionValue = response[section.name];
-        const names = Object.keys(section.schema.paths);
+        for (let section of sections) {
+          const sectionValue = response[section.name];
+          const names = Object.keys(section.schema.paths);
 
-        // if section value is empty then ignore rest checks
-        if (!sectionValue) {
-          isQualified = false;
-          break;
-        }
-
-        for (let name of names) {
-          const fieldValue = sectionValue[name] || {};
-
-          if (!fieldValue.auditorScore) {
+          // if section value is empty then ignore rest checks
+          if (!sectionValue) {
             isQualified = false;
+            break;
+          }
+
+          for (let name of names) {
+            const fieldValue = sectionValue[name] || {};
+
+            if (!fieldValue.auditorScore) {
+              isQualified = false;
+            }
           }
         }
+
+        // update supplier's qualified status
+        await Companies.update({ _id: supplierId }, { $set: { isQualified } });
+
+        // update response's qualified status
+        await this.update(selector, { $set: { isQualified } });
       }
-
-      // update supplier's qualified status
-      await Companies.update({ _id: supplierId }, { $set: { isQualified } });
-
-      // update response's qualified status
-      await this.update(selector, { $set: { isQualified } });
 
       return response;
     }
