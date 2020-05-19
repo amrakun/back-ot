@@ -202,6 +202,7 @@ export const types = `
 
     isSentResubmitRequest: Boolean
 
+    qualificationStatusDisplay: String
     supplier: Company
     audit: Audit
   }

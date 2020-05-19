@@ -13,6 +13,10 @@ export default {
     return auditResponse.auditStatus();
   },
 
+  qualificationStatusDisplay(auditResponse) {
+    return auditResponse.qualificationStatusDisplay();
+  },
+
   async qualifiedStatus(response) {
     return {
       coreHseqInfo: AuditResponses.isSectionPassed({

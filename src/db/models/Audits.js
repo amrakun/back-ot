@@ -962,6 +962,14 @@ class AuditResponse {
       );
     });
   }
+
+  qualificationStatusDisplay() {
+    if (typeof this.isQualified === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isQualified ? 'Qualified' : 'Not-qualified';
+  }
 }
 
 AuditResponseSchema.loadClass(AuditResponse);
