@@ -211,7 +211,7 @@ const userMutations = {
       },
     });
 
-    return link;
+    return 'sent';
   },
 
   /*
