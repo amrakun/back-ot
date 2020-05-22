@@ -10,7 +10,7 @@ schedule.scheduleJob('0 45 23 * * *', async () => {
   for (const { createdUser, endDate, suppliers } of blockedSuppliers) {
     const now = moment();
 
-    if (endDate.diff(now, 'days') <= 7) {
+    if (moment(endDate).diff(now, 'days') <= 7) {
       // supplier names to remind
       let supNames = '';
 
