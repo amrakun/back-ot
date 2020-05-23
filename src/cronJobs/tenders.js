@@ -14,7 +14,7 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     const attachments = await getAttachments(tender);
 
     if (tender.isDeleted) {
-      continue
+      continue;
     }
 
     await sendEmail({
@@ -35,11 +35,11 @@ schedule.scheduleJob('*/1 * * * *', async () => {
 
   // send closed email to suppliers ================
   const closedTenderIds = await Tenders.closeOpens();
-  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds }, type: { $ne: 'eoi' } });
+  const closedTenders = await Tenders.find({ _id: { $in: closedTenderIds } });
 
   for (const tender of closedTenders) {
     if (tender.isDeleted) {
-      continue
+      continue;
     }
 
     await sendEmail({ kind: 'close', tender, extraBuyerEmails });
