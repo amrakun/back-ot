@@ -78,7 +78,6 @@ export const sendEmailToSuppliers = async ({ kind, tender, supplierIds, attachme
         return replacer({ text, tender });
       },
       toEmails: receivers,
-      bulk: tender.type === 'eoi',
       data: {
         source: 'tender',
         tenderId: tender._id.toString(),
