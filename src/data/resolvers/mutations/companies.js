@@ -342,6 +342,26 @@ sections.forEach(section => {
   requireSupplier(companyMutations, name);
 });
 
+const recommendationSections = ['shareholder', 'basic', 'managementTeam', 'group'];
+
+recommendationSections.forEach(section => {
+  // capitalize first letter
+  const capsedName = section.charAt(0).toUpperCase() + section.slice(1);
+  const name = `recommendationsSave${capsedName}Info`;
+  const subFieldName = `${section}Info`;
+
+  /**
+   * @param {Object} args Object containing subField data
+   */
+  companyMutations[name] = async (root, args) => {
+    const updated = await Companies.updateSection(args._id, subFieldName, args[subFieldName], true);
+
+    return updated;
+  };
+
+  requireBuyer(companyMutations, name);
+});
+
 requireSupplier(companyMutations, 'companiesEditCertificateInfo');
 requireSupplier(companyMutations, 'companiesSendRegistrationInfo');
 requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');

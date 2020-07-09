@@ -1,7 +1,13 @@
 import mongoose from 'mongoose';
 import { field } from './utils';
 import { Users, Feedbacks, BlockedCompanies } from './';
-import { TIER_TYPES } from './constants';
+import {
+  TIER_TYPES,
+  addressFieldNames,
+  shareholderFieldNames,
+  personFieldNames,
+  groupInfoFieldNames,
+} from './constants';
 
 const FileSchema = mongoose.Schema(
   {
@@ -183,8 +189,11 @@ const ManagementTeamInfoSchema = mongoose.Schema(
 // shareholder information =========
 const ShareholderSchema = mongoose.Schema(
   {
-    name: field({ type: String, label: 'Name' }),
+    type: field({ type: String, label: 'Type' }),
+    firstName: field({ type: String, label: 'First name' }),
+    lastName: field({ type: String, label: 'Last name' }),
     jobTitle: field({ type: String, label: 'Job title' }),
+    companyName: field({ type: String, label: 'Company name' }),
     percentage: field({ type: Number, label: 'Share percentage (%)' }),
   },
   { _id: false },
@@ -836,6 +845,34 @@ const ProductsInfoValidation = mongoose.Schema(
   { _id: false },
 );
 
+const generateFields = names => {
+  const definitions = {};
+
+  for (let name of names) {
+    definitions[name] = field({
+      type: String,
+      optional: true,
+    });
+  }
+
+  return mongoose.Schema(definitions, { _id: false });
+};
+
+const RecommendationSchema = mongoose.Schema(
+  {
+    basicInfo: generateFields(addressFieldNames),
+    shareholderInfo: {
+      shareholders: [generateFields(shareholderFieldNames)],
+    },
+    managementTeamInfo: {
+      managingDirector: generateFields(personFieldNames),
+      executiveOfficer: generateFields(personFieldNames),
+    },
+    groupInfo: generateFields(groupInfoFieldNames),
+  },
+  { _id: false },
+);
+
 // Main schema ============
 const CompanySchema = mongoose.Schema({
   createdDate: field({ type: Date, index: true }),
@@ -971,6 +1008,8 @@ const CompanySchema = mongoose.Schema({
   averageDifotScore: field({ type: Number, optional: true, label: 'Average difot score' }),
 
   isDeleted: field({ type: Boolean, default: false }),
+
+  recommendations: field({ type: RecommendationSchema, optional: true, label: 'Recommendation' }),
 });
 
 class Company {
@@ -1094,7 +1133,7 @@ class Company {
    * @param {Object} value - related update doc
    * @return Updated company object
    */
-  static async updateSection(_id, key, value) {
+  static async updateSection(_id, key, value, isRecommendation = false) {
     const company = await this.findOne({ _id });
 
     if (value) {
@@ -1159,8 +1198,25 @@ class Company {
       throw new Error('Changes disabled');
     }
 
-    // update
-    await this.update({ _id }, { $set: { [key]: value } });
+    if (isRecommendation) {
+      const rec = company.recommendations || {};
+
+      // update
+      await this.update(
+        { _id },
+        {
+          $set: {
+            recommendations: {
+              ...rec.toJSON(),
+              [key]: value,
+            },
+          },
+        },
+      );
+    } else {
+      // update
+      await this.update({ _id }, { $set: { [key]: value } });
+    }
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {

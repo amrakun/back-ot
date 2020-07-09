@@ -1,3 +1,10 @@
+import {
+  addressFieldNames,
+  shareholderFieldNames,
+  personFieldNames,
+  groupInfoFieldNames,
+} from '../../db/models/constants';
+
 const basicInfoFields = `
   enName: String!
   mnName: String
@@ -48,8 +55,11 @@ const personFields = `
 `;
 
 const shareholderFields = `
-  name: String
+  type: String
+  firstName: String
+  lastName: String
   jobTitle: String
+  companyName: String
   percentage: Float
   attachments: [JSON]
 `;
@@ -194,6 +204,31 @@ const healthInfoNotQualifiableFields = `
 const difotScoreFields = `
   date: Date!
   amount: Float!
+`;
+
+const generateFields = names => {
+  let fields = '';
+  for (let name of names) {
+    fields += `${name}: String\n`;
+  }
+
+  return fields;
+};
+
+const dshareholderFields = `
+  ${generateFields(shareholderFieldNames)}
+`;
+
+const daddressFields = `
+  ${generateFields(addressFieldNames)}
+`;
+
+const dpersonFields = `
+  ${generateFields(personFieldNames)}
+`;
+
+const dgroupInfoFields = `
+  ${generateFields(groupInfoFieldNames)}
 `;
 
 export const types = `
@@ -355,6 +390,44 @@ export const types = `
     expireDate: Date!
   }
 
+  # recommendations =========================
+  input dshareholderInput {
+    ${dshareholderFields}
+  }
+
+  type RecommendationShareholderInfo {${dshareholderFields}}
+  input RecommendationShareholderInfoInput {shareholders: [dshareholderInput]}
+  
+
+  type RecommendationAddressInfo {${daddressFields}}
+  input RecommendationAddressInfoInput {${daddressFields}}
+
+  input dpersonInput {
+    ${dpersonFields}
+  }
+
+  type RecommendationManagementTeamPerson {${dpersonFields}}
+  input RecommendationManagementTeamPersonInput {
+    managingDirector: dpersonInput,
+    executiveOfficer: dpersonInput
+  }
+
+  type RecommendationGroupInfo {${dgroupInfoFields}}
+  input RecommendationGroupInfoInput {${dgroupInfoFields}}
+
+  type dperson {
+    managingDirector: RecommendationManagementTeamPerson
+    executiveOfficer: RecommendationManagementTeamPerson
+  }
+
+  type Recommendations {
+    basicInfo: RecommendationAddressInfo
+    shareholderInfo: RecommendationShareholderInfo
+    managementTeamInfo: dperson
+    groupInfo: RecommendationGroupInfo
+  }
+
+  # main type =============================
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo
@@ -414,6 +487,8 @@ export const types = `
     audits: [Audit]
 
     qualificationState: JSON
+
+    recommendations: Recommendations
   }
 `;
 
@@ -503,4 +578,24 @@ export const mutations = `
   companiesSkipPrequalification(reason: String!): Company
 
   companiesTogglePrequalificationState(supplierId: String!): Company
+
+  recommendationsSaveShareholderInfo(
+    _id: String!
+    shareholderInfo: RecommendationShareholderInfoInput
+  ): Company
+
+  recommendationsSaveBasicInfo(
+    _id: String!
+    basicInfo: RecommendationAddressInfoInput
+  ): Company
+
+  recommendationsSaveManagementTeamInfo(
+    _id: String!
+    managementTeamInfo: RecommendationManagementTeamPersonInput
+  ): Company
+
+  recommendationsSaveGroupInfo(
+    _id: String!
+    groupInfo: RecommendationGroupInfoInput
+  ): Company
 `;

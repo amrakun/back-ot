@@ -102,4 +102,22 @@ export const decryptArray = hexArray => {
   return (hexArray || []).map(hex => decrypt(hex));
 };
 
+/*
+ * Get all possible fields for given schema
+ */
+export const getFieldsBySchema = schema => {
+  const filterdNames = [];
+  const names = Object.keys(schema.paths);
+
+  for (let name of names) {
+    const options = schema.paths[name].options;
+
+    if (options.qualifiable !== false) {
+      filterdNames.push(name);
+    }
+  }
+
+  return filterdNames;
+};
+
 export default utils;

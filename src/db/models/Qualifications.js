@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { field } from './utils';
+import { field, getFieldsBySchema } from './utils';
 import {
   FinancialInfoSchema,
   BusinessInfoSchema,
@@ -9,24 +9,6 @@ import {
 } from './Companies';
 
 import { Configs, Companies } from './';
-
-/*
- * Get all possible fields for given schema
- */
-const getFieldsBySchema = schema => {
-  const filterdNames = [];
-  const names = Object.keys(schema.paths);
-
-  for (let name of names) {
-    const options = schema.paths[name].options;
-
-    if (options.qualifiable !== false) {
-      filterdNames.push(name);
-    }
-  }
-
-  return filterdNames;
-};
 
 const generateFields = schema => {
   const names = getFieldsBySchema(schema);
