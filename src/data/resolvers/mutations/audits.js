@@ -40,8 +40,8 @@ const auditMutations = {
 
   // mark response as sent
   async auditsSupplierSendResponse(root, { auditId }, { user }) {
-    const audit = await Audits.findOne({ _id: auditId });
-    const supplier = await Companies.findOne({ _id: user.companyId });
+    await Audits.findOne({ _id: auditId });
+    await Companies.findOne({ _id: user.companyId });
 
     const response = await AuditResponses.findOne({
       auditId: auditId,

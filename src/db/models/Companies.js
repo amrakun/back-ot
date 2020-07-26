@@ -1199,17 +1199,16 @@ class Company {
     }
 
     if (isRecommendation) {
-      const rec = company.recommendations || {};
+      const recommendations = company.recommendations || {};
+
+      recommendations[key] = value;
 
       // update
       await this.update(
         { _id },
         {
           $set: {
-            recommendations: {
-              ...rec.toJSON(),
-              [key]: value,
-            },
+            recommendations,
           },
         },
       );
