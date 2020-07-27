@@ -285,6 +285,16 @@ const companyMutations = {
 
     return updatedCompany;
   },
+
+  /**
+   *
+   * @param {string} args._id Company id
+   */
+  async companiesValidateDueDiligence(root, args) {
+    const validated = await Companies.validateDueDiligence(args._id);
+
+    return validated;
+  },
 };
 
 const sections = [

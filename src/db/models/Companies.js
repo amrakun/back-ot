@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { field } from './utils';
+import { field, isEmpty } from './utils';
 import { Users, Feedbacks, BlockedCompanies } from './';
 import {
   TIER_TYPES,
@@ -1009,6 +1009,12 @@ const CompanySchema = mongoose.Schema({
 
   isDeleted: field({ type: Boolean, default: false }),
 
+  isDueDiligenceValidated: field({
+    type: Boolean,
+    optional: true,
+    label: 'Is due diligence validated',
+  }),
+
   recommendations: field({ type: RecommendationSchema, optional: true, label: 'Recommendation' }),
 });
 
@@ -1200,7 +1206,6 @@ class Company {
 
     if (isRecommendation) {
       const recommendations = company.recommendations || {};
-
       recommendations[key] = value;
 
       // update
@@ -1435,6 +1440,14 @@ class Company {
     return this.isProductsInfoValidated ? 'Validated' : 'Not-validated';
   }
 
+  dueDiligenceStatusDisplay() {
+    if (typeof this.isDueDiligenceValidated === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isPrequalified ? 'Verified' : 'Verification failed';
+  }
+
   async isBlocked() {
     const isBlocked = await BlockedCompanies.isBlocked(this._id);
 
@@ -1516,6 +1529,34 @@ class Company {
     }
 
     return name;
+  }
+
+  /*
+   * Validate die diligence
+   * @param String _id - Company id
+   * @return updated company
+   */
+  static async validateDueDiligence(_id) {
+    const company = await Companies.findOne({ _id });
+    const recommendations = company.recommendations;
+
+    const isValidated = () => {
+      if (company.recommendations) {
+        const object = recommendations.toJSON();
+
+        for (let key of Object.keys(object)) {
+          if (!isEmpty(object[key], ['shareholderInfo', 'managementTeamInfo'].includes(key)))
+            return false;
+        }
+      }
+
+      return true;
+    };
+
+    // update fields
+    await this.update({ _id }, { $set: { isDueDiligenceValidated: isValidated() } });
+
+    return Companies.findOne({ _id: this._id });
   }
 }
 

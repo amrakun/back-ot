@@ -120,4 +120,26 @@ export const getFieldsBySchema = schema => {
   return filterdNames;
 };
 
+export const isEmpty = (input, isParent = false) => {
+  const checkObject = obj => {
+    if (Array.isArray(obj)) {
+      return obj.length === 0;
+    }
+
+    for (let key in obj) {
+      if (obj[key]) return false;
+    }
+
+    return true;
+  };
+
+  if (isParent) {
+    for (let key in input) {
+      return checkObject(input[key]);
+    }
+  }
+
+  return checkObject(input);
+};
+
 export default utils;

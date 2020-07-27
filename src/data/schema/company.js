@@ -391,11 +391,12 @@ export const types = `
   }
 
   # recommendations =========================
+  type dshareholder {${dshareholderFields}}
   input dshareholderInput {
     ${dshareholderFields}
   }
 
-  type RecommendationShareholderInfo {${dshareholderFields}}
+  type RecommendationShareholderInfo { shareholders: [dshareholder]}
   input RecommendationShareholderInfoInput {shareholders: [dshareholderInput]}
   
 
@@ -489,6 +490,7 @@ export const types = `
     qualificationState: JSON
 
     recommendations: Recommendations
+    dueDiligenceStatusDisplay: String
   }
 `;
 
@@ -598,4 +600,6 @@ export const mutations = `
     _id: String!
     groupInfo: RecommendationGroupInfoInput
   ): Company
+
+  companiesValidateDueDiligence(_id: String!): Company
 `;
