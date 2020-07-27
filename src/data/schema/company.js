@@ -491,6 +491,7 @@ export const types = `
 
     recommendations: Recommendations
     dueDiligenceStatusDisplay: String
+    isDueDiligenceEditable: Boolean
   }
 `;
 
@@ -602,4 +603,6 @@ export const mutations = `
   ): Company
 
   companiesValidateDueDiligence(_id: String!): Company
+
+  companiesEnableRecommendationState(supplierId: String!): Company
 `;

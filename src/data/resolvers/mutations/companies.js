@@ -295,6 +295,16 @@ const companyMutations = {
 
     return validated;
   },
+
+  /**
+   *
+   * @param {string} args.supplierId Company id
+   */
+  async companiesEnableRecommendationState(root, { supplierId }) {
+    const updatedCompany = await Companies.enableRecommendataionState(supplierId);
+
+    return updatedCompany;
+  },
 };
 
 const sections = [

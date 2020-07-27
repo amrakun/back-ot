@@ -1015,6 +1015,13 @@ const CompanySchema = mongoose.Schema({
     label: 'Is due diligence validated',
   }),
 
+  isDueDiligenceEditable: field({
+    type: Boolean,
+    optional: true,
+    default: true,
+    label: 'Is due diligence information editable',
+  }),
+
   recommendations: field({ type: RecommendationSchema, optional: true, label: 'Recommendation' }),
 });
 
@@ -1445,7 +1452,7 @@ class Company {
       return 'In process';
     }
 
-    return this.isPrequalified ? 'Verified' : 'Verification failed';
+    return this.isDueDiligenceValidated ? 'Verified' : 'Verification failed';
   }
 
   async isBlocked() {
@@ -1554,9 +1561,28 @@ class Company {
     };
 
     // update fields
-    await this.update({ _id }, { $set: { isDueDiligenceValidated: isValidated() } });
+    await this.update(
+      { _id },
+      { $set: { isDueDiligenceValidated: isValidated(), isDueDiligenceEditable: false } },
+    );
 
     return Companies.findOne({ _id: this._id });
+  }
+
+  static async enableRecommendataionState(_id) {
+    await Companies.findOne({ _id });
+
+    const updateQuery = {
+      $set: {
+        isDueDiligenceEditable: true,
+      },
+    };
+
+    updateQuery.$unset = { isDueDiligenceValidated: 1, recommendations: 1 };
+
+    await Companies.update({ _id }, updateQuery);
+
+    return Companies.findOne({ _id });
   }
 }
 
