@@ -305,6 +305,13 @@ const companyMutations = {
 
     return updatedCompany;
   },
+
+  async companiesAddDueDiligenceRisk(root, { supplierId, ...doc }, { user }) {
+    const company = await Companies.findOne({ _id: supplierId });
+    const updatedCompany = await company.updateDueDiligence(doc, user);
+
+    return updatedCompany;
+  },
 };
 
 const sections = [

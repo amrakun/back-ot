@@ -382,6 +382,7 @@ export const types = `
     file: JSON
     createdUserId: String
     createdUser: User
+    risk: String
   }
 
   input CompanyDueDiligenceInput {
@@ -603,6 +604,6 @@ export const mutations = `
   ): Company
 
   companiesValidateDueDiligence(_id: String!): Company
-
   companiesEnableRecommendationState(supplierId: String!): Company
+  companiesAddDueDiligenceRisk(supplierId: String!, file: JSON, risk: String!): Company
 `;

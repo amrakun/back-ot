@@ -826,10 +826,13 @@ const DateAmountSchema = mongoose.Schema(
 
 const DueDiligenceSchema = mongoose.Schema(
   {
-    date: field({ type: String, label: 'Date' }),
     file: field({ type: FileSchema, label: 'File', optional: true }),
     createdUserId: field({ type: String, label: 'Created user' }),
-    expireDate: field({ type: String, label: 'Expire date' }),
+    date: field({ type: Date, label: 'Date' }),
+    expireDate: field({ type: Date, label: 'Expire date' }),
+    reminderDate: field({ type: Date, label: 'Reminder date' }),
+    supplierSubmissionDate: field({ type: Date, label: 'Supplier submission date' }),
+    risk: field({ type: String, label: 'Risk' }),
   },
   { _id: false },
 );
@@ -1285,27 +1288,6 @@ class Company {
   }
 
   /*
-   * Add new due diligence report
-   * @param {String} file - File path
-   * @return updated company
-   */
-  async addDueDiligence({ file, expireDate }, user) {
-    const dueDiligences = this.dueDiligences || [];
-
-    dueDiligences.push({
-      date: new Date(),
-      file,
-      expireDate,
-      createdUserId: user._id,
-    });
-
-    // update field
-    await this.update({ dueDiligences });
-
-    return Companies.findOne({ _id: this._id });
-  }
-
-  /*
    * Validate product codes
    * @param [String] codes - Product codes to validate
    * @return updated company
@@ -1583,6 +1565,47 @@ class Company {
     await Companies.update({ _id }, updateQuery);
 
     return Companies.findOne({ _id });
+  }
+
+  /*
+   * Add new due diligence report
+   * @param {String} file - File path
+   * @return updated company
+   */
+  async addDueDiligence({ file, expireDate }, user) {
+    const dueDiligences = this.dueDiligences || [];
+
+    dueDiligences.push({
+      date: new Date(),
+      file,
+      expireDate,
+      createdUserId: user._id,
+    });
+
+    // update field
+    await this.update({ dueDiligences });
+
+    return Companies.findOne({ _id: this._id });
+  }
+  /*
+   * Add new due diligence report
+   * @param {String} file - File path
+   * @return updated company
+   */
+  async updateDueDiligence({ file, risk }, user) {
+    const dueDiligences = this.dueDiligences || [];
+
+    dueDiligences.push({
+      date: new Date(),
+      file: file && file[0],
+      risk,
+      createdUserId: user._id,
+    });
+
+    // update field
+    await this.update({ dueDiligences });
+
+    return Companies.findOne({ _id: this._id });
   }
 }
 
