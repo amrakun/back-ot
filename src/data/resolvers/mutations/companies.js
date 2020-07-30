@@ -282,7 +282,7 @@ const companyMutations = {
    * @param {string} args._id Company id
    */
   async companiesValidateDueDiligence(root, args, { user }) {
-    const validated = await Companies.validateDueDiligence(args._id, user);
+    const validated = await Companies.validateDueDiligence(args, user);
 
     return validated;
   },

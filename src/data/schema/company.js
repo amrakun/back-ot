@@ -606,7 +606,7 @@ export const mutations = `
     groupInfo: RecommendationGroupInfoInput
   ): Company
 
-  companiesValidateDueDiligence(_id: String!): Company
+  companiesValidateDueDiligence(_id: String!, isCancel: Boolean): Company
   companiesEnableRecommendationState(supplierId: String!): Company
   companiesAddDueDiligence(
     supplierId: String!,

@@ -1549,37 +1549,48 @@ class Company {
    * @param String _id - Company id
    * @return updated company
    */
-  static async validateDueDiligence(_id, user) {
+  static async validateDueDiligence({ _id, isCancel = false }, user) {
     const company = await Companies.findOne({ _id });
     const recommendations = company.recommendations;
 
-    const isValidated = () => {
-      if (company.recommendations) {
-        const object = recommendations.toJSON();
-
-        for (let key of Object.keys(object)) {
-          if (!isEmpty(object[key], ['shareholderInfo', 'managementTeamInfo'].includes(key)))
-            return false;
-        }
-      }
-
-      return true;
-    };
-
-    const dueDiligences = company.updateLastDueDiligence({ createdUserId: user._id });
-
-    // update fields
-    await this.update(
-      { _id },
-      {
-        $set: {
-          isDueDiligenceValidated: isValidated(),
-          isDueDiligenceEditable: false,
-          dueDiligences,
+    if (company.isDueDiligenceValidated && isCancel) {
+      // update fields
+      await this.update(
+        { _id },
+        {
+          $set: {
+            isDueDiligenceValidated: false,
+          },
         },
-      },
-    );
+      );
+    } else {
+      const isValidated = () => {
+        if (company.recommendations) {
+          const object = recommendations.toJSON();
 
+          for (let key of Object.keys(object)) {
+            if (!isEmpty(object[key], ['shareholderInfo', 'managementTeamInfo'].includes(key)))
+              return false;
+          }
+        }
+
+        return true;
+      };
+
+      const dueDiligences = company.updateLastDueDiligence({ createdUserId: user._id });
+
+      // update fields
+      await this.update(
+        { _id },
+        {
+          $set: {
+            isDueDiligenceValidated: isValidated(),
+            isDueDiligenceEditable: false,
+            dueDiligences,
+          },
+        },
+      );
+    }
     return Companies.findOne({ _id });
   }
 

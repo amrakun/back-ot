@@ -62,7 +62,6 @@ const companiesFilter = async args => {
       { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
     ];
   }
-  console.log(selector);
 
   // product & services filter
   if (productCodes) {
