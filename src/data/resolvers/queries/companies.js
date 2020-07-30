@@ -27,6 +27,8 @@ const companiesFilter = async args => {
     difotScore,
     region,
     source,
+    searchValue,
+    fieldNames,
   } = args;
 
   const selector = {
@@ -45,13 +47,22 @@ const companiesFilter = async args => {
   }
 
   // main filter
-  if (search) {
+  if (fieldNames && searchValue) {
+    const names = fieldNames.split(',');
+    selector.$or = [];
+    const regex = new RegExp(`.*${searchValue}.*`, 'i');
+
+    names.forEach(name => {
+      selector.$or.push({ [name]: regex });
+    });
+  } else if (search) {
     selector.$or = [
       { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
       { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
       { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
     ];
   }
+  console.log(selector);
 
   // product & services filter
   if (productCodes) {
@@ -143,7 +154,20 @@ const companyQueries = {
       SearchLogs.createLog(user._id);
     }
 
-    return paginate(Companies.find(selector).sort({ createdDate: -1 }), args);
+    const { fieldNames, sortDirection } = args;
+    const sortParams = {};
+
+    if (fieldNames && sortDirection) {
+      const names = fieldNames.split(',');
+
+      names.forEach(name => {
+        sortParams[name] = sortDirection;
+      });
+    } else {
+      sortParams.createdDate = -1;
+    }
+
+    return paginate(Companies.find(selector).sort(sortParams), args);
   },
 
   /**

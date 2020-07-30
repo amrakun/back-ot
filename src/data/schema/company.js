@@ -513,6 +513,8 @@ const queryParams = `
   sortDirection: Int,
   source: String,
   _ids: [String],
+  searchValue: String,
+  fieldNames: String
 `;
 
 export const queries = `
