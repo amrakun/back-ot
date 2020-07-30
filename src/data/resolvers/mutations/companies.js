@@ -91,15 +91,6 @@ const companyMutations = {
     }
   },
 
-  async companiesAddDueDiligences(root, { dueDiligences }, { user }) {
-    for (let dueDiligence of dueDiligences) {
-      const company = await Companies.findOne({ _id: dueDiligence.supplierId });
-
-      // add new due diligence report to every supplier
-      await company.addDueDiligence(dueDiligence, user);
-    }
-  },
-
   /**
    *
    * @param {string} args._id Company id
@@ -290,8 +281,8 @@ const companyMutations = {
    *
    * @param {string} args._id Company id
    */
-  async companiesValidateDueDiligence(root, args) {
-    const validated = await Companies.validateDueDiligence(args._id);
+  async companiesValidateDueDiligence(root, args, { user }) {
+    const validated = await Companies.validateDueDiligence(args._id, user);
 
     return validated;
   },
@@ -306,7 +297,7 @@ const companyMutations = {
     return updatedCompany;
   },
 
-  async companiesAddDueDiligenceRisk(root, { supplierId, ...doc }, { user }) {
+  async companiesAddDueDiligence(root, { supplierId, ...doc }, { user }) {
     const company = await Companies.findOne({ _id: supplierId });
     const updatedCompany = await company.updateDueDiligence(doc, user);
 

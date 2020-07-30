@@ -829,10 +829,12 @@ const DueDiligenceSchema = mongoose.Schema(
     file: field({ type: FileSchema, label: 'File', optional: true }),
     createdUserId: field({ type: String, label: 'Created user' }),
     date: field({ type: Date, label: 'Date' }),
-    expireDate: field({ type: Date, label: 'Expire date' }),
-    reminderDate: field({ type: Date, label: 'Reminder date' }),
+    closeDate: field({ type: Date, label: 'Close date' }),
+
     supplierSubmissionDate: field({ type: Date, label: 'Supplier submission date' }),
     risk: field({ type: String, label: 'Risk' }),
+
+    reminderDay: field({ type: Number, optional: true, label: 'Reminder day' }),
   },
   { _id: false },
 );
@@ -1059,6 +1061,19 @@ class Company {
    */
   getLastDueDiligence() {
     return this.sortAndGetLast('dueDiligences');
+  }
+
+  /*
+   * Update last entry from dueDilgences
+   */
+  updateLastDueDiligence(doc) {
+    const dueDiligences = this.dueDiligences || [];
+    const lastDueDiligence = this.getLastDueDiligence() || {};
+    Object.assign(lastDueDiligence, doc);
+
+    dueDiligences.splice(dueDiligences.length - 1, 1, lastDueDiligence);
+
+    return dueDiligences;
   }
 
   /*
@@ -1323,7 +1338,16 @@ class Company {
    * Mark as sent registration info
    */
   async sendRegistrationInfo() {
-    await this.update({ isSentRegistrationInfo: true, registrationInfoSentDate: new Date() });
+    const dueDiligences = this.dueDiligences || [];
+
+    dueDiligences.push({ date: new Date() });
+
+    await this.update({
+      isSentRegistrationInfo: true,
+      registrationInfoSentDate: new Date(),
+      isDueDiligenceEditable: false,
+      dueDiligences,
+    });
 
     return Companies.findOne({ _id: this._id });
   }
@@ -1525,7 +1549,7 @@ class Company {
    * @param String _id - Company id
    * @return updated company
    */
-  static async validateDueDiligence(_id) {
+  static async validateDueDiligence(_id, user) {
     const company = await Companies.findOne({ _id });
     const recommendations = company.recommendations;
 
@@ -1542,13 +1566,21 @@ class Company {
       return true;
     };
 
+    const dueDiligences = company.updateLastDueDiligence({ createdUserId: user._id });
+
     // update fields
     await this.update(
       { _id },
-      { $set: { isDueDiligenceValidated: isValidated(), isDueDiligenceEditable: false } },
+      {
+        $set: {
+          isDueDiligenceValidated: isValidated(),
+          isDueDiligenceEditable: false,
+          dueDiligences,
+        },
+      },
     );
 
-    return Companies.findOne({ _id: this._id });
+    return Companies.findOne({ _id });
   }
 
   static async enableRecommendataionState(_id) {
@@ -1572,35 +1604,8 @@ class Company {
    * @param {String} file - File path
    * @return updated company
    */
-  async addDueDiligence({ file, expireDate }, user) {
-    const dueDiligences = this.dueDiligences || [];
-
-    dueDiligences.push({
-      date: new Date(),
-      file,
-      expireDate,
-      createdUserId: user._id,
-    });
-
-    // update field
-    await this.update({ dueDiligences });
-
-    return Companies.findOne({ _id: this._id });
-  }
-  /*
-   * Add new due diligence report
-   * @param {String} file - File path
-   * @return updated company
-   */
-  async updateDueDiligence({ file, risk }, user) {
-    const dueDiligences = this.dueDiligences || [];
-
-    dueDiligences.push({
-      date: new Date(),
-      file: file && file[0],
-      risk,
-      createdUserId: user._id,
-    });
+  async updateDueDiligence(doc) {
+    const dueDiligences = this.updateLastDueDiligence(doc);
 
     // update field
     await this.update({ dueDiligences });

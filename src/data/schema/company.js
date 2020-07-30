@@ -493,6 +493,7 @@ export const types = `
     recommendations: Recommendations
     dueDiligenceStatusDisplay: String
     isDueDiligenceEditable: Boolean
+    isDueDiligenceValidated: Boolean
   }
 `;
 
@@ -605,5 +606,12 @@ export const mutations = `
 
   companiesValidateDueDiligence(_id: String!): Company
   companiesEnableRecommendationState(supplierId: String!): Company
-  companiesAddDueDiligenceRisk(supplierId: String!, file: JSON, risk: String!): Company
+  companiesAddDueDiligence(
+    supplierId: String!,
+    file: JSON,
+    risk: String,
+    date: Date,
+    closeDate: Date,
+    reminderDay: Int
+  ): Company
 `;
