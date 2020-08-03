@@ -50,16 +50,22 @@ const companiesFilter = async args => {
   if (fieldNames && searchValue) {
     const names = fieldNames.split(',');
     selector.$or = [];
-    const regex = new RegExp(`.*${searchValue}.*`, 'i');
 
     names.forEach(name => {
-      selector.$or.push({ [name]: regex });
+      selector.$or.push({
+        [name]:
+          name === 'contactInfo.phone'
+            ? parseInt(searchValue)
+            : new RegExp(`.*${searchValue}.*`, 'i'),
+      });
     });
   } else if (search) {
+    const regex = new RegExp(`.*${search}.*`, 'i');
+
     selector.$or = [
-      { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
-      { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
-      { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
+      { 'basicInfo.mnName': regex },
+      { 'basicInfo.enName': regex },
+      { 'basicInfo.sapNumber': regex },
     ];
   }
 
