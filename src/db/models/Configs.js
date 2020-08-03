@@ -73,6 +73,19 @@ const ConfigSchema = mongoose.Schema({
     optional: true,
   }),
 
+  // Due diligence duration of warranty ========
+  // { duration: 'year', amount: 2 }
+  dueDiligenceDow: field({
+    type: DurationAmountSchema,
+    optional: true,
+  }),
+
+  // { supplierIds: ['_id1', '_id2'], duration: 'year', amount: 2 }
+  specificDueDiligenceDow: field({
+    type: SuppliersDurationAmountSchema,
+    optional: true,
+  }),
+
   // Desktop audit duration of warranty ===========
   // { duration: 'year', amount: 2 }
   auditDow: field({
@@ -139,6 +152,23 @@ class Config {
     await config.update({
       prequalificationDow: common,
       specificPrequalificationDow: specific,
+    });
+
+    return this.findOne({ _id: config._id });
+  }
+
+  /*
+   * Save pre due diligence duration of warranty
+   * @param common - {duration: 'year', amount: 2}
+   * @param specific - {supplierIds: ['_id'], duration: 'month', amount: 1}
+   * @return updated config
+   */
+  static async saveDueDiligenceDow({ common, specific }) {
+    const config = await this.getConfig();
+
+    await config.update({
+      dueDiligenceDow: common,
+      specificDueDiligenceDow: specific,
     });
 
     return this.findOne({ _id: config._id });

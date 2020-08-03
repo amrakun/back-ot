@@ -1,45 +1,36 @@
 import { Companies } from '../../db/models';
 
+const dataWithSuppliers = async (config, name) => {
+  const dow = config[name];
+
+  if (!dow) {
+    return dow;
+  }
+
+  const { supplierIds } = dow;
+
+  if (!supplierIds) {
+    return dow;
+  }
+
+  const suppliers = await Companies.find({ _id: { $in: supplierIds } });
+
+  return {
+    ...dow.toJSON(),
+    suppliers,
+  };
+};
+
 export default {
-  async specificPrequalificationDow(config) {
-    const { specificPrequalificationDow } = config;
+  specificPrequalificationDow(config) {
+    return dataWithSuppliers(config, 'specificPrequalificationDow');
+  },
 
-    if (!specificPrequalificationDow) {
-      return specificPrequalificationDow;
-    }
-
-    const { supplierIds } = specificPrequalificationDow;
-
-    if (!supplierIds) {
-      return specificPrequalificationDow;
-    }
-
-    const suppliers = await Companies.find({ _id: { $in: supplierIds } });
-
-    return {
-      ...specificPrequalificationDow,
-      suppliers,
-    };
+  specificDueDiligenceDow(config) {
+    return dataWithSuppliers(config, 'specificDueDiligenceDow');
   },
 
   async specificAuditDow(config) {
-    const { specificAuditDow } = config;
-
-    if (!specificAuditDow) {
-      return specificAuditDow;
-    }
-
-    const { supplierIds } = specificAuditDow;
-
-    if (!supplierIds) {
-      return specificAuditDow;
-    }
-
-    const suppliers = await Companies.find({ _id: { $in: supplierIds } });
-
-    return {
-      ...specificAuditDow,
-      suppliers,
-    };
+    return dataWithSuppliers(config, 'specificAuditDow');
   },
 };
