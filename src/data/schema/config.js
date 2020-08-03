@@ -64,6 +64,7 @@ export const types = `
     blockTemplates: JSON
     prequalificationTemplates: JSON
     desktopAuditTemplates: JSON
+    dueDiligenceTemplates: JSON
 
     prequalificationDow: JSON
     specificPrequalificationDow: JSON

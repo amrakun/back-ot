@@ -59,6 +59,7 @@ const ConfigSchema = mongoose.Schema({
   blockTemplates: field({ type: Object, optional: true }),
   prequalificationTemplates: field({ type: Object, optional: true }),
   desktopAuditTemplates: field({ type: Object, optional: true }),
+  dueDiligenceTemplates: field({ type: Object, optional: true }),
 
   // Prequalification duration of warranty ========
   // { duration: 'year', amount: 2 }
