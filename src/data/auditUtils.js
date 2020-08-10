@@ -12,6 +12,7 @@ export const sendEmail = async ({ kind, toEmails, supplier, audit, attachments }
       return text
         .replace(/{publishDate}/g, audit.publishDate.toLocaleString())
         .replace(/{closeDate}/g, audit.closeDate.toLocaleString())
+        .replace(/{editableDate}/g, audit.editableDate.toLocaleString())
         .replace(/{supplier.name}/g, basicInfo.enName)
         .replace(/{content}/g, audit.content);
     },

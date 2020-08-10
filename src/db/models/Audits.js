@@ -968,6 +968,10 @@ class AuditResponse {
       return 'In process';
     }
 
+    if (!this.isSent) {
+      return 'In process';
+    }
+
     return this.isQualified ? 'Qualified' : 'Not-qualified';
   }
 }
