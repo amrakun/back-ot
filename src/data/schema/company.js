@@ -1,10 +1,3 @@
-import {
-  addressFieldNames,
-  shareholderFieldNames,
-  personFieldNames,
-  groupInfoFieldNames,
-} from '../../db/models/constants';
-
 const basicInfoFields = `
   enName: String!
   mnName: String
@@ -206,31 +199,6 @@ const difotScoreFields = `
   amount: Float!
 `;
 
-const generateFields = names => {
-  let fields = '';
-  for (let name of names) {
-    fields += `${name}: String\n`;
-  }
-
-  return fields;
-};
-
-const dshareholderFields = `
-  ${generateFields(shareholderFieldNames)}
-`;
-
-const daddressFields = `
-  ${generateFields(addressFieldNames)}
-`;
-
-const dpersonFields = `
-  ${generateFields(personFieldNames)}
-`;
-
-const dgroupInfoFields = `
-  ${generateFields(groupInfoFieldNames)}
-`;
-
 export const types = `
   #  basic info ========================
   type CompanyBasicInfo { ${basicInfoFields.replace(/!/g, '')} }
@@ -376,59 +344,6 @@ export const types = `
     ${difotScoreFields}
   }
 
-  type CompanyDueDiligence {
-    date: Date
-    expireDate: Date
-    file: JSON
-    createdUserId: String
-    createdUser: User
-    risk: String
-  }
-
-  input CompanyDueDiligenceInput {
-    supplierId: String!
-    file: JSON!
-    expireDate: Date!
-  }
-
-  # recommendations =========================
-  type dshareholder {${dshareholderFields}}
-  input dshareholderInput {
-    ${dshareholderFields}
-  }
-
-  type RecommendationShareholderInfo { shareholders: [dshareholder]}
-  input RecommendationShareholderInfoInput {shareholders: [dshareholderInput]}
-  
-
-  type RecommendationAddressInfo {${daddressFields}}
-  input RecommendationAddressInfoInput {${daddressFields}}
-
-  input dpersonInput {
-    ${dpersonFields}
-  }
-
-  type RecommendationManagementTeamPerson {${dpersonFields}}
-  input RecommendationManagementTeamPersonInput {
-    managingDirector: dpersonInput,
-    executiveOfficer: dpersonInput
-  }
-
-  type RecommendationGroupInfo {${dgroupInfoFields}}
-  input RecommendationGroupInfoInput {${dgroupInfoFields}}
-
-  type dperson {
-    managingDirector: RecommendationManagementTeamPerson
-    executiveOfficer: RecommendationManagementTeamPerson
-  }
-
-  type Recommendations {
-    basicInfo: RecommendationAddressInfo
-    shareholderInfo: RecommendationShareholderInfo
-    managementTeamInfo: dperson
-    groupInfo: RecommendationGroupInfo
-  }
-
   # main type =============================
   type Company {
     _id: String!
@@ -469,7 +384,6 @@ export const types = `
 
     productsInfoValidations: [CompanyProductsInfoValidation]
     difotScores: [CompanyDifotScore]
-    dueDiligences: [CompanyDueDiligence]
     feedbacks: [Feedback]
 
     owner: User
@@ -490,7 +404,6 @@ export const types = `
 
     qualificationState: JSON
 
-    recommendations: Recommendations
     dueDiligenceStatusDisplay: String
     isDueDiligenceEditable: Boolean
     isDueDiligenceValidated: Boolean
@@ -570,7 +483,6 @@ export const mutations = `
 
   companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
-  companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
 
   companiesValidateProductsInfo(
     _id: String!
@@ -585,35 +497,4 @@ export const mutations = `
   companiesSkipPrequalification(reason: String!): Company
 
   companiesTogglePrequalificationState(supplierId: String!): Company
-
-  recommendationsSaveShareholderInfo(
-    _id: String!
-    shareholderInfo: RecommendationShareholderInfoInput
-  ): Company
-
-  recommendationsSaveBasicInfo(
-    _id: String!
-    basicInfo: RecommendationAddressInfoInput
-  ): Company
-
-  recommendationsSaveManagementTeamInfo(
-    _id: String!
-    managementTeamInfo: RecommendationManagementTeamPersonInput
-  ): Company
-
-  recommendationsSaveGroupInfo(
-    _id: String!
-    groupInfo: RecommendationGroupInfoInput
-  ): Company
-
-  companiesValidateDueDiligence(_id: String!, isCancel: Boolean): Company
-  companiesEnableRecommendationState(supplierId: String!): Company
-  companiesAddDueDiligence(
-    supplierId: String!,
-    file: JSON,
-    risk: String,
-    date: Date,
-    closeDate: Date,
-    reminderDay: Int
-  ): Company
 `;

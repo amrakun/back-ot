@@ -1,6 +1,8 @@
 export const TIER_TYPES = ['national', 'umnugovi', 'tier1', 'tier2', 'tier3'];
 
-export const addressFieldNames = [
+export const basicInfoFieldNames = [
+  'enName',
+  'mnName',
   'address',
   'address2',
   'address3',
@@ -8,6 +10,8 @@ export const addressFieldNames = [
   'province',
   'townOrCity',
   'zipCode',
+  'registrationNumber',
+  'certificateOfRegistration',
 ];
 
 export const shareholderFieldNames = [

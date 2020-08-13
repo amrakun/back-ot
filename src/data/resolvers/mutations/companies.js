@@ -276,33 +276,6 @@ const companyMutations = {
 
     return updatedCompany;
   },
-
-  /**
-   *
-   * @param {string} args._id Company id
-   */
-  async companiesValidateDueDiligence(root, args, { user }) {
-    const validated = await Companies.validateDueDiligence(args, user);
-
-    return validated;
-  },
-
-  /**
-   *
-   * @param {string} args.supplierId Company id
-   */
-  async companiesEnableRecommendationState(root, { supplierId }) {
-    const updatedCompany = await Companies.enableRecommendataionState(supplierId);
-
-    return updatedCompany;
-  },
-
-  async companiesAddDueDiligence(root, { supplierId, ...doc }, { user }) {
-    const company = await Companies.findOne({ _id: supplierId });
-    const updatedCompany = await company.updateDueDiligence(doc, user);
-
-    return updatedCompany;
-  },
 };
 
 const sections = [
@@ -360,33 +333,12 @@ sections.forEach(section => {
   requireSupplier(companyMutations, name);
 });
 
-const recommendationSections = ['shareholder', 'basic', 'managementTeam', 'group'];
-
-recommendationSections.forEach(section => {
-  // capitalize first letter
-  const capsedName = section.charAt(0).toUpperCase() + section.slice(1);
-  const name = `recommendationsSave${capsedName}Info`;
-  const subFieldName = `${section}Info`;
-
-  /**
-   * @param {Object} args Object containing subField data
-   */
-  companyMutations[name] = async (root, args) => {
-    const updated = await Companies.updateSection(args._id, subFieldName, args[subFieldName], true);
-
-    return updated;
-  };
-
-  requireBuyer(companyMutations, name);
-});
-
 requireSupplier(companyMutations, 'companiesEditCertificateInfo');
 requireSupplier(companyMutations, 'companiesSendRegistrationInfo');
 requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
 requireSupplier(companyMutations, 'companiesSkipPrequalification');
 
 requireBuyer(companyMutations, 'companiesAddDifotScores');
-requireBuyer(companyMutations, 'companiesAddDueDiligences');
 requireBuyer(companyMutations, 'companiesValidateProductsInfo');
 requireBuyer(companyMutations, 'companiesTogglePrequalificationState');
 

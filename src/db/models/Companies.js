@@ -1,15 +1,9 @@
 import mongoose from 'mongoose';
-import { field, isEmpty } from './utils';
-import { Users, Feedbacks, BlockedCompanies } from './';
-import {
-  TIER_TYPES,
-  addressFieldNames,
-  shareholderFieldNames,
-  personFieldNames,
-  groupInfoFieldNames,
-} from './constants';
+import { field } from './utils';
+import { Users, Feedbacks, BlockedCompanies, DueDiligences } from './';
+import { TIER_TYPES } from './constants';
 
-const FileSchema = mongoose.Schema(
+export const FileSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Name' }),
     url: field({ type: String, label: 'File url' }),
@@ -824,21 +818,6 @@ const DateAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const DueDiligenceSchema = mongoose.Schema(
-  {
-    file: field({ type: FileSchema, label: 'File', optional: true }),
-    createdUserId: field({ type: String, label: 'Created user' }),
-    date: field({ type: Date, label: 'Date' }),
-    closeDate: field({ type: Date, label: 'Close date' }),
-
-    supplierSubmissionDate: field({ type: Date, label: 'Supplier submission date' }),
-    risk: field({ type: String, label: 'Risk' }),
-
-    reminderDay: field({ type: Number, optional: true, label: 'Reminder day' }),
-  },
-  { _id: false },
-);
-
 const ProductsInfoValidation = mongoose.Schema(
   {
     date: field({ type: String, label: 'Date' }),
@@ -846,34 +825,6 @@ const ProductsInfoValidation = mongoose.Schema(
     checkedItems: field({ type: [String], label: 'Checked items' }),
     files: field({ type: [FileSchema], label: 'Supporting documents', optional: true }),
     justification: field({ type: String, label: 'Justification' }),
-  },
-  { _id: false },
-);
-
-const generateFields = names => {
-  const definitions = {};
-
-  for (let name of names) {
-    definitions[name] = field({
-      type: String,
-      optional: true,
-    });
-  }
-
-  return mongoose.Schema(definitions, { _id: false });
-};
-
-const RecommendationSchema = mongoose.Schema(
-  {
-    basicInfo: generateFields(addressFieldNames),
-    shareholderInfo: {
-      shareholders: [generateFields(shareholderFieldNames)],
-    },
-    managementTeamInfo: {
-      managingDirector: generateFields(personFieldNames),
-      executiveOfficer: generateFields(personFieldNames),
-    },
-    groupInfo: generateFields(groupInfoFieldNames),
   },
   { _id: false },
 );
@@ -1008,7 +959,6 @@ const CompanySchema = mongoose.Schema({
     optional: true,
     label: 'Product information validations',
   }),
-  dueDiligences: field({ type: [DueDiligenceSchema], optional: true, label: 'Due diligences' }),
   difotScores: field({ type: [DateAmountSchema], optional: true, label: 'Difot scores' }),
   averageDifotScore: field({ type: Number, optional: true, label: 'Average difot score' }),
 
@@ -1026,8 +976,6 @@ const CompanySchema = mongoose.Schema({
     default: true,
     label: 'Is due diligence information editable',
   }),
-
-  recommendations: field({ type: RecommendationSchema, optional: true, label: 'Recommendation' }),
 });
 
 class Company {
@@ -1055,27 +1003,6 @@ class Company {
   getLastDifotScore() {
     return this.sortAndGetLast('difotScores');
   }
-
-  /*
-   * Sort by date and get last entry from dueDilgences
-   */
-  getLastDueDiligence() {
-    return this.sortAndGetLast('dueDiligences');
-  }
-
-  /*
-   * Update last entry from dueDilgences
-   */
-  updateLastDueDiligence(doc) {
-    const dueDiligences = this.dueDiligences || [];
-    const lastDueDiligence = this.getLastDueDiligence() || {};
-    Object.assign(lastDueDiligence, doc);
-
-    dueDiligences.splice(dueDiligences.length - 1, 1, lastDueDiligence);
-
-    return dueDiligences;
-  }
-
   /*
    * Get feedbacks that this supplier can see
    */
@@ -1164,7 +1091,7 @@ class Company {
    * @param {Object} value - related update doc
    * @return Updated company object
    */
-  static async updateSection(_id, key, value, isRecommendation = false) {
+  static async updateSection(_id, key, value) {
     const company = await this.findOne({ _id });
 
     if (value) {
@@ -1229,23 +1156,8 @@ class Company {
       throw new Error('Changes disabled');
     }
 
-    if (isRecommendation) {
-      const recommendations = company.recommendations || {};
-      recommendations[key] = value;
-
-      // update
-      await this.update(
-        { _id },
-        {
-          $set: {
-            recommendations,
-          },
-        },
-      );
-    } else {
-      // update
-      await this.update({ _id }, { $set: { [key]: value } });
-    }
+    // update
+    await this.update({ _id }, { $set: { [key]: value } });
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {
@@ -1338,15 +1250,14 @@ class Company {
    * Mark as sent registration info
    */
   async sendRegistrationInfo() {
-    const dueDiligences = this.dueDiligences || [];
-
-    dueDiligences.push({ date: new Date() });
+    if (this.isDueDiligenceEditable) {
+      await DueDiligences.create({ supplierId: this._id, supplierSubmissionDate: new Date() });
+    }
 
     await this.update({
       isSentRegistrationInfo: true,
       registrationInfoSentDate: new Date(),
       isDueDiligenceEditable: false,
-      dueDiligences,
     });
 
     return Companies.findOne({ _id: this._id });
@@ -1543,86 +1454,6 @@ class Company {
 
     return name;
   }
-
-  /*
-   * Validate die diligence
-   * @param String _id - Company id
-   * @return updated company
-   */
-  static async validateDueDiligence({ _id, isCancel = false }, user) {
-    const company = await Companies.findOne({ _id });
-    const recommendations = company.recommendations;
-
-    if (company.isDueDiligenceValidated && isCancel) {
-      // update fields
-      await this.update(
-        { _id },
-        {
-          $set: {
-            isDueDiligenceValidated: false,
-          },
-        },
-      );
-    } else {
-      const isValidated = () => {
-        if (company.recommendations) {
-          const object = recommendations.toJSON();
-
-          for (let key of Object.keys(object)) {
-            if (!isEmpty(object[key], ['shareholderInfo', 'managementTeamInfo'].includes(key)))
-              return false;
-          }
-        }
-
-        return true;
-      };
-
-      const dueDiligences = company.updateLastDueDiligence({ createdUserId: user._id });
-
-      // update fields
-      await this.update(
-        { _id },
-        {
-          $set: {
-            isDueDiligenceValidated: isValidated(),
-            isDueDiligenceEditable: false,
-            dueDiligences,
-          },
-        },
-      );
-    }
-    return Companies.findOne({ _id });
-  }
-
-  static async enableRecommendataionState(_id) {
-    await Companies.findOne({ _id });
-
-    const updateQuery = {
-      $set: {
-        isDueDiligenceEditable: true,
-      },
-    };
-
-    updateQuery.$unset = { isDueDiligenceValidated: 1, recommendations: 1 };
-
-    await Companies.update({ _id }, updateQuery);
-
-    return Companies.findOne({ _id });
-  }
-
-  /*
-   * Add new due diligence report
-   * @param {String} file - File path
-   * @return updated company
-   */
-  async updateDueDiligence(doc) {
-    const dueDiligences = this.updateLastDueDiligence(doc);
-
-    // update field
-    await this.update({ dueDiligences });
-
-    return Companies.findOne({ _id: this._id });
-  }
 }
 
 CompanySchema.loadClass(Company);
@@ -1644,7 +1475,6 @@ export const CompanyRelatedSchemas = [
   BusinessInfoSchema,
   EnvironmentalInfoSchema,
   HealthInfoSchema,
-  DueDiligenceSchema,
   ProductsInfoValidation,
   CompanySchema,
   DateAmountSchema,

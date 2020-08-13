@@ -15,6 +15,7 @@ import {
   ActivityLogs,
 } from './Logs';
 import TenderMessages from './TenderMessages';
+import DueDiligences from './DueDiligences';
 
 export {
   Companies,
@@ -36,4 +37,5 @@ export {
   SuppliersByProductCodeLogs,
   ActivityLogs,
   TenderMessages,
+  DueDiligences,
 };
