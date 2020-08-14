@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { field, isEmpty } from './utils';
+import { field, isEmpty, generateSearchText } from './utils';
 import { FileSchema } from './Companies';
 import { Companies } from './';
 import {
@@ -7,6 +7,7 @@ import {
   shareholderFieldNames,
   personFieldNames,
   groupInfoFieldNames,
+  searchFieldNames,
 } from './constants';
 
 const generateFields = names => {
@@ -22,11 +23,14 @@ const generateFields = names => {
   return mongoose.Schema(definitions, { _id: false });
 };
 
+export const SearchTextSchema = generateFields(searchFieldNames);
+
 export const DueDiligenceSchema = mongoose.Schema({
   supplierId: field({ type: String, label: 'Supplier' }),
 
-  file: field({ type: FileSchema, label: 'File', optional: true }),
+  files: field({ type: [FileSchema], label: 'File', optional: true }),
   createdUserId: field({ type: String, label: 'Created user', optional: true }),
+  fileUploadDate: field({ type: Date, label: 'File upload date', optional: true }),
 
   date: field({ type: Date, label: 'Date', optional: true }),
   closeDate: field({ type: Date, label: 'Close date', optional: true }),
@@ -44,9 +48,14 @@ export const DueDiligenceSchema = mongoose.Schema({
     executiveOfficer: generateFields(personFieldNames),
   },
   groupInfo: generateFields(groupInfoFieldNames),
+  searchText: SearchTextSchema,
 });
 
 class DueDiligence {
+  static getLastDueDiligence(supplierId) {
+    return this.findOne({ supplierId }).sort({ createDate: 1 });
+  }
+
   /**
    * Update sub section info
    * @param {String } supplierId - Company id
@@ -55,7 +64,7 @@ class DueDiligence {
    * @return Updated company object
    */
   static async updateSection(supplierId, key, value) {
-    const dd = await this.findOne({ supplierId }).sort({ createDate: 1 });
+    const dd = await this.getLastDueDiligence(supplierId);
 
     if (!dd) {
       return this.create({ supplierId, [key]: value });
@@ -63,7 +72,9 @@ class DueDiligence {
 
     const _id = dd._id;
 
-    await this.update({ _id }, { $set: { [key]: value } });
+    const searchText = generateSearchText({ ...dd.toJSON(), [key]: value });
+
+    await this.update({ _id }, { $set: { [key]: value, searchText } });
 
     return this.findOne({ _id });
   }
@@ -74,7 +85,7 @@ class DueDiligence {
    * @return updated company
    */
   static async saveDueDiligence({ supplierId }, user) {
-    const dd = await this.findOne({ supplierId }).sort({ createDate: 1 });
+    const dd = await this.getLastDueDiligence(supplierId);
 
     const recommendations = dd
       ? {
@@ -163,19 +174,21 @@ class DueDiligence {
   /*
    * Add new due diligence report
    * @param {String} file - File path
-   * @return updated company
+   * @return updated due diligence
    */
   static async updateDueDiligence(supplierId, doc) {
-    const dd = await this.findOne({ supplierId }).sort({ createDate: 1 });
-
-    if (doc.file) {
-      doc.file = doc.file[0];
-    }
+    const dd = await this.getLastDueDiligence(supplierId);
 
     if (!dd) {
       await this.create({ supplierId, doc });
 
       return this.findOne({ supplierId });
+    }
+
+    if (doc.files) {
+      doc.files = dd.files ? dd.files.concat(doc.files) : doc.files;
+
+      doc.fileUploadDate = new Date();
     }
 
     const _id = dd._id;
@@ -184,6 +197,28 @@ class DueDiligence {
       { _id },
       {
         $set: doc,
+      },
+    );
+
+    return this.findOne({ _id });
+  }
+
+  /*
+   * Remove risk and upload files
+   * @param {String} supplierId - company _id
+   * @return updated due diligence
+   */
+  static async removeRisk(supplierId) {
+    const { _id } = await this.getLastDueDiligence(supplierId);
+
+    await this.update(
+      { _id },
+      {
+        $unset: {
+          fileUploadDate: 1,
+          files: 1,
+          risk: 1,
+        },
       },
     );
 

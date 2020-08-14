@@ -32,3 +32,14 @@ export const groupInfoFieldNames = [
   'parentAddress',
   'parentRegistrationNumber',
 ];
+
+export const searchFieldNames = [
+  'companyName',
+  'phone',
+  'email',
+  'registrationNumber',
+  'address',
+  'fullName',
+  'firstName',
+  'lastName',
+];

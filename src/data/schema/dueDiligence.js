@@ -73,10 +73,11 @@ export const types = `
 
     date: Date
     expireDate: Date
-    file: JSON
+    files: JSON
     createdUserId: String
     createdUser: User
     risk: String
+    fileUploadDate: Date
   }
 `;
 
@@ -108,9 +109,10 @@ export const mutations = `
   dueDiligencesSave(supplierId: String!): Company
   dueDiligencesCancel(supplierId: String!): Company
   dueDiligencesEnableState(supplierId: String!): DueDiligence
+  dueDiligencesRemoveRisk(supplierId: String!): DueDiligence
   dueDiligencesUpdate(
     supplierId: String!,
-    file: JSON,
+    files: JSON,
     risk: String,
     date: Date,
     closeDate: Date,

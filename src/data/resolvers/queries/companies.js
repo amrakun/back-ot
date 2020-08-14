@@ -53,10 +53,7 @@ const companiesFilter = async args => {
 
     names.forEach(name => {
       selector.$or.push({
-        [name]:
-          name === 'contactInfo.phone'
-            ? parseInt(searchValue) || 0
-            : new RegExp(`.*${searchValue}.*`, 'i'),
+        [`searchText.${name}`]: new RegExp(`.*${searchValue}.*`, 'i'),
       });
     });
   } else if (search) {

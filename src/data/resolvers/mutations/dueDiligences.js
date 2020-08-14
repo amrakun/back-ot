@@ -31,6 +31,10 @@ const dueDiligenceMutations = {
   async dueDiligencesUpdate(root, { supplierId, ...doc }) {
     return DueDiligences.updateDueDiligence(supplierId, doc);
   },
+
+  async dueDiligencesRemoveRisk(root, { supplierId }) {
+    return DueDiligences.removeRisk(supplierId);
+  },
 };
 
 const sections = ['shareholder', 'basic', 'managementTeam', 'group'];

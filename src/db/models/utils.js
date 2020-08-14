@@ -142,4 +142,44 @@ export const isEmpty = (input, isParent = false) => {
   return checkObject(input);
 };
 
+export const generateSearchText = (data = {}) => {
+  const { basicInfo = {}, shareholderInfo = {}, contactInfo = {}, managementTeamInfo = {} } = data;
+
+  const { enName, mnName, email, registrationNumber } = basicInfo || {};
+  const { phone, phone2, address, address2, address3 } = contactInfo || {};
+  const { shareholders = [] } = shareholderInfo || {};
+  const { managingDirector = {}, executiveOfficer = {} } = managementTeamInfo || {};
+
+  const teamMembers = [managingDirector, executiveOfficer];
+  const companies = shareholders.filter(obj => obj.companyName);
+
+  const check = str => (str ? `${str},` : '');
+  const generateText = (array, key) => {
+    let str = '';
+
+    if (!array || !key) return str;
+
+    array.map(obj => (str = `${str}${check(obj[key])} `));
+
+    return str;
+  };
+
+  const companyName = `${check(enName)} ${check(mnName)} ${generateText(companies, 'companyName')}`;
+  const basicAddress = `${check(basicInfo.address)} ${check(basicInfo.address2)} ${check(
+    basicInfo.address3,
+  )}`;
+  const contactAddress = `${check(address)} ${check(address2)} ${check(address3)}`;
+
+  return {
+    companyName,
+    phone: `${check(phone)} ${check(phone2)} ${generateText(teamMembers, 'phone')}`,
+    email: `${check(email)} ${check(contactInfo.email)} ${generateText(teamMembers, 'email')}`,
+    registrationNumber,
+    address: `${basicAddress} ${contactAddress}`,
+    fullName: generateText(teamMembers, 'name'),
+    firstName: generateText(shareholders, 'firstName'),
+    lastName: generateText(shareholders, 'lastName'),
+  };
+};
+
 export default utils;

@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
-import { field } from './utils';
+import { field, generateSearchText } from './utils';
 import { Users, Feedbacks, BlockedCompanies, DueDiligences } from './';
 import { TIER_TYPES } from './constants';
+import { SearchTextSchema } from './DueDiligences';
 
 export const FileSchema = mongoose.Schema(
   {
@@ -976,6 +977,8 @@ const CompanySchema = mongoose.Schema({
     default: true,
     label: 'Is due diligence information editable',
   }),
+
+  searchText: SearchTextSchema,
 });
 
 class Company {
@@ -1156,8 +1159,10 @@ class Company {
       throw new Error('Changes disabled');
     }
 
+    const searchText = generateSearchText({ ...company.toJSON(), [key]: value });
+
     // update
-    await this.update({ _id }, { $set: { [key]: value } });
+    await this.update({ _id }, { $set: { [key]: value, searchText } });
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {
