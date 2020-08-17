@@ -158,7 +158,7 @@ export const companiesGenerateDueDiligenceList = async (user, companies) => {
     const basicInfo = company.basicInfo || {};
     const contactInfo = company.contactInfo || {};
 
-    const lastDueDiligence = company.getLastDueDiligence();
+    const lastDueDiligence = company.lastDueDiligence;
 
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
