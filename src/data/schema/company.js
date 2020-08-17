@@ -426,8 +426,10 @@ const queryParams = `
   sortDirection: Int,
   source: String,
   _ids: [String],
+  dueDiligenceRisk: String,
+  dueDiligenceStatus: String,
   searchValue: String,
-  fieldNames: String
+  fieldNames: String,
 `;
 
 export const queries = `

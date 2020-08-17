@@ -23,6 +23,7 @@ const companiesFilter = async args => {
     includeBlocked,
     prequalifiedStatus,
     qualifiedStatus,
+    dueDiligenceStatus,
     productsInfoStatus,
     difotScore,
     region,
@@ -134,6 +135,9 @@ const companiesFilter = async args => {
 
   // by qualified status
   checkStatus(qualifiedStatus, 'isQualified');
+
+  // by due diligence status
+  checkStatus(dueDiligenceStatus, 'isDueDiligenceValidated');
 
   // remove emtpy selector
   if (Object.keys(selector._id).length === 0) {
