@@ -6,7 +6,7 @@ import { generateSearchText } from '../src/db/models/utils';
 dotenv.config();
 
 /**
- * Trim names
+ * Generate search text fields
  */
 module.exports.up = next => {
   const { MONGO_URL = '' } = process.env;
@@ -29,4 +29,8 @@ module.exports.up = next => {
       next();
     },
   );
+};
+
+module.exports.down = next => {
+  next();
 };

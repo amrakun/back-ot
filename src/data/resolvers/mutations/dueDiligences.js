@@ -61,4 +61,10 @@ sections.forEach(section => {
   requireBuyer(dueDiligenceMutations, name);
 });
 
+requireBuyer(dueDiligenceMutations, 'dueDiligencesSave');
+requireBuyer(dueDiligenceMutations, 'dueDiligencesCancel');
+requireBuyer(dueDiligenceMutations, 'dueDiligencesEnableState');
+requireBuyer(dueDiligenceMutations, 'dueDiligencesUpdate');
+requireBuyer(dueDiligenceMutations, 'dueDiligencesRemoveRisk');
+
 export default dueDiligenceMutations;

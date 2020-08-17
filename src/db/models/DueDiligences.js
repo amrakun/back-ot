@@ -224,6 +224,17 @@ class DueDiligence {
 
     return this.findOne({ _id });
   }
+
+  /*
+   * get selected supplier ids
+   */
+  static async companyIds(selector) {
+    if (!selector) return [];
+
+    const selectedItems = await this.find(selector).select('supplierId');
+
+    return selectedItems.map(i => i.supplierId);
+  }
 }
 
 DueDiligenceSchema.loadClass(DueDiligence);

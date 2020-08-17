@@ -94,6 +94,7 @@ const qualificationMutations = {
    */
   async qualificationsPrequalify(root, { supplierId, qualified, templateObject }, { user }) {
     const supplier = await Companies.findOne({ _id: supplierId });
+    const prequalified = await Qualifications.prequalify(supplierId, qualified);
 
     await SuppliersByProductCodeLogs.createLog(supplier);
 
@@ -115,12 +116,13 @@ const qualificationMutations = {
       prequalifiedDate: supplier.prequalifiedDate,
       isPrequalificationInfoEditable: supplier.isPrequalificationInfoEditable,
     };
-    const prequalified = await Qualifications.prequalify(supplierId, qualified);
+
     const logDoc = {
       isPrequalified: qualified,
       prequalifiedDate: new Date(),
       isPrequalificationInfoEditable: false,
     };
+
     const companyName = await Companies.getName(supplierId);
 
     putUpdateLog(

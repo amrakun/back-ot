@@ -133,6 +133,12 @@ class Qualification {
    * @return - Updated supplier
    */
   static async prequalify(supplierId, status) {
+    const company = await Companies.findOne({ _id: supplierId });
+
+    if (company.isDueDiligenceValidated !== true) {
+      throw Error('Not due diligence');
+    }
+
     // update supplier's tier type
     await Companies.update(
       { _id: supplierId },

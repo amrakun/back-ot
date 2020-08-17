@@ -1,4 +1,10 @@
-import { Companies, BlockedCompanies, Qualifications, SearchLogs } from '../../../db/models';
+import {
+  Companies,
+  BlockedCompanies,
+  Qualifications,
+  SearchLogs,
+  DueDiligences,
+} from '../../../db/models';
 
 import { paginate } from './utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
@@ -30,6 +36,7 @@ const companiesFilter = async args => {
     source,
     searchValue,
     fieldNames,
+    dueDiligenceRisk,
   } = args;
 
   const selector = {
@@ -47,16 +54,23 @@ const companiesFilter = async args => {
     selector.isSentPrequalificationInfo = true;
   }
 
+  selector._id = {};
+
   // main filter
   if (fieldNames && searchValue) {
     const names = fieldNames.split(',');
-    selector.$or = [];
+    const searchSelector = [];
 
     names.forEach(name => {
-      selector.$or.push({
+      searchSelector.push({
         [`searchText.${name}`]: new RegExp(`.*${searchValue}.*`, 'i'),
       });
     });
+
+    const companyIds = await DueDiligences.companyIds({ $or: searchSelector });
+    if (companyIds.length > 0) searchSelector.push({ _id: { $in: companyIds } });
+
+    selector.$or = searchSelector;
   } else if (search) {
     const regex = new RegExp(`.*${search}.*`, 'i');
 
@@ -102,11 +116,14 @@ const companiesFilter = async args => {
     selector.averageDifotScore = { $gte: min, $lte: max };
   }
 
-  selector._id = {};
-
   // ids filter
   if (_ids) {
     selector._id.$in = _ids;
+  }
+
+  // by due diligence risk
+  if (dueDiligenceRisk) {
+    selector._id.$in = await DueDiligences.companyIds({ risk: dueDiligenceRisk });
   }
 
   // include blocked

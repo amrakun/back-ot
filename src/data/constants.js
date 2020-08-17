@@ -7,7 +7,6 @@ export const PERMISSION_LIST = [
   'physicalAuditsAdd',
   'configsSaveImprovementPlanDow',
   'companiesValidateProductsInfo',
-  'companiesAddDueDiligences',
   'blockedCompaniesBlock',
   'blockedCompaniesUnblock',
   'tenderResponses',
@@ -34,6 +33,7 @@ export const PERMISSION_LIST = [
   'auditsAdd',
   'auditReport',
   'auditsBuyerSendFiles',
+  'dueDiligencesEnableState',
 ];
 
 export const PERMISSIONS = [
@@ -61,7 +61,7 @@ export const PERMISSIONS = [
   },
   {
     name: 'Due diligence',
-    permissions: ['companiesAddDueDiligences', 'companiesGenerateDueDiligenceList'],
+    permissions: ['dueDiligencesEnableState', 'companiesGenerateDueDiligenceList'],
   },
   {
     name: 'Blocking',
