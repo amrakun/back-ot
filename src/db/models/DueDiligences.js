@@ -31,6 +31,7 @@ export const DueDiligenceSchema = mongoose.Schema({
   files: field({ type: [FileSchema], label: 'File', optional: true }),
   createdUserId: field({ type: String, label: 'Created user', optional: true }),
   fileUploadDate: field({ type: Date, label: 'File upload date', optional: true }),
+  createdDate: field({ type: Date, label: 'Created date', default: new Date() }),
 
   date: field({ type: Date, label: 'Date', optional: true }),
   closeDate: field({ type: Date, label: 'Close date', optional: true }),
@@ -52,8 +53,10 @@ export const DueDiligenceSchema = mongoose.Schema({
 });
 
 class DueDiligence {
-  static getLastDueDiligence(supplierId) {
-    return this.findOne({ supplierId }).sort({ createDate: 1 });
+  static async getLastDueDiligence(supplierId) {
+    const dueDilingences = await this.find({ supplierId }).sort({ createdDate: -1 });
+
+    return dueDilingences.pop();
   }
 
   /**
@@ -146,8 +149,9 @@ class DueDiligence {
     await Companies.update(
       { _id },
       {
-        $set: {
-          isDueDiligenceValidated: false,
+        $unset: {
+          isDueDiligenceValidated: 1,
+          isDueDiligenceEditable: 1,
         },
       },
     );
@@ -164,7 +168,7 @@ class DueDiligence {
       },
     };
 
-    updateQuery.$unset = { isDueDiligenceValidated: 1, recommendations: 1 };
+    updateQuery.$unset = { isDueDiligenceValidated: 1 };
 
     await Companies.update({ _id }, updateQuery);
 
@@ -180,7 +184,7 @@ class DueDiligence {
     const dd = await this.getLastDueDiligence(supplierId);
 
     if (!dd) {
-      await this.create({ supplierId, doc });
+      await this.create({ supplierId, ...doc });
 
       return this.findOne({ supplierId });
     }
@@ -189,6 +193,12 @@ class DueDiligence {
       doc.files = dd.files ? dd.files.concat(doc.files) : doc.files;
 
       doc.fileUploadDate = new Date();
+    }
+
+    const company = await Companies.findOne({ _id: supplierId });
+
+    if (!company.isDueDiligenceValidated) {
+      await Companies.update({ _id: supplierId }, { $set: { isDueDiligenceEditable: true } });
     }
 
     const _id = dd._id;

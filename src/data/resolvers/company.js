@@ -24,7 +24,7 @@ export default {
   },
 
   lastDueDiligence({ _id }) {
-    return DueDiligences.findOne({ supplierId: _id }).sort({ createdDate: 1 });
+    return DueDiligences.getLastDueDiligence(_id);
   },
 
   feedbacks(company) {
