@@ -1256,7 +1256,7 @@ class Company {
    */
   async sendRegistrationInfo() {
     if (this.isDueDiligenceEditable) {
-      await DueDiligences.create({ supplierId: this._id, supplierSubmissionDate: new Date() });
+      await DueDiligences.createDueDiligence(this._id, { supplierSubmissionDate: new Date() });
     }
 
     await this.update({

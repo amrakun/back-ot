@@ -170,6 +170,7 @@ export const LOG_TYPES = {
   QUALIFICATION: 'qualification',
   USER: 'user',
   DESKTOP_AUDIT: 'desktop_audit',
+  DUE_DILIGENCE: 'due_diligence',
 };
 
 export const productsMap = {

@@ -1,5 +1,7 @@
-import { DueDiligences } from '../../../db/models';
+import { DueDiligences, Companies } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
+import { putUpdateLog } from '../../../data/utils';
+import { LOG_TYPES } from '../../constants';
 
 const dueDiligenceMutations = {
   /**
@@ -48,12 +50,32 @@ sections.forEach(section => {
   /**
    * @param {Object} args Object containing subField data
    */
-  dueDiligenceMutations[name] = async (root, args) => {
-    const updated = await DueDiligences.updateSection(
-      args.supplierId,
-      subFieldName,
-      args[subFieldName],
-    );
+  dueDiligenceMutations[name] = async (root, args, { user }) => {
+    const supplierId = args.supplierId;
+
+    const dd = await DueDiligences.getLastDueDiligence(supplierId);
+    const updated = await DueDiligences.updateSection(supplierId, subFieldName, args[subFieldName]);
+
+    if (dd && updated) {
+      const company = await Companies.findOne({ _id: supplierId });
+
+      let companyName = '';
+
+      if (company && company.basicInfo && company.basicInfo.enName) {
+        companyName = company.basicInfo.enName;
+      }
+
+      console.log(LOG_TYPES.DUE_DILIGENCE);
+      putUpdateLog(
+        {
+          type: LOG_TYPES.DUE_DILIGENCE,
+          object: { [subFieldName]: dd[subFieldName] },
+          newData: JSON.stringify({ [subFieldName]: args[subFieldName] }),
+          description: `"${companyName}" has been edited`,
+        },
+        user,
+      );
+    }
 
     return updated;
   };

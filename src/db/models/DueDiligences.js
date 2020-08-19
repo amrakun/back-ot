@@ -54,9 +54,17 @@ export const DueDiligenceSchema = mongoose.Schema({
 
 class DueDiligence {
   static async getLastDueDiligence(supplierId) {
-    const dueDilingences = await this.find({ supplierId }).sort({ createdDate: -1 });
+    const dueDilingences = await this.find({ supplierId }).sort({ createdDate: 1 });
 
     return dueDilingences.pop();
+  }
+  /*
+   * Create die diligence
+   * @param String supplierId - Company id
+   * @return created due diligence
+   */
+  static createDueDiligence(supplierId, doc = {}) {
+    return this.create({ supplierId, ...doc });
   }
 
   /**
@@ -156,7 +164,27 @@ class DueDiligence {
       },
     );
 
-    return Companies.findOne({ _id });
+    const company = await Companies.findOne({ _id });
+
+    if (!company.isDueDiligenceValidated) {
+      const dd = await this.getLastDueDiligence(_id);
+
+      await this.update(
+        { _id: dd._id },
+        {
+          $unset: {
+            basicInfo: 1,
+            shareholderInfo: 1,
+            managementTeamInfo: 1,
+            groupInfo: 1,
+            closeDate: 1,
+            reminderDay: 1,
+          },
+        },
+      );
+    }
+
+    return company;
   }
 
   static async enableRecommendataionState(_id) {
@@ -181,17 +209,12 @@ class DueDiligence {
    * @return updated due diligence
    */
   static async updateDueDiligence(supplierId, doc) {
-    const dd = await this.getLastDueDiligence(supplierId);
-
-    if (!dd) {
-      await this.create({ supplierId, ...doc });
-
-      return this.findOne({ supplierId });
-    }
+    const dd = (await this.getLastDueDiligence(supplierId)) || (await this.create({ supplierId }));
 
     if (doc.files) {
-      doc.files = dd.files ? dd.files.concat(doc.files) : doc.files;
+      const oldFiles = dd.files || [];
 
+      doc.files = oldFiles.concat(doc.files);
       doc.fileUploadDate = new Date();
     }
 
