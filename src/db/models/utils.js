@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import moment from 'moment';
 import crypto from 'crypto';
 import { encryptAes256Ctr } from 'mongoose-field-encryption';
@@ -120,11 +121,41 @@ export const getFieldsBySchema = schema => {
   return filterdNames;
 };
 
+/*
+ *  Generate field with schema
+ */
+export const generateFieldWithNames = (names, schema) => {
+  const definitions = {};
+
+  for (let name of names) {
+    let label = '';
+
+    if (schema) {
+      const paths = schema.paths;
+      const options = (paths && paths[name] && paths[name].options) || {};
+      label = options.label;
+    }
+
+    definitions[name] = field({
+      type: String,
+      optional: true,
+      label: label || name,
+    });
+  }
+
+  return mongoose.Schema(definitions, { _id: false });
+};
+
+// check empty object`s
 export const isEmpty = (input, isParent = false) => {
   const checkObject = obj => {
+    if (!obj) return true;
+
     if (Array.isArray(obj)) {
       return obj.length === 0;
     }
+
+    if (Object.keys(obj).length === 0) return true;
 
     for (let key in obj) {
       if (obj[key]) return false;
@@ -142,6 +173,7 @@ export const isEmpty = (input, isParent = false) => {
   return checkObject(input);
 };
 
+// Generate company search text
 export const generateSearchText = (data = {}) => {
   const { basicInfo = {}, shareholderInfo = {}, contactInfo = {}, managementTeamInfo = {} } = data;
 

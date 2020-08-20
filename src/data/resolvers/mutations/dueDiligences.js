@@ -1,41 +1,149 @@
 import { DueDiligences, Companies } from '../../../db/models';
 import { requireBuyer } from '../../permissions';
-import { putUpdateLog } from '../../../data/utils';
+import { putUpdateLog, putDeleteLog } from '../../../data/utils';
 import { LOG_TYPES } from '../../constants';
+
+// get company name
+const getCompanyName = async supplierId => {
+  const company = await Companies.findOne({ _id: supplierId });
+
+  if (company && company.basicInfo) {
+    const { enName, mnName } = company.basicInfo;
+
+    return enName || mnName;
+  }
+
+  return ' - ';
+};
 
 const dueDiligenceMutations = {
   /**
    *
    * @param {string} args.supplierId Company id
    */
-  async dueDiligencesSave(root, args, { user }) {
-    return DueDiligences.saveDueDiligence(args, user);
+  async dueDiligencesSave(root, { supplierId }, { user }) {
+    const company = await Companies.findOne({ _id: supplierId });
+    const companyName = company.basicInfo && company.basicInfo.enName;
+    const updated = await DueDiligences.saveDueDiligence(supplierId, user);
+
+    putUpdateLog(
+      {
+        type: LOG_TYPES.COMPANY,
+        object: {
+          isDueDiligenceValidated: company.isDueDiligenceValidated,
+        },
+        newData: JSON.stringify({
+          isDueDiligenceValidated: updated.isDueDiligenceValidated,
+        }),
+        description: `Due diligence of company "${companyName}" has been validated`,
+      },
+      user,
+    );
+
+    return updated;
   },
 
   /**
    *
    * @param {string} args.supplierId Company id
    */
-  async dueDiligencesCancel(root, args) {
-    return DueDiligences.cancelDueDiligence(args);
+  async dueDiligencesCancel(root, { supplierId }, { user }) {
+    const company = await Companies.findOne({ _id: supplierId });
+    const companyName = company.basicInfo && company.basicInfo.enName;
+
+    const doc = {
+      isDueDiligenceEditable: company.isDueDiligenceEditable,
+      isDueDiligenceValidated: company.isDueDiligenceValidated,
+    };
+
+    putDeleteLog(
+      {
+        type: LOG_TYPES.COMPANY,
+        object: doc,
+        newData: JSON.stringify(doc),
+        description: `Due diligence of company "${companyName}" has been canceled`,
+      },
+      user,
+    );
+
+    return DueDiligences.cancelDueDiligence(supplierId);
   },
 
   /**
    *
    * @param {string} args.supplierId Company id
    */
-  async dueDiligencesEnableState(root, { supplierId }) {
-    const updatedCompany = await DueDiligences.enableRecommendataionState(supplierId);
+  async dueDiligencesEnableState(root, { supplierId }, { user }) {
+    const company = await Companies.findOne({ _id: supplierId });
+    const updatedCompany = await DueDiligences.enableDueDiligence(supplierId);
+    const companyName = company.basicInfo && company.basicInfo.enName;
+
+    putUpdateLog(
+      {
+        type: LOG_TYPES.COMPANY,
+        object: {
+          isDueDiligenceEditable: company.isDueDiligenceEditable,
+          isDueDiligenceValidated: company.isDueDiligenceValidated,
+        },
+        newData: JSON.stringify({
+          isDueDiligenceEditable: updatedCompany.isDueDiligenceEditable,
+          isDueDiligenceValidated: updatedCompany.isDueDiligenceValidated,
+        }),
+        description: `Due diligence of company "${companyName}" has been enabled`,
+      },
+      user,
+    );
 
     return updatedCompany;
   },
 
-  async dueDiligencesUpdate(root, { supplierId, ...doc }) {
-    return DueDiligences.updateDueDiligence(supplierId, doc);
+  async dueDiligencesUpdate(root, { supplierId, ...doc }, { user }) {
+    const dd = await DueDiligences.getLastDueDiligence(supplierId);
+    const updated = await DueDiligences.updateDueDiligence(supplierId, doc);
+    const companyName = await getCompanyName(supplierId);
+
+    const oldData = {};
+    Object.keys(doc).map(key => {
+      oldData[key] = dd[key];
+    });
+
+    putUpdateLog(
+      {
+        type: LOG_TYPES.DUE_DILIGENCE,
+        object: oldData,
+        newData: JSON.stringify(doc),
+        description: `"${companyName}" company has been edited`,
+      },
+      user,
+    );
+
+    return updated;
   },
 
-  async dueDiligencesRemoveRisk(root, { supplierId }) {
-    return DueDiligences.removeRisk(supplierId);
+  async dueDiligencesRemoveRisk(root, { supplierId }, { user }) {
+    const dd = await DueDiligences.getLastDueDiligence(supplierId);
+    const updated = await DueDiligences.removeRisk(supplierId);
+    const companyName = await getCompanyName(supplierId);
+
+    const oldScoreDoc = {
+      risk: dd.risk,
+      fileUploadDate: dd.fileUploadDate,
+    };
+
+    putDeleteLog(
+      {
+        type: LOG_TYPES.DUE_DILIGENCE,
+        object: oldScoreDoc,
+        newData: JSON.stringify({
+          risk: updated.risk,
+          fileUploadDate: updated.fileUploadDate,
+        }),
+        description: `"${companyName}" company has clear risk value`,
+      },
+      user,
+    );
+
+    return updated;
   },
 };
 
@@ -57,15 +165,8 @@ sections.forEach(section => {
     const updated = await DueDiligences.updateSection(supplierId, subFieldName, args[subFieldName]);
 
     if (dd && updated) {
-      const company = await Companies.findOne({ _id: supplierId });
+      const companyName = await getCompanyName(supplierId);
 
-      let companyName = '';
-
-      if (company && company.basicInfo && company.basicInfo.enName) {
-        companyName = company.basicInfo.enName;
-      }
-
-      console.log(LOG_TYPES.DUE_DILIGENCE);
       putUpdateLog(
         {
           type: LOG_TYPES.DUE_DILIGENCE,

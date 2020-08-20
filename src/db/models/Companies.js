@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
-import { field, generateSearchText } from './utils';
+import { field, generateSearchText, generateFieldWithNames } from './utils';
 import { Users, Feedbacks, BlockedCompanies, DueDiligences } from './';
-import { TIER_TYPES } from './constants';
-import { SearchTextSchema } from './DueDiligences';
+import {
+  TIER_TYPES,
+  searchFieldNames,
+  basicInfoFieldNames,
+  groupInfoFieldNames,
+} from './constants';
 
 export const FileSchema = mongoose.Schema(
   {
@@ -13,7 +17,7 @@ export const FileSchema = mongoose.Schema(
 );
 
 // basic info ===========
-const BasicInfoSchema = mongoose.Schema(
+export const BasicInfoSchema = mongoose.Schema(
   {
     enName: field({
       type: String,
@@ -127,7 +131,7 @@ const BasicInfoSchema = mongoose.Schema(
 );
 
 // contact info ==================
-const ContactInfoSchema = mongoose.Schema(
+export const ContactInfoSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Full name' }),
     jobTitle: field({ type: String, optional: true, label: 'Job title' }),
@@ -146,7 +150,7 @@ const ContactInfoSchema = mongoose.Schema(
 );
 
 // management team ================
-const PersonSchema = mongoose.Schema(
+export const PersonSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Full name' }),
     jobTitle: field({ type: String, label: 'Job title' }),
@@ -182,7 +186,7 @@ const ManagementTeamInfoSchema = mongoose.Schema(
 );
 
 // shareholder information =========
-const ShareholderSchema = mongoose.Schema(
+export const ShareholderSchema = mongoose.Schema(
   {
     type: field({ type: String, label: 'Type' }),
     firstName: field({ type: String, label: 'First name' }),
@@ -217,7 +221,7 @@ const FactorySchema = mongoose.Schema(
   { _id: false },
 );
 
-const GroupInfoSchema = mongoose.Schema(
+export const GroupInfoSchema = mongoose.Schema(
   {
     hasParent: field({
       type: Boolean,
@@ -978,7 +982,7 @@ const CompanySchema = mongoose.Schema({
     label: 'Is due diligence information editable',
   }),
 
-  searchText: SearchTextSchema,
+  searchText: generateFieldWithNames(searchFieldNames),
 });
 
 class Company {
@@ -1157,6 +1161,23 @@ class Company {
 
     if (preqTabs.includes(key.replace('Info', '')) && !editable) {
       throw new Error('Changes disabled');
+    }
+
+    // disabled fields of due diligence
+    if (!company.isDueDiligenceEditable) {
+      let replaceFieldNames;
+
+      if (key === 'basicInfo') replaceFieldNames = basicInfoFieldNames;
+      if (key === 'groupInfo') replaceFieldNames = groupInfoFieldNames;
+      if (key === 'shareholderInfo') replaceFieldNames = ['shareholders'];
+      if (key === 'managementTeamInfo')
+        replaceFieldNames = ['managingDirector', 'executiveOfficer'];
+
+      if (replaceFieldNames) {
+        replaceFieldNames.forEach(name => {
+          value[name] = company[key][name];
+        });
+      }
     }
 
     const searchText = generateSearchText({ ...company.toJSON(), [key]: value });
