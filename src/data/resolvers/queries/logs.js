@@ -22,6 +22,7 @@ import { QualificationSchema } from '../../../db/models/Qualifications';
 import { tenderMessageSchema, attachmentSchema } from '../../../db/models/TenderMessages';
 import { TenderRelatedSchemas } from '../../../db/models/Tenders';
 import { UserSchema } from '../../../db/models/Users';
+import { DueDiligenceSchema } from '../../../db/models/DueDiligences';
 
 // Used to show field labels in action log
 const mappings = [
@@ -52,6 +53,10 @@ const mappings = [
   {
     name: LOG_TYPES.USER,
     schemas: [UserSchema],
+  },
+  {
+    name: LOG_TYPES.DUE_DILIGENCE,
+    schemas: [DueDiligenceSchema],
   },
 ];
 

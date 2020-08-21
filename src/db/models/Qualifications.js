@@ -10,7 +10,7 @@ import {
 
 import { Configs, Companies } from './';
 
-const generateFields = schema => {
+export const generateFields = (schema, type = Boolean) => {
   const names = getFieldsBySchema(schema);
 
   const definitions = {};
@@ -19,7 +19,7 @@ const generateFields = schema => {
     const options = schema.paths[name].options;
 
     definitions[name] = field({
-      type: Boolean,
+      type,
       optional: options.optional || false,
       label: options.label,
     });
