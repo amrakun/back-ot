@@ -164,8 +164,11 @@ export const companyDocs = {
   shareholder: () => {
     const generateShareholderDoc = () => {
       return {
-        name: `${Math.random()}name`,
+        type: `${Math.random()}type`,
+        firstName: `${Math.random()}firstname`,
+        lastName: `${Math.random()}lastname`,
         jobTitle: `${Math.random()}jobTitle`,
+        companyName: `${Math.random()}companyName`,
         percentage: 10,
       };
     };

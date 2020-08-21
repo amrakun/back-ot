@@ -135,7 +135,7 @@ class Qualification {
   static async prequalify(supplierId, status) {
     const company = await Companies.findOne({ _id: supplierId });
 
-    if (company.isDueDiligenceValidated !== true) {
+    if (company.isDueDiligenceValidated === true) {
       throw Error('Not due diligence');
     }
 

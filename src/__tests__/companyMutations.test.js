@@ -70,11 +70,10 @@ describe('Company mutations', () => {
       }
     };
 
-    expect.assertions(4);
+    expect.assertions(3);
 
     const mutations = [
       'companiesAddDifotScores',
-      'companiesAddDueDiligences',
       'companiesValidateProductsInfo',
       'companiesTogglePrequalificationState',
     ];
@@ -287,51 +286,6 @@ describe('Company mutations', () => {
 
     expect(updatedSup2.difotScores.length).toBe(1);
     expect(updatedSup2.averageDifotScore).toBe(11);
-  });
-
-  test('add due diligence', async () => {
-    const user = await userFactory({ companyId: _company._id });
-
-    const supplier = await companyFactory({
-      dueDiligences: [
-        {
-          date: new Date(),
-          file: { name: 'name', url: '/path1' },
-          expireDate: new Date(),
-          createdUserId: user._id,
-        },
-      ],
-    });
-
-    const mutation = `
-      mutation companiesAddDueDiligences($dueDiligences: [CompanyDueDiligenceInput]!) {
-        companiesAddDueDiligences(dueDiligences: $dueDiligences) {
-          _id
-        }
-      }
-    `;
-
-    const context = { user };
-
-    const dueDiligences = [
-      {
-        supplierId: supplier._id,
-        file: { url: '/path2' },
-        expireDate: new Date(),
-      },
-    ];
-
-    await graphqlRequest(mutation, 'companiesAddDueDiligences', { dueDiligences }, context);
-
-    const updatedSupplier = await Companies.findOne({ _id: supplier._id });
-
-    expect(updatedSupplier.dueDiligences.length).toBe(2);
-
-    const lastDueDiligence = updatedSupplier.getLastDueDiligence();
-
-    expect(lastDueDiligence.file.url).toBe('/path2');
-    expect(lastDueDiligence.expireDate).toBeDefined();
-    expect(lastDueDiligence.createdUserId).toBeDefined();
   });
 
   test('validate products info', async () => {

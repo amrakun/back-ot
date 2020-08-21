@@ -232,6 +232,8 @@ const auditMutations = {
         });
       }
 
+      console.log(audit);
+
       // send notification to supplier ==============
       await sendEmail({
         kind: response.isQualified ? 'supplier__approved' : 'supplier__failed',

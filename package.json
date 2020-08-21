@@ -34,7 +34,7 @@
   "dependencies": {
     "amqplib": "^0.5.5",
     "aws-sdk": "^2.373.0",
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.17.1",
     "cellref": "^3.0.0",
     "clamav.js": "^0.12.0",
