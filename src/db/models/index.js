@@ -5,6 +5,7 @@ import { Tenders, TenderResponses } from './Tenders';
 import { Feedbacks, FeedbackResponses } from './Feedbacks';
 import BlockedCompanies from './BlockedCompanies';
 import Qualifications from './Qualifications';
+import DueDiligences from './DueDiligences';
 import { Audits, AuditResponses, PhysicalAudits } from './Audits';
 import Configs from './Configs';
 import {
@@ -36,4 +37,5 @@ export {
   SuppliersByProductCodeLogs,
   ActivityLogs,
   TenderMessages,
+  DueDiligences,
 };

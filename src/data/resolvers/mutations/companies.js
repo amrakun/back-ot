@@ -91,15 +91,6 @@ const companyMutations = {
     }
   },
 
-  async companiesAddDueDiligences(root, { dueDiligences }, { user }) {
-    for (let dueDiligence of dueDiligences) {
-      const company = await Companies.findOne({ _id: dueDiligence.supplierId });
-
-      // add new due diligence report to every supplier
-      await company.addDueDiligence(dueDiligence, user);
-    }
-  },
-
   /**
    *
    * @param {string} args._id Company id
@@ -348,7 +339,6 @@ requireSupplier(companyMutations, 'companiesSendPrequalificationInfo');
 requireSupplier(companyMutations, 'companiesSkipPrequalification');
 
 requireBuyer(companyMutations, 'companiesAddDifotScores');
-requireBuyer(companyMutations, 'companiesAddDueDiligences');
 requireBuyer(companyMutations, 'companiesValidateProductsInfo');
 requireBuyer(companyMutations, 'companiesTogglePrequalificationState');
 

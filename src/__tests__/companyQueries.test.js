@@ -75,17 +75,7 @@ describe('Company queries', () => {
           justification
           personName
         }
-
-        dueDiligences {
-          date
-          expireDate
-          file
-          createdUserId
-
-          createdUser {
-            _id
-          }
-        }
+        
 
         difotScores {
           date

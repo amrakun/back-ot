@@ -1,4 +1,10 @@
-import { Companies, BlockedCompanies, Qualifications, SearchLogs } from '../../../db/models';
+import {
+  Companies,
+  BlockedCompanies,
+  Qualifications,
+  SearchLogs,
+  DueDiligences,
+} from '../../../db/models';
 
 import { paginate } from './utils';
 import { requireBuyer, requireSupplier } from '../../permissions';
@@ -23,10 +29,14 @@ const companiesFilter = async args => {
     includeBlocked,
     prequalifiedStatus,
     qualifiedStatus,
+    dueDiligenceStatus,
     productsInfoStatus,
     difotScore,
     region,
     source,
+    searchValue,
+    fieldNames,
+    dueDiligenceRisk,
   } = args;
 
   const selector = {
@@ -44,12 +54,30 @@ const companiesFilter = async args => {
     selector.isSentPrequalificationInfo = true;
   }
 
+  selector._id = {};
+
   // main filter
-  if (search) {
+  if (fieldNames && searchValue) {
+    const names = fieldNames.split(',');
+    const searchSelector = [];
+
+    names.forEach(name => {
+      searchSelector.push({
+        [`searchText.${name}`]: new RegExp(`.*${searchValue}.*`, 'i'),
+      });
+    });
+
+    const companyIds = await DueDiligences.companyIds({ $or: searchSelector });
+    if (companyIds.length > 0) searchSelector.push({ _id: { $in: companyIds } });
+
+    selector.$or = searchSelector;
+  } else if (search) {
+    const regex = new RegExp(`.*${search}.*`, 'i');
+
     selector.$or = [
-      { 'basicInfo.mnName': new RegExp(`.*${search}.*`, 'i') },
-      { 'basicInfo.enName': new RegExp(`.*${search}.*`, 'i') },
-      { 'basicInfo.sapNumber': new RegExp(`.*${search}.*`, 'i') },
+      { 'basicInfo.mnName': regex },
+      { 'basicInfo.enName': regex },
+      { 'basicInfo.sapNumber': regex },
     ];
   }
 
@@ -88,11 +116,14 @@ const companiesFilter = async args => {
     selector.averageDifotScore = { $gte: min, $lte: max };
   }
 
-  selector._id = {};
-
   // ids filter
   if (_ids) {
     selector._id.$in = _ids;
+  }
+
+  // by due diligence risk
+  if (dueDiligenceRisk) {
+    selector._id.$in = await DueDiligences.companyIds({ risk: dueDiligenceRisk });
   }
 
   // include blocked
@@ -122,6 +153,9 @@ const companiesFilter = async args => {
   // by qualified status
   checkStatus(qualifiedStatus, 'isQualified');
 
+  // by due diligence status
+  checkStatus(dueDiligenceStatus, 'isDueDiligenceValidated');
+
   // remove emtpy selector
   if (Object.keys(selector._id).length === 0) {
     delete selector._id;
@@ -143,7 +177,20 @@ const companyQueries = {
       SearchLogs.createLog(user._id);
     }
 
-    return paginate(Companies.find(selector).sort({ createdDate: -1 }), args);
+    const { fieldNames, sortDirection } = args;
+    const sortParams = {};
+
+    if (fieldNames && sortDirection) {
+      const names = fieldNames.split(',');
+
+      names.forEach(name => {
+        sortParams[name] = sortDirection;
+      });
+    } else {
+      sortParams.createdDate = -1;
+    }
+
+    return paginate(Companies.find(selector).sort(sortParams), args);
   },
 
   /**

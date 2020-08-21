@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { BlockedCompanies, Qualifications, Users } from '../../../db/models';
+import { BlockedCompanies, Qualifications, Users, DueDiligences } from '../../../db/models';
 import { readTemplate, generateXlsx } from '../../utils';
 
 /**
@@ -150,6 +150,12 @@ export const companiesGenerateDueDiligenceList = async (user, companies) => {
   // read template
   const { workbook, sheet } = await readTemplate('suppliers_due_diligence');
 
+  const generateDate = date => {
+    if (!date) return;
+
+    return new Date(date).toLocaleDateString();
+  };
+
   let rowIndex = 1;
 
   for (let company of companies) {
@@ -158,22 +164,28 @@ export const companiesGenerateDueDiligenceList = async (user, companies) => {
     const basicInfo = company.basicInfo || {};
     const contactInfo = company.contactInfo || {};
 
-    const lastDueDiligence = company.getLastDueDiligence();
+    const lastDueDiligence = await DueDiligences.getLastDueDiligence(company._id);
 
     sheet.cell(rowIndex, 1).value(basicInfo.enName);
     sheet.cell(rowIndex, 2).value(basicInfo.sapNumber);
     sheet.cell(rowIndex, 3).value(company.tierType);
 
-    sheet.cell(rowIndex, 4).value(lastDueDiligence ? 'YES' : 'NO');
+    sheet.cell(rowIndex, 4).value(company.dueDiligenceStatusDisplay());
+    sheet.cell(rowIndex, 5).value(company.prequalificationStatusDisplay());
+
+    sheet.cell(rowIndex, 6).value(contactInfo.name);
+    sheet.cell(rowIndex, 7).value(contactInfo.email);
+    sheet.cell(rowIndex, 8).value(contactInfo.phone);
 
     if (lastDueDiligence) {
-      sheet.cell(rowIndex, 5).value(lastDueDiligence.file.url);
-      sheet.cell(rowIndex, 6).value(new Date(lastDueDiligence.date).toLocaleDateString());
-    }
+      const { date, closeDate, supplierSubmissionDate, fileUploadDate, risk } = lastDueDiligence;
 
-    sheet.cell(rowIndex, 7).value('');
-    sheet.cell(rowIndex, 8).value(contactInfo.email);
-    sheet.cell(rowIndex, 9).value(contactInfo.phone);
+      sheet.cell(rowIndex, 9).value(generateDate(date));
+      sheet.cell(rowIndex, 10).value(generateDate(closeDate));
+      sheet.cell(rowIndex, 11).value(generateDate(supplierSubmissionDate));
+      sheet.cell(rowIndex, 13).value(generateDate(fileUploadDate));
+      sheet.cell(rowIndex, 14).value(risk);
+    }
   }
 
   // Write to file.

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { field } from './utils';
+import { field, getFieldsBySchema } from './utils';
 import {
   FinancialInfoSchema,
   BusinessInfoSchema,
@@ -10,25 +10,7 @@ import {
 
 import { Configs, Companies } from './';
 
-/*
- * Get all possible fields for given schema
- */
-const getFieldsBySchema = schema => {
-  const filterdNames = [];
-  const names = Object.keys(schema.paths);
-
-  for (let name of names) {
-    const options = schema.paths[name].options;
-
-    if (options.qualifiable !== false) {
-      filterdNames.push(name);
-    }
-  }
-
-  return filterdNames;
-};
-
-const generateFields = schema => {
+export const generateFields = (schema, type = Boolean) => {
   const names = getFieldsBySchema(schema);
 
   const definitions = {};
@@ -37,7 +19,7 @@ const generateFields = schema => {
     const options = schema.paths[name].options;
 
     definitions[name] = field({
-      type: Boolean,
+      type,
       optional: options.optional || false,
       label: options.label,
     });
@@ -151,6 +133,12 @@ class Qualification {
    * @return - Updated supplier
    */
   static async prequalify(supplierId, status) {
+    const company = await Companies.findOne({ _id: supplierId });
+
+    if (company.isDueDiligenceValidated === true) {
+      throw Error('Not due diligence');
+    }
+
     // update supplier's tier type
     await Companies.update(
       { _id: supplierId },

@@ -12,6 +12,7 @@ import configs from './configs';
 import massMails from './massMails';
 import logs from './logs';
 import TenderMessage from './tenderMessages';
+import DueDiligence from './dueDiligences';
 
 export default {
   ...companies,
@@ -28,4 +29,5 @@ export default {
   ...massMails,
   ...logs,
   ...TenderMessage,
+  ...DueDiligence,
 };

@@ -5,6 +5,7 @@ import {
   Audits,
   AuditResponses,
   Users,
+  DueDiligences,
 } from '../../db/models';
 
 import { tendersSupplierFilter } from './queries/tenders';
@@ -22,8 +23,8 @@ export default {
     return company.getLastDifotScore();
   },
 
-  lastDueDiligence(company) {
-    return company.getLastDueDiligence();
+  lastDueDiligence({ _id }) {
+    return DueDiligences.getLastDueDiligence(_id);
   },
 
   feedbacks(company) {

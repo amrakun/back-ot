@@ -48,8 +48,11 @@ const personFields = `
 `;
 
 const shareholderFields = `
-  name: String
+  type: String
+  firstName: String
+  lastName: String
   jobTitle: String
+  companyName: String
   percentage: Float
   attachments: [JSON]
 `;
@@ -341,20 +344,7 @@ export const types = `
     ${difotScoreFields}
   }
 
-  type CompanyDueDiligence {
-    date: Date
-    expireDate: Date
-    file: JSON
-    createdUserId: String
-    createdUser: User
-  }
-
-  input CompanyDueDiligenceInput {
-    supplierId: String!
-    file: JSON!
-    expireDate: Date!
-  }
-
+  # main type =============================
   type Company {
     _id: String!
     basicInfo: CompanyBasicInfo
@@ -394,7 +384,6 @@ export const types = `
 
     productsInfoValidations: [CompanyProductsInfoValidation]
     difotScores: [CompanyDifotScore]
-    dueDiligences: [CompanyDueDiligence]
     feedbacks: [Feedback]
 
     owner: User
@@ -414,6 +403,10 @@ export const types = `
     audits: [Audit]
 
     qualificationState: JSON
+
+    dueDiligenceStatusDisplay: String
+    isDueDiligenceEditable: Boolean
+    isDueDiligenceValidated: Boolean
   }
 `;
 
@@ -433,6 +426,10 @@ const queryParams = `
   sortDirection: Int,
   source: String,
   _ids: [String],
+  dueDiligenceRisk: String,
+  dueDiligenceStatus: String,
+  searchValue: String,
+  fieldNames: String,
 `;
 
 export const queries = `
@@ -488,7 +485,6 @@ export const mutations = `
 
   companiesEditHealthInfo(healthInfo: CompanyHealthInfoInput): Company
   companiesAddDifotScores(difotScores: [CompanyDifotScoreInput]!): Company
-  companiesAddDueDiligences(dueDiligences: [CompanyDueDiligenceInput]!): Company
 
   companiesValidateProductsInfo(
     _id: String!

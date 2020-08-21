@@ -62,6 +62,12 @@ import {
   mutations as TenderMessageMutations,
 } from './tenderMessage';
 
+import {
+  types as DueDiligenceTypes,
+  queries as DueDiligenceQueries,
+  mutations as DueDiligenceMutations,
+} from './dueDiligence';
+
 export const types = `
   scalar JSON
   scalar Date
@@ -80,6 +86,7 @@ export const types = `
   ${PermissionTypes}
   ${TenderMessageTypes}
   ${LogTypes}
+  ${DueDiligenceTypes}
 `;
 
 export const queries = `
@@ -98,6 +105,7 @@ export const queries = `
     ${PermissionQueries}
     ${LogQueries}
     ${TenderMessageQueries}
+    ${DueDiligenceQueries}
   }
 `;
 
@@ -115,5 +123,6 @@ export const mutations = `
     ${MassMailMutations}
     ${LogMutations}
     ${TenderMessageMutations}
+    ${DueDiligenceMutations}
   }
 `;

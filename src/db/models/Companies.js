@@ -1,9 +1,14 @@
 import mongoose from 'mongoose';
-import { field } from './utils';
-import { Users, Feedbacks, BlockedCompanies } from './';
-import { TIER_TYPES } from './constants';
+import { field, generateSearchText, generateFieldWithNames } from './utils';
+import { Users, Feedbacks, BlockedCompanies, DueDiligences } from './';
+import {
+  TIER_TYPES,
+  searchFieldNames,
+  basicInfoFieldNames,
+  groupInfoFieldNames,
+} from './constants';
 
-const FileSchema = mongoose.Schema(
+export const FileSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Name' }),
     url: field({ type: String, label: 'File url' }),
@@ -12,7 +17,7 @@ const FileSchema = mongoose.Schema(
 );
 
 // basic info ===========
-const BasicInfoSchema = mongoose.Schema(
+export const BasicInfoSchema = mongoose.Schema(
   {
     enName: field({
       type: String,
@@ -126,7 +131,7 @@ const BasicInfoSchema = mongoose.Schema(
 );
 
 // contact info ==================
-const ContactInfoSchema = mongoose.Schema(
+export const ContactInfoSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Full name' }),
     jobTitle: field({ type: String, optional: true, label: 'Job title' }),
@@ -145,7 +150,7 @@ const ContactInfoSchema = mongoose.Schema(
 );
 
 // management team ================
-const PersonSchema = mongoose.Schema(
+export const PersonSchema = mongoose.Schema(
   {
     name: field({ type: String, label: 'Full name' }),
     jobTitle: field({ type: String, label: 'Job title' }),
@@ -181,10 +186,13 @@ const ManagementTeamInfoSchema = mongoose.Schema(
 );
 
 // shareholder information =========
-const ShareholderSchema = mongoose.Schema(
+export const ShareholderSchema = mongoose.Schema(
   {
-    name: field({ type: String, label: 'Name' }),
+    type: field({ type: String, label: 'Type' }),
+    firstName: field({ type: String, label: 'First name' }),
+    lastName: field({ type: String, label: 'Last name' }),
     jobTitle: field({ type: String, label: 'Job title' }),
+    companyName: field({ type: String, label: 'Company name' }),
     percentage: field({ type: Number, label: 'Share percentage (%)' }),
   },
   { _id: false },
@@ -213,7 +221,7 @@ const FactorySchema = mongoose.Schema(
   { _id: false },
 );
 
-const GroupInfoSchema = mongoose.Schema(
+export const GroupInfoSchema = mongoose.Schema(
   {
     hasParent: field({
       type: Boolean,
@@ -815,16 +823,6 @@ const DateAmountSchema = mongoose.Schema(
   { _id: false },
 );
 
-const DueDiligenceSchema = mongoose.Schema(
-  {
-    date: field({ type: String, label: 'Date' }),
-    file: field({ type: FileSchema, label: 'File', optional: true }),
-    createdUserId: field({ type: String, label: 'Created user' }),
-    expireDate: field({ type: String, label: 'Expire date' }),
-  },
-  { _id: false },
-);
-
 const ProductsInfoValidation = mongoose.Schema(
   {
     date: field({ type: String, label: 'Date' }),
@@ -966,11 +964,25 @@ const CompanySchema = mongoose.Schema({
     optional: true,
     label: 'Product information validations',
   }),
-  dueDiligences: field({ type: [DueDiligenceSchema], optional: true, label: 'Due diligences' }),
   difotScores: field({ type: [DateAmountSchema], optional: true, label: 'Difot scores' }),
   averageDifotScore: field({ type: Number, optional: true, label: 'Average difot score' }),
 
   isDeleted: field({ type: Boolean, default: false }),
+
+  isDueDiligenceValidated: field({
+    type: Boolean,
+    optional: true,
+    label: 'Is due diligence validated',
+  }),
+
+  isDueDiligenceEditable: field({
+    type: Boolean,
+    optional: true,
+    default: true,
+    label: 'Is due diligence information editable',
+  }),
+
+  searchText: generateFieldWithNames(searchFieldNames),
 });
 
 class Company {
@@ -998,14 +1010,6 @@ class Company {
   getLastDifotScore() {
     return this.sortAndGetLast('difotScores');
   }
-
-  /*
-   * Sort by date and get last entry from dueDilgences
-   */
-  getLastDueDiligence() {
-    return this.sortAndGetLast('dueDiligences');
-  }
-
   /*
    * Get feedbacks that this supplier can see
    */
@@ -1159,8 +1163,27 @@ class Company {
       throw new Error('Changes disabled');
     }
 
+    // disabled fields of due diligence
+    if (!company.isDueDiligenceEditable) {
+      let replaceFieldNames;
+
+      if (key === 'basicInfo') replaceFieldNames = basicInfoFieldNames;
+      if (key === 'groupInfo') replaceFieldNames = groupInfoFieldNames;
+      if (key === 'shareholderInfo') replaceFieldNames = ['shareholders'];
+      if (key === 'managementTeamInfo')
+        replaceFieldNames = ['managingDirector', 'executiveOfficer'];
+
+      if (replaceFieldNames) {
+        replaceFieldNames.forEach(name => {
+          value[name] = company[key][name];
+        });
+      }
+    }
+
+    const searchText = generateSearchText({ ...company.toJSON(), [key]: value });
+
     // update
-    await this.update({ _id }, { $set: { [key]: value } });
+    await this.update({ _id }, { $set: { [key]: value, searchText } });
 
     // if updating products info then reset validated status
     if (key === 'productsInfo') {
@@ -1218,27 +1241,6 @@ class Company {
   }
 
   /*
-   * Add new due diligence report
-   * @param {String} file - File path
-   * @return updated company
-   */
-  async addDueDiligence({ file, expireDate }, user) {
-    const dueDiligences = this.dueDiligences || [];
-
-    dueDiligences.push({
-      date: new Date(),
-      file,
-      expireDate,
-      createdUserId: user._id,
-    });
-
-    // update field
-    await this.update({ dueDiligences });
-
-    return Companies.findOne({ _id: this._id });
-  }
-
-  /*
    * Validate product codes
    * @param [String] codes - Product codes to validate
    * @return updated company
@@ -1274,7 +1276,15 @@ class Company {
    * Mark as sent registration info
    */
   async sendRegistrationInfo() {
-    await this.update({ isSentRegistrationInfo: true, registrationInfoSentDate: new Date() });
+    if (this.isDueDiligenceEditable) {
+      await DueDiligences.createDueDiligence(this._id, { supplierSubmissionDate: new Date() });
+    }
+
+    await this.update({
+      isSentRegistrationInfo: true,
+      registrationInfoSentDate: new Date(),
+      isDueDiligenceEditable: false,
+    });
 
     return Companies.findOne({ _id: this._id });
   }
@@ -1380,6 +1390,14 @@ class Company {
     return this.isProductsInfoValidated ? 'Validated' : 'Not-validated';
   }
 
+  dueDiligenceStatusDisplay() {
+    if (typeof this.isDueDiligenceValidated === 'undefined') {
+      return 'In process';
+    }
+
+    return this.isDueDiligenceValidated ? 'Verified' : 'Verification failed';
+  }
+
   async isBlocked() {
     const isBlocked = await BlockedCompanies.isBlocked(this._id);
 
@@ -1483,7 +1501,6 @@ export const CompanyRelatedSchemas = [
   BusinessInfoSchema,
   EnvironmentalInfoSchema,
   HealthInfoSchema,
-  DueDiligenceSchema,
   ProductsInfoValidation,
   CompanySchema,
   DateAmountSchema,

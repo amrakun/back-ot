@@ -32,6 +32,11 @@ export const types = `
     specific: ConfigSuppliersDurationAmount
   }
 
+  input ConfigDueDiligenceDowInput {
+    common: ConfigDurationAmount!
+    specific: ConfigSuppliersDurationAmount
+  }
+
   input ConfigAuditDowInput {
     common: ConfigDurationAmount!
     specific: ConfigSuppliersDurationAmount
@@ -59,9 +64,13 @@ export const types = `
     blockTemplates: JSON
     prequalificationTemplates: JSON
     desktopAuditTemplates: JSON
+    dueDiligenceTemplates: JSON
 
     prequalificationDow: JSON
     specificPrequalificationDow: JSON
+
+    dueDiligenceDow: JSON
+    specificDueDiligenceDow: JSON
 
     auditDow: JSON
     specificAuditDow: JSON
@@ -89,6 +98,7 @@ export const mutations = `
   ): Config
 
   configsSavePrequalificationDow(doc: ConfigPrequalificationDowInput!): Config
+  configsSaveDueDiligenceDow(doc: ConfigDueDiligenceDowInput!): Config
   configsSaveAuditDow(doc: ConfigAuditDowInput!): Config
   configsSaveImprovementPlanDow(doc: ConfigImprovementPlanDowInput!): Config
 `;

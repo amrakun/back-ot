@@ -315,35 +315,6 @@ describe('Companies model tests', () => {
     expect(score2.amount).toBe(11);
   });
 
-  test('Add due dilingence', async () => {
-    const user = await userFactory({});
-    const company = await Companies.findOne({ _id: _company._id });
-
-    let updatedCompany = await company.addDueDiligence(
-      { file: { url: '/path1' }, expireDate: new Date() },
-      user,
-    );
-
-    updatedCompany = await company.addDueDiligence(
-      { file: { url: '/path2' }, expireDate: new Date() },
-      user,
-    );
-
-    expect(updatedCompany.dueDiligences.length).toBe(2);
-
-    const [diligence1, diligence2] = updatedCompany.dueDiligences;
-
-    expect(diligence1.date).toBeDefined();
-    expect(diligence1.expireDate).toBeDefined();
-    expect(diligence1.file.url).toBe('/path1');
-    expect(diligence1.createdUserId).toBeDefined();
-
-    expect(diligence2.date).toBeDefined();
-    expect(diligence2.expireDate).toBeDefined();
-    expect(diligence2.file.url).toBe('/path2');
-    expect(diligence2.createdUserId).toBeDefined();
-  });
-
   test('Validate product info', async () => {
     expect.assertions(14);
 

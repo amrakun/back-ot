@@ -30,6 +30,15 @@ const configMutations = {
     return response;
   },
 
+  // save due diligence duration of warranty
+  async configsSaveDueDiligenceDow(root, { doc }) {
+    const response = await Configs.saveDueDiligenceDow(doc);
+
+    resetConfigCache();
+
+    return response;
+  },
+
   // save audit duration of warranty
   async configsSaveAuditDow(root, { doc }) {
     const response = await Configs.saveAuditDow(doc);
