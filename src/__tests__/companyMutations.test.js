@@ -57,7 +57,7 @@ describe('Company mutations', () => {
     const user = await userFactory();
 
     for (let mutation of mutations) {
-      checkLogin(companyMutations[mutation], {}, { user });
+      await checkLogin(companyMutations[mutation], {}, { user });
     }
   });
 

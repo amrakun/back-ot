@@ -23,6 +23,7 @@ const dueDiligenceMutations = {
    */
   async dueDiligencesSave(root, { supplierId }, { user }) {
     const company = await Companies.findOne({ _id: supplierId });
+
     const companyName = company.basicInfo && company.basicInfo.enName;
     const updated = await DueDiligences.saveDueDiligence(supplierId, user);
 

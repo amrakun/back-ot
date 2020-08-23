@@ -319,7 +319,7 @@ class DueDiligence {
    * @return - Updated supplier
    */
   static async resetDueDiligence(supplierId) {
-    const lastDueDiligence = this.getLastDueDiligence(supplierId) || {};
+    const lastDueDiligence = (await this.getLastDueDiligence(supplierId)) || {};
     const supplierSubmissionDate = lastDueDiligence.supplierSubmissionDate;
 
     // ignore not supplier submission
