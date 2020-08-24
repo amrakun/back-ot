@@ -19,6 +19,7 @@ describe('Due Diligence model test', () => {
 
     return doc;
   };
+
   test('Create Due Diligence Check', async () => {
     const date = new Date();
     const supplierIds = ['id1'];
@@ -55,10 +56,13 @@ describe('Due Diligence model test', () => {
     const doc = generateDoc(FinancialInfoSchema);
 
     const checkUpdateSection = await DueDiligences.updateSection(supplierIds, 'basicInfo', doc);
+
     expect(checkUpdateSection).toBeDefined();
+    expect(checkUpdateSection.Date).toBe(dueDiligence2.date);
   });
 
   test('Save and Cancel', async () => {
+    const date = new Date();
     const user = await userFactory({});
     const company = await Companies.createCompany(user._id, {
       basicInfo: { enName: 'enName ', mnName: 'mnName ' },
@@ -66,18 +70,21 @@ describe('Due Diligence model test', () => {
     const supplierIds = company._id;
 
     const dueDiligence = await DueDiligences.createDueDiligence(supplierIds, {
-      date: new Date(),
+      date: date,
       files: { name: 'hello', url: 'asdf' },
     });
 
     const dueDiligence2 = await DueDiligences.createDueDiligence(supplierIds, {
-      date: new Date(),
+      date: date,
       files: { name: 'amra', url: 'jrgl' },
     });
 
     const cancelDueDiligence = await DueDiligences.cancelDueDiligence(supplierIds);
     const saveDueDiligence = await DueDiligences.saveDueDiligence(supplierIds, company);
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
+    expect(saveDueDiligence.basicInfo).toBe(company.basicInfo);
     expect(saveDueDiligence).toBeDefined();
     expect(cancelDueDiligence).toBeDefined();
   });
@@ -105,6 +112,8 @@ describe('Due Diligence model test', () => {
 
     const update = await DueDiligences.enableDueDiligence(supplierIds, { doc });
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
     expect(enable).toBeDefined();
     expect(update).toBeDefined();
   });
@@ -128,6 +137,8 @@ describe('Due Diligence model test', () => {
 
     const removeRisk = await DueDiligences.removeRisk(supplierIds);
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
     expect(removeRisk).toBeDefined();
   });
 
@@ -154,6 +165,8 @@ describe('Due Diligence model test', () => {
 
     const companyIds = await DueDiligences.companyIds(random);
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
     expect(companyIds).toBeDefined();
   });
 
@@ -171,6 +184,8 @@ describe('Due Diligence model test', () => {
 
     const config = await DueDiligences.getDueDiligenceConfig(dueDiligence.supplierId);
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
     expect(config).toBeDefined();
   });
 
@@ -197,6 +212,8 @@ describe('Due Diligence model test', () => {
 
     const reset = await DueDiligences.resetDueDiligence(companyIds);
 
+    expect(dueDiligence).toBeDefined();
+    expect(dueDiligence2).toBeDefined();
     expect(reset).toBeDefined();
   });
 });

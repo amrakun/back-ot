@@ -65,13 +65,16 @@ describe('DueDiligence mutations', () => {
 
     const response = await graphqlRequest(
       ` mutation dueDiligencesCancel($supplierId: String!){
-                   dueDiligencesCancel(supplierId: $supplierId){
-                      _id
-                      isDueDiligenceEditable
-                     }
-                   }`,
+          dueDiligencesCancel(supplierId: $supplierId){
+              _id
+              isDueDiligenceEditable
+          }
+        }`,
+
       'dueDiligencesCancel',
+
       { supplierId: supplier._id },
+
       {
         user: await userFactory({ companyId: _company._id, isSupplier: false }),
       },
@@ -84,28 +87,31 @@ describe('DueDiligence mutations', () => {
     const supplier = await companyFactory({ isPrequalified: false });
 
     const response = await graphqlRequest(
-      ` mutation dueDiligencesUpdate($supplierId: String!
-                                              $files: JSON
-                                              $risk: String
-                                              $date: Date
-                                              $closeDate: Date
-                                              $reminderDay: Int
-                          ){
-                          dueDiligencesUpdate(supplierId: $supplierId
-                                              files: $files
-                                              risk: $risk
-                                              date: $date
-                                              closeDate: $closeDate
-                                              reminderDay: $reminderDay
-                   ){
-                      _id
-                      date
-                      expireDate
-                      files
-                      risk
-                     }
-                   }`,
+      ` mutation dueDiligencesUpdate(
+          $supplierId: String!
+          $files: JSON
+          $risk: String
+          $date: Date
+          $closeDate: Date
+          $reminderDay: Int
+        ){
+          dueDiligencesUpdate(supplierId: $supplierId
+            files: $files
+            risk: $risk
+            date: $date
+            closeDate: $closeDate
+            reminderDay: $reminderDay
+          ){
+              _id
+              date
+              expireDate
+              files
+              risk
+            }
+          }`,
+
       'dueDiligencesUpdate',
+
       {
         supplierId: supplier._id,
         basicInfo: {
@@ -126,12 +132,15 @@ describe('DueDiligence mutations', () => {
 
     const response = await graphqlRequest(
       ` mutation dueDiligencesEnableState($supplierId: String!){
-                   dueDiligencesEnableState(supplierId: $supplierId){
-                      _id
-                     }
-                   }`,
+          dueDiligencesEnableState(supplierId: $supplierId){
+            _id
+          }
+        }`,
+
       'dueDiligencesEnableState',
+
       { supplierId: supplier._id },
+
       {
         user: await userFactory({ companyId: _company._id, isSupplier: false }),
       },
